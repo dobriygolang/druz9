@@ -3,7 +3,7 @@ import { apiClient } from '@/shared/api/base'
 export type NotificationSettings = {
   duelsEnabled: boolean
   progressEnabled: boolean
-  circlesEnabled: boolean
+  guildsEnabled: boolean
   dailyChallengeEnabled: boolean
   quietHoursStart: number
   quietHoursEnd: number
@@ -14,7 +14,7 @@ export type NotificationSettings = {
 export type NotificationSettingsUpdate = {
   duelsEnabled?: boolean
   progressEnabled?: boolean
-  circlesEnabled?: boolean
+  guildsEnabled?: boolean
   dailyChallengeEnabled?: boolean
 }
 

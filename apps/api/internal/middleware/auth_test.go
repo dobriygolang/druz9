@@ -101,9 +101,9 @@ type mockTransporter struct {
 	operation string
 }
 
-func (m *mockTransporter) Kind() transport.Kind      { return m.kind }
-func (m *mockTransporter) Operation() string         { return m.operation }
+func (m *mockTransporter) Kind() transport.Kind            { return m.kind }
+func (m *mockTransporter) Operation() string               { return m.operation }
 func (m *mockTransporter) RequestHeader() transport.Header { return nil }
 func (m *mockTransporter) ReplyHeader() transport.Header   { return nil }
-func (m *mockTransporter) PathTemplate() string           { return "" }
-func (m *mockTransporter) PathVars() map[string]string    { return nil }
+func (m *mockTransporter) PathTemplate() string            { return "" }
+func (m *mockTransporter) PathVars() map[string]string     { return nil }

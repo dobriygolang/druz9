@@ -1,0 +1,109 @@
+/**
+ * DRUZ9 magic/RPG/dragon design tokens.
+ * Loaded once by the gamification components that need them.
+ *
+ * Colors: parchment + gold accent + gem colors (ember/emerald/amethyst/ruby/sapphire).
+ * Fonts: Cinzel (display), Manrope (body), JetBrains Mono (numeric), Press Start 2P (pixel/HUD).
+ */
+
+:root {
+  /* Surfaces */
+  --gm-parchment:        #F4E8CE;
+  --gm-parchment-dark:   #E0CDA5;
+  --gm-parchment-edge:   #BFA86B;
+  --gm-ink:              #2A1810;
+  --gm-ink-soft:         #4A2E14;
+  --gm-ink-faint:        #6B5030;
+
+  /* Night / background */
+  --gm-bg:               #14100A;
+  --gm-bg-top:           #2A2014;
+  --gm-bg-obsidian:      #0F0A08;
+
+  /* Gold accents */
+  --gm-gold:             #D4A940;
+  --gm-gold-light:       #FFE28A;
+  --gm-gold-deep:        #8B6914;
+  --gm-gold-shadow:      #6B4F10;
+
+  /* Gemstones */
+  --gm-ember:            #E8703A;
+  --gm-ember-bright:     #FF9A5A;
+  --gm-ember-deep:       #A83A10;
+
+  --gm-emerald:          #2E8B57;
+  --gm-emerald-bright:   #58C078;
+  --gm-emerald-deep:     #1A5530;
+
+  --gm-amethyst:         #6B3FA0;
+  --gm-amethyst-bright:  #9E6FD4;
+  --gm-amethyst-deep:    #3A1E68;
+
+  --gm-ruby:             #A52A2A;
+  --gm-ruby-bright:      #D84C4C;
+  --gm-ruby-deep:        #601010;
+
+  --gm-sapphire:         #2E5FA0;
+  --gm-sapphire-bright:  #5A8FD4;
+  --gm-sapphire-deep:    #143068;
+
+  --gm-moonlight:        #E8F0FF;
+
+  /* Typography */
+  --gm-font-display:     'Cinzel', 'Press Start 2P', Georgia, serif;
+  --gm-font-display-dec: 'Cinzel Decorative', 'Cinzel', serif;
+  --gm-font-body:        'Manrope', system-ui, sans-serif;
+  --gm-font-mono:        'JetBrains Mono', monospace;
+  --gm-font-pixel:       'Press Start 2P', monospace;
+
+  /* Sizing scale */
+  --gm-r-btn:    4px;
+  --gm-r-card:   4px;
+  --gm-r-pill:   999px;
+
+  /* Spacing scale */
+  --gm-s-1: 4px;
+  --gm-s-2: 8px;
+  --gm-s-3: 12px;
+  --gm-s-4: 16px;
+  --gm-s-5: 24px;
+  --gm-s-6: 32px;
+  --gm-s-7: 48px;
+
+  /* Shadows */
+  --gm-shadow-sm:  0 2px 4px rgba(0,0,0,.3);
+  --gm-shadow-md:  0 4px 12px rgba(0,0,0,.4);
+  --gm-shadow-lg:  0 8px 28px rgba(0,0,0,.5);
+  --gm-shadow-gold-glow: 0 0 16px rgba(255,210,100,.55);
+
+  /* ── Material / depth ───────────────────────────────── */
+  --gm-wood:              #130E07;
+  --gm-wood-mid:          #221608;
+  --gm-wood-warm:         #3A2510;
+  --gm-brass:             #C4942A;
+  --gm-brass-light:       #E8C060;
+  --gm-brass-dark:        #7A5A18;
+  --gm-border-brass:      rgba(196, 148, 42, 0.38);
+  --gm-shadow-panel:      0 4px 24px rgba(0,0,0,.6), 0 1px 0 rgba(196,148,42,.08);
+  --gm-shadow-inset-deep: inset 0 2px 6px rgba(0,0,0,.6), inset 0 -1px 0 rgba(255,255,255,.03);
+}
+
+/* Font utility — apply on any element to get the RPG vibe. */
+.gm-font-display { font-family: var(--gm-font-display); letter-spacing: 0.03em; }
+.gm-font-display-dec { font-family: var(--gm-font-display-dec); letter-spacing: 0.04em; }
+.gm-font-pixel { font-family: var(--gm-font-pixel); letter-spacing: 0.04em; }
+.gm-font-mono { font-family: var(--gm-font-mono); }
+
+/* Parchment surface — used by cards, scrolls, modals. */
+.gm-parchment {
+  background:
+    linear-gradient(148deg, var(--gm-parchment) 0%, var(--gm-parchment-dark) 100%),
+    radial-gradient(ellipse at 70% 30%, rgba(255,240,200,.5) 0%, transparent 55%);
+  background-blend-mode: overlay;
+  border: 2px solid var(--gm-gold-deep);
+  border-radius: var(--gm-r-card);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    var(--gm-shadow-md);
+  color: var(--gm-ink);
+}

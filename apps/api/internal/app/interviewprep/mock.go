@@ -120,9 +120,10 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 
 		stageKind := model.InterviewPrepMockStageKindFromRoundType(round.RoundType)
 		stage := &model.InterviewPrepMockStage{
-			ID:                      uuid.New(),
-			SessionID:               session.ID,
-			StageIndex:              int32(index),
+			ID:         uuid.New(),
+			SessionID:  session.ID,
+			StageIndex: int32(index), //nolint:gosec // stage index is bounded by small Rounds slice
+
 			Kind:                    stageKind,
 			RoundType:               round.RoundType,
 			Title:                   round.Title,
@@ -539,7 +540,15 @@ func (s *Service) completeAndAdvanceMockStage(ctx context.Context, session *mode
 
 	nextIndex := stage.StageIndex + 1
 	if int(nextIndex) >= len(session.Stages) {
-		return s.repo.FinishMockSession(ctx, session.ID)
+		if err := s.repo.FinishMockSession(ctx, session.ID); err != nil {
+			return err
+		}
+		// Credit Season Pass XP for completing a full mock interview.
+		// Fire-and-forget — pass errors must not rollback session finish.
+		if s.seasonPass != nil {
+			_ = s.seasonPass.AddXP(ctx, session.UserID, mockInterviewCompleteXP)
+		}
+		return nil
 	}
 	if err := s.repo.SetMockStageStatus(ctx, session.Stages[nextIndex].ID, model.InterviewPrepMockStageStatusSolving); err != nil {
 		return err
@@ -698,6 +707,7 @@ func selectQuestionTemplates(items []mockQuestionTemplate, maxCount int32) []moc
 		return selected
 	}
 	remaining := append([]mockQuestionTemplate{}, items[1:]...)
+	//nolint:gosec // non-cryptographic shuffle for mock interview question selection
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	for len(selected) < limit && len(remaining) > 0 {
 		index := rng.Intn(len(remaining))

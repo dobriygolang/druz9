@@ -1,34 +1,117 @@
-import { memo } from 'react'
+import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import { MobileNav } from '@/widgets/MobileNav/ui/MobileNav'
-import { HubTopNav } from '@/widgets/HubTopNav/ui/HubTopNav'
-import { PageTransition } from '@/shared/ui/PageTransition'
-import { AudioPlayerBar } from '@/features/Podcast/ui/AudioPlayerBar'
-import { useAudioPlayer } from '@/features/Podcast/providers/AudioPlayerProvider'
+import { HeroStrip } from '@/widgets/HeroStrip'
+import { Sidebar } from '@/widgets/Sidebar'
+import { OnboardingFlow } from '@/widgets/Onboarding'
+import {
+  TweaksPanel,
+  ToastStack,
+  NotificationsPanel,
+  LevelUpModal,
+  KeyboardHintPanel,
+  StreakRecoveryModal,
+  SeasonCompleteModal,
+  TourMode,
+  DemoFlowOverlay,
+} from '@/widgets/Overlays'
+import { useApplySeasonToHtml, useGameUser } from '@/shared/lib/gameState'
+import { useKeyboardShortcuts } from '@/shared/lib/useKeyboardShortcuts'
 
-const MemoMobileNav = memo(MobileNav)
-const MemoHubTopNav = memo(HubTopNav)
+// `useGameUser` here feeds demo-only overlay props (level-up demo, streak
+// demo) — those modals accept numeric inputs so we don't need real profile
+// progress here. For production identity we use `useAuth()` everywhere else.
+
+function needsOnboarding() {
+  return !localStorage.getItem('druz9_onboarding_done')
+}
 
 export function PageLayout() {
-  const { playing } = useAudioPlayer()
-  const mainPadding = playing ? 'pb-[198px] md:pb-[76px]' : 'pb-[116px] md:pb-0'
+  useApplySeasonToHtml()
+  const user = useGameUser()
+
+  const [tweaksOpen, setTweaksOpen] = useState(false)
+  const [notifsOpen, setNotifsOpen] = useState(false)
+  const [levelUpOpen, setLevelUpOpen] = useState(false)
+  const [onboardingOpen, setOnboardingOpen] = useState(() => needsOnboarding())
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [shortcutsOpen, setShortcutsOpen] = useState(false)
+  const [streakRecoveryOpen, setStreakRecoveryOpen] = useState(false)
+  const [seasonCompleteOpen, setSeasonCompleteOpen] = useState(false)
+  const [tourActive, setTourActive] = useState(false)
+  const [demoOpen, setDemoOpen] = useState(false)
+
+  useKeyboardShortcuts({ onHelp: () => setShortcutsOpen(true) })
 
   return (
-    <div className="relative h-screen overflow-hidden bg-[#F0F5F1] dark:bg-[#0B1210] bg-grain transition-colors duration-300">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,_rgba(5,150,105,0.1),_transparent_62%)] dark:bg-[radial-gradient(circle_at_top,_rgba(52,211,153,0.12),_transparent_58%)] md:hidden" />
-
-      <div className="relative mx-auto flex h-full w-full max-w-[1600px] flex-col">
-        <MemoHubTopNav />
-
-        <main className={`relative flex-1 min-w-0 overflow-x-hidden overflow-y-auto pt-[104px] md:pt-0 ${mainPadding}`}>
-          <PageTransition className="h-full">
-            <Outlet />
-          </PageTransition>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <HeroStrip
+        onOpenTweaks={() => setTweaksOpen(true)}
+        onToggleSidebar={() => setSidebarOpen((v) => !v)}
+        onOpenNotifs={() => setNotifsOpen(true)}
+      />
+      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <main
+          className="app-main"
+          style={{
+            flex: 1,
+            marginLeft: 228,
+            padding: '28px 32px 56px',
+            maxWidth: '100%',
+            minWidth: 0,
+          }}
+        >
+          <Outlet />
         </main>
       </div>
 
-      <MemoMobileNav />
-      <AudioPlayerBar />
+      {/* global overlays — NotificationBell now lives inside HeroStrip */}
+      <TweaksPanel
+        open={tweaksOpen}
+        onClose={() => setTweaksOpen(false)}
+        onOpenNotifs={() => setNotifsOpen(true)}
+        onOpenLevelUp={() => setLevelUpOpen(true)}
+        onOpenOnboarding={() => setOnboardingOpen(true)}
+        onOpenStreakRecovery={() => setStreakRecoveryOpen(true)}
+        onOpenSeasonComplete={() => setSeasonCompleteOpen(true)}
+        onStartTour={() => setTourActive(true)}
+        onOpenDemo={() => setDemoOpen(true)}
+      />
+      <ToastStack />
+      {notifsOpen && <NotificationsPanel onClose={() => setNotifsOpen(false)} />}
+      <LevelUpModal
+        open={levelUpOpen}
+        level={user.level + 1}
+        onClose={() => setLevelUpOpen(false)}
+      />
+      {onboardingOpen && (
+        <OnboardingFlow onFinish={() => setOnboardingOpen(false)} />
+      )}
+      {shortcutsOpen && (
+        <KeyboardHintPanel onClose={() => setShortcutsOpen(false)} />
+      )}
+      {streakRecoveryOpen && (
+        <StreakRecoveryModal
+          streakBefore={user.streak}
+          onUseShield={() => setStreakRecoveryOpen(false)}
+          onDismiss={() => setStreakRecoveryOpen(false)}
+        />
+      )}
+      {tourActive && <TourMode onEnd={() => setTourActive(false)} />}
+      {demoOpen && <DemoFlowOverlay onClose={() => setDemoOpen(false)} />}
+      {seasonCompleteOpen && (
+        <SeasonCompleteModal
+          seasonNumber={3}
+          seasonName="The Ember Pact"
+          finalRank={847}
+          totalPlayers={42180}
+          percentile={2}
+          xpEarned={18420}
+          goldEarned={3200}
+          trophiesEarned={128}
+          onClose={() => setSeasonCompleteOpen(false)}
+        />
+      )}
     </div>
   )
 }

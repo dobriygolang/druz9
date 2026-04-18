@@ -13,7 +13,7 @@ service NotificationService {
   // Send enqueues a single notification for delivery.
   rpc Send(SendRequest) returns (SendResponse);
 
-  // SendBatch enqueues notifications for multiple users (e.g. circle fan-out).
+  // SendBatch enqueues notifications for multiple users (e.g. guild fan-out).
   rpc SendBatch(SendBatchRequest) returns (SendBatchResponse);
 
   // RegisterChat links a Telegram chat ID to a user (by user UUID).
@@ -28,8 +28,8 @@ service NotificationService {
   // GetSettings returns a user's notification preferences.
   rpc GetSettings(GetSettingsRequest) returns (GetSettingsResponse);
 
-  // UpdateCircleSettings updates per-circle notification preferences.
-  rpc UpdateCircleSettings(UpdateCircleSettingsRequest) returns (UpdateCircleSettingsResponse);
+  // UpdateGuildSettings updates per-guild notification preferences.
+  rpc UpdateGuildSettings(UpdateGuildSettingsRequest) returns (UpdateGuildSettingsResponse);
 }
 
 enum NotificationKind {
@@ -43,15 +43,15 @@ enum NotificationKind {
   NOTIFICATION_KIND_RATING_MILESTONE          = 7;
   NOTIFICATION_KIND_MOCK_RESULT               = 8;
   NOTIFICATION_KIND_REVIEW_READY              = 9;
-  NOTIFICATION_KIND_CIRCLE_EVENT_CREATED      = 10;
-  NOTIFICATION_KIND_CIRCLE_EVENT_REMINDER     = 11;
-  NOTIFICATION_KIND_CIRCLE_INVITE             = 12;
-  NOTIFICATION_KIND_CIRCLE_CHALLENGE_COMPLETED = 13;
-  NOTIFICATION_KIND_CIRCLE_MEMBER_JOINED      = 14;
-  NOTIFICATION_KIND_CIRCLE_CHALLENGE_PROGRESS = 15;
-  NOTIFICATION_KIND_CIRCLE_WEEKLY_DIGEST      = 16;
+  NOTIFICATION_KIND_GUILD_EVENT_CREATED      = 10;
+  NOTIFICATION_KIND_GUILD_EVENT_REMINDER     = 11;
+  NOTIFICATION_KIND_GUILD_INVITE             = 12;
+  NOTIFICATION_KIND_GUILD_CHALLENGE_COMPLETED = 13;
+  NOTIFICATION_KIND_GUILD_MEMBER_JOINED      = 14;
+  NOTIFICATION_KIND_GUILD_CHALLENGE_PROGRESS = 15;
+  NOTIFICATION_KIND_GUILD_WEEKLY_DIGEST      = 16;
   NOTIFICATION_KIND_DAILY_CHALLENGE           = 17;
-  NOTIFICATION_KIND_RE_ENGAGEMENT_CIRCLE      = 18;
+  NOTIFICATION_KIND_RE_ENGAGEMENT_GUILD      = 18;
   NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL    = 19;
 }
 
@@ -106,7 +106,7 @@ message UpdateSettingsRequest {
   string user_id = 1;
   optional bool duels_enabled = 2;
   optional bool progress_enabled = 3;
-  optional bool circles_enabled = 4;
+  optional bool guilds_enabled = 4;
   optional bool daily_challenge_enabled = 5;
   optional int32 quiet_hours_start = 6;
   optional int32 quiet_hours_end = 7;
@@ -122,7 +122,7 @@ message GetSettingsRequest {
 message GetSettingsResponse {
   bool duels_enabled = 1;
   bool progress_enabled = 2;
-  bool circles_enabled = 3;
+  bool guilds_enabled = 3;
   bool daily_challenge_enabled = 4;
   int32 quiet_hours_start = 5;
   int32 quiet_hours_end = 6;
@@ -130,15 +130,15 @@ message GetSettingsResponse {
   int64 telegram_chat_id = 8;
 }
 
-// ── Circle Settings ───────────────────────────────────────────
+// ── Guild Settings ───────────────────────────────────────────
 
-message UpdateCircleSettingsRequest {
+message UpdateGuildSettingsRequest {
   string user_id = 1;
-  string circle_id = 2;
+  string guild_id = 2;
   optional bool events_enabled = 3;
   optional bool activity_enabled = 4;
   optional bool digest_enabled = 5;
   optional bool muted = 6;
 }
 
-message UpdateCircleSettingsResponse {}
+message UpdateGuildSettingsResponse {}

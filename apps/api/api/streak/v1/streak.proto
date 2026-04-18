@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package streak.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "api/pkg/api/streak/v1;v1";
+
+// StreakService manages daily-activity streak state and the "Streak Shield"
+// inventory item users can spend to restore a broken streak. The raw streak
+// count itself is derived from existing activity tables (mission/practice)
+// and exposed via profile progress; this service owns the protection layer.
+service StreakService {
+  // GetStreak returns current streak, longest streak, shields owned,
+  // whether the streak is broken today, and whether a shield can restore it.
+  rpc GetStreak(GetStreakRequest) returns (GetStreakResponse) {
+    option (google.api.http) = { get: "/api/v1/streak" };
+  }
+
+  // UseShield consumes one shield to restore a broken streak. Idempotent:
+  // calling when streak is intact returns an error.
+  rpc UseShield(UseShieldRequest) returns (UseShieldResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/streak/shield/use"
+      body: "*"
+    };
+  }
+
+  // PurchaseShield buys N shields for gold. N=1 by default; max 5 per call
+  // enforced server-side.
+  rpc PurchaseShield(PurchaseShieldRequest) returns (PurchaseShieldResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/streak/shield/purchase"
+      body: "*"
+    };
+  }
+}
+
+message StreakState {
+  int32                     current_days        = 1;
+  int32                     longest_days        = 2;
+  int32                     shields_owned       = 3;
+  bool                      is_broken           = 4;
+  bool                      can_restore         = 5;  // one shield restores; streak break is within 1 day
+  google.protobuf.Timestamp last_active_at      = 6;
+  google.protobuf.Timestamp last_shield_used_at = 7;
+  int32                     shield_price_gold   = 8;
+}
+
+message GetStreakRequest {}
+message GetStreakResponse {
+  StreakState state = 1;
+}
+
+message UseShieldRequest {}
+message UseShieldResponse {
+  StreakState state = 1;
+  int32       restored_to_days = 2;
+}
+
+message PurchaseShieldRequest {
+  int32 count = 1;  // default 1, max 5
+}
+message PurchaseShieldResponse {
+  StreakState state = 1;
+  int32       purchased_count = 2;
+  int32       total_cost_gold = 3;
+}

@@ -56,17 +56,17 @@ type SolutionReview struct {
 	TotalCount    int32
 
 	// Level 2: AI review (populated asynchronously)
-	Status          ReviewStatus
-	AIVerdict       AIVerdict
+	Status            ReviewStatus
+	AIVerdict         AIVerdict
 	AITimeComplexity  string
 	AISpaceComplexity string
-	AIPattern       string
-	AIStrengths     []string
-	AIWeaknesses    []string
-	AIHint          string
-	AISkillSignals  map[string]string // e.g. {"arrays": "strong", "dp": "weak"}
-	AIProvider      string
-	AIModel         string
+	AIPattern         string
+	AIStrengths       []string
+	AIWeaknesses      []string
+	AIHint            string
+	AISkillSignals    map[string]string // e.g. {"arrays": "strong", "dp": "weak"}
+	AIProvider        string
+	AIModel           string
 
 	// Level 3: duel comparison
 	OpponentSubmissionID *uuid.UUID
@@ -77,8 +77,8 @@ type SolutionReview struct {
 
 // TaskStats holds aggregated solve statistics for a single task.
 type TaskStats struct {
-	TaskID          uuid.UUID
+	TaskID            uuid.UUID
 	MedianSolveTimeMs int64
-	TotalSolves     int
-	UpdatedAt       time.Time
+	TotalSolves       int
+	UpdatedAt         time.Time
 }

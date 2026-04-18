@@ -9,6 +9,7 @@ import (
 
 	"api/internal/aireview"
 	challengedata "api/internal/data/challenge"
+	"api/internal/model"
 
 	"github.com/google/uuid"
 )
@@ -33,35 +34,21 @@ func NewService(c Config) *Service {
 	}
 }
 
-// ── Daily Challenge ──────────────────────────────────────────────────
-
-// SubmitDailyReview records the user's AI review score for today's daily challenge.
-func (s *Service) SubmitDailyReview(ctx context.Context, userID uuid.UUID, taskID uuid.UUID, aiScore int32) error {
-	if aiScore < 0 || aiScore > 10 {
-		return fmt.Errorf("invalid AI score: %d", aiScore)
-	}
-	return s.repo.UpsertDailyResult(ctx, userID, taskID, aiScore)
-}
-
-// GetDailyLeaderboard returns today's top performers.
-func (s *Service) GetDailyLeaderboard(ctx context.Context, limit int) ([]challengedata.DailyResult, error) {
-	return s.repo.GetDailyLeaderboard(ctx, limit)
-}
-
-// GetUserDailyScore returns the user's best score for today.
-func (s *Service) GetUserDailyScore(ctx context.Context, userID uuid.UUID) (int32, error) {
-	return s.repo.GetUserDailyScore(ctx, userID)
-}
+// Daily challenge methods (SubmitDailyReview, GetDailyLeaderboard,
+// GetUserDailyScore) lived here historically. All three RPCs were
+// deleted as dead in Wave 2 — the frontend never consumed them — so
+// the service methods and their repo helpers went with them. Bring
+// them back alongside a real UI when daily challenge ships.
 
 // ── Blind Review ──────────────────────────────────────────────────────
 
 // GetBlindReviewTask returns a random code submission for the user to review.
-func (s *Service) GetBlindReviewTask(ctx context.Context, userID uuid.UUID) (*challengedata.BlindReviewTask, error) {
+func (s *Service) GetBlindReviewTask(ctx context.Context, userID uuid.UUID) (*model.BlindReviewTask, error) {
 	return s.repo.GetRandomBlindReviewTask(ctx, userID)
 }
 
 // SubmitBlindReview evaluates the user's code review using AI and stores the result.
-func (s *Service) SubmitBlindReview(ctx context.Context, userID uuid.UUID, sourceReviewID uuid.UUID, taskID uuid.UUID, sourceCode, sourceLang, userReview string) (*challengedata.BlindReviewResult, error) {
+func (s *Service) SubmitBlindReview(ctx context.Context, userID uuid.UUID, sourceReviewID uuid.UUID, taskID uuid.UUID, sourceCode, sourceLang, userReview string) (*model.BlindReviewResult, error) {
 	if len(userReview) < 10 {
 		return nil, fmt.Errorf("review too short")
 	}
@@ -83,7 +70,7 @@ func (s *Service) SubmitBlindReview(ctx context.Context, userID uuid.UUID, sourc
 	aiScore := int32(0)
 	aiFeedback := ""
 	if err == nil && review != nil {
-		aiScore = int32(review.Score)
+		aiScore = int32(review.Score) //nolint:gosec // AI score is a small bounded rating (0-100)
 		aiFeedback = review.Summary
 	}
 
@@ -92,16 +79,8 @@ func (s *Service) SubmitBlindReview(ctx context.Context, userID uuid.UUID, sourc
 
 // ── Speed Run ──────────────────────────────────────────────────────────
 
-// RecordSpeedRun saves a speed-run attempt and returns whether it was a new PB.
-func (s *Service) RecordSpeedRun(ctx context.Context, userID uuid.UUID, taskID uuid.UUID, timeMs int64, aiScore int32) (*challengedata.RecordResult, error) {
-	if timeMs <= 0 {
-		return nil, fmt.Errorf("invalid time: %d", timeMs)
-	}
-	return s.repo.UpsertTaskRecord(ctx, userID, taskID, timeMs, aiScore)
-}
-
 // GetUserRecords returns the user's personal bests.
-func (s *Service) GetUserRecords(ctx context.Context, userID uuid.UUID, limit int) ([]challengedata.TaskRecord, error) {
+func (s *Service) GetUserRecords(ctx context.Context, userID uuid.UUID, limit int) ([]model.TaskRecord, error) {
 	return s.repo.GetUserRecords(ctx, userID, limit)
 }
 
@@ -135,7 +114,7 @@ func WeekEndsAt() time.Time {
 
 // GetWeeklyTask returns the deterministically selected task for the current week.
 // Returns nil if no hard tasks are configured.
-func (s *Service) GetWeeklyTask(ctx context.Context, weekKey string) (*challengedata.WeeklyInfo, error) {
+func (s *Service) GetWeeklyTask(ctx context.Context, weekKey string) (*model.WeeklyInfo, error) {
 	ids, err := s.repo.GetHardTaskIDs(ctx)
 	if err != nil || len(ids) == 0 {
 		return nil, err
@@ -145,7 +124,7 @@ func (s *Service) GetWeeklyTask(ctx context.Context, weekKey string) (*challenge
 	if err != nil {
 		return nil, err
 	}
-	return &challengedata.WeeklyInfo{
+	return &model.WeeklyInfo{
 		WeekKey:    weekKey,
 		TaskID:     taskID,
 		TaskTitle:  title,
@@ -155,18 +134,13 @@ func (s *Service) GetWeeklyTask(ctx context.Context, weekKey string) (*challenge
 	}, nil
 }
 
-// SubmitWeeklyBoss records a weekly boss attempt.
-func (s *Service) SubmitWeeklyBoss(ctx context.Context, userID uuid.UUID, weekKey string, taskID uuid.UUID, aiScore int32, solveTimeMs int64, code, language string) error {
-	return s.repo.UpsertWeeklyEntry(ctx, userID, weekKey, taskID, aiScore, solveTimeMs, code, language)
-}
-
 // GetWeeklyLeaderboard returns the leaderboard for the current week.
-func (s *Service) GetWeeklyLeaderboard(ctx context.Context, weekKey string, limit int) ([]challengedata.WeeklyEntry, error) {
+func (s *Service) GetWeeklyLeaderboard(ctx context.Context, weekKey string, limit int) ([]model.WeeklyEntry, error) {
 	return s.repo.GetWeeklyLeaderboard(ctx, weekKey, limit)
 }
 
 // GetUserWeeklyEntry returns the user's entry for the current week.
-func (s *Service) GetUserWeeklyEntry(ctx context.Context, userID uuid.UUID, weekKey string) (*challengedata.WeeklyEntry, error) {
+func (s *Service) GetUserWeeklyEntry(ctx context.Context, userID uuid.UUID, weekKey string) (*model.WeeklyEntry, error) {
 	return s.repo.GetUserWeeklyEntry(ctx, userID, weekKey)
 }
 

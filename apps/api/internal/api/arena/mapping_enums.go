@@ -111,16 +111,6 @@ func mapSubmitFailureKind(kind model.ArenaSubmissionFailureKind) commonv1.Submit
 	}
 }
 
-// mapQueueStatus converts internal match status + match state to the typed queue status enum.
-func mapQueueStatus(matchStatus model.ArenaMatchStatus, hasMatch bool) v1.ArenaQueueStatus {
-	if hasMatch || matchStatus == model.ArenaMatchStatusActive {
-		return v1.ArenaQueueStatus_ARENA_QUEUE_STATUS_MATCHED
-	}
-	if matchStatus == model.ArenaMatchStatusWaiting {
-		return v1.ArenaQueueStatus_ARENA_QUEUE_STATUS_QUEUED
-	}
-	return v1.ArenaQueueStatus_ARENA_QUEUE_STATUS_IDLE
-}
 
 // unmapAntiCheatReason converts the proto enum to the string used by the domain.
 func unmapAntiCheatReason(reason v1.AntiCheatEventReason) string {

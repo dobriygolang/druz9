@@ -15,24 +15,24 @@ const (
 	KindMockResult      = "mock_result"
 	KindReviewReady     = "review_ready"
 
-	// Circle events.
-	KindCircleEventCreated  = "circle_event_created"
-	KindCircleEventReminder = "circle_event_reminder"
-	KindCircleInvite        = "circle_invite"
+	// Guild events.
+	KindGuildEventCreated  = "guild_event_created"
+	KindGuildEventReminder = "guild_event_reminder"
+	KindGuildInvite        = "guild_invite"
 
-	// Circle activity.
-	KindCircleChallengeCompleted = "circle_challenge_completed"
-	KindCircleMemberJoined       = "circle_member_joined"
-	KindCircleChallengeProgress  = "circle_challenge_progress"
+	// Guild activity.
+	KindGuildChallengeCompleted = "guild_challenge_completed"
+	KindGuildMemberJoined       = "guild_member_joined"
+	KindGuildChallengeProgress  = "guild_challenge_progress"
 
-	// Circle digest.
-	KindCircleWeeklyDigest = "circle_weekly_digest"
+	// Guild digest.
+	KindGuildWeeklyDigest = "guild_weekly_digest"
 
 	// Daily.
 	KindDailyChallenge = "daily_challenge"
 
 	// Re-engagement.
-	KindReEngagementCircle   = "re_engagement_circle"
+	KindReEngagementGuild   = "re_engagement_guild"
 	KindReEngagementPersonal = "re_engagement_personal"
 )
 
@@ -40,15 +40,15 @@ const (
 const (
 	CategoryDuels          = "duels"
 	CategoryProgress       = "progress"
-	CategoryCircles        = "circles"
+	CategoryGuilds        = "guilds"
 	CategoryDailyChallenge = "daily_challenge"
 )
 
-// Circle subcategories.
+// Guild subcategories.
 const (
-	CircleSubEvents   = "events"
-	CircleSubActivity = "activity"
-	CircleSubDigest   = "digest"
+	GuildSubEvents   = "events"
+	GuildSubActivity = "activity"
+	GuildSubDigest   = "digest"
 )
 
 var kindToCategory = map[string]string{
@@ -63,24 +63,24 @@ var kindToCategory = map[string]string{
 	KindMockResult:      CategoryProgress,
 	KindReviewReady:     CategoryProgress,
 
-	KindCircleEventCreated:       CategoryCircles,
-	KindCircleEventReminder:      CategoryCircles,
-	KindCircleInvite:             CategoryCircles,
-	KindCircleChallengeCompleted: CategoryCircles,
-	KindCircleMemberJoined:       CategoryCircles,
-	KindCircleChallengeProgress:  CategoryCircles,
-	KindCircleWeeklyDigest:       CategoryCircles,
+	KindGuildEventCreated:       CategoryGuilds,
+	KindGuildEventReminder:      CategoryGuilds,
+	KindGuildInvite:             CategoryGuilds,
+	KindGuildChallengeCompleted: CategoryGuilds,
+	KindGuildMemberJoined:       CategoryGuilds,
+	KindGuildChallengeProgress:  CategoryGuilds,
+	KindGuildWeeklyDigest:       CategoryGuilds,
 
 	KindDailyChallenge: CategoryDailyChallenge,
 }
 
-var kindToCircleSub = map[string]string{
-	KindCircleEventCreated:       CircleSubEvents,
-	KindCircleEventReminder:      CircleSubEvents,
-	KindCircleChallengeCompleted: CircleSubActivity,
-	KindCircleMemberJoined:       CircleSubActivity,
-	KindCircleChallengeProgress:  CircleSubActivity,
-	KindCircleWeeklyDigest:       CircleSubDigest,
+var kindToGuildSub = map[string]string{
+	KindGuildEventCreated:       GuildSubEvents,
+	KindGuildEventReminder:      GuildSubEvents,
+	KindGuildChallengeCompleted: GuildSubActivity,
+	KindGuildMemberJoined:       GuildSubActivity,
+	KindGuildChallengeProgress:  GuildSubActivity,
+	KindGuildWeeklyDigest:       GuildSubDigest,
 }
 
 // CategoryForKind returns the global category for a notification kind.
@@ -88,17 +88,17 @@ func CategoryForKind(kind string) string {
 	return kindToCategory[kind]
 }
 
-// CircleSubForKind returns the circle subcategory, or empty if not a circle kind.
-func CircleSubForKind(kind string) string {
-	return kindToCircleSub[kind]
+// GuildSubForKind returns the guild subcategory, or empty if not a guild kind.
+func GuildSubForKind(kind string) string {
+	return kindToGuildSub[kind]
 }
 
-// IsCircleKind returns true if the notification kind belongs to circles.
-func IsCircleKind(kind string) bool {
-	return kindToCategory[kind] == CategoryCircles
+// IsGuildKind returns true if the notification kind belongs to guilds.
+func IsGuildKind(kind string) bool {
+	return kindToCategory[kind] == CategoryGuilds
 }
 
 // IsReEngagement returns true for re-engagement notification kinds.
 func IsReEngagement(kind string) bool {
-	return kind == KindReEngagementCircle || kind == KindReEngagementPersonal
+	return kind == KindReEngagementGuild || kind == KindReEngagementPersonal
 }

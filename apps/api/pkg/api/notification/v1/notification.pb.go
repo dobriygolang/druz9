@@ -7,9 +7,9 @@
 package v1
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -26,26 +26,26 @@ const (
 type NotificationKind int32
 
 const (
-	NotificationKind_NOTIFICATION_KIND_UNSPECIFIED                NotificationKind = 0
-	NotificationKind_NOTIFICATION_KIND_DUEL_INVITE                NotificationKind = 1
-	NotificationKind_NOTIFICATION_KIND_DUEL_MATCH_FOUND           NotificationKind = 2
-	NotificationKind_NOTIFICATION_KIND_DUEL_RESULT                NotificationKind = 3
-	NotificationKind_NOTIFICATION_KIND_DUEL_WIN_STREAK            NotificationKind = 4
-	NotificationKind_NOTIFICATION_KIND_STREAK_WARNING             NotificationKind = 5
-	NotificationKind_NOTIFICATION_KIND_STREAK_MILESTONE           NotificationKind = 6
-	NotificationKind_NOTIFICATION_KIND_RATING_MILESTONE           NotificationKind = 7
-	NotificationKind_NOTIFICATION_KIND_MOCK_RESULT                NotificationKind = 8
-	NotificationKind_NOTIFICATION_KIND_REVIEW_READY               NotificationKind = 9
-	NotificationKind_NOTIFICATION_KIND_CIRCLE_EVENT_CREATED       NotificationKind = 10
-	NotificationKind_NOTIFICATION_KIND_CIRCLE_EVENT_REMINDER      NotificationKind = 11
-	NotificationKind_NOTIFICATION_KIND_CIRCLE_INVITE              NotificationKind = 12
-	NotificationKind_NOTIFICATION_KIND_CIRCLE_CHALLENGE_COMPLETED NotificationKind = 13
-	NotificationKind_NOTIFICATION_KIND_CIRCLE_MEMBER_JOINED       NotificationKind = 14
-	NotificationKind_NOTIFICATION_KIND_CIRCLE_CHALLENGE_PROGRESS  NotificationKind = 15
-	NotificationKind_NOTIFICATION_KIND_CIRCLE_WEEKLY_DIGEST       NotificationKind = 16
-	NotificationKind_NOTIFICATION_KIND_DAILY_CHALLENGE            NotificationKind = 17
-	NotificationKind_NOTIFICATION_KIND_RE_ENGAGEMENT_CIRCLE       NotificationKind = 18
-	NotificationKind_NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL     NotificationKind = 19
+	NotificationKind_NOTIFICATION_KIND_UNSPECIFIED               NotificationKind = 0
+	NotificationKind_NOTIFICATION_KIND_DUEL_INVITE               NotificationKind = 1
+	NotificationKind_NOTIFICATION_KIND_DUEL_MATCH_FOUND          NotificationKind = 2
+	NotificationKind_NOTIFICATION_KIND_DUEL_RESULT               NotificationKind = 3
+	NotificationKind_NOTIFICATION_KIND_DUEL_WIN_STREAK           NotificationKind = 4
+	NotificationKind_NOTIFICATION_KIND_STREAK_WARNING            NotificationKind = 5
+	NotificationKind_NOTIFICATION_KIND_STREAK_MILESTONE          NotificationKind = 6
+	NotificationKind_NOTIFICATION_KIND_RATING_MILESTONE          NotificationKind = 7
+	NotificationKind_NOTIFICATION_KIND_MOCK_RESULT               NotificationKind = 8
+	NotificationKind_NOTIFICATION_KIND_REVIEW_READY              NotificationKind = 9
+	NotificationKind_NOTIFICATION_KIND_GUILD_EVENT_CREATED       NotificationKind = 10
+	NotificationKind_NOTIFICATION_KIND_GUILD_EVENT_REMINDER      NotificationKind = 11
+	NotificationKind_NOTIFICATION_KIND_GUILD_INVITE              NotificationKind = 12
+	NotificationKind_NOTIFICATION_KIND_GUILD_CHALLENGE_COMPLETED NotificationKind = 13
+	NotificationKind_NOTIFICATION_KIND_GUILD_MEMBER_JOINED       NotificationKind = 14
+	NotificationKind_NOTIFICATION_KIND_GUILD_CHALLENGE_PROGRESS  NotificationKind = 15
+	NotificationKind_NOTIFICATION_KIND_GUILD_WEEKLY_DIGEST       NotificationKind = 16
+	NotificationKind_NOTIFICATION_KIND_DAILY_CHALLENGE           NotificationKind = 17
+	NotificationKind_NOTIFICATION_KIND_RE_ENGAGEMENT_GUILD       NotificationKind = 18
+	NotificationKind_NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL    NotificationKind = 19
 )
 
 // Enum value maps for NotificationKind.
@@ -61,38 +61,38 @@ var (
 		7:  "NOTIFICATION_KIND_RATING_MILESTONE",
 		8:  "NOTIFICATION_KIND_MOCK_RESULT",
 		9:  "NOTIFICATION_KIND_REVIEW_READY",
-		10: "NOTIFICATION_KIND_CIRCLE_EVENT_CREATED",
-		11: "NOTIFICATION_KIND_CIRCLE_EVENT_REMINDER",
-		12: "NOTIFICATION_KIND_CIRCLE_INVITE",
-		13: "NOTIFICATION_KIND_CIRCLE_CHALLENGE_COMPLETED",
-		14: "NOTIFICATION_KIND_CIRCLE_MEMBER_JOINED",
-		15: "NOTIFICATION_KIND_CIRCLE_CHALLENGE_PROGRESS",
-		16: "NOTIFICATION_KIND_CIRCLE_WEEKLY_DIGEST",
+		10: "NOTIFICATION_KIND_GUILD_EVENT_CREATED",
+		11: "NOTIFICATION_KIND_GUILD_EVENT_REMINDER",
+		12: "NOTIFICATION_KIND_GUILD_INVITE",
+		13: "NOTIFICATION_KIND_GUILD_CHALLENGE_COMPLETED",
+		14: "NOTIFICATION_KIND_GUILD_MEMBER_JOINED",
+		15: "NOTIFICATION_KIND_GUILD_CHALLENGE_PROGRESS",
+		16: "NOTIFICATION_KIND_GUILD_WEEKLY_DIGEST",
 		17: "NOTIFICATION_KIND_DAILY_CHALLENGE",
-		18: "NOTIFICATION_KIND_RE_ENGAGEMENT_CIRCLE",
+		18: "NOTIFICATION_KIND_RE_ENGAGEMENT_GUILD",
 		19: "NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL",
 	}
 	NotificationKind_value = map[string]int32{
-		"NOTIFICATION_KIND_UNSPECIFIED":                0,
-		"NOTIFICATION_KIND_DUEL_INVITE":                1,
-		"NOTIFICATION_KIND_DUEL_MATCH_FOUND":           2,
-		"NOTIFICATION_KIND_DUEL_RESULT":                3,
-		"NOTIFICATION_KIND_DUEL_WIN_STREAK":            4,
-		"NOTIFICATION_KIND_STREAK_WARNING":             5,
-		"NOTIFICATION_KIND_STREAK_MILESTONE":           6,
-		"NOTIFICATION_KIND_RATING_MILESTONE":           7,
-		"NOTIFICATION_KIND_MOCK_RESULT":                8,
-		"NOTIFICATION_KIND_REVIEW_READY":               9,
-		"NOTIFICATION_KIND_CIRCLE_EVENT_CREATED":       10,
-		"NOTIFICATION_KIND_CIRCLE_EVENT_REMINDER":      11,
-		"NOTIFICATION_KIND_CIRCLE_INVITE":              12,
-		"NOTIFICATION_KIND_CIRCLE_CHALLENGE_COMPLETED": 13,
-		"NOTIFICATION_KIND_CIRCLE_MEMBER_JOINED":       14,
-		"NOTIFICATION_KIND_CIRCLE_CHALLENGE_PROGRESS":  15,
-		"NOTIFICATION_KIND_CIRCLE_WEEKLY_DIGEST":       16,
-		"NOTIFICATION_KIND_DAILY_CHALLENGE":            17,
-		"NOTIFICATION_KIND_RE_ENGAGEMENT_CIRCLE":       18,
-		"NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL":     19,
+		"NOTIFICATION_KIND_UNSPECIFIED":               0,
+		"NOTIFICATION_KIND_DUEL_INVITE":               1,
+		"NOTIFICATION_KIND_DUEL_MATCH_FOUND":          2,
+		"NOTIFICATION_KIND_DUEL_RESULT":               3,
+		"NOTIFICATION_KIND_DUEL_WIN_STREAK":           4,
+		"NOTIFICATION_KIND_STREAK_WARNING":            5,
+		"NOTIFICATION_KIND_STREAK_MILESTONE":          6,
+		"NOTIFICATION_KIND_RATING_MILESTONE":          7,
+		"NOTIFICATION_KIND_MOCK_RESULT":               8,
+		"NOTIFICATION_KIND_REVIEW_READY":              9,
+		"NOTIFICATION_KIND_GUILD_EVENT_CREATED":       10,
+		"NOTIFICATION_KIND_GUILD_EVENT_REMINDER":      11,
+		"NOTIFICATION_KIND_GUILD_INVITE":              12,
+		"NOTIFICATION_KIND_GUILD_CHALLENGE_COMPLETED": 13,
+		"NOTIFICATION_KIND_GUILD_MEMBER_JOINED":       14,
+		"NOTIFICATION_KIND_GUILD_CHALLENGE_PROGRESS":  15,
+		"NOTIFICATION_KIND_GUILD_WEEKLY_DIGEST":       16,
+		"NOTIFICATION_KIND_DAILY_CHALLENGE":           17,
+		"NOTIFICATION_KIND_RE_ENGAGEMENT_GUILD":       18,
+		"NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL":    19,
 	}
 )
 
@@ -123,13 +123,151 @@ func (NotificationKind) EnumDescriptor() ([]byte, []int) {
 	return file_notification_v1_notification_proto_rawDescGZIP(), []int{0}
 }
 
+// NotificationPayload carries typed deep-link context for a
+// notification. Replaces the legacy google.protobuf.Struct field —
+// typed fields make it impossible for the client to drift from the
+// server's expectations and lets us generate mobile bindings cleanly.
+// All fields are optional; populate only the ones the notification
+// kind needs.
+type NotificationPayload struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	MatchId        string                 `protobuf:"bytes,1,opt,name=match_id,json=matchId,proto3" json:"match_id,omitempty"`
+	Topic          string                 `protobuf:"bytes,2,opt,name=topic,proto3" json:"topic,omitempty"`
+	IsWinner       bool                   `protobuf:"varint,3,opt,name=is_winner,json=isWinner,proto3" json:"is_winner,omitempty"`
+	SessionId      string                 `protobuf:"bytes,4,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	BlueprintTitle string                 `protobuf:"bytes,5,opt,name=blueprint_title,json=blueprintTitle,proto3" json:"blueprint_title,omitempty"`
+	CompanyTag     string                 `protobuf:"bytes,6,opt,name=company_tag,json=companyTag,proto3" json:"company_tag,omitempty"`
+	GuildId        string                 `protobuf:"bytes,7,opt,name=guild_id,json=guildId,proto3" json:"guild_id,omitempty"`
+	InviterId      string                 `protobuf:"bytes,8,opt,name=inviter_id,json=inviterId,proto3" json:"inviter_id,omitempty"`
+	ChallengeId    string                 `protobuf:"bytes,9,opt,name=challenge_id,json=challengeId,proto3" json:"challenge_id,omitempty"`
+	TemplateKey    string                 `protobuf:"bytes,10,opt,name=template_key,json=templateKey,proto3" json:"template_key,omitempty"`
+	TargetValue    int64                  `protobuf:"varint,11,opt,name=target_value,json=targetValue,proto3" json:"target_value,omitempty"`
+	EventId        string                 `protobuf:"bytes,12,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty"` // reserved for future event notifications
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *NotificationPayload) Reset() {
+	*x = NotificationPayload{}
+	mi := &file_notification_v1_notification_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NotificationPayload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NotificationPayload) ProtoMessage() {}
+
+func (x *NotificationPayload) ProtoReflect() protoreflect.Message {
+	mi := &file_notification_v1_notification_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NotificationPayload.ProtoReflect.Descriptor instead.
+func (*NotificationPayload) Descriptor() ([]byte, []int) {
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *NotificationPayload) GetMatchId() string {
+	if x != nil {
+		return x.MatchId
+	}
+	return ""
+}
+
+func (x *NotificationPayload) GetTopic() string {
+	if x != nil {
+		return x.Topic
+	}
+	return ""
+}
+
+func (x *NotificationPayload) GetIsWinner() bool {
+	if x != nil {
+		return x.IsWinner
+	}
+	return false
+}
+
+func (x *NotificationPayload) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *NotificationPayload) GetBlueprintTitle() string {
+	if x != nil {
+		return x.BlueprintTitle
+	}
+	return ""
+}
+
+func (x *NotificationPayload) GetCompanyTag() string {
+	if x != nil {
+		return x.CompanyTag
+	}
+	return ""
+}
+
+func (x *NotificationPayload) GetGuildId() string {
+	if x != nil {
+		return x.GuildId
+	}
+	return ""
+}
+
+func (x *NotificationPayload) GetInviterId() string {
+	if x != nil {
+		return x.InviterId
+	}
+	return ""
+}
+
+func (x *NotificationPayload) GetChallengeId() string {
+	if x != nil {
+		return x.ChallengeId
+	}
+	return ""
+}
+
+func (x *NotificationPayload) GetTemplateKey() string {
+	if x != nil {
+		return x.TemplateKey
+	}
+	return ""
+}
+
+func (x *NotificationPayload) GetTargetValue() int64 {
+	if x != nil {
+		return x.TargetValue
+	}
+	return 0
+}
+
+func (x *NotificationPayload) GetEventId() string {
+	if x != nil {
+		return x.EventId
+	}
+	return ""
+}
+
 type SendRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Kind          NotificationKind       `protobuf:"varint,2,opt,name=kind,proto3,enum=notification.v1.NotificationKind" json:"kind,omitempty"`
 	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
 	Body          string                 `protobuf:"bytes,4,opt,name=body,proto3" json:"body,omitempty"`
-	Payload       *structpb.Struct       `protobuf:"bytes,5,opt,name=payload,proto3" json:"payload,omitempty"`
+	Payload       *NotificationPayload   `protobuf:"bytes,5,opt,name=payload,proto3" json:"payload,omitempty"`
 	ScheduleAt    *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=schedule_at,json=scheduleAt,proto3" json:"schedule_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -137,7 +275,7 @@ type SendRequest struct {
 
 func (x *SendRequest) Reset() {
 	*x = SendRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[0]
+	mi := &file_notification_v1_notification_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -149,7 +287,7 @@ func (x *SendRequest) String() string {
 func (*SendRequest) ProtoMessage() {}
 
 func (x *SendRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[0]
+	mi := &file_notification_v1_notification_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -162,7 +300,7 @@ func (x *SendRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendRequest.ProtoReflect.Descriptor instead.
 func (*SendRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{0}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *SendRequest) GetUserId() string {
@@ -193,7 +331,7 @@ func (x *SendRequest) GetBody() string {
 	return ""
 }
 
-func (x *SendRequest) GetPayload() *structpb.Struct {
+func (x *SendRequest) GetPayload() *NotificationPayload {
 	if x != nil {
 		return x.Payload
 	}
@@ -216,7 +354,7 @@ type SendResponse struct {
 
 func (x *SendResponse) Reset() {
 	*x = SendResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[1]
+	mi := &file_notification_v1_notification_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -228,7 +366,7 @@ func (x *SendResponse) String() string {
 func (*SendResponse) ProtoMessage() {}
 
 func (x *SendResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[1]
+	mi := &file_notification_v1_notification_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -241,7 +379,7 @@ func (x *SendResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendResponse.ProtoReflect.Descriptor instead.
 func (*SendResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{1}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *SendResponse) GetNotificationId() string {
@@ -257,14 +395,14 @@ type SendBatchRequest struct {
 	Kind          NotificationKind       `protobuf:"varint,2,opt,name=kind,proto3,enum=notification.v1.NotificationKind" json:"kind,omitempty"`
 	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
 	Body          string                 `protobuf:"bytes,4,opt,name=body,proto3" json:"body,omitempty"`
-	Payload       *structpb.Struct       `protobuf:"bytes,5,opt,name=payload,proto3" json:"payload,omitempty"`
+	Payload       *NotificationPayload   `protobuf:"bytes,5,opt,name=payload,proto3" json:"payload,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SendBatchRequest) Reset() {
 	*x = SendBatchRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[2]
+	mi := &file_notification_v1_notification_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -276,7 +414,7 @@ func (x *SendBatchRequest) String() string {
 func (*SendBatchRequest) ProtoMessage() {}
 
 func (x *SendBatchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[2]
+	mi := &file_notification_v1_notification_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -289,7 +427,7 @@ func (x *SendBatchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendBatchRequest.ProtoReflect.Descriptor instead.
 func (*SendBatchRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{2}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *SendBatchRequest) GetUserIds() []string {
@@ -320,7 +458,7 @@ func (x *SendBatchRequest) GetBody() string {
 	return ""
 }
 
-func (x *SendBatchRequest) GetPayload() *structpb.Struct {
+func (x *SendBatchRequest) GetPayload() *NotificationPayload {
 	if x != nil {
 		return x.Payload
 	}
@@ -336,7 +474,7 @@ type SendBatchResponse struct {
 
 func (x *SendBatchResponse) Reset() {
 	*x = SendBatchResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[3]
+	mi := &file_notification_v1_notification_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -348,7 +486,7 @@ func (x *SendBatchResponse) String() string {
 func (*SendBatchResponse) ProtoMessage() {}
 
 func (x *SendBatchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[3]
+	mi := &file_notification_v1_notification_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -361,7 +499,7 @@ func (x *SendBatchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendBatchResponse.ProtoReflect.Descriptor instead.
 func (*SendBatchResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{3}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *SendBatchResponse) GetEnqueued() int32 {
@@ -381,7 +519,7 @@ type RegisterChatRequest struct {
 
 func (x *RegisterChatRequest) Reset() {
 	*x = RegisterChatRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[4]
+	mi := &file_notification_v1_notification_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -393,7 +531,7 @@ func (x *RegisterChatRequest) String() string {
 func (*RegisterChatRequest) ProtoMessage() {}
 
 func (x *RegisterChatRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[4]
+	mi := &file_notification_v1_notification_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -406,7 +544,7 @@ func (x *RegisterChatRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterChatRequest.ProtoReflect.Descriptor instead.
 func (*RegisterChatRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{4}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *RegisterChatRequest) GetUserId() string {
@@ -431,7 +569,7 @@ type RegisterChatResponse struct {
 
 func (x *RegisterChatResponse) Reset() {
 	*x = RegisterChatResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[5]
+	mi := &file_notification_v1_notification_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -443,7 +581,7 @@ func (x *RegisterChatResponse) String() string {
 func (*RegisterChatResponse) ProtoMessage() {}
 
 func (x *RegisterChatResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[5]
+	mi := &file_notification_v1_notification_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -456,7 +594,7 @@ func (x *RegisterChatResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterChatResponse.ProtoReflect.Descriptor instead.
 func (*RegisterChatResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{5}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{6}
 }
 
 type LinkTelegramRequest struct {
@@ -469,7 +607,7 @@ type LinkTelegramRequest struct {
 
 func (x *LinkTelegramRequest) Reset() {
 	*x = LinkTelegramRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[6]
+	mi := &file_notification_v1_notification_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -481,7 +619,7 @@ func (x *LinkTelegramRequest) String() string {
 func (*LinkTelegramRequest) ProtoMessage() {}
 
 func (x *LinkTelegramRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[6]
+	mi := &file_notification_v1_notification_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -494,7 +632,7 @@ func (x *LinkTelegramRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LinkTelegramRequest.ProtoReflect.Descriptor instead.
 func (*LinkTelegramRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{6}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *LinkTelegramRequest) GetUserId() string {
@@ -519,7 +657,7 @@ type LinkTelegramResponse struct {
 
 func (x *LinkTelegramResponse) Reset() {
 	*x = LinkTelegramResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[7]
+	mi := &file_notification_v1_notification_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -531,7 +669,7 @@ func (x *LinkTelegramResponse) String() string {
 func (*LinkTelegramResponse) ProtoMessage() {}
 
 func (x *LinkTelegramResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[7]
+	mi := &file_notification_v1_notification_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -544,7 +682,7 @@ func (x *LinkTelegramResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LinkTelegramResponse.ProtoReflect.Descriptor instead.
 func (*LinkTelegramResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{7}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{8}
 }
 
 type UpdateSettingsRequest struct {
@@ -552,7 +690,7 @@ type UpdateSettingsRequest struct {
 	UserId                string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	DuelsEnabled          *bool                  `protobuf:"varint,2,opt,name=duels_enabled,json=duelsEnabled,proto3,oneof" json:"duels_enabled,omitempty"`
 	ProgressEnabled       *bool                  `protobuf:"varint,3,opt,name=progress_enabled,json=progressEnabled,proto3,oneof" json:"progress_enabled,omitempty"`
-	CirclesEnabled        *bool                  `protobuf:"varint,4,opt,name=circles_enabled,json=circlesEnabled,proto3,oneof" json:"circles_enabled,omitempty"`
+	GuildsEnabled         *bool                  `protobuf:"varint,4,opt,name=guilds_enabled,json=guildsEnabled,proto3,oneof" json:"guilds_enabled,omitempty"`
 	DailyChallengeEnabled *bool                  `protobuf:"varint,5,opt,name=daily_challenge_enabled,json=dailyChallengeEnabled,proto3,oneof" json:"daily_challenge_enabled,omitempty"`
 	QuietHoursStart       *int32                 `protobuf:"varint,6,opt,name=quiet_hours_start,json=quietHoursStart,proto3,oneof" json:"quiet_hours_start,omitempty"`
 	QuietHoursEnd         *int32                 `protobuf:"varint,7,opt,name=quiet_hours_end,json=quietHoursEnd,proto3,oneof" json:"quiet_hours_end,omitempty"`
@@ -563,7 +701,7 @@ type UpdateSettingsRequest struct {
 
 func (x *UpdateSettingsRequest) Reset() {
 	*x = UpdateSettingsRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[8]
+	mi := &file_notification_v1_notification_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -575,7 +713,7 @@ func (x *UpdateSettingsRequest) String() string {
 func (*UpdateSettingsRequest) ProtoMessage() {}
 
 func (x *UpdateSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[8]
+	mi := &file_notification_v1_notification_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -588,7 +726,7 @@ func (x *UpdateSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateSettingsRequest.ProtoReflect.Descriptor instead.
 func (*UpdateSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{8}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *UpdateSettingsRequest) GetUserId() string {
@@ -612,9 +750,9 @@ func (x *UpdateSettingsRequest) GetProgressEnabled() bool {
 	return false
 }
 
-func (x *UpdateSettingsRequest) GetCirclesEnabled() bool {
-	if x != nil && x.CirclesEnabled != nil {
-		return *x.CirclesEnabled
+func (x *UpdateSettingsRequest) GetGuildsEnabled() bool {
+	if x != nil && x.GuildsEnabled != nil {
+		return *x.GuildsEnabled
 	}
 	return false
 }
@@ -655,7 +793,7 @@ type UpdateSettingsResponse struct {
 
 func (x *UpdateSettingsResponse) Reset() {
 	*x = UpdateSettingsResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[9]
+	mi := &file_notification_v1_notification_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -667,7 +805,7 @@ func (x *UpdateSettingsResponse) String() string {
 func (*UpdateSettingsResponse) ProtoMessage() {}
 
 func (x *UpdateSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[9]
+	mi := &file_notification_v1_notification_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -680,7 +818,7 @@ func (x *UpdateSettingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateSettingsResponse.ProtoReflect.Descriptor instead.
 func (*UpdateSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{9}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{10}
 }
 
 type GetSettingsRequest struct {
@@ -692,7 +830,7 @@ type GetSettingsRequest struct {
 
 func (x *GetSettingsRequest) Reset() {
 	*x = GetSettingsRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[10]
+	mi := &file_notification_v1_notification_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -704,7 +842,7 @@ func (x *GetSettingsRequest) String() string {
 func (*GetSettingsRequest) ProtoMessage() {}
 
 func (x *GetSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[10]
+	mi := &file_notification_v1_notification_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -717,7 +855,7 @@ func (x *GetSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSettingsRequest.ProtoReflect.Descriptor instead.
 func (*GetSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{10}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetSettingsRequest) GetUserId() string {
@@ -731,7 +869,7 @@ type GetSettingsResponse struct {
 	state                 protoimpl.MessageState `protogen:"open.v1"`
 	DuelsEnabled          bool                   `protobuf:"varint,1,opt,name=duels_enabled,json=duelsEnabled,proto3" json:"duels_enabled,omitempty"`
 	ProgressEnabled       bool                   `protobuf:"varint,2,opt,name=progress_enabled,json=progressEnabled,proto3" json:"progress_enabled,omitempty"`
-	CirclesEnabled        bool                   `protobuf:"varint,3,opt,name=circles_enabled,json=circlesEnabled,proto3" json:"circles_enabled,omitempty"`
+	GuildsEnabled         bool                   `protobuf:"varint,3,opt,name=guilds_enabled,json=guildsEnabled,proto3" json:"guilds_enabled,omitempty"`
 	DailyChallengeEnabled bool                   `protobuf:"varint,4,opt,name=daily_challenge_enabled,json=dailyChallengeEnabled,proto3" json:"daily_challenge_enabled,omitempty"`
 	QuietHoursStart       int32                  `protobuf:"varint,5,opt,name=quiet_hours_start,json=quietHoursStart,proto3" json:"quiet_hours_start,omitempty"`
 	QuietHoursEnd         int32                  `protobuf:"varint,6,opt,name=quiet_hours_end,json=quietHoursEnd,proto3" json:"quiet_hours_end,omitempty"`
@@ -743,7 +881,7 @@ type GetSettingsResponse struct {
 
 func (x *GetSettingsResponse) Reset() {
 	*x = GetSettingsResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[11]
+	mi := &file_notification_v1_notification_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -755,7 +893,7 @@ func (x *GetSettingsResponse) String() string {
 func (*GetSettingsResponse) ProtoMessage() {}
 
 func (x *GetSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[11]
+	mi := &file_notification_v1_notification_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -768,7 +906,7 @@ func (x *GetSettingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSettingsResponse.ProtoReflect.Descriptor instead.
 func (*GetSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{11}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GetSettingsResponse) GetDuelsEnabled() bool {
@@ -785,9 +923,9 @@ func (x *GetSettingsResponse) GetProgressEnabled() bool {
 	return false
 }
 
-func (x *GetSettingsResponse) GetCirclesEnabled() bool {
+func (x *GetSettingsResponse) GetGuildsEnabled() bool {
 	if x != nil {
-		return x.CirclesEnabled
+		return x.GuildsEnabled
 	}
 	return false
 }
@@ -827,10 +965,10 @@ func (x *GetSettingsResponse) GetTelegramChatId() int64 {
 	return 0
 }
 
-type UpdateCircleSettingsRequest struct {
+type UpdateGuildSettingsRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	UserId          string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	CircleId        string                 `protobuf:"bytes,2,opt,name=circle_id,json=circleId,proto3" json:"circle_id,omitempty"`
+	GuildId         string                 `protobuf:"bytes,2,opt,name=guild_id,json=guildId,proto3" json:"guild_id,omitempty"`
 	EventsEnabled   *bool                  `protobuf:"varint,3,opt,name=events_enabled,json=eventsEnabled,proto3,oneof" json:"events_enabled,omitempty"`
 	ActivityEnabled *bool                  `protobuf:"varint,4,opt,name=activity_enabled,json=activityEnabled,proto3,oneof" json:"activity_enabled,omitempty"`
 	DigestEnabled   *bool                  `protobuf:"varint,5,opt,name=digest_enabled,json=digestEnabled,proto3,oneof" json:"digest_enabled,omitempty"`
@@ -839,21 +977,21 @@ type UpdateCircleSettingsRequest struct {
 	sizeCache       protoimpl.SizeCache
 }
 
-func (x *UpdateCircleSettingsRequest) Reset() {
-	*x = UpdateCircleSettingsRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[12]
+func (x *UpdateGuildSettingsRequest) Reset() {
+	*x = UpdateGuildSettingsRequest{}
+	mi := &file_notification_v1_notification_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UpdateCircleSettingsRequest) String() string {
+func (x *UpdateGuildSettingsRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UpdateCircleSettingsRequest) ProtoMessage() {}
+func (*UpdateGuildSettingsRequest) ProtoMessage() {}
 
-func (x *UpdateCircleSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[12]
+func (x *UpdateGuildSettingsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notification_v1_notification_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -864,74 +1002,74 @@ func (x *UpdateCircleSettingsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateCircleSettingsRequest.ProtoReflect.Descriptor instead.
-func (*UpdateCircleSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{12}
+// Deprecated: Use UpdateGuildSettingsRequest.ProtoReflect.Descriptor instead.
+func (*UpdateGuildSettingsRequest) Descriptor() ([]byte, []int) {
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *UpdateCircleSettingsRequest) GetUserId() string {
+func (x *UpdateGuildSettingsRequest) GetUserId() string {
 	if x != nil {
 		return x.UserId
 	}
 	return ""
 }
 
-func (x *UpdateCircleSettingsRequest) GetCircleId() string {
+func (x *UpdateGuildSettingsRequest) GetGuildId() string {
 	if x != nil {
-		return x.CircleId
+		return x.GuildId
 	}
 	return ""
 }
 
-func (x *UpdateCircleSettingsRequest) GetEventsEnabled() bool {
+func (x *UpdateGuildSettingsRequest) GetEventsEnabled() bool {
 	if x != nil && x.EventsEnabled != nil {
 		return *x.EventsEnabled
 	}
 	return false
 }
 
-func (x *UpdateCircleSettingsRequest) GetActivityEnabled() bool {
+func (x *UpdateGuildSettingsRequest) GetActivityEnabled() bool {
 	if x != nil && x.ActivityEnabled != nil {
 		return *x.ActivityEnabled
 	}
 	return false
 }
 
-func (x *UpdateCircleSettingsRequest) GetDigestEnabled() bool {
+func (x *UpdateGuildSettingsRequest) GetDigestEnabled() bool {
 	if x != nil && x.DigestEnabled != nil {
 		return *x.DigestEnabled
 	}
 	return false
 }
 
-func (x *UpdateCircleSettingsRequest) GetMuted() bool {
+func (x *UpdateGuildSettingsRequest) GetMuted() bool {
 	if x != nil && x.Muted != nil {
 		return *x.Muted
 	}
 	return false
 }
 
-type UpdateCircleSettingsResponse struct {
+type UpdateGuildSettingsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UpdateCircleSettingsResponse) Reset() {
-	*x = UpdateCircleSettingsResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[13]
+func (x *UpdateGuildSettingsResponse) Reset() {
+	*x = UpdateGuildSettingsResponse{}
+	mi := &file_notification_v1_notification_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UpdateCircleSettingsResponse) String() string {
+func (x *UpdateGuildSettingsResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UpdateCircleSettingsResponse) ProtoMessage() {}
+func (*UpdateGuildSettingsResponse) ProtoMessage() {}
 
-func (x *UpdateCircleSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[13]
+func (x *UpdateGuildSettingsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notification_v1_notification_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -942,32 +1080,289 @@ func (x *UpdateCircleSettingsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateCircleSettingsResponse.ProtoReflect.Descriptor instead.
-func (*UpdateCircleSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{13}
+// Deprecated: Use UpdateGuildSettingsResponse.ProtoReflect.Descriptor instead.
+func (*UpdateGuildSettingsResponse) Descriptor() ([]byte, []int) {
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{14}
+}
+
+type GetNotificationSettingsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetNotificationSettingsRequest) Reset() {
+	*x = GetNotificationSettingsRequest{}
+	mi := &file_notification_v1_notification_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetNotificationSettingsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNotificationSettingsRequest) ProtoMessage() {}
+
+func (x *GetNotificationSettingsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notification_v1_notification_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNotificationSettingsRequest.ProtoReflect.Descriptor instead.
+func (*GetNotificationSettingsRequest) Descriptor() ([]byte, []int) {
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{15}
+}
+
+type NotificationSettings struct {
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	DuelsEnabled          bool                   `protobuf:"varint,1,opt,name=duels_enabled,json=duelsEnabled,proto3" json:"duels_enabled,omitempty"`
+	ProgressEnabled       bool                   `protobuf:"varint,2,opt,name=progress_enabled,json=progressEnabled,proto3" json:"progress_enabled,omitempty"`
+	GuildsEnabled         bool                   `protobuf:"varint,3,opt,name=guilds_enabled,json=guildsEnabled,proto3" json:"guilds_enabled,omitempty"`
+	DailyChallengeEnabled bool                   `protobuf:"varint,4,opt,name=daily_challenge_enabled,json=dailyChallengeEnabled,proto3" json:"daily_challenge_enabled,omitempty"`
+	QuietHoursStart       int32                  `protobuf:"varint,5,opt,name=quiet_hours_start,json=quietHoursStart,proto3" json:"quiet_hours_start,omitempty"`
+	QuietHoursEnd         int32                  `protobuf:"varint,6,opt,name=quiet_hours_end,json=quietHoursEnd,proto3" json:"quiet_hours_end,omitempty"`
+	Timezone              string                 `protobuf:"bytes,7,opt,name=timezone,proto3" json:"timezone,omitempty"`
+	TelegramLinked        bool                   `protobuf:"varint,8,opt,name=telegram_linked,json=telegramLinked,proto3" json:"telegram_linked,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *NotificationSettings) Reset() {
+	*x = NotificationSettings{}
+	mi := &file_notification_v1_notification_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NotificationSettings) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NotificationSettings) ProtoMessage() {}
+
+func (x *NotificationSettings) ProtoReflect() protoreflect.Message {
+	mi := &file_notification_v1_notification_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NotificationSettings.ProtoReflect.Descriptor instead.
+func (*NotificationSettings) Descriptor() ([]byte, []int) {
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *NotificationSettings) GetDuelsEnabled() bool {
+	if x != nil {
+		return x.DuelsEnabled
+	}
+	return false
+}
+
+func (x *NotificationSettings) GetProgressEnabled() bool {
+	if x != nil {
+		return x.ProgressEnabled
+	}
+	return false
+}
+
+func (x *NotificationSettings) GetGuildsEnabled() bool {
+	if x != nil {
+		return x.GuildsEnabled
+	}
+	return false
+}
+
+func (x *NotificationSettings) GetDailyChallengeEnabled() bool {
+	if x != nil {
+		return x.DailyChallengeEnabled
+	}
+	return false
+}
+
+func (x *NotificationSettings) GetQuietHoursStart() int32 {
+	if x != nil {
+		return x.QuietHoursStart
+	}
+	return 0
+}
+
+func (x *NotificationSettings) GetQuietHoursEnd() int32 {
+	if x != nil {
+		return x.QuietHoursEnd
+	}
+	return 0
+}
+
+func (x *NotificationSettings) GetTimezone() string {
+	if x != nil {
+		return x.Timezone
+	}
+	return ""
+}
+
+func (x *NotificationSettings) GetTelegramLinked() bool {
+	if x != nil {
+		return x.TelegramLinked
+	}
+	return false
+}
+
+type UpdateNotificationSettingsRequest struct {
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	DuelsEnabled          *bool                  `protobuf:"varint,1,opt,name=duels_enabled,json=duelsEnabled,proto3,oneof" json:"duels_enabled,omitempty"`
+	ProgressEnabled       *bool                  `protobuf:"varint,2,opt,name=progress_enabled,json=progressEnabled,proto3,oneof" json:"progress_enabled,omitempty"`
+	GuildsEnabled         *bool                  `protobuf:"varint,3,opt,name=guilds_enabled,json=guildsEnabled,proto3,oneof" json:"guilds_enabled,omitempty"`
+	DailyChallengeEnabled *bool                  `protobuf:"varint,4,opt,name=daily_challenge_enabled,json=dailyChallengeEnabled,proto3,oneof" json:"daily_challenge_enabled,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *UpdateNotificationSettingsRequest) Reset() {
+	*x = UpdateNotificationSettingsRequest{}
+	mi := &file_notification_v1_notification_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateNotificationSettingsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateNotificationSettingsRequest) ProtoMessage() {}
+
+func (x *UpdateNotificationSettingsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notification_v1_notification_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateNotificationSettingsRequest.ProtoReflect.Descriptor instead.
+func (*UpdateNotificationSettingsRequest) Descriptor() ([]byte, []int) {
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *UpdateNotificationSettingsRequest) GetDuelsEnabled() bool {
+	if x != nil && x.DuelsEnabled != nil {
+		return *x.DuelsEnabled
+	}
+	return false
+}
+
+func (x *UpdateNotificationSettingsRequest) GetProgressEnabled() bool {
+	if x != nil && x.ProgressEnabled != nil {
+		return *x.ProgressEnabled
+	}
+	return false
+}
+
+func (x *UpdateNotificationSettingsRequest) GetGuildsEnabled() bool {
+	if x != nil && x.GuildsEnabled != nil {
+		return *x.GuildsEnabled
+	}
+	return false
+}
+
+func (x *UpdateNotificationSettingsRequest) GetDailyChallengeEnabled() bool {
+	if x != nil && x.DailyChallengeEnabled != nil {
+		return *x.DailyChallengeEnabled
+	}
+	return false
+}
+
+type UpdateNotificationSettingsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateNotificationSettingsResponse) Reset() {
+	*x = UpdateNotificationSettingsResponse{}
+	mi := &file_notification_v1_notification_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateNotificationSettingsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateNotificationSettingsResponse) ProtoMessage() {}
+
+func (x *UpdateNotificationSettingsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notification_v1_notification_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateNotificationSettingsResponse.ProtoReflect.Descriptor instead.
+func (*UpdateNotificationSettingsResponse) Descriptor() ([]byte, []int) {
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{18}
 }
 
 var File_notification_v1_notification_proto protoreflect.FileDescriptor
 
 const file_notification_v1_notification_proto_rawDesc = "" +
 	"\n" +
-	"\"notification/v1/notification.proto\x12\x0fnotification.v1\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf7\x01\n" +
+	"\"notification/v1/notification.proto\x12\x0fnotification.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8a\x03\n" +
+	"\x13NotificationPayload\x12\x19\n" +
+	"\bmatch_id\x18\x01 \x01(\tR\amatchId\x12\x14\n" +
+	"\x05topic\x18\x02 \x01(\tR\x05topic\x12\x1b\n" +
+	"\tis_winner\x18\x03 \x01(\bR\bisWinner\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x04 \x01(\tR\tsessionId\x12'\n" +
+	"\x0fblueprint_title\x18\x05 \x01(\tR\x0eblueprintTitle\x12\x1f\n" +
+	"\vcompany_tag\x18\x06 \x01(\tR\n" +
+	"companyTag\x12\x19\n" +
+	"\bguild_id\x18\a \x01(\tR\aguildId\x12\x1d\n" +
+	"\n" +
+	"inviter_id\x18\b \x01(\tR\tinviterId\x12!\n" +
+	"\fchallenge_id\x18\t \x01(\tR\vchallengeId\x12!\n" +
+	"\ftemplate_key\x18\n" +
+	" \x01(\tR\vtemplateKey\x12!\n" +
+	"\ftarget_value\x18\v \x01(\x03R\vtargetValue\x12\x19\n" +
+	"\bevent_id\x18\f \x01(\tR\aeventId\"\x84\x02\n" +
 	"\vSendRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x125\n" +
 	"\x04kind\x18\x02 \x01(\x0e2!.notification.v1.NotificationKindR\x04kind\x12\x14\n" +
 	"\x05title\x18\x03 \x01(\tR\x05title\x12\x12\n" +
-	"\x04body\x18\x04 \x01(\tR\x04body\x121\n" +
-	"\apayload\x18\x05 \x01(\v2\x17.google.protobuf.StructR\apayload\x12;\n" +
+	"\x04body\x18\x04 \x01(\tR\x04body\x12>\n" +
+	"\apayload\x18\x05 \x01(\v2$.notification.v1.NotificationPayloadR\apayload\x12;\n" +
 	"\vschedule_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"scheduleAt\"7\n" +
 	"\fSendResponse\x12'\n" +
-	"\x0fnotification_id\x18\x01 \x01(\tR\x0enotificationId\"\xc1\x01\n" +
+	"\x0fnotification_id\x18\x01 \x01(\tR\x0enotificationId\"\xce\x01\n" +
 	"\x10SendBatchRequest\x12\x19\n" +
 	"\buser_ids\x18\x01 \x03(\tR\auserIds\x125\n" +
 	"\x04kind\x18\x02 \x01(\x0e2!.notification.v1.NotificationKindR\x04kind\x12\x14\n" +
 	"\x05title\x18\x03 \x01(\tR\x05title\x12\x12\n" +
-	"\x04body\x18\x04 \x01(\tR\x04body\x121\n" +
-	"\apayload\x18\x05 \x01(\v2\x17.google.protobuf.StructR\apayload\"/\n" +
+	"\x04body\x18\x04 \x01(\tR\x04body\x12>\n" +
+	"\apayload\x18\x05 \x01(\v2$.notification.v1.NotificationPayloadR\apayload\"/\n" +
 	"\x11SendBatchResponse\x12\x1a\n" +
 	"\benqueued\x18\x01 \x01(\x05R\benqueued\"X\n" +
 	"\x13RegisterChatRequest\x12\x17\n" +
@@ -978,38 +1373,38 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1f\n" +
 	"\vtelegram_id\x18\x02 \x01(\x03R\n" +
 	"telegramId\"\x16\n" +
-	"\x14LinkTelegramResponse\"\x82\x04\n" +
+	"\x14LinkTelegramResponse\"\xff\x03\n" +
 	"\x15UpdateSettingsRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12(\n" +
 	"\rduels_enabled\x18\x02 \x01(\bH\x00R\fduelsEnabled\x88\x01\x01\x12.\n" +
-	"\x10progress_enabled\x18\x03 \x01(\bH\x01R\x0fprogressEnabled\x88\x01\x01\x12,\n" +
-	"\x0fcircles_enabled\x18\x04 \x01(\bH\x02R\x0ecirclesEnabled\x88\x01\x01\x12;\n" +
+	"\x10progress_enabled\x18\x03 \x01(\bH\x01R\x0fprogressEnabled\x88\x01\x01\x12*\n" +
+	"\x0eguilds_enabled\x18\x04 \x01(\bH\x02R\rguildsEnabled\x88\x01\x01\x12;\n" +
 	"\x17daily_challenge_enabled\x18\x05 \x01(\bH\x03R\x15dailyChallengeEnabled\x88\x01\x01\x12/\n" +
 	"\x11quiet_hours_start\x18\x06 \x01(\x05H\x04R\x0fquietHoursStart\x88\x01\x01\x12+\n" +
 	"\x0fquiet_hours_end\x18\a \x01(\x05H\x05R\rquietHoursEnd\x88\x01\x01\x12\x1f\n" +
 	"\btimezone\x18\b \x01(\tH\x06R\btimezone\x88\x01\x01B\x10\n" +
 	"\x0e_duels_enabledB\x13\n" +
-	"\x11_progress_enabledB\x12\n" +
-	"\x10_circles_enabledB\x1a\n" +
+	"\x11_progress_enabledB\x11\n" +
+	"\x0f_guilds_enabledB\x1a\n" +
 	"\x18_daily_challenge_enabledB\x14\n" +
 	"\x12_quiet_hours_startB\x12\n" +
 	"\x10_quiet_hours_endB\v\n" +
 	"\t_timezone\"\x18\n" +
 	"\x16UpdateSettingsResponse\"-\n" +
 	"\x12GetSettingsRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\"\xe0\x02\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"\xde\x02\n" +
 	"\x13GetSettingsResponse\x12#\n" +
 	"\rduels_enabled\x18\x01 \x01(\bR\fduelsEnabled\x12)\n" +
-	"\x10progress_enabled\x18\x02 \x01(\bR\x0fprogressEnabled\x12'\n" +
-	"\x0fcircles_enabled\x18\x03 \x01(\bR\x0ecirclesEnabled\x126\n" +
+	"\x10progress_enabled\x18\x02 \x01(\bR\x0fprogressEnabled\x12%\n" +
+	"\x0eguilds_enabled\x18\x03 \x01(\bR\rguildsEnabled\x126\n" +
 	"\x17daily_challenge_enabled\x18\x04 \x01(\bR\x15dailyChallengeEnabled\x12*\n" +
 	"\x11quiet_hours_start\x18\x05 \x01(\x05R\x0fquietHoursStart\x12&\n" +
 	"\x0fquiet_hours_end\x18\x06 \x01(\x05R\rquietHoursEnd\x12\x1a\n" +
 	"\btimezone\x18\a \x01(\tR\btimezone\x12(\n" +
-	"\x10telegram_chat_id\x18\b \x01(\x03R\x0etelegramChatId\"\xbb\x02\n" +
-	"\x1bUpdateCircleSettingsRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
-	"\tcircle_id\x18\x02 \x01(\tR\bcircleId\x12*\n" +
+	"\x10telegram_chat_id\x18\b \x01(\x03R\x0etelegramChatId\"\xb8\x02\n" +
+	"\x1aUpdateGuildSettingsRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x19\n" +
+	"\bguild_id\x18\x02 \x01(\tR\aguildId\x12*\n" +
 	"\x0eevents_enabled\x18\x03 \x01(\bH\x00R\reventsEnabled\x88\x01\x01\x12.\n" +
 	"\x10activity_enabled\x18\x04 \x01(\bH\x01R\x0factivityEnabled\x88\x01\x01\x12*\n" +
 	"\x0edigest_enabled\x18\x05 \x01(\bH\x02R\rdigestEnabled\x88\x01\x01\x12\x19\n" +
@@ -1017,8 +1412,28 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\x0f_events_enabledB\x13\n" +
 	"\x11_activity_enabledB\x11\n" +
 	"\x0f_digest_enabledB\b\n" +
-	"\x06_muted\"\x1e\n" +
-	"\x1cUpdateCircleSettingsResponse*\xc1\x06\n" +
+	"\x06_muted\"\x1d\n" +
+	"\x1bUpdateGuildSettingsResponse\" \n" +
+	"\x1eGetNotificationSettingsRequest\"\xde\x02\n" +
+	"\x14NotificationSettings\x12#\n" +
+	"\rduels_enabled\x18\x01 \x01(\bR\fduelsEnabled\x12)\n" +
+	"\x10progress_enabled\x18\x02 \x01(\bR\x0fprogressEnabled\x12%\n" +
+	"\x0eguilds_enabled\x18\x03 \x01(\bR\rguildsEnabled\x126\n" +
+	"\x17daily_challenge_enabled\x18\x04 \x01(\bR\x15dailyChallengeEnabled\x12*\n" +
+	"\x11quiet_hours_start\x18\x05 \x01(\x05R\x0fquietHoursStart\x12&\n" +
+	"\x0fquiet_hours_end\x18\x06 \x01(\x05R\rquietHoursEnd\x12\x1a\n" +
+	"\btimezone\x18\a \x01(\tR\btimezone\x12'\n" +
+	"\x0ftelegram_linked\x18\b \x01(\bR\x0etelegramLinked\"\xbc\x02\n" +
+	"!UpdateNotificationSettingsRequest\x12(\n" +
+	"\rduels_enabled\x18\x01 \x01(\bH\x00R\fduelsEnabled\x88\x01\x01\x12.\n" +
+	"\x10progress_enabled\x18\x02 \x01(\bH\x01R\x0fprogressEnabled\x88\x01\x01\x12*\n" +
+	"\x0eguilds_enabled\x18\x03 \x01(\bH\x02R\rguildsEnabled\x88\x01\x01\x12;\n" +
+	"\x17daily_challenge_enabled\x18\x04 \x01(\bH\x03R\x15dailyChallengeEnabled\x88\x01\x01B\x10\n" +
+	"\x0e_duels_enabledB\x13\n" +
+	"\x11_progress_enabledB\x11\n" +
+	"\x0f_guilds_enabledB\x1a\n" +
+	"\x18_daily_challenge_enabled\"$\n" +
+	"\"UpdateNotificationSettingsResponse*\xb9\x06\n" +
 	"\x10NotificationKind\x12!\n" +
 	"\x1dNOTIFICATION_KIND_UNSPECIFIED\x10\x00\x12!\n" +
 	"\x1dNOTIFICATION_KIND_DUEL_INVITE\x10\x01\x12&\n" +
@@ -1029,26 +1444,29 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\"NOTIFICATION_KIND_STREAK_MILESTONE\x10\x06\x12&\n" +
 	"\"NOTIFICATION_KIND_RATING_MILESTONE\x10\a\x12!\n" +
 	"\x1dNOTIFICATION_KIND_MOCK_RESULT\x10\b\x12\"\n" +
-	"\x1eNOTIFICATION_KIND_REVIEW_READY\x10\t\x12*\n" +
-	"&NOTIFICATION_KIND_CIRCLE_EVENT_CREATED\x10\n" +
-	"\x12+\n" +
-	"'NOTIFICATION_KIND_CIRCLE_EVENT_REMINDER\x10\v\x12#\n" +
-	"\x1fNOTIFICATION_KIND_CIRCLE_INVITE\x10\f\x120\n" +
-	",NOTIFICATION_KIND_CIRCLE_CHALLENGE_COMPLETED\x10\r\x12*\n" +
-	"&NOTIFICATION_KIND_CIRCLE_MEMBER_JOINED\x10\x0e\x12/\n" +
-	"+NOTIFICATION_KIND_CIRCLE_CHALLENGE_PROGRESS\x10\x0f\x12*\n" +
-	"&NOTIFICATION_KIND_CIRCLE_WEEKLY_DIGEST\x10\x10\x12%\n" +
-	"!NOTIFICATION_KIND_DAILY_CHALLENGE\x10\x11\x12*\n" +
-	"&NOTIFICATION_KIND_RE_ENGAGEMENT_CIRCLE\x10\x12\x12,\n" +
-	"(NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL\x10\x132\x9a\x05\n" +
+	"\x1eNOTIFICATION_KIND_REVIEW_READY\x10\t\x12)\n" +
+	"%NOTIFICATION_KIND_GUILD_EVENT_CREATED\x10\n" +
+	"\x12*\n" +
+	"&NOTIFICATION_KIND_GUILD_EVENT_REMINDER\x10\v\x12\"\n" +
+	"\x1eNOTIFICATION_KIND_GUILD_INVITE\x10\f\x12/\n" +
+	"+NOTIFICATION_KIND_GUILD_CHALLENGE_COMPLETED\x10\r\x12)\n" +
+	"%NOTIFICATION_KIND_GUILD_MEMBER_JOINED\x10\x0e\x12.\n" +
+	"*NOTIFICATION_KIND_GUILD_CHALLENGE_PROGRESS\x10\x0f\x12)\n" +
+	"%NOTIFICATION_KIND_GUILD_WEEKLY_DIGEST\x10\x10\x12%\n" +
+	"!NOTIFICATION_KIND_DAILY_CHALLENGE\x10\x11\x12)\n" +
+	"%NOTIFICATION_KIND_RE_ENGAGEMENT_GUILD\x10\x12\x12,\n" +
+	"(NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL\x10\x132\x97\x05\n" +
 	"\x13NotificationService\x12C\n" +
 	"\x04Send\x12\x1c.notification.v1.SendRequest\x1a\x1d.notification.v1.SendResponse\x12R\n" +
 	"\tSendBatch\x12!.notification.v1.SendBatchRequest\x1a\".notification.v1.SendBatchResponse\x12[\n" +
 	"\fRegisterChat\x12$.notification.v1.RegisterChatRequest\x1a%.notification.v1.RegisterChatResponse\x12[\n" +
 	"\fLinkTelegram\x12$.notification.v1.LinkTelegramRequest\x1a%.notification.v1.LinkTelegramResponse\x12a\n" +
 	"\x0eUpdateSettings\x12&.notification.v1.UpdateSettingsRequest\x1a'.notification.v1.UpdateSettingsResponse\x12X\n" +
-	"\vGetSettings\x12#.notification.v1.GetSettingsRequest\x1a$.notification.v1.GetSettingsResponse\x12s\n" +
-	"\x14UpdateCircleSettings\x12,.notification.v1.UpdateCircleSettingsRequest\x1a-.notification.v1.UpdateCircleSettingsResponseB Z\x1eapi/pkg/api/notification/v1;v1b\x06proto3"
+	"\vGetSettings\x12#.notification.v1.GetSettingsRequest\x1a$.notification.v1.GetSettingsResponse\x12p\n" +
+	"\x13UpdateGuildSettings\x12+.notification.v1.UpdateGuildSettingsRequest\x1a,.notification.v1.UpdateGuildSettingsResponse2\xec\x02\n" +
+	"\x1bNotificationSettingsService\x12\x99\x01\n" +
+	"\x17GetNotificationSettings\x12/.notification.v1.GetNotificationSettingsRequest\x1a%.notification.v1.NotificationSettings\"&\x82\xd3\xe4\x93\x02 \x12\x1e/api/v1/notifications/settings\x12\xb0\x01\n" +
+	"\x1aUpdateNotificationSettings\x122.notification.v1.UpdateNotificationSettingsRequest\x1a3.notification.v1.UpdateNotificationSettingsResponse\")\x82\xd3\xe4\x93\x02#:\x01*2\x1e/api/v1/notifications/settingsB Z\x1eapi/pkg/api/notification/v1;v1b\x06proto3"
 
 var (
 	file_notification_v1_notification_proto_rawDescOnce sync.Once
@@ -1063,48 +1481,56 @@ func file_notification_v1_notification_proto_rawDescGZIP() []byte {
 }
 
 var file_notification_v1_notification_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_notification_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_notification_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_notification_v1_notification_proto_goTypes = []any{
-	(NotificationKind)(0),                // 0: notification.v1.NotificationKind
-	(*SendRequest)(nil),                  // 1: notification.v1.SendRequest
-	(*SendResponse)(nil),                 // 2: notification.v1.SendResponse
-	(*SendBatchRequest)(nil),             // 3: notification.v1.SendBatchRequest
-	(*SendBatchResponse)(nil),            // 4: notification.v1.SendBatchResponse
-	(*RegisterChatRequest)(nil),          // 5: notification.v1.RegisterChatRequest
-	(*RegisterChatResponse)(nil),         // 6: notification.v1.RegisterChatResponse
-	(*LinkTelegramRequest)(nil),          // 7: notification.v1.LinkTelegramRequest
-	(*LinkTelegramResponse)(nil),         // 8: notification.v1.LinkTelegramResponse
-	(*UpdateSettingsRequest)(nil),        // 9: notification.v1.UpdateSettingsRequest
-	(*UpdateSettingsResponse)(nil),       // 10: notification.v1.UpdateSettingsResponse
-	(*GetSettingsRequest)(nil),           // 11: notification.v1.GetSettingsRequest
-	(*GetSettingsResponse)(nil),          // 12: notification.v1.GetSettingsResponse
-	(*UpdateCircleSettingsRequest)(nil),  // 13: notification.v1.UpdateCircleSettingsRequest
-	(*UpdateCircleSettingsResponse)(nil), // 14: notification.v1.UpdateCircleSettingsResponse
-	(*structpb.Struct)(nil),              // 15: google.protobuf.Struct
-	(*timestamppb.Timestamp)(nil),        // 16: google.protobuf.Timestamp
+	(NotificationKind)(0),                      // 0: notification.v1.NotificationKind
+	(*NotificationPayload)(nil),                // 1: notification.v1.NotificationPayload
+	(*SendRequest)(nil),                        // 2: notification.v1.SendRequest
+	(*SendResponse)(nil),                       // 3: notification.v1.SendResponse
+	(*SendBatchRequest)(nil),                   // 4: notification.v1.SendBatchRequest
+	(*SendBatchResponse)(nil),                  // 5: notification.v1.SendBatchResponse
+	(*RegisterChatRequest)(nil),                // 6: notification.v1.RegisterChatRequest
+	(*RegisterChatResponse)(nil),               // 7: notification.v1.RegisterChatResponse
+	(*LinkTelegramRequest)(nil),                // 8: notification.v1.LinkTelegramRequest
+	(*LinkTelegramResponse)(nil),               // 9: notification.v1.LinkTelegramResponse
+	(*UpdateSettingsRequest)(nil),              // 10: notification.v1.UpdateSettingsRequest
+	(*UpdateSettingsResponse)(nil),             // 11: notification.v1.UpdateSettingsResponse
+	(*GetSettingsRequest)(nil),                 // 12: notification.v1.GetSettingsRequest
+	(*GetSettingsResponse)(nil),                // 13: notification.v1.GetSettingsResponse
+	(*UpdateGuildSettingsRequest)(nil),         // 14: notification.v1.UpdateGuildSettingsRequest
+	(*UpdateGuildSettingsResponse)(nil),        // 15: notification.v1.UpdateGuildSettingsResponse
+	(*GetNotificationSettingsRequest)(nil),     // 16: notification.v1.GetNotificationSettingsRequest
+	(*NotificationSettings)(nil),               // 17: notification.v1.NotificationSettings
+	(*UpdateNotificationSettingsRequest)(nil),  // 18: notification.v1.UpdateNotificationSettingsRequest
+	(*UpdateNotificationSettingsResponse)(nil), // 19: notification.v1.UpdateNotificationSettingsResponse
+	(*timestamppb.Timestamp)(nil),              // 20: google.protobuf.Timestamp
 }
 var file_notification_v1_notification_proto_depIdxs = []int32{
 	0,  // 0: notification.v1.SendRequest.kind:type_name -> notification.v1.NotificationKind
-	15, // 1: notification.v1.SendRequest.payload:type_name -> google.protobuf.Struct
-	16, // 2: notification.v1.SendRequest.schedule_at:type_name -> google.protobuf.Timestamp
+	1,  // 1: notification.v1.SendRequest.payload:type_name -> notification.v1.NotificationPayload
+	20, // 2: notification.v1.SendRequest.schedule_at:type_name -> google.protobuf.Timestamp
 	0,  // 3: notification.v1.SendBatchRequest.kind:type_name -> notification.v1.NotificationKind
-	15, // 4: notification.v1.SendBatchRequest.payload:type_name -> google.protobuf.Struct
-	1,  // 5: notification.v1.NotificationService.Send:input_type -> notification.v1.SendRequest
-	3,  // 6: notification.v1.NotificationService.SendBatch:input_type -> notification.v1.SendBatchRequest
-	5,  // 7: notification.v1.NotificationService.RegisterChat:input_type -> notification.v1.RegisterChatRequest
-	7,  // 8: notification.v1.NotificationService.LinkTelegram:input_type -> notification.v1.LinkTelegramRequest
-	9,  // 9: notification.v1.NotificationService.UpdateSettings:input_type -> notification.v1.UpdateSettingsRequest
-	11, // 10: notification.v1.NotificationService.GetSettings:input_type -> notification.v1.GetSettingsRequest
-	13, // 11: notification.v1.NotificationService.UpdateCircleSettings:input_type -> notification.v1.UpdateCircleSettingsRequest
-	2,  // 12: notification.v1.NotificationService.Send:output_type -> notification.v1.SendResponse
-	4,  // 13: notification.v1.NotificationService.SendBatch:output_type -> notification.v1.SendBatchResponse
-	6,  // 14: notification.v1.NotificationService.RegisterChat:output_type -> notification.v1.RegisterChatResponse
-	8,  // 15: notification.v1.NotificationService.LinkTelegram:output_type -> notification.v1.LinkTelegramResponse
-	10, // 16: notification.v1.NotificationService.UpdateSettings:output_type -> notification.v1.UpdateSettingsResponse
-	12, // 17: notification.v1.NotificationService.GetSettings:output_type -> notification.v1.GetSettingsResponse
-	14, // 18: notification.v1.NotificationService.UpdateCircleSettings:output_type -> notification.v1.UpdateCircleSettingsResponse
-	12, // [12:19] is the sub-list for method output_type
-	5,  // [5:12] is the sub-list for method input_type
+	1,  // 4: notification.v1.SendBatchRequest.payload:type_name -> notification.v1.NotificationPayload
+	2,  // 5: notification.v1.NotificationService.Send:input_type -> notification.v1.SendRequest
+	4,  // 6: notification.v1.NotificationService.SendBatch:input_type -> notification.v1.SendBatchRequest
+	6,  // 7: notification.v1.NotificationService.RegisterChat:input_type -> notification.v1.RegisterChatRequest
+	8,  // 8: notification.v1.NotificationService.LinkTelegram:input_type -> notification.v1.LinkTelegramRequest
+	10, // 9: notification.v1.NotificationService.UpdateSettings:input_type -> notification.v1.UpdateSettingsRequest
+	12, // 10: notification.v1.NotificationService.GetSettings:input_type -> notification.v1.GetSettingsRequest
+	14, // 11: notification.v1.NotificationService.UpdateGuildSettings:input_type -> notification.v1.UpdateGuildSettingsRequest
+	16, // 12: notification.v1.NotificationSettingsService.GetNotificationSettings:input_type -> notification.v1.GetNotificationSettingsRequest
+	18, // 13: notification.v1.NotificationSettingsService.UpdateNotificationSettings:input_type -> notification.v1.UpdateNotificationSettingsRequest
+	3,  // 14: notification.v1.NotificationService.Send:output_type -> notification.v1.SendResponse
+	5,  // 15: notification.v1.NotificationService.SendBatch:output_type -> notification.v1.SendBatchResponse
+	7,  // 16: notification.v1.NotificationService.RegisterChat:output_type -> notification.v1.RegisterChatResponse
+	9,  // 17: notification.v1.NotificationService.LinkTelegram:output_type -> notification.v1.LinkTelegramResponse
+	11, // 18: notification.v1.NotificationService.UpdateSettings:output_type -> notification.v1.UpdateSettingsResponse
+	13, // 19: notification.v1.NotificationService.GetSettings:output_type -> notification.v1.GetSettingsResponse
+	15, // 20: notification.v1.NotificationService.UpdateGuildSettings:output_type -> notification.v1.UpdateGuildSettingsResponse
+	17, // 21: notification.v1.NotificationSettingsService.GetNotificationSettings:output_type -> notification.v1.NotificationSettings
+	19, // 22: notification.v1.NotificationSettingsService.UpdateNotificationSettings:output_type -> notification.v1.UpdateNotificationSettingsResponse
+	14, // [14:23] is the sub-list for method output_type
+	5,  // [5:14] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -1115,17 +1541,18 @@ func file_notification_v1_notification_proto_init() {
 	if File_notification_v1_notification_proto != nil {
 		return
 	}
-	file_notification_v1_notification_proto_msgTypes[8].OneofWrappers = []any{}
-	file_notification_v1_notification_proto_msgTypes[12].OneofWrappers = []any{}
+	file_notification_v1_notification_proto_msgTypes[9].OneofWrappers = []any{}
+	file_notification_v1_notification_proto_msgTypes[13].OneofWrappers = []any{}
+	file_notification_v1_notification_proto_msgTypes[17].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_notification_v1_notification_proto_rawDesc), len(file_notification_v1_notification_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   14,
+			NumMessages:   19,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_notification_v1_notification_proto_goTypes,
 		DependencyIndexes: file_notification_v1_notification_proto_depIdxs,

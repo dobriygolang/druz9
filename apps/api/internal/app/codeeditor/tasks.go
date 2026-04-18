@@ -13,6 +13,10 @@ func (s *Service) ListTasks(ctx context.Context, filter domain.TaskFilter) ([]*d
 	return s.repo.ListTasks(ctx, filter)
 }
 
+func (s *Service) ListSolvedTasks(ctx context.Context, userID uuid.UUID) ([]*domain.Task, error) {
+	return s.repo.ListSolvedTasks(ctx, userID)
+}
+
 func (s *Service) GetTask(ctx context.Context, taskID uuid.UUID) (*domain.Task, error) {
 	cacheKey := taskID.String()
 	if cached, ok := s.taskCache.Get(cacheKey); ok {

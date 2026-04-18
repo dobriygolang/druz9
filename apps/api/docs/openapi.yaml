@@ -659,6 +659,48 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/arena.v1.GetLeaderboardResponse'
+    /api/v1/arena/leaderboard/guilds:
+        get:
+            tags:
+                - ArenaService
+            description: |-
+                GuildsLeaderboard ranks guilds by aggregate wins + member average
+                 rating. Powers the /leaderboards "guilds" tab.
+            operationId: ArenaService_GuildsLeaderboard
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.GuildsLeaderboardResponse'
+    /api/v1/arena/leaderboard/season-xp:
+        get:
+            tags:
+                - ArenaService
+            description: |-
+                SeasonXPLeaderboard ranks users by their current season-pass XP.
+                 Powers the /leaderboards "season" tab.
+            operationId: ArenaService_SeasonXPLeaderboard
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.SeasonXPLeaderboardResponse'
     /api/v1/arena/matches:
         post:
             tags:
@@ -767,113 +809,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/arena.v1.SubmitCodeResponse'
-    /api/v1/arena/open-matches:
-        get:
-            tags:
-                - ArenaService
-            operationId: ArenaService_ListOpenMatches
-            parameters:
-                - name: limit
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/arena.v1.ListOpenMatchesResponse'
-    /api/v1/arena/queue/join:
-        post:
-            tags:
-                - ArenaService
-            operationId: ArenaService_JoinQueue
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/arena.v1.JoinQueueRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/arena.v1.ArenaQueueStateResponse'
-    /api/v1/arena/queue/leave:
-        post:
-            tags:
-                - ArenaService
-            operationId: ArenaService_LeaveQueue
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/arena.v1.LeaveQueueRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/arena.v1.ArenaQueueStateResponse'
-    /api/v1/arena/queue/status:
-        get:
-            tags:
-                - ArenaService
-            operationId: ArenaService_GetQueueStatus
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/arena.v1.ArenaQueueStateResponse'
-    /api/v1/arena/seasons/{userId}:
-        get:
-            tags:
-                - ArenaService
-            operationId: ArenaService_GetSeasonHistory
-            parameters:
-                - name: userId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: limit
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/arena.v1.GetSeasonHistoryResponse'
-    /api/v1/arena/stats/batch:
-        post:
-            tags:
-                - ArenaService
-            operationId: ArenaService_GetPlayerStatsBatch
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/arena.v1.GetPlayerStatsBatchRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/arena.v1.ArenaPlayerStatsBatchResponse'
     /api/v1/arena/stats/{userId}:
         get:
             tags:
@@ -892,11 +827,61 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/arena.v1.ArenaPlayerStatsResponse'
-    /api/v1/circles:
+    /api/v1/challenges:
+        post:
+            tags:
+                - FriendChallengeService
+            description: SendChallenge creates a new challenge addressed to a friend by username.
+            operationId: FriendChallengeService_SendChallenge
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/friend_challenge.v1.SendChallengeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/friend_challenge.v1.SendChallengeResponse'
+    /api/v1/challenges/blind-review:
         get:
             tags:
-                - CircleService
-            operationId: CircleService_ListCircles
+                - ChallengeService
+            operationId: ChallengeService_GetBlindReviewTask
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/challenge.v1.BlindReviewTask'
+    /api/v1/challenges/blind-review/submit:
+        post:
+            tags:
+                - ChallengeService
+            operationId: ChallengeService_SubmitBlindReview
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/challenge.v1.SubmitBlindReviewRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/challenge.v1.BlindReviewResult'
+    /api/v1/challenges/history:
+        get:
+            tags:
+                - FriendChallengeService
+            description: ListHistory returns completed (won/lost/expired/declined) challenges.
+            operationId: FriendChallengeService_ListHistory
             parameters:
                 - name: limit
                   in: query
@@ -914,254 +899,136 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/circle.v1.ListCirclesResponse'
-        post:
-            tags:
-                - CircleService
-            operationId: CircleService_CreateCircle
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/circle.v1.CreateCircleRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/circle.v1.CircleResponse'
-    /api/v1/circles/{circleId}:
-        delete:
-            tags:
-                - CircleService
-            operationId: CircleService_DeleteCircle
-            parameters:
-                - name: circleId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/circle.v1.DeleteCircleResponse'
-    /api/v1/circles/{circleId}/challenge:
+                                $ref: '#/components/schemas/friend_challenge.v1.ListChallengesResponse'
+    /api/v1/challenges/incoming:
         get:
             tags:
-                - CircleService
-            operationId: CircleService_GetActiveCircleChallenge
+                - FriendChallengeService
+            description: |-
+                ListIncoming returns challenges where the authenticated user is the
+                 opponent and hasn't yet submitted their solution.
+            operationId: FriendChallengeService_ListIncoming
             parameters:
-                - name: circleId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/circle.v1.GetActiveCircleChallengeResponse'
-        post:
-            tags:
-                - CircleService
-            operationId: CircleService_CreateCircleChallenge
-            parameters:
-                - name: circleId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/circle.v1.CreateCircleChallengeRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/circle.v1.CreateCircleChallengeResponse'
-    /api/v1/circles/{circleId}/events:
-        get:
-            tags:
-                - CircleService
-            operationId: CircleService_ListCircleEvents
-            parameters:
-                - name: circleId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: status
+                - name: limit
                   in: query
                   schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/circle.v1.ListCircleEventsResponse'
-        post:
-            tags:
-                - CircleService
-            operationId: CircleService_CreateCircleEvent
-            parameters:
-                - name: circleId
-                  in: path
-                  required: true
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
                   schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/circle.v1.CreateCircleEventRequest'
-                required: true
+                    type: integer
+                    format: int32
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/circle.v1.CreateCircleEventResponse'
-    /api/v1/circles/{circleId}/invite:
-        post:
-            tags:
-                - CircleService
-            operationId: CircleService_InviteToCircle
-            parameters:
-                - name: circleId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/circle.v1.InviteToCircleRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/circle.v1.InviteToCircleResponse'
-    /api/v1/circles/{circleId}/join:
-        post:
-            tags:
-                - CircleService
-            operationId: CircleService_JoinCircle
-            parameters:
-                - name: circleId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/circle.v1.JoinCircleRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/circle.v1.JoinCircleResponse'
-    /api/v1/circles/{circleId}/leave:
-        post:
-            tags:
-                - CircleService
-            operationId: CircleService_LeaveCircle
-            parameters:
-                - name: circleId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/circle.v1.LeaveCircleRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/circle.v1.LeaveCircleResponse'
-    /api/v1/circles/{circleId}/member-stats:
+                                $ref: '#/components/schemas/friend_challenge.v1.ListChallengesResponse'
+    /api/v1/challenges/sent:
         get:
             tags:
-                - CircleService
-            operationId: CircleService_GetCircleMemberStats
+                - FriendChallengeService
+            description: |-
+                ListSent returns challenges the authenticated user originated (pending
+                 opponent response or in progress).
+            operationId: FriendChallengeService_ListSent
             parameters:
-                - name: circleId
-                  in: path
-                  required: true
+                - name: limit
+                  in: query
                   schema:
-                    type: string
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/circle.v1.GetCircleMemberStatsResponse'
-    /api/v1/circles/{circleId}/members:
+                                $ref: '#/components/schemas/friend_challenge.v1.ListChallengesResponse'
+    /api/v1/challenges/speed-run/records:
         get:
             tags:
-                - CircleService
-            operationId: CircleService_ListCircleMembers
-            parameters:
-                - name: circleId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
+                - ChallengeService
+            operationId: ChallengeService_GetSpeedRunRecords
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/circle.v1.ListCircleMembersResponse'
-    /api/v1/circles/{circleId}/pulse:
+                                $ref: '#/components/schemas/challenge.v1.GetSpeedRunRecordsResponse'
+    /api/v1/challenges/weekly:
         get:
             tags:
-                - CircleService
-            operationId: CircleService_GetCirclePulse
-            parameters:
-                - name: circleId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
+                - ChallengeService
+            operationId: ChallengeService_GetWeeklyChallenge
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/circle.v1.GetCirclePulseResponse'
+                                $ref: '#/components/schemas/challenge.v1.GetWeeklyChallengeResponse'
+    /api/v1/challenges/{challengeId}/decline:
+        post:
+            tags:
+                - FriendChallengeService
+            description: Decline lets the opponent refuse a challenge before they start.
+            operationId: FriendChallengeService_Decline
+            parameters:
+                - name: challengeId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/friend_challenge.v1.DeclineRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/friend_challenge.v1.DeclineResponse'
+    /api/v1/challenges/{challengeId}/submit:
+        post:
+            tags:
+                - FriendChallengeService
+            description: |-
+                SubmitSolution records a player's completion time + score. When both
+                 sides have submitted, the row transitions to COMPLETED and a winner is
+                 assigned.
+            operationId: FriendChallengeService_SubmitSolution
+            parameters:
+                - name: challengeId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/friend_challenge.v1.SubmitSolutionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/friend_challenge.v1.SubmitSolutionResponse'
     /api/v1/code-editor/ai-review:
         post:
             tags:
@@ -1293,6 +1160,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/code_editor.v1.GetRoomResponse'
+        patch:
+            tags:
+                - CodeEditorService
+            description: UpdateRoom updates the room's task and/or privacy flag. Either field may be omitted.
+            operationId: CodeEditorService_UpdateRoom
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/code_editor.v1.UpdateRoomRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.StatusResponse'
     /api/v1/code-editor/rooms/{roomId}/close:
         post:
             tags:
@@ -1413,24 +1304,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/code_editor.v1.StartRoomResponse'
-    /api/v1/code-editor/rooms/{roomId}/submissions:
-        get:
-            tags:
-                - CodeEditorService
-            operationId: CodeEditorService_GetSubmissions
-            parameters:
-                - name: roomId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/code_editor.v1.GetSubmissionsResponse'
     /api/v1/code-editor/rooms/{roomId}/submit:
         post:
             tags:
@@ -1481,6 +1354,78 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/code_editor.v1.ListTasksResponse'
+    /api/v1/duel-replays:
+        get:
+            tags:
+                - DuelReplayService
+            description: |-
+                ListMyReplays returns replays the authenticated user participated in,
+                 newest first. Used by the profile + arena history tabs.
+            operationId: DuelReplayService_ListMyReplays
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/duel_replay.v1.ListReplaysResponse'
+    /api/v1/duel-replays/{replayId}:
+        get:
+            tags:
+                - DuelReplayService
+            description: GetReplay returns a single replay's metadata plus the full event stream.
+            operationId: DuelReplayService_GetReplay
+            parameters:
+                - name: replayId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/duel_replay.v1.GetReplayResponse'
+    /api/v1/duel-replays/{replayId}/events:
+        post:
+            tags:
+                - DuelReplayService
+            description: |-
+                RecordEvent appends a single event to a replay during live play.
+                 Caller must be a participant of the replay.
+            operationId: DuelReplayService_RecordEvent
+            parameters:
+                - name: replayId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/duel_replay.v1.RecordEventRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/duel_replay.v1.RecordEventResponse'
     /api/v1/events:
         get:
             tags:
@@ -1678,13 +1623,68 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/geo.v1.ResolveResponse'
-    /api/v1/interview-prep/checkpoints/session/{sessionId}:
+    /api/v1/geo/world-pins:
         get:
             tags:
-                - InterviewPrepService
-            operationId: InterviewPrepService_GetCheckpointBySession
+                - GeoService
+            description: |-
+                WorldPins aggregates locations of guild halls and upcoming events so
+                 the front-end world map can render a single query per view.
+            operationId: GeoService_WorldPins
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/geo.v1.WorldPinsResponse'
+    /api/v1/guilds:
+        get:
+            tags:
+                - GuildService
+            operationId: GuildService_ListGuilds
             parameters:
-                - name: sessionId
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.ListGuildsResponse'
+        post:
+            tags:
+                - GuildService
+            operationId: GuildService_CreateGuild
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/guild.v1.CreateGuildRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.GuildResponse'
+    /api/v1/guilds/{guildId}:
+        delete:
+            tags:
+                - GuildService
+            operationId: GuildService_DeleteGuild
+            parameters:
+                - name: guildId
                   in: path
                   required: true
                   schema:
@@ -1695,17 +1695,40 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/interview_prep.v1.CheckpointSessionResponse'
-    /api/v1/interview-prep/checkpoints/start:
+                                $ref: '#/components/schemas/guild.v1.DeleteGuildResponse'
+    /api/v1/guilds/{guildId}/challenge:
+        get:
+            tags:
+                - GuildService
+            operationId: GuildService_GetActiveGuildChallenge
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.GetActiveGuildChallengeResponse'
         post:
             tags:
-                - InterviewPrepService
-            operationId: InterviewPrepService_StartCheckpointSession
+                - GuildService
+            operationId: GuildService_CreateGuildChallenge
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/interview_prep.v1.StartCheckpointSessionRequest'
+                            $ref: '#/components/schemas/guild.v1.CreateGuildChallengeRequest'
                 required: true
             responses:
                 "200":
@@ -1713,7 +1736,304 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/interview_prep.v1.CheckpointSessionResponse'
+                                $ref: '#/components/schemas/guild.v1.CreateGuildChallengeResponse'
+    /api/v1/guilds/{guildId}/events:
+        get:
+            tags:
+                - GuildService
+            operationId: GuildService_ListGuildEvents
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.ListGuildEventsResponse'
+        post:
+            tags:
+                - GuildService
+            operationId: GuildService_CreateGuildEvent
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/guild.v1.CreateGuildEventRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.CreateGuildEventResponse'
+    /api/v1/guilds/{guildId}/invite:
+        post:
+            tags:
+                - GuildService
+            operationId: GuildService_InviteToGuild
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/guild.v1.InviteToGuildRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.InviteToGuildResponse'
+    /api/v1/guilds/{guildId}/join:
+        post:
+            tags:
+                - GuildService
+            operationId: GuildService_JoinGuild
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/guild.v1.JoinGuildRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.JoinGuildResponse'
+    /api/v1/guilds/{guildId}/leave:
+        post:
+            tags:
+                - GuildService
+            operationId: GuildService_LeaveGuild
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/guild.v1.LeaveGuildRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.LeaveGuildResponse'
+    /api/v1/guilds/{guildId}/member-stats:
+        get:
+            tags:
+                - GuildService
+            operationId: GuildService_GetGuildMemberStats
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.GetGuildMemberStatsResponse'
+    /api/v1/guilds/{guildId}/members:
+        get:
+            tags:
+                - GuildService
+            operationId: GuildService_ListGuildMembers
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.ListGuildMembersResponse'
+    /api/v1/guilds/{guildId}/pulse:
+        get:
+            tags:
+                - GuildService
+            operationId: GuildService_GetGuildPulse
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.GetGuildPulseResponse'
+    /api/v1/hub/overview:
+        get:
+            tags:
+                - HubService
+            operationId: HubService_GetOverview
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/hub.v1.GetOverviewResponse'
+    /api/v1/inbox/threads:
+        get:
+            tags:
+                - InboxService
+            description: ListThreads returns the authenticated user's threads, newest activity first.
+            operationId: InboxService_ListThreads
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.ListThreadsResponse'
+    /api/v1/inbox/threads/{threadId}:
+        get:
+            tags:
+                - InboxService
+            description: |-
+                GetThread returns a single thread with its full message list.
+                 Does NOT implicitly mark messages as read; use MarkThreadRead for that.
+            operationId: InboxService_GetThread
+            parameters:
+                - name: threadId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.GetThreadResponse'
+    /api/v1/inbox/threads/{threadId}/messages:
+        post:
+            tags:
+                - InboxService
+            description: |-
+                SendMessage appends a user-authored message to an interactive thread
+                 (mentor, challenge, duel). Non-interactive threads (system, guild-bot)
+                 reject this call.
+            operationId: InboxService_SendMessage
+            parameters:
+                - name: threadId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/inbox.v1.SendMessageRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.SendMessageResponse'
+    /api/v1/inbox/threads/{threadId}/read:
+        post:
+            tags:
+                - InboxService
+            description: |-
+                MarkThreadRead zeroes the thread's unread counter and flags every message
+                 in it as read for the current user.
+            operationId: InboxService_MarkThreadRead
+            parameters:
+                - name: threadId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/inbox.v1.MarkThreadReadRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.MarkThreadReadResponse'
+    /api/v1/inbox/unread:
+        get:
+            tags:
+                - InboxService
+            description: GetUnreadCount returns the total unread thread count for badge rendering.
+            operationId: InboxService_GetUnreadCount
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.GetUnreadCountResponse'
     /api/v1/interview-prep/companies:
         get:
             tags:
@@ -1995,6 +2315,77 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/interview_prep.v1.ListTasksResponse'
+    /api/v1/missions/daily:
+        get:
+            tags:
+                - MissionService
+            description: |-
+                GetDailyMissions returns today's daily missions with current progress
+                 for the authenticated user.
+            operationId: MissionService_GetDailyMissions
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/mission.v1.GetDailyMissionsResponse'
+    /api/v1/missions/{missionKey}/complete:
+        post:
+            tags:
+                - MissionService
+            description: |-
+                CompleteMission explicitly marks a mission as done for the current day.
+                 Used for missions that can't be computed from existing tables (e.g. daily_challenge).
+            operationId: MissionService_CompleteMission
+            parameters:
+                - name: missionKey
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/mission.v1.CompleteMissionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/mission.v1.CompleteMissionResponse'
+    /api/v1/notifications/settings:
+        get:
+            tags:
+                - NotificationSettingsService
+            operationId: NotificationSettingsService_GetNotificationSettings
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/notification.v1.NotificationSettings'
+        patch:
+            tags:
+                - NotificationSettingsService
+            operationId: NotificationSettingsService_UpdateNotificationSettings
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/notification.v1.UpdateNotificationSettingsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/notification.v1.UpdateNotificationSettingsResponse'
     /api/v1/podcasts:
         get:
             tags:
@@ -2455,6 +2846,398 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/referral.v1.ReferralStatusResponse'
+    /api/v1/season-pass/active:
+        get:
+            tags:
+                - SeasonPassService
+            description: |-
+                GetActive returns the currently active season pass with its full tier
+                 ladder and the authenticated user's progress + claim state baked in.
+            operationId: SeasonPassService_GetActive
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/season_pass.v1.GetActiveResponse'
+    /api/v1/season-pass/claim:
+        post:
+            tags:
+                - SeasonPassService
+            description: |-
+                ClaimTierReward claims one tier reward. Caller must have reached the
+                 tier; premium rewards require has_premium.
+            operationId: SeasonPassService_ClaimTierReward
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/season_pass.v1.ClaimTierRewardRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/season_pass.v1.ClaimTierRewardResponse'
+    /api/v1/season-pass/purchase-premium:
+        post:
+            tags:
+                - SeasonPassService
+            description: PurchasePremium flips has_premium for the current season. Idempotent.
+            operationId: SeasonPassService_PurchasePremium
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/season_pass.v1.PurchasePremiumRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/season_pass.v1.PurchasePremiumResponse'
+    /api/v1/shop/categories:
+        get:
+            tags:
+                - ShopService
+            description: |-
+                ListCategories returns the tabs shown on the tavern page along with the
+                 item count per tab.
+            operationId: ShopService_ListCategories
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/shop.v1.ListCategoriesResponse'
+    /api/v1/shop/inventory:
+        get:
+            tags:
+                - ShopService
+            description: GetInventory returns items the authenticated user owns.
+            operationId: ShopService_GetInventory
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/shop.v1.GetInventoryResponse'
+    /api/v1/shop/items:
+        get:
+            tags:
+                - ShopService
+            description: ListItems returns catalog entries filtered by category and/or rarity.
+            operationId: ShopService_ListItems
+            parameters:
+                - name: category
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+                - name: rarity
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/shop.v1.ListItemsResponse'
+    /api/v1/shop/items/{itemId}:
+        get:
+            tags:
+                - ShopService
+            description: GetItem returns a single item's full detail (art, lore, price).
+            operationId: ShopService_GetItem
+            parameters:
+                - name: itemId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/shop.v1.GetItemResponse'
+    /api/v1/shop/purchase:
+        post:
+            tags:
+                - ShopService
+            description: |-
+                Purchase buys an item with the user's gold/gems. Idempotent on a
+                 per-item basis (re-purchasing an owned item returns AlreadyOwned).
+            operationId: ShopService_Purchase
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/shop.v1.PurchaseRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/shop.v1.PurchaseResponse'
+    /api/v1/social/friends:
+        get:
+            tags:
+                - SocialService
+            operationId: SocialService_ListFriends
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/social.v1.ListFriendsResponse'
+    /api/v1/social/friends/{userId}/remove:
+        post:
+            tags:
+                - SocialService
+            operationId: SocialService_RemoveFriend
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/social.v1.RemoveFriendRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/social.v1.RemoveFriendResponse'
+    /api/v1/social/requests:
+        get:
+            tags:
+                - SocialService
+            operationId: SocialService_ListPendingRequests
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/social.v1.ListPendingRequestsResponse'
+        post:
+            tags:
+                - SocialService
+            operationId: SocialService_SendFriendRequest
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/social.v1.SendFriendRequestRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/social.v1.SendFriendRequestResponse'
+    /api/v1/social/requests/{requestId}/accept:
+        post:
+            tags:
+                - SocialService
+            operationId: SocialService_AcceptFriendRequest
+            parameters:
+                - name: requestId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/social.v1.AcceptFriendRequestRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/social.v1.AcceptFriendRequestResponse'
+    /api/v1/social/requests/{requestId}/decline:
+        post:
+            tags:
+                - SocialService
+            operationId: SocialService_DeclineFriendRequest
+            parameters:
+                - name: requestId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/social.v1.DeclineFriendRequestRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/social.v1.DeclineFriendRequestResponse'
+    /api/v1/streak:
+        get:
+            tags:
+                - StreakService
+            description: |-
+                GetStreak returns current streak, longest streak, shields owned,
+                 whether the streak is broken today, and whether a shield can restore it.
+            operationId: StreakService_GetStreak
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/streak.v1.GetStreakResponse'
+    /api/v1/streak/shield/purchase:
+        post:
+            tags:
+                - StreakService
+            description: |-
+                PurchaseShield buys N shields for gold. N=1 by default; max 5 per call
+                 enforced server-side.
+            operationId: StreakService_PurchaseShield
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/streak.v1.PurchaseShieldRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/streak.v1.PurchaseShieldResponse'
+    /api/v1/streak/shield/use:
+        post:
+            tags:
+                - StreakService
+            description: |-
+                UseShield consumes one shield to restore a broken streak. Idempotent:
+                 calling when streak is intact returns an error.
+            operationId: StreakService_UseShield
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/streak.v1.UseShieldRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/streak.v1.UseShieldResponse'
+    /api/v1/training/skill-tree:
+        get:
+            tags:
+                - TrainingService
+            operationId: TrainingService_GetSkillTree
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/training.v1.GetSkillTreeResponse'
+    /api/v1/training/tasks/{moduleId}:
+        get:
+            tags:
+                - TrainingService
+            operationId: TrainingService_GetTask
+            parameters:
+                - name: moduleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/training.v1.GetTaskResponse'
+    /api/v1/training/tasks/{moduleId}/evaluate:
+        post:
+            tags:
+                - TrainingService
+            operationId: TrainingService_EvaluateTaskSolution
+            parameters:
+                - name: moduleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/training.v1.EvaluateTaskSolutionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/training.v1.EvaluateTaskSolutionResponse'
 components:
     schemas:
         admin.v1.AdminStatusResponse:
@@ -2699,37 +3482,11 @@ components:
                 nextLeagueAt:
                     type: integer
                     format: int32
-        arena.v1.ArenaPlayerStatsBatchResponse:
-            type: object
-            properties:
-                stats:
-                    type: object
-                    additionalProperties:
-                        $ref: '#/components/schemas/arena.v1.ArenaPlayerStats'
         arena.v1.ArenaPlayerStatsResponse:
             type: object
             properties:
                 stats:
                     $ref: '#/components/schemas/arena.v1.ArenaPlayerStats'
-        arena.v1.ArenaQueueStateResponse:
-            type: object
-            properties:
-                status:
-                    type: integer
-                    format: enum
-                topic:
-                    type: string
-                difficulty:
-                    type: integer
-                    format: enum
-                queueSize:
-                    type: integer
-                    format: int32
-                queuedAt:
-                    type: string
-                    format: date-time
-                match:
-                    $ref: '#/components/schemas/arena.v1.ArenaMatch'
         arena.v1.ArenaSeasonInfo:
             type: object
             properties:
@@ -2742,32 +3499,6 @@ components:
                 endsAt:
                     type: string
                     format: date-time
-        arena.v1.ArenaSeasonResultEntry:
-            type: object
-            properties:
-                seasonNumber:
-                    type: integer
-                    format: int32
-                finalRating:
-                    type: integer
-                    format: int32
-                finalLeague:
-                    type: string
-                leagueRank:
-                    type: integer
-                    format: int32
-                peakRating:
-                    type: integer
-                    format: int32
-                wins:
-                    type: integer
-                    format: int32
-                losses:
-                    type: integer
-                    format: int32
-                matches:
-                    type: integer
-                    format: int32
         arena.v1.ArenaStatusResponse:
             type: object
             properties:
@@ -2793,50 +3524,45 @@ components:
                         $ref: '#/components/schemas/arena.v1.ArenaLeaderboardEntry'
                 season:
                     $ref: '#/components/schemas/arena.v1.ArenaSeasonInfo'
-        arena.v1.GetPlayerStatsBatchRequest:
+        arena.v1.GuildLeaderboardEntry:
             type: object
             properties:
-                userIds:
-                    type: array
-                    items:
-                        type: string
-        arena.v1.GetSeasonHistoryResponse:
+                guildId:
+                    type: string
+                name:
+                    type: string
+                memberCount:
+                    type: integer
+                    format: int32
+                totalWins:
+                    type: integer
+                    format: int32
+                aggregatePoints:
+                    type: integer
+                    format: int32
+                avgRating:
+                    type: integer
+                    format: int32
+                deltaWeek:
+                    type: integer
+                    format: int32
+        arena.v1.GuildsLeaderboardResponse:
             type: object
             properties:
-                seasons:
+                entries:
                     type: array
                     items:
-                        $ref: '#/components/schemas/arena.v1.ArenaSeasonResultEntry'
+                        $ref: '#/components/schemas/arena.v1.GuildLeaderboardEntry'
         arena.v1.JoinMatchRequest:
             type: object
             properties:
                 matchId:
                     type: string
-        arena.v1.JoinQueueRequest:
-            type: object
-            properties:
-                topic:
-                    type: string
-                difficulty:
-                    type: integer
-                    format: enum
-                obfuscateOpponent:
-                    type: boolean
         arena.v1.LeaveMatchRequest:
             type: object
             properties:
                 matchId:
                     type: string
-        arena.v1.LeaveQueueRequest:
-            type: object
-            properties: {}
-        arena.v1.ListOpenMatchesResponse:
-            type: object
-            properties:
-                matches:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/arena.v1.ArenaMatch'
         arena.v1.ReportAntiCheatEventRequest:
             type: object
             properties:
@@ -2845,6 +3571,38 @@ components:
                 reason:
                     type: integer
                     format: enum
+        arena.v1.SeasonXPEntry:
+            type: object
+            properties:
+                userId:
+                    type: string
+                username:
+                    type: string
+                displayName:
+                    type: string
+                avatarUrl:
+                    type: string
+                guildName:
+                    type: string
+                xp:
+                    type: integer
+                    format: int32
+                currentTier:
+                    type: integer
+                    format: int32
+                trophies:
+                    type: integer
+                    format: int32
+        arena.v1.SeasonXPLeaderboardResponse:
+            type: object
+            properties:
+                entries:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/arena.v1.SeasonXPEntry'
+                seasonNumber:
+                    type: integer
+                    format: int32
         arena.v1.SubmitCodeRequest:
             type: object
             properties:
@@ -2882,302 +3640,121 @@ components:
                     format: enum
                 submissionId:
                     type: string
-        circle.v1.ChallengeMemberProgress:
-            type: object
-            properties:
-                userId:
-                    type: string
-                firstName:
-                    type: string
-                lastName:
-                    type: string
-                avatarUrl:
-                    type: string
-                current:
-                    type: integer
-                    format: int32
-        circle.v1.Circle:
+        challenge.v1.BlindReviewResult:
             type: object
             properties:
                 id:
                     type: string
-                name:
-                    type: string
-                description:
-                    type: string
-                creatorId:
-                    type: string
-                memberCount:
+                aiScore:
                     type: integer
-                    format: uint32
-                tags:
+                    format: int32
+                aiFeedback:
+                    type: string
+                submittedAt:
+                    type: string
+                    format: date-time
+        challenge.v1.BlindReviewTask:
+            type: object
+            properties:
+                sourceReviewId:
+                    type: string
+                taskId:
+                    type: string
+                taskTitle:
+                    type: string
+                taskStatement:
+                    type: string
+                code:
+                    type: string
+                language:
+                    type: string
+        challenge.v1.GetSpeedRunRecordsResponse:
+            type: object
+            properties:
+                records:
                     type: array
                     items:
-                        type: string
-                isPublic:
-                    type: boolean
-                isJoined:
-                    type: boolean
-                createdAt:
-                    type: string
-                    format: date-time
-        circle.v1.CircleChallengeData:
+                        $ref: '#/components/schemas/challenge.v1.TaskRecord'
+        challenge.v1.GetWeeklyChallengeResponse:
             type: object
             properties:
-                id:
+                weekKey:
                     type: string
-                circleId:
-                    type: string
-                templateKey:
-                    type: string
-                targetValue:
-                    type: integer
-                    format: int32
-                startsAt:
-                    type: string
-                    format: date-time
                 endsAt:
                     type: string
                     format: date-time
-                createdBy:
-                    type: string
-                progress:
+                leaderboard:
                     type: array
                     items:
-                        $ref: '#/components/schemas/circle.v1.ChallengeMemberProgress'
-        circle.v1.CircleDayActivity:
+                        $ref: '#/components/schemas/challenge.v1.WeeklyEntry'
+                myEntry:
+                    $ref: '#/components/schemas/challenge.v1.WeeklyEntry'
+                weeklyTask:
+                    $ref: '#/components/schemas/challenge.v1.WeeklyInfo'
+        challenge.v1.SubmitBlindReviewRequest:
             type: object
             properties:
-                date:
+                sourceReviewId:
                     type: string
-                dailyCount:
+                taskId:
+                    type: string
+                sourceCode:
+                    type: string
+                sourceLanguage:
+                    type: string
+                userReview:
+                    type: string
+        challenge.v1.TaskRecord:
+            type: object
+            properties:
+                taskId:
+                    type: string
+                taskTitle:
+                    type: string
+                bestTimeMs:
+                    type: string
+                bestAiScore:
                     type: integer
                     format: int32
-                duelCount:
+                attempts:
                     type: integer
                     format: int32
-                mockCount:
-                    type: integer
-                    format: int32
-        circle.v1.CircleMember:
+                lastAt:
+                    type: string
+                    format: date-time
+        challenge.v1.WeeklyEntry:
             type: object
             properties:
                 userId:
                     type: string
-                firstName:
-                    type: string
-                lastName:
+                displayName:
                     type: string
                 avatarUrl:
                     type: string
-                role:
+                aiScore:
                     type: integer
-                    format: enum
-                joinedAt:
+                    format: int32
+                solveTimeMs:
+                    type: string
+                submittedAt:
                     type: string
                     format: date-time
-        circle.v1.CircleMemberAction:
+        challenge.v1.WeeklyInfo:
             type: object
             properties:
-                userId:
+                weekKey:
                     type: string
-                firstName:
+                taskId:
                     type: string
-                lastName:
+                taskTitle:
                     type: string
-                avatarUrl:
+                taskSlug:
                     type: string
-                actionType:
-                    type: integer
-                    format: enum
-                actionDetail:
+                difficulty:
                     type: string
-                happenedAt:
+                endsAt:
                     type: string
                     format: date-time
-        circle.v1.CircleMemberStatsEntry:
-            type: object
-            properties:
-                userId:
-                    type: string
-                firstName:
-                    type: string
-                lastName:
-                    type: string
-                avatarUrl:
-                    type: string
-                role:
-                    type: integer
-                    format: enum
-                joinedAt:
-                    type: string
-                    format: date-time
-                dailySolved:
-                    type: integer
-                    format: int32
-                duelsWon:
-                    type: integer
-                    format: int32
-                duelsPlayed:
-                    type: integer
-                    format: int32
-                mocksDone:
-                    type: integer
-                    format: int32
-                arenaRating:
-                    type: integer
-                    format: int32
-                arenaLeague:
-                    type: string
-        circle.v1.CircleResponse:
-            type: object
-            properties:
-                circle:
-                    $ref: '#/components/schemas/circle.v1.Circle'
-        circle.v1.CreateCircleChallengeRequest:
-            type: object
-            properties:
-                circleId:
-                    type: string
-                templateKey:
-                    type: string
-                targetValue:
-                    type: integer
-                    format: int32
-        circle.v1.CreateCircleChallengeResponse:
-            type: object
-            properties:
-                challenge:
-                    $ref: '#/components/schemas/circle.v1.CircleChallengeData'
-        circle.v1.CreateCircleEventRequest:
-            type: object
-            properties:
-                circleId:
-                    type: string
-                title:
-                    type: string
-                description:
-                    type: string
-                meetingLink:
-                    type: string
-                placeLabel:
-                    type: string
-                scheduledAt:
-                    type: string
-                repeat:
-                    type: string
-        circle.v1.CreateCircleEventResponse:
-            type: object
-            properties:
-                event:
-                    $ref: '#/components/schemas/event.v1.Event'
-        circle.v1.CreateCircleRequest:
-            type: object
-            properties:
-                name:
-                    type: string
-                description:
-                    type: string
-                tags:
-                    type: array
-                    items:
-                        type: string
-                isPublic:
-                    type: boolean
-        circle.v1.DeleteCircleResponse:
-            type: object
-            properties:
-                status:
-                    type: integer
-                    format: enum
-        circle.v1.GetActiveCircleChallengeResponse:
-            type: object
-            properties:
-                challenge:
-                    $ref: '#/components/schemas/circle.v1.CircleChallengeData'
-        circle.v1.GetCircleMemberStatsResponse:
-            type: object
-            properties:
-                members:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/circle.v1.CircleMemberStatsEntry'
-        circle.v1.GetCirclePulseResponse:
-            type: object
-            properties:
-                activeToday:
-                    type: integer
-                    format: int32
-                totalMembers:
-                    type: integer
-                    format: int32
-                weekActivity:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/circle.v1.CircleDayActivity'
-                recentActions:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/circle.v1.CircleMemberAction'
-        circle.v1.InviteToCircleRequest:
-            type: object
-            properties:
-                circleId:
-                    type: string
-                userId:
-                    type: string
-        circle.v1.InviteToCircleResponse:
-            type: object
-            properties:
-                status:
-                    type: integer
-                    format: enum
-        circle.v1.JoinCircleRequest:
-            type: object
-            properties:
-                circleId:
-                    type: string
-        circle.v1.JoinCircleResponse:
-            type: object
-            properties:
-                status:
-                    type: integer
-                    format: enum
-        circle.v1.LeaveCircleRequest:
-            type: object
-            properties:
-                circleId:
-                    type: string
-        circle.v1.LeaveCircleResponse:
-            type: object
-            properties:
-                status:
-                    type: integer
-                    format: enum
-        circle.v1.ListCircleEventsResponse:
-            type: object
-            properties:
-                events:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/event.v1.Event'
-        circle.v1.ListCircleMembersResponse:
-            type: object
-            properties:
-                members:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/circle.v1.CircleMember'
-        circle.v1.ListCirclesResponse:
-            type: object
-            properties:
-                circles:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/circle.v1.Circle'
-                totalCount:
-                    type: integer
-                    format: int32
         code_editor.v1.AIReviewRequest:
             type: object
             properties:
@@ -3249,13 +3826,6 @@ components:
             properties:
                 room:
                     $ref: '#/components/schemas/code_editor.v1.Room'
-        code_editor.v1.GetSubmissionsResponse:
-            type: object
-            properties:
-                submissions:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/code_editor.v1.Submission'
         code_editor.v1.JoinRoomByInviteCodeRequest:
             type: object
             properties:
@@ -3459,34 +4029,6 @@ components:
                     type: integer
                     format: enum
             description: StatusResponse is used for operations that only need to confirm success.
-        code_editor.v1.Submission:
-            type: object
-            properties:
-                id:
-                    type: string
-                userId:
-                    type: string
-                guestName:
-                    type: string
-                code:
-                    type: string
-                output:
-                    type: string
-                error:
-                    type: string
-                submittedAt:
-                    type: string
-                    format: date-time
-                durationMs:
-                    type: string
-                isCorrect:
-                    type: boolean
-                passedCount:
-                    type: integer
-                    format: int32
-                totalCount:
-                    type: integer
-                    format: int32
         code_editor.v1.SubmitCodeRequest:
             type: object
             properties:
@@ -3679,6 +4221,15 @@ components:
                 order:
                     type: integer
                     format: int32
+        code_editor.v1.UpdateRoomRequest:
+            type: object
+            properties:
+                roomId:
+                    type: string
+                task:
+                    type: string
+                isPrivate:
+                    type: boolean
         code_editor.v1.UpdateTaskRequest:
             type: object
             properties:
@@ -3714,6 +4265,99 @@ components:
                     type: array
                     items:
                         type: string
+        duel_replay.v1.GetReplayResponse:
+            type: object
+            properties:
+                summary:
+                    $ref: '#/components/schemas/duel_replay.v1.ReplaySummary'
+                events:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/duel_replay.v1.ReplayEvent'
+        duel_replay.v1.ListReplaysResponse:
+            type: object
+            properties:
+                replays:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/duel_replay.v1.ReplaySummary'
+                total:
+                    type: integer
+                    format: int32
+        duel_replay.v1.RecordEventRequest:
+            type: object
+            properties:
+                replayId:
+                    type: string
+                tMs:
+                    type: integer
+                    format: int32
+                kind:
+                    type: integer
+                    format: enum
+                label:
+                    type: string
+                linesCount:
+                    type: integer
+                    format: int32
+        duel_replay.v1.RecordEventResponse:
+            type: object
+            properties:
+                event:
+                    $ref: '#/components/schemas/duel_replay.v1.ReplayEvent'
+        duel_replay.v1.ReplayEvent:
+            type: object
+            properties:
+                id:
+                    type: string
+                userId:
+                    type: string
+                tMs:
+                    type: integer
+                    format: int32
+                kind:
+                    type: integer
+                    format: enum
+                label:
+                    type: string
+                linesCount:
+                    type: integer
+                    format: int32
+            description: ReplayEvent is a single point on the timeline.
+        duel_replay.v1.ReplaySummary:
+            type: object
+            properties:
+                id:
+                    type: string
+                sourceKind:
+                    type: integer
+                    format: enum
+                sourceId:
+                    type: string
+                player1Id:
+                    type: string
+                player1Username:
+                    type: string
+                player2Id:
+                    type: string
+                player2Username:
+                    type: string
+                taskTitle:
+                    type: string
+                taskTopic:
+                    type: string
+                taskDifficulty:
+                    type: integer
+                    format: int32
+                durationMs:
+                    type: integer
+                    format: int32
+                winnerId:
+                    type: string
+                completedAt:
+                    type: string
+                    format: date-time
+            description: ReplaySummary is the lightweight list item.
         event.v1.CreateEventRequest:
             type: object
             properties:
@@ -3797,6 +4441,9 @@ components:
                     type: string
                 isPublic:
                     type: boolean
+                status:
+                    type: integer
+                    format: enum
         event.v1.EventParticipant:
             type: object
             properties:
@@ -3888,6 +4535,122 @@ components:
                     type: string
                 meetingLink:
                     type: string
+        friend_challenge.v1.DeclineRequest:
+            type: object
+            properties:
+                challengeId:
+                    type: string
+        friend_challenge.v1.DeclineResponse:
+            type: object
+            properties:
+                challenge:
+                    $ref: '#/components/schemas/friend_challenge.v1.FriendChallenge'
+        friend_challenge.v1.FriendChallenge:
+            type: object
+            properties:
+                id:
+                    type: string
+                challengerId:
+                    type: string
+                challengerUsername:
+                    type: string
+                opponentId:
+                    type: string
+                opponentUsername:
+                    type: string
+                taskTitle:
+                    type: string
+                taskTopic:
+                    type: string
+                taskDifficulty:
+                    type: integer
+                    format: enum
+                taskRef:
+                    type: string
+                note:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+                challengerSubmittedAt:
+                    type: string
+                    format: date-time
+                challengerTimeMs:
+                    type: integer
+                    format: int32
+                challengerScore:
+                    type: integer
+                    format: int32
+                opponentSubmittedAt:
+                    type: string
+                    format: date-time
+                opponentTimeMs:
+                    type: integer
+                    format: int32
+                opponentScore:
+                    type: integer
+                    format: int32
+                winnerId:
+                    type: string
+                deadlineAt:
+                    type: string
+                    format: date-time
+                createdAt:
+                    type: string
+                    format: date-time
+                completedAt:
+                    type: string
+                    format: date-time
+            description: |-
+                FriendChallenge is the full row as the server sees it. Clients render
+                 status chips based on the current viewer's relationship to the row.
+        friend_challenge.v1.ListChallengesResponse:
+            type: object
+            properties:
+                challenges:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/friend_challenge.v1.FriendChallenge'
+                total:
+                    type: integer
+                    format: int32
+        friend_challenge.v1.SendChallengeRequest:
+            type: object
+            properties:
+                opponentUsername:
+                    type: string
+                taskTitle:
+                    type: string
+                taskTopic:
+                    type: string
+                taskDifficulty:
+                    type: integer
+                    format: enum
+                taskRef:
+                    type: string
+                note:
+                    type: string
+        friend_challenge.v1.SendChallengeResponse:
+            type: object
+            properties:
+                challenge:
+                    $ref: '#/components/schemas/friend_challenge.v1.FriendChallenge'
+        friend_challenge.v1.SubmitSolutionRequest:
+            type: object
+            properties:
+                challengeId:
+                    type: string
+                timeMs:
+                    type: integer
+                    format: int32
+                score:
+                    type: integer
+                    format: int32
+        friend_challenge.v1.SubmitSolutionResponse:
+            type: object
+            properties:
+                challenge:
+                    $ref: '#/components/schemas/friend_challenge.v1.FriendChallenge'
         geo.v1.CommunityMapPoint:
             type: object
             properties:
@@ -3954,6 +4717,573 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/geo.v1.GeoCandidate'
+        geo.v1.WorldPin:
+            type: object
+            properties:
+                id:
+                    type: string
+                kind:
+                    type: integer
+                    format: enum
+                title:
+                    type: string
+                subtitle:
+                    type: string
+                latitude:
+                    type: number
+                    format: double
+                longitude:
+                    type: number
+                    format: double
+                region:
+                    type: string
+                iconRef:
+                    type: string
+                linkPath:
+                    type: string
+                isHot:
+                    type: boolean
+        geo.v1.WorldPinsResponse:
+            type: object
+            properties:
+                pins:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/geo.v1.WorldPin'
+        guild.v1.ChallengeMemberProgress:
+            type: object
+            properties:
+                userId:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                avatarUrl:
+                    type: string
+                current:
+                    type: integer
+                    format: int32
+        guild.v1.CreateGuildChallengeRequest:
+            type: object
+            properties:
+                guildId:
+                    type: string
+                templateKey:
+                    type: string
+                targetValue:
+                    type: integer
+                    format: int32
+        guild.v1.CreateGuildChallengeResponse:
+            type: object
+            properties:
+                challenge:
+                    $ref: '#/components/schemas/guild.v1.GuildChallengeData'
+        guild.v1.CreateGuildEventRequest:
+            type: object
+            properties:
+                guildId:
+                    type: string
+                title:
+                    type: string
+                description:
+                    type: string
+                meetingLink:
+                    type: string
+                placeLabel:
+                    type: string
+                scheduledAt:
+                    type: string
+                repeat:
+                    type: string
+        guild.v1.CreateGuildEventResponse:
+            type: object
+            properties:
+                event:
+                    $ref: '#/components/schemas/event.v1.Event'
+        guild.v1.CreateGuildRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+                tags:
+                    type: array
+                    items:
+                        type: string
+                isPublic:
+                    type: boolean
+        guild.v1.DeleteGuildResponse:
+            type: object
+            properties:
+                status:
+                    type: integer
+                    format: enum
+        guild.v1.GetActiveGuildChallengeResponse:
+            type: object
+            properties:
+                challenge:
+                    $ref: '#/components/schemas/guild.v1.GuildChallengeData'
+        guild.v1.GetGuildMemberStatsResponse:
+            type: object
+            properties:
+                members:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/guild.v1.GuildMemberStatsEntry'
+        guild.v1.GetGuildPulseResponse:
+            type: object
+            properties:
+                activeToday:
+                    type: integer
+                    format: int32
+                totalMembers:
+                    type: integer
+                    format: int32
+                weekActivity:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/guild.v1.GuildDayActivity'
+                recentActions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/guild.v1.GuildMemberAction'
+        guild.v1.Guild:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                creatorId:
+                    type: string
+                memberCount:
+                    type: integer
+                    format: uint32
+                tags:
+                    type: array
+                    items:
+                        type: string
+                isPublic:
+                    type: boolean
+                isJoined:
+                    type: boolean
+                createdAt:
+                    type: string
+                    format: date-time
+        guild.v1.GuildChallengeData:
+            type: object
+            properties:
+                id:
+                    type: string
+                guildId:
+                    type: string
+                templateKey:
+                    type: string
+                targetValue:
+                    type: integer
+                    format: int32
+                startsAt:
+                    type: string
+                    format: date-time
+                endsAt:
+                    type: string
+                    format: date-time
+                createdBy:
+                    type: string
+                progress:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/guild.v1.ChallengeMemberProgress'
+        guild.v1.GuildDayActivity:
+            type: object
+            properties:
+                date:
+                    type: string
+                dailyCount:
+                    type: integer
+                    format: int32
+                duelCount:
+                    type: integer
+                    format: int32
+                mockCount:
+                    type: integer
+                    format: int32
+        guild.v1.GuildMember:
+            type: object
+            properties:
+                userId:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                avatarUrl:
+                    type: string
+                role:
+                    type: integer
+                    format: enum
+                joinedAt:
+                    type: string
+                    format: date-time
+        guild.v1.GuildMemberAction:
+            type: object
+            properties:
+                userId:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                avatarUrl:
+                    type: string
+                actionType:
+                    type: integer
+                    format: enum
+                actionDetail:
+                    type: string
+                happenedAt:
+                    type: string
+                    format: date-time
+        guild.v1.GuildMemberStatsEntry:
+            type: object
+            properties:
+                userId:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                avatarUrl:
+                    type: string
+                role:
+                    type: integer
+                    format: enum
+                joinedAt:
+                    type: string
+                    format: date-time
+                dailySolved:
+                    type: integer
+                    format: int32
+                duelsWon:
+                    type: integer
+                    format: int32
+                duelsPlayed:
+                    type: integer
+                    format: int32
+                mocksDone:
+                    type: integer
+                    format: int32
+                arenaRating:
+                    type: integer
+                    format: int32
+                arenaLeague:
+                    type: string
+        guild.v1.GuildResponse:
+            type: object
+            properties:
+                guild:
+                    $ref: '#/components/schemas/guild.v1.Guild'
+        guild.v1.InviteToGuildRequest:
+            type: object
+            properties:
+                guildId:
+                    type: string
+                userId:
+                    type: string
+        guild.v1.InviteToGuildResponse:
+            type: object
+            properties:
+                status:
+                    type: integer
+                    format: enum
+        guild.v1.JoinGuildRequest:
+            type: object
+            properties:
+                guildId:
+                    type: string
+        guild.v1.JoinGuildResponse:
+            type: object
+            properties:
+                status:
+                    type: integer
+                    format: enum
+        guild.v1.LeaveGuildRequest:
+            type: object
+            properties:
+                guildId:
+                    type: string
+        guild.v1.LeaveGuildResponse:
+            type: object
+            properties:
+                status:
+                    type: integer
+                    format: enum
+        guild.v1.ListGuildEventsResponse:
+            type: object
+            properties:
+                events:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/event.v1.Event'
+        guild.v1.ListGuildMembersResponse:
+            type: object
+            properties:
+                members:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/guild.v1.GuildMember'
+        guild.v1.ListGuildsResponse:
+            type: object
+            properties:
+                guilds:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/guild.v1.Guild'
+                totalCount:
+                    type: integer
+                    format: int32
+        hub.v1.GetOverviewResponse:
+            type: object
+            properties:
+                player:
+                    $ref: '#/components/schemas/hub.v1.HubPlayer'
+                dailyMissions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/hub.v1.HubDailyMission'
+                quest:
+                    $ref: '#/components/schemas/hub.v1.HubQuest'
+                arena:
+                    $ref: '#/components/schemas/hub.v1.HubArena'
+                events:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/hub.v1.HubEvent'
+                guild:
+                    $ref: '#/components/schemas/hub.v1.HubGuild'
+                merchantPicks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/hub.v1.HubMerchantPick'
+        hub.v1.HubAchievements:
+            type: object
+            properties:
+                unlocked:
+                    type: integer
+                    format: int32
+                total:
+                    type: integer
+                    format: int32
+        hub.v1.HubArena:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/hub.v1.HubArenaItem'
+        hub.v1.HubArenaItem:
+            type: object
+            properties:
+                label:
+                    type: string
+                meta:
+                    type: string
+                actionUrl:
+                    type: string
+        hub.v1.HubDailyMission:
+            type: object
+            properties:
+                key:
+                    type: string
+                title:
+                    type: string
+                progressLabel:
+                    type: string
+                current:
+                    type: integer
+                    format: int32
+                target:
+                    type: integer
+                    format: int32
+                completed:
+                    type: boolean
+                rewardLabel:
+                    type: string
+                actionUrl:
+                    type: string
+                icon:
+                    type: string
+        hub.v1.HubEvent:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                startsAt:
+                    type: string
+                meta:
+                    type: string
+                actionUrl:
+                    type: string
+        hub.v1.HubGuild:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                memberPreview:
+                    type: array
+                    items:
+                        type: string
+                actionUrl:
+                    type: string
+        hub.v1.HubMerchantPick:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                rarity:
+                    type: string
+                priceLabel:
+                    type: string
+                actionUrl:
+                    type: string
+        hub.v1.HubPlayer:
+            type: object
+            properties:
+                id:
+                    type: string
+                displayName:
+                    type: string
+                title:
+                    type: string
+                levelLabel:
+                    type: string
+                streakDays:
+                    type: integer
+                    format: int32
+                achievements:
+                    $ref: '#/components/schemas/hub.v1.HubAchievements'
+        hub.v1.HubQuest:
+            type: object
+            properties:
+                title:
+                    type: string
+                description:
+                    type: string
+                progressPct:
+                    type: integer
+                    format: int32
+                actionUrl:
+                    type: string
+                actionLabel:
+                    type: string
+        inbox.v1.GetThreadResponse:
+            type: object
+            properties:
+                thread:
+                    $ref: '#/components/schemas/inbox.v1.InboxThread'
+                messages:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/inbox.v1.InboxMessage'
+        inbox.v1.GetUnreadCountResponse:
+            type: object
+            properties:
+                unreadTotal:
+                    type: integer
+                    format: int32
+        inbox.v1.InboxMessage:
+            type: object
+            properties:
+                id:
+                    type: string
+                threadId:
+                    type: string
+                senderKind:
+                    type: integer
+                    format: enum
+                senderId:
+                    type: string
+                senderName:
+                    type: string
+                body:
+                    type: string
+                read:
+                    type: boolean
+                createdAt:
+                    type: string
+                    format: date-time
+        inbox.v1.InboxThread:
+            type: object
+            properties:
+                id:
+                    type: string
+                kind:
+                    type: integer
+                    format: enum
+                subject:
+                    type: string
+                avatar:
+                    type: string
+                preview:
+                    type: string
+                unreadCount:
+                    type: integer
+                    format: int32
+                lastMessageAt:
+                    type: string
+                    format: date-time
+                externalId:
+                    type: string
+                interactive:
+                    type: boolean
+        inbox.v1.ListThreadsResponse:
+            type: object
+            properties:
+                threads:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/inbox.v1.InboxThread'
+                total:
+                    type: integer
+                    format: int32
+                unreadTotal:
+                    type: integer
+                    format: int32
+        inbox.v1.MarkThreadReadRequest:
+            type: object
+            properties:
+                threadId:
+                    type: string
+        inbox.v1.MarkThreadReadResponse:
+            type: object
+            properties:
+                ok:
+                    type: boolean
+                unreadTotal:
+                    type: integer
+                    format: int32
+        inbox.v1.SendMessageRequest:
+            type: object
+            properties:
+                threadId:
+                    type: string
+                body:
+                    type: string
+        inbox.v1.SendMessageResponse:
+            type: object
+            properties:
+                message:
+                    $ref: '#/components/schemas/inbox.v1.InboxMessage'
         interview_prep.v1.AbortMockSessionRequest:
             type: object
             properties:
@@ -4059,53 +5389,6 @@ components:
                     $ref: '#/components/schemas/interview_prep.v1.InterviewPrepQuestion'
                 review:
                     $ref: '#/components/schemas/interview_prep.v1.InterviewAnswerReview'
-        interview_prep.v1.CheckpointProgress:
-            type: object
-            properties:
-                id:
-                    type: string
-                userId:
-                    type: string
-                taskId:
-                    type: string
-                sessionId:
-                    type: string
-                skillKey:
-                    type: string
-                status:
-                    type: integer
-                    format: enum
-                durationSeconds:
-                    type: integer
-                    format: int32
-                attemptsUsed:
-                    type: integer
-                    format: int32
-                maxAttempts:
-                    type: integer
-                    format: int32
-                score:
-                    type: integer
-                    format: int32
-                startedAt:
-                    type: string
-                    format: date-time
-                finishedAt:
-                    type: string
-                    format: date-time
-                createdAt:
-                    type: string
-                    format: date-time
-                updatedAt:
-                    type: string
-                    format: date-time
-        interview_prep.v1.CheckpointSessionResponse:
-            type: object
-            properties:
-                session:
-                    $ref: '#/components/schemas/interview_prep.v1.InterviewPrepSession'
-                checkpoint:
-                    $ref: '#/components/schemas/interview_prep.v1.CheckpointProgress'
         interview_prep.v1.CreateAdminQuestionRequest:
             type: object
             properties:
@@ -4644,11 +5927,6 @@ components:
             properties:
                 session:
                     $ref: '#/components/schemas/interview_prep.v1.InterviewPrepSession'
-        interview_prep.v1.StartCheckpointSessionRequest:
-            type: object
-            properties:
-                taskId:
-                    type: string
         interview_prep.v1.StartMockSessionRequest:
             type: object
             properties:
@@ -4831,6 +6109,93 @@ components:
                     type: string
                 item:
                     $ref: '#/components/schemas/interview_prep.v1.MockQuestionPoolPayload'
+        mission.v1.CompleteMissionRequest:
+            type: object
+            properties:
+                missionKey:
+                    type: string
+        mission.v1.CompleteMissionResponse:
+            type: object
+            properties:
+                ok:
+                    type: boolean
+        mission.v1.DailyMission:
+            type: object
+            properties:
+                key:
+                    type: string
+                title:
+                    type: string
+                description:
+                    type: string
+                targetValue:
+                    type: integer
+                    format: int32
+                current:
+                    type: integer
+                    format: int32
+                completed:
+                    type: boolean
+                xpReward:
+                    type: integer
+                    format: int32
+                actionUrl:
+                    type: string
+                icon:
+                    type: string
+        mission.v1.GetDailyMissionsResponse:
+            type: object
+            properties:
+                missions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/mission.v1.DailyMission'
+                allComplete:
+                    type: boolean
+                completedCount:
+                    type: integer
+                    format: int32
+                bonusXp:
+                    type: integer
+                    format: int32
+                totalXpEarned:
+                    type: integer
+                    format: int32
+        notification.v1.NotificationSettings:
+            type: object
+            properties:
+                duelsEnabled:
+                    type: boolean
+                progressEnabled:
+                    type: boolean
+                guildsEnabled:
+                    type: boolean
+                dailyChallengeEnabled:
+                    type: boolean
+                quietHoursStart:
+                    type: integer
+                    format: int32
+                quietHoursEnd:
+                    type: integer
+                    format: int32
+                timezone:
+                    type: string
+                telegramLinked:
+                    type: boolean
+        notification.v1.UpdateNotificationSettingsRequest:
+            type: object
+            properties:
+                duelsEnabled:
+                    type: boolean
+                progressEnabled:
+                    type: boolean
+                guildsEnabled:
+                    type: boolean
+                dailyChallengeEnabled:
+                    type: boolean
+        notification.v1.UpdateNotificationSettingsResponse:
+            type: object
+            properties: {}
         podcast.v1.CompletePodcastUploadRequest:
             type: object
             properties:
@@ -5536,14 +6901,676 @@ components:
                     type: string
                 referral:
                     $ref: '#/components/schemas/referral.v1.ReferralPayload'
+        season_pass.v1.ClaimTierRewardRequest:
+            type: object
+            properties:
+                tier:
+                    type: integer
+                    format: int32
+                track:
+                    type: integer
+                    format: enum
+        season_pass.v1.ClaimTierRewardResponse:
+            type: object
+            properties:
+                progress:
+                    $ref: '#/components/schemas/season_pass.v1.SeasonPassProgress'
+                claimedKind:
+                    type: integer
+                    format: enum
+                claimedAmount:
+                    type: integer
+                    format: int32
+                claimedLabel:
+                    type: string
+        season_pass.v1.GetActiveResponse:
+            type: object
+            properties:
+                pass:
+                    $ref: '#/components/schemas/season_pass.v1.SeasonPass'
+                tiers:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/season_pass.v1.SeasonPassTier'
+                progress:
+                    $ref: '#/components/schemas/season_pass.v1.SeasonPassProgress'
+        season_pass.v1.PurchasePremiumRequest:
+            type: object
+            properties: {}
+        season_pass.v1.PurchasePremiumResponse:
+            type: object
+            properties:
+                progress:
+                    $ref: '#/components/schemas/season_pass.v1.SeasonPassProgress'
+        season_pass.v1.SeasonPass:
+            type: object
+            properties:
+                id:
+                    type: string
+                seasonNumber:
+                    type: integer
+                    format: int32
+                title:
+                    type: string
+                subtitle:
+                    type: string
+                startsAt:
+                    type: string
+                    format: date-time
+                endsAt:
+                    type: string
+                    format: date-time
+                maxTier:
+                    type: integer
+                    format: int32
+                xpPerTier:
+                    type: integer
+                    format: int32
+                premiumPriceGems:
+                    type: integer
+                    format: int32
+        season_pass.v1.SeasonPassProgress:
+            type: object
+            properties:
+                xp:
+                    type: integer
+                    format: int32
+                currentTier:
+                    type: integer
+                    format: int32
+                hasPremium:
+                    type: boolean
+                claimedFree:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                claimedPremium:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+        season_pass.v1.SeasonPassTier:
+            type: object
+            properties:
+                tier:
+                    type: integer
+                    format: int32
+                freeRewardKind:
+                    type: integer
+                    format: enum
+                freeRewardAmount:
+                    type: integer
+                    format: int32
+                freeRewardLabel:
+                    type: string
+                premiumRewardKind:
+                    type: integer
+                    format: enum
+                premiumRewardAmount:
+                    type: integer
+                    format: int32
+                premiumRewardLabel:
+                    type: string
+        shop.v1.CategoryInfo:
+            type: object
+            properties:
+                category:
+                    type: integer
+                    format: enum
+                name:
+                    type: string
+                itemCount:
+                    type: integer
+                    format: int32
+        shop.v1.GetInventoryResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/shop.v1.OwnedItem'
+        shop.v1.GetItemResponse:
+            type: object
+            properties:
+                item:
+                    $ref: '#/components/schemas/shop.v1.ShopItem'
+                owned:
+                    type: boolean
+        shop.v1.ListCategoriesResponse:
+            type: object
+            properties:
+                categories:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/shop.v1.CategoryInfo'
+        shop.v1.ListItemsResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/shop.v1.ShopItem'
+                total:
+                    type: integer
+                    format: int32
+        shop.v1.OwnedItem:
+            type: object
+            properties:
+                item:
+                    $ref: '#/components/schemas/shop.v1.ShopItem'
+                acquiredAt:
+                    type: string
+                    format: date-time
+                equipped:
+                    type: boolean
+        shop.v1.PurchaseRequest:
+            type: object
+            properties:
+                itemId:
+                    type: string
+        shop.v1.PurchaseResponse:
+            type: object
+            properties:
+                item:
+                    $ref: '#/components/schemas/shop.v1.OwnedItem'
+                remainingGold:
+                    type: integer
+                    format: int32
+                remainingGems:
+                    type: integer
+                    format: int32
+        shop.v1.ShopItem:
+            type: object
+            properties:
+                id:
+                    type: string
+                slug:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                category:
+                    type: integer
+                    format: enum
+                rarity:
+                    type: integer
+                    format: enum
+                currency:
+                    type: integer
+                    format: enum
+                price:
+                    type: integer
+                    format: int32
+                iconRef:
+                    type: string
+                accentColor:
+                    type: string
+                isActive:
+                    type: boolean
+                isSeasonal:
+                    type: boolean
+                rotatesAt:
+                    type: string
+                    format: date-time
+        social.v1.AcceptFriendRequestRequest:
+            type: object
+            properties:
+                requestId:
+                    type: string
+        social.v1.AcceptFriendRequestResponse:
+            type: object
+            properties:
+                friend:
+                    $ref: '#/components/schemas/social.v1.Friend'
+        social.v1.DeclineFriendRequestRequest:
+            type: object
+            properties:
+                requestId:
+                    type: string
+        social.v1.DeclineFriendRequestResponse:
+            type: object
+            properties:
+                ok:
+                    type: boolean
+        social.v1.Friend:
+            type: object
+            properties:
+                userId:
+                    type: string
+                username:
+                    type: string
+                displayName:
+                    type: string
+                avatarUrl:
+                    type: string
+                guildName:
+                    type: string
+                presence:
+                    type: integer
+                    format: enum
+                lastActivity:
+                    type: string
+                lastSeenAt:
+                    type: string
+                    format: date-time
+                friendsSince:
+                    type: string
+                    format: date-time
+                isFavorite:
+                    type: boolean
+        social.v1.FriendRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                fromUserId:
+                    type: string
+                fromUsername:
+                    type: string
+                toUserId:
+                    type: string
+                message:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+        social.v1.ListFriendsResponse:
+            type: object
+            properties:
+                friends:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/social.v1.Friend'
+                total:
+                    type: integer
+                    format: int32
+                onlineCount:
+                    type: integer
+                    format: int32
+        social.v1.ListPendingRequestsResponse:
+            type: object
+            properties:
+                incoming:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/social.v1.FriendRequest'
+                outgoing:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/social.v1.FriendRequest'
+        social.v1.RemoveFriendRequest:
+            type: object
+            properties:
+                userId:
+                    type: string
+        social.v1.RemoveFriendResponse:
+            type: object
+            properties:
+                ok:
+                    type: boolean
+        social.v1.SendFriendRequestRequest:
+            type: object
+            properties:
+                toUsername:
+                    type: string
+                message:
+                    type: string
+        social.v1.SendFriendRequestResponse:
+            type: object
+            properties:
+                request:
+                    $ref: '#/components/schemas/social.v1.FriendRequest'
+        streak.v1.GetStreakResponse:
+            type: object
+            properties:
+                state:
+                    $ref: '#/components/schemas/streak.v1.StreakState'
+        streak.v1.PurchaseShieldRequest:
+            type: object
+            properties:
+                count:
+                    type: integer
+                    format: int32
+        streak.v1.PurchaseShieldResponse:
+            type: object
+            properties:
+                state:
+                    $ref: '#/components/schemas/streak.v1.StreakState'
+                purchasedCount:
+                    type: integer
+                    format: int32
+                totalCostGold:
+                    type: integer
+                    format: int32
+        streak.v1.StreakState:
+            type: object
+            properties:
+                currentDays:
+                    type: integer
+                    format: int32
+                longestDays:
+                    type: integer
+                    format: int32
+                shieldsOwned:
+                    type: integer
+                    format: int32
+                isBroken:
+                    type: boolean
+                canRestore:
+                    type: boolean
+                lastActiveAt:
+                    type: string
+                    format: date-time
+                lastShieldUsedAt:
+                    type: string
+                    format: date-time
+                shieldPriceGold:
+                    type: integer
+                    format: int32
+        streak.v1.UseShieldRequest:
+            type: object
+            properties: {}
+        streak.v1.UseShieldResponse:
+            type: object
+            properties:
+                state:
+                    $ref: '#/components/schemas/streak.v1.StreakState'
+                restoredToDays:
+                    type: integer
+                    format: int32
+        training.v1.EvaluateTaskSolutionRequest:
+            type: object
+            properties:
+                moduleId:
+                    type: string
+                language:
+                    type: integer
+                    format: enum
+                code:
+                    type: string
+                mode:
+                    type: integer
+                    format: enum
+        training.v1.EvaluateTaskSolutionResponse:
+            type: object
+            properties:
+                testResults:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/training.v1.TrainingTestResult'
+                accepted:
+                    type: boolean
+                error:
+                    type: string
+                passedCount:
+                    type: integer
+                    format: int32
+                totalCount:
+                    type: integer
+                    format: int32
+                submissionId:
+                    type: string
+                rewardLabels:
+                    type: array
+                    items:
+                        type: string
+        training.v1.GetSkillTreeResponse:
+            type: object
+            properties:
+                selectedNodeId:
+                    type: string
+                branchStats:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/training.v1.TrainingBranchStat'
+                nodes:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/training.v1.TrainingNode'
+                edges:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/training.v1.TrainingEdge'
+                modules:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/training.v1.TrainingModule'
+        training.v1.GetTaskResponse:
+            type: object
+            properties:
+                task:
+                    $ref: '#/components/schemas/training.v1.TrainingTask'
+        training.v1.TrainingBranchStat:
+            type: object
+            properties:
+                branch:
+                    type: string
+                name:
+                    type: string
+                done:
+                    type: integer
+                    format: int32
+                total:
+                    type: integer
+                    format: int32
+                colorToken:
+                    type: string
+        training.v1.TrainingEdge:
+            type: object
+            properties:
+                fromNodeId:
+                    type: string
+                toNodeId:
+                    type: string
+        training.v1.TrainingModule:
+            type: object
+            properties:
+                nodeId:
+                    type: string
+                title:
+                    type: string
+                description:
+                    type: string
+                tasks:
+                    type: integer
+                    format: int32
+                projects:
+                    type: integer
+                    format: int32
+                hours:
+                    type: string
+                rewards:
+                    type: array
+                    items:
+                        type: string
+                prereq:
+                    type: array
+                    items:
+                        type: string
+                unlocks:
+                    type: array
+                    items:
+                        type: string
+                progressPct:
+                    type: integer
+                    format: int32
+                tasksSolved:
+                    type: integer
+                    format: int32
+                projectsDone:
+                    type: integer
+                    format: int32
+                actionUrl:
+                    type: string
+        training.v1.TrainingNode:
+            type: object
+            properties:
+                id:
+                    type: string
+                x:
+                    type: integer
+                    format: int32
+                y:
+                    type: integer
+                    format: int32
+                label:
+                    type: string
+                state:
+                    type: string
+                branch:
+                    type: string
+                keystone:
+                    type: boolean
+        training.v1.TrainingStarterCode:
+            type: object
+            properties:
+                language:
+                    type: integer
+                    format: enum
+                code:
+                    type: string
+        training.v1.TrainingTask:
+            type: object
+            properties:
+                moduleId:
+                    type: string
+                taskId:
+                    type: string
+                title:
+                    type: string
+                topic:
+                    type: string
+                difficulty:
+                    type: integer
+                    format: enum
+                statement:
+                    type: string
+                examples:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/training.v1.TrainingTaskExample'
+                constraints:
+                    type: array
+                    items:
+                        type: string
+                starterCodes:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/training.v1.TrainingStarterCode'
+                visibleTestCases:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/training.v1.TrainingTestCase'
+                hints:
+                    type: array
+                    items:
+                        type: string
+                rewardLabels:
+                    type: array
+                    items:
+                        type: string
+        training.v1.TrainingTaskExample:
+            type: object
+            properties:
+                input:
+                    type: string
+                output:
+                    type: string
+                note:
+                    type: string
+        training.v1.TrainingTestCase:
+            type: object
+            properties:
+                id:
+                    type: string
+                input:
+                    type: string
+                expected:
+                    type: string
+                hidden:
+                    type: boolean
+        training.v1.TrainingTestResult:
+            type: object
+            properties:
+                id:
+                    type: string
+                input:
+                    type: string
+                expected:
+                    type: string
+                hidden:
+                    type: boolean
+                status:
+                    type: integer
+                    format: enum
+                runtimeMs:
+                    type: string
+                actual:
+                    type: string
 tags:
     - name: AdminService
     - name: ArenaService
-    - name: CircleService
+    - name: ChallengeService
+      description: |-
+        ChallengeService hosts the read-only "mini-game" modes in druz9:
+         blind review, personal speed-run records, weekly boss info. Write
+         paths (SubmitDailyReview, SubmitWeeklyBoss, RecordSpeedRun,
+         GetDailyLeaderboard) existed historically but were never wired on
+         the frontend and have been removed — add them back only when a page
+         actually consumes them.
     - name: CodeEditorService
+    - name: DuelReplayService
+      description: |-
+        DuelReplayService stores and serves time-series replay data for arena
+         duels and friend challenges. Events are append-only keystroke/run/submit
+         entries timestamped as millisecond offsets from the match start; the
+         client replay viewer scrubs through them on a timeline.
     - name: EventService
+    - name: FriendChallengeService
+      description: |-
+        FriendChallengeService handles asynchronous 1v1 task duels between friends.
+         Unlike live arena matches, both players solve the same task on their own
+         schedule within a 48-hour window; the faster-and-more-correct submission
+         wins.
     - name: GeoService
+    - name: GuildService
+    - name: HubService
+    - name: InboxService
+      description: |-
+        InboxService delivers messages to the authenticated user. Each user sees
+         their own thread list: mentor feedback, guild notices, system events,
+         duel chat, friend-challenge conversations. Threads are per-user and own
+         their message list; cross-user threads are modeled by mirroring messages.
     - name: InterviewPrepService
+    - name: MissionService
+    - name: NotificationSettingsService
     - name: PodcastService
     - name: ProfileService
     - name: ReferralService
+    - name: SeasonPassService
+      description: |-
+        SeasonPassService exposes the current season's tiered-reward track. Each
+         season has a fixed tier ladder (~40 tiers); free rewards are claimable by
+         every player as they accumulate XP, premium rewards require buying the
+         season pass first.
+    - name: ShopService
+      description: |-
+        ShopService is the Tavern: a catalog of cosmetics/decor/pets plus a
+         per-user inventory of what's been purchased. Prices are paid in gold or
+         gems; both balances live on the profile (not yet debited from this
+         service — Debit* is a follow-up when the profile wallet API is ready).
+    - name: SocialService
+      description: |-
+        SocialService manages the friends graph: sending/accepting requests,
+         listing current friends with their online presence, and removing
+         friendships. Chat between friends happens in the inbox service; this
+         service is purely about the relationship edges.
+    - name: StreakService
+      description: |-
+        StreakService manages daily-activity streak state and the "Streak Shield"
+         inventory item users can spend to restore a broken streak. The raw streak
+         count itself is derived from existing activity tables (mission/practice)
+         and exposed via profile progress; this service owns the protection layer.
+    - name: TrainingService

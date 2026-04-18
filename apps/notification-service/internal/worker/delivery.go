@@ -107,21 +107,21 @@ func (w *DeliveryWorker) deliver(ctx context.Context, n *data.Notification) erro
 		return w.markFailed(ctx, n.ID, fmt.Sprintf("daily count: %v", err))
 	}
 
-	// Get circle settings if this is a circle notification.
-	var circleSettings *data.CircleSettings
-	if service.IsCircleKind(n.Kind) {
-		circleID := extractCircleID(n.Payload)
-		if circleID != uuid.Nil {
-			cs, csErr := w.repo.GetCircleSettings(ctx, n.UserID, circleID)
+	// Get guild settings if this is a guild notification.
+	var guildSettings *data.GuildSettings
+	if service.IsGuildKind(n.Kind) {
+		guildID := extractGuildID(n.Payload)
+		if guildID != uuid.Nil {
+			cs, csErr := w.repo.GetGuildSettings(ctx, n.UserID, guildID)
 			if csErr != nil {
-				klog.Warnf("worker get circle settings: %v", csErr)
+				klog.Warnf("worker get guild settings: %v", csErr)
 			} else {
-				circleSettings = cs
+				guildSettings = cs
 			}
 		}
 	}
 
-	result := service.ShouldDeliver(n, settings, dailyCount, circleSettings)
+	result := service.ShouldDeliver(n, settings, dailyCount, guildSettings)
 
 	switch result {
 	case service.FilterDrop:
@@ -171,15 +171,15 @@ func buildKeyboard(n *data.Notification) *telegram.InlineKeyboardMarkup {
 				},
 			},
 		}
-	case service.KindCircleInvite:
-		circleID := extractStringField(n.Payload, "circle_id")
-		if circleID == "" {
+	case service.KindGuildInvite:
+		guildID := extractStringField(n.Payload, "guild_id")
+		if guildID == "" {
 			return nil
 		}
 		return &telegram.InlineKeyboardMarkup{
 			InlineKeyboard: [][]telegram.InlineKeyboardButton{
 				{
-					{Text: "Открыть круг", URL: "https://druz9.online/circles/" + circleID},
+					{Text: "Открыть круг", URL: "https://druz9.online/guilds/" + guildID},
 				},
 			},
 		}
@@ -212,17 +212,17 @@ func extractStringField(payload []byte, field string) string {
 	return v
 }
 
-func extractCircleID(payload []byte) uuid.UUID {
+func extractGuildID(payload []byte) uuid.UUID {
 	if len(payload) == 0 {
 		return uuid.Nil
 	}
 	var p struct {
-		CircleID string `json:"circle_id"`
+		GuildID string `json:"guild_id"`
 	}
 	if err := json.Unmarshal(payload, &p); err != nil {
 		return uuid.Nil
 	}
-	id, err := uuid.Parse(p.CircleID)
+	id, err := uuid.Parse(p.GuildID)
 	if err != nil {
 		return uuid.Nil
 	}

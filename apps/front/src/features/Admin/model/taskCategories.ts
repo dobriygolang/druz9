@@ -1,6 +1,6 @@
 export const TASK_CATEGORIES = [
-  { value: 'mock', label: 'Mock Interview', topicTag: 'category:mock' },
-  { value: 'solo_practice', label: 'Solo Practice', topicTag: 'category:solo_practice' },
+  { value: 'mock', label: 'Пробное интервью', topicTag: 'category:mock' },
+  { value: 'solo_practice', label: 'Самостоятельная практика', topicTag: 'category:solo_practice' },
 ] as const
 
 export type TaskCategory = typeof TASK_CATEGORIES[number]['value']

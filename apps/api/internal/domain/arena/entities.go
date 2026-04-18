@@ -34,7 +34,7 @@ const (
 	ArenaLeagueGold     = model.ArenaLeagueGold
 	ArenaLeaguePlatinum = model.ArenaLeaguePlatinum
 	ArenaLeagueDiamond  = model.ArenaLeagueDiamond
-	ArenaLeagueMaster = model.ArenaLeagueMaster
+	ArenaLeagueMaster   = model.ArenaLeagueMaster
 )
 
 type Match = model.ArenaMatch

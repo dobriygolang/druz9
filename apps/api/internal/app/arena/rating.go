@@ -17,6 +17,10 @@ const (
 	defaultMatchDurationSeconds = int32(900) // 15 minutes
 	freezePenaltySeconds        = int32(30)
 	defaultRating               = arenarating.DefaultRating
+	// arenaWinXP feeds into the active Season Pass. Chosen to roughly
+	// match a mission completion so duel grinding and questing feel
+	// equally rewarding toward tier progression.
+	arenaWinXP = int32(150)
 )
 
 func (s *Service) GetLeaderboard(ctx context.Context, limit int32) ([]*domain.LeaderboardEntry, error) {
@@ -61,6 +65,9 @@ func (s *Service) refreshMatchState(ctx context.Context, match *domain.Match) er
 		err := s.repo.FinishMatch(ctx, match.ID, &winner.UserID, winner.reason, nowTime)
 		if err == nil {
 			s.observeMatchFinished(match, nowTime)
+			s.awardSeasonPassXP(ctx, winner.UserID, arenaWinXP)
+			winnerID := winner.UserID
+			s.recordReplaySummary(ctx, match, nowTime, &winnerID)
 		}
 		return err
 	}
@@ -70,6 +77,9 @@ func (s *Service) refreshMatchState(ctx context.Context, match *domain.Match) er
 			err := s.repo.FinishMatch(ctx, match.ID, &accepted[0].UserID, domain.WinnerReasonSingleAC, nowTime)
 			if err == nil {
 				s.observeMatchFinished(match, nowTime)
+				s.awardSeasonPassXP(ctx, accepted[0].UserID, arenaWinXP)
+				winnerID := accepted[0].UserID
+				s.recordReplaySummary(ctx, match, nowTime, &winnerID)
 			}
 			return err
 		}
@@ -135,6 +145,55 @@ func leagueName(rating int32) model.ArenaLeague {
 	return model.ArenaLeagueFromString(arenarating.LeagueName(rating))
 }
 
+// recordReplaySummary asks the duel_replay subsystem to persist a header
+// for this finished match so players can revisit it later. Requires at
+// least 2 players (1v1 rated duels). Non-fatal on failure — replays are
+// a convenience, not a correctness concern for the match itself.
+func (s *Service) recordReplaySummary(ctx context.Context, match *domain.Match, finishedAt time.Time, winnerID *uuid.UUID) {
+	if s.duelReplay == nil || match == nil || len(match.Players) < 2 {
+		return
+	}
+	p1, p2 := match.Players[0], match.Players[1]
+	var durationMs int32
+	if match.StartedAt != nil {
+		if d := finishedAt.Sub(*match.StartedAt); d > 0 {
+			durationMs = int32(d / time.Millisecond)
+		}
+	}
+	taskTitle, taskTopic := "", match.Topic
+	var taskDifficulty int32
+	if match.Task != nil {
+		taskTitle = match.Task.Title
+		taskDifficulty = int32(match.Task.Difficulty)
+	}
+	summary := &model.DuelReplaySummary{
+		ID:              uuid.New(),
+		SourceKind:      model.ReplaySourceArena,
+		SourceID:        match.ID,
+		Player1ID:       p1.UserID,
+		Player1Username: p1.DisplayName,
+		Player2ID:       p2.UserID,
+		Player2Username: p2.DisplayName,
+		TaskTitle:       taskTitle,
+		TaskTopic:       taskTopic,
+		TaskDifficulty:  taskDifficulty,
+		DurationMs:      durationMs,
+		WinnerID:        winnerID,
+		CompletedAt:     finishedAt,
+	}
+	_ = s.duelReplay.CreateReplay(ctx, summary)
+}
+
+// awardSeasonPassXP credits the winner's Season Pass when one is active.
+// Failures are logged (via the domain layer) but never bubble up — a broken
+// pass service must not block match completion.
+func (s *Service) awardSeasonPassXP(ctx context.Context, userID uuid.UUID, delta int32) {
+	if s.seasonPass == nil || delta <= 0 {
+		return
+	}
+	_ = s.seasonPass.AddXP(ctx, userID, delta)
+}
+
 func (s *Service) observeMatchFinished(match *domain.Match, finishedAt time.Time) {
 	var durationSeconds float64
 	if match.StartedAt != nil {
@@ -151,6 +210,3 @@ func (s *Service) GetLeaguePosition(ctx context.Context, userID string, rating i
 	return s.repo.GetLeaguePosition(ctx, userID, rating)
 }
 
-func (s *Service) GetSeasonHistory(ctx context.Context, userID string, limit int32) ([]*model.ArenaSeasonResult, error) {
-	return s.repo.GetSeasonHistory(ctx, userID, limit)
-}

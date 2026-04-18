@@ -45,12 +45,12 @@ function normalizeKind(raw: string | undefined, stage?: any): string {
 }
 
 const STAGE_KIND_LABELS: Record<string, string> = {
-  algorithm:    'Algorithms',
-  coding:       'Coding',
-  sql:          'SQL',
-  system_design:'System Design',
-  behavioral:   'Behavioral',
-  theoretical:  'Theoretical',
+  algorithm: 'mock.stageLabel.algorithm',
+  coding: 'mock.stageLabel.coding',
+  sql: 'mock.stageLabel.sql',
+  system_design: 'mock.stageLabel.systemDesign',
+  behavioral: 'mock.stageLabel.behavioral',
+  theoretical: 'mock.stageLabel.theoretical',
 }
 
 
@@ -146,7 +146,7 @@ export function InterviewPrepMockSessionPage() {
   const currentStageIndex = currentStage?.stageIndex ?? session?.currentStageIndex ?? 0
   const isFinished = session?.status === 'MOCK_SESSION_STATUS_FINISHED' || session?.status === 'finished'
   const supportedLanguages = resolveSupportedLanguages(currentStage?.task, currentStage?.solveLanguage ?? currentStage?.task?.language ?? 'python')
-  const stageTitle = currentStage?.title || STAGE_KIND_LABELS[stageKind] || t('mock.stageDefault')
+  const stageTitle = currentStage?.title || t(STAGE_KIND_LABELS[stageKind] ?? 'mock.stageDefault')
   const isCodeReview = stageKind === 'theoretical' && (
     currentStage?.task?.prepType === 'code_review' ||
     currentStage?.roundType === 'code_review'
@@ -238,7 +238,7 @@ export function InterviewPrepMockSessionPage() {
             </div>
             {!compact && (
               <span className={`whitespace-nowrap text-[11px] font-medium ${isCurrent ? 'text-[#E2F0E8]' : 'text-[#7A9982]'}`}>
-                {s.title || STAGE_KIND_LABELS[kind] || kind}
+                {s.title || t(STAGE_KIND_LABELS[kind] ?? 'mock.stageDefault')}
               </span>
             )}
             {compact && i < stages.length - 1 && (
@@ -355,9 +355,9 @@ export function InterviewPrepMockSessionPage() {
       <button
         onClick={() => { if (editorRef.current && monacoRef.current) formatEditorCode(editorRef.current, monacoRef.current) }}
         className="rounded px-2 py-0.5 text-[10px] font-medium text-[#94a3b8] transition-colors hover:bg-[#0B1210] hover:text-white"
-        title="Format (Shift+Alt+F)"
+        title={t('mock.formatTooltip')}
       >
-        Format
+        {t('mock.format')}
       </button>
       {supportedLanguages.length > 1 ? (
         <select
@@ -392,7 +392,7 @@ export function InterviewPrepMockSessionPage() {
       {[
         { label: t('mock.design.architecture'), key: 'notes', value: designNotes, set: setDesignNotes, rows: 6, placeholder: t('mock.design.architecturePlaceholder') },
         { label: t('mock.design.components'), key: 'components', value: designComponents, set: setDesignComponents, rows: 4, placeholder: t('mock.design.componentsPlaceholder') },
-        { label: 'API', key: 'apis', value: designApis, set: setDesignApis, rows: 3, placeholder: t('mock.design.apiPlaceholder') },
+        { label: t('mock.design.api'), key: 'apis', value: designApis, set: setDesignApis, rows: 3, placeholder: t('mock.design.apiPlaceholder') },
         { label: t('mock.design.schema'), key: 'schema', value: designSchema, set: setDesignSchema, rows: 3, placeholder: t('mock.design.schemaPlaceholder') },
       ].map(({ label, key, value, set, rows, placeholder }) => (
         <div key={key}>
@@ -495,7 +495,7 @@ export function InterviewPrepMockSessionPage() {
                 {[
                   { label: t('mock.design.architecture'), key: 'notes', value: designNotes, set: setDesignNotes, rows: 6, placeholder: t('mock.design.architecturePlaceholder') },
                   { label: t('mock.design.components'), key: 'components', value: designComponents, set: setDesignComponents, rows: 4, placeholder: t('mock.design.componentsPlaceholder') },
-                  { label: 'API', key: 'apis', value: designApis, set: setDesignApis, rows: 3, placeholder: t('mock.design.apiPlaceholder') },
+                  { label: t('mock.design.api'), key: 'apis', value: designApis, set: setDesignApis, rows: 3, placeholder: t('mock.design.apiPlaceholder') },
                   { label: t('mock.design.schema'), key: 'schema', value: designSchema, set: setDesignSchema, rows: 3, placeholder: t('mock.design.schemaPlaceholder') },
                 ].map(({ label, key, value, set, rows, placeholder }) => (
                   <div key={key}>
@@ -570,7 +570,7 @@ export function InterviewPrepMockSessionPage() {
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
-            <p className="text-sm font-bold text-[#E2F0E8]">Mock Interview · {blueprintTitle || companyTag || t('mock.general')}</p>
+            <p className="text-sm font-bold text-[#E2F0E8]">{t('mock.meta.title')} · {blueprintTitle || companyTag || t('mock.general')}</p>
             <p className="text-xs text-[#7A9982]">
               {isFinished
                 ? t('mock.finishedTitle')
@@ -721,7 +721,7 @@ export function InterviewPrepMockSessionPage() {
           {t('mock.leaveBody')}
         </p>
         <p className="mt-2 text-xs text-[#94a3b8] dark:text-[#4A7058]">
-          {t('mock.leaveNoStats', 'Incomplete stages will not count towards your stats.')}
+          {t('mock.leaveNoStats')}
         </p>
       </Modal>
     </div>

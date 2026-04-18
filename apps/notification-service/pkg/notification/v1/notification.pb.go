@@ -36,15 +36,15 @@ const (
 	NotificationKind_NOTIFICATION_KIND_RATING_MILESTONE           NotificationKind = 7
 	NotificationKind_NOTIFICATION_KIND_MOCK_RESULT                NotificationKind = 8
 	NotificationKind_NOTIFICATION_KIND_REVIEW_READY               NotificationKind = 9
-	NotificationKind_NOTIFICATION_KIND_CIRCLE_EVENT_CREATED       NotificationKind = 10
-	NotificationKind_NOTIFICATION_KIND_CIRCLE_EVENT_REMINDER      NotificationKind = 11
-	NotificationKind_NOTIFICATION_KIND_CIRCLE_INVITE              NotificationKind = 12
-	NotificationKind_NOTIFICATION_KIND_CIRCLE_CHALLENGE_COMPLETED NotificationKind = 13
-	NotificationKind_NOTIFICATION_KIND_CIRCLE_MEMBER_JOINED       NotificationKind = 14
-	NotificationKind_NOTIFICATION_KIND_CIRCLE_CHALLENGE_PROGRESS  NotificationKind = 15
-	NotificationKind_NOTIFICATION_KIND_CIRCLE_WEEKLY_DIGEST       NotificationKind = 16
+	NotificationKind_NOTIFICATION_KIND_GUILD_EVENT_CREATED       NotificationKind = 10
+	NotificationKind_NOTIFICATION_KIND_GUILD_EVENT_REMINDER      NotificationKind = 11
+	NotificationKind_NOTIFICATION_KIND_GUILD_INVITE              NotificationKind = 12
+	NotificationKind_NOTIFICATION_KIND_GUILD_CHALLENGE_COMPLETED NotificationKind = 13
+	NotificationKind_NOTIFICATION_KIND_GUILD_MEMBER_JOINED       NotificationKind = 14
+	NotificationKind_NOTIFICATION_KIND_GUILD_CHALLENGE_PROGRESS  NotificationKind = 15
+	NotificationKind_NOTIFICATION_KIND_GUILD_WEEKLY_DIGEST       NotificationKind = 16
 	NotificationKind_NOTIFICATION_KIND_DAILY_CHALLENGE            NotificationKind = 17
-	NotificationKind_NOTIFICATION_KIND_RE_ENGAGEMENT_CIRCLE       NotificationKind = 18
+	NotificationKind_NOTIFICATION_KIND_RE_ENGAGEMENT_GUILD       NotificationKind = 18
 	NotificationKind_NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL     NotificationKind = 19
 )
 
@@ -61,15 +61,15 @@ var (
 		7:  "NOTIFICATION_KIND_RATING_MILESTONE",
 		8:  "NOTIFICATION_KIND_MOCK_RESULT",
 		9:  "NOTIFICATION_KIND_REVIEW_READY",
-		10: "NOTIFICATION_KIND_CIRCLE_EVENT_CREATED",
-		11: "NOTIFICATION_KIND_CIRCLE_EVENT_REMINDER",
-		12: "NOTIFICATION_KIND_CIRCLE_INVITE",
-		13: "NOTIFICATION_KIND_CIRCLE_CHALLENGE_COMPLETED",
-		14: "NOTIFICATION_KIND_CIRCLE_MEMBER_JOINED",
-		15: "NOTIFICATION_KIND_CIRCLE_CHALLENGE_PROGRESS",
-		16: "NOTIFICATION_KIND_CIRCLE_WEEKLY_DIGEST",
+		10: "NOTIFICATION_KIND_GUILD_EVENT_CREATED",
+		11: "NOTIFICATION_KIND_GUILD_EVENT_REMINDER",
+		12: "NOTIFICATION_KIND_GUILD_INVITE",
+		13: "NOTIFICATION_KIND_GUILD_CHALLENGE_COMPLETED",
+		14: "NOTIFICATION_KIND_GUILD_MEMBER_JOINED",
+		15: "NOTIFICATION_KIND_GUILD_CHALLENGE_PROGRESS",
+		16: "NOTIFICATION_KIND_GUILD_WEEKLY_DIGEST",
 		17: "NOTIFICATION_KIND_DAILY_CHALLENGE",
-		18: "NOTIFICATION_KIND_RE_ENGAGEMENT_CIRCLE",
+		18: "NOTIFICATION_KIND_RE_ENGAGEMENT_GUILD",
 		19: "NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL",
 	}
 	NotificationKind_value = map[string]int32{
@@ -83,15 +83,15 @@ var (
 		"NOTIFICATION_KIND_RATING_MILESTONE":           7,
 		"NOTIFICATION_KIND_MOCK_RESULT":                8,
 		"NOTIFICATION_KIND_REVIEW_READY":               9,
-		"NOTIFICATION_KIND_CIRCLE_EVENT_CREATED":       10,
-		"NOTIFICATION_KIND_CIRCLE_EVENT_REMINDER":      11,
-		"NOTIFICATION_KIND_CIRCLE_INVITE":              12,
-		"NOTIFICATION_KIND_CIRCLE_CHALLENGE_COMPLETED": 13,
-		"NOTIFICATION_KIND_CIRCLE_MEMBER_JOINED":       14,
-		"NOTIFICATION_KIND_CIRCLE_CHALLENGE_PROGRESS":  15,
-		"NOTIFICATION_KIND_CIRCLE_WEEKLY_DIGEST":       16,
+		"NOTIFICATION_KIND_GUILD_EVENT_CREATED":       10,
+		"NOTIFICATION_KIND_GUILD_EVENT_REMINDER":      11,
+		"NOTIFICATION_KIND_GUILD_INVITE":              12,
+		"NOTIFICATION_KIND_GUILD_CHALLENGE_COMPLETED": 13,
+		"NOTIFICATION_KIND_GUILD_MEMBER_JOINED":       14,
+		"NOTIFICATION_KIND_GUILD_CHALLENGE_PROGRESS":  15,
+		"NOTIFICATION_KIND_GUILD_WEEKLY_DIGEST":       16,
 		"NOTIFICATION_KIND_DAILY_CHALLENGE":            17,
-		"NOTIFICATION_KIND_RE_ENGAGEMENT_CIRCLE":       18,
+		"NOTIFICATION_KIND_RE_ENGAGEMENT_GUILD":       18,
 		"NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL":     19,
 	}
 )
@@ -552,7 +552,7 @@ type UpdateSettingsRequest struct {
 	UserId                string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	DuelsEnabled          *bool                  `protobuf:"varint,2,opt,name=duels_enabled,json=duelsEnabled,proto3,oneof" json:"duels_enabled,omitempty"`
 	ProgressEnabled       *bool                  `protobuf:"varint,3,opt,name=progress_enabled,json=progressEnabled,proto3,oneof" json:"progress_enabled,omitempty"`
-	CirclesEnabled        *bool                  `protobuf:"varint,4,opt,name=circles_enabled,json=circlesEnabled,proto3,oneof" json:"circles_enabled,omitempty"`
+	GuildsEnabled        *bool                  `protobuf:"varint,4,opt,name=guilds_enabled,json=guildsEnabled,proto3,oneof" json:"guilds_enabled,omitempty"`
 	DailyChallengeEnabled *bool                  `protobuf:"varint,5,opt,name=daily_challenge_enabled,json=dailyChallengeEnabled,proto3,oneof" json:"daily_challenge_enabled,omitempty"`
 	QuietHoursStart       *int32                 `protobuf:"varint,6,opt,name=quiet_hours_start,json=quietHoursStart,proto3,oneof" json:"quiet_hours_start,omitempty"`
 	QuietHoursEnd         *int32                 `protobuf:"varint,7,opt,name=quiet_hours_end,json=quietHoursEnd,proto3,oneof" json:"quiet_hours_end,omitempty"`
@@ -612,9 +612,9 @@ func (x *UpdateSettingsRequest) GetProgressEnabled() bool {
 	return false
 }
 
-func (x *UpdateSettingsRequest) GetCirclesEnabled() bool {
-	if x != nil && x.CirclesEnabled != nil {
-		return *x.CirclesEnabled
+func (x *UpdateSettingsRequest) GetGuildsEnabled() bool {
+	if x != nil && x.GuildsEnabled != nil {
+		return *x.GuildsEnabled
 	}
 	return false
 }
@@ -731,7 +731,7 @@ type GetSettingsResponse struct {
 	state                 protoimpl.MessageState `protogen:"open.v1"`
 	DuelsEnabled          bool                   `protobuf:"varint,1,opt,name=duels_enabled,json=duelsEnabled,proto3" json:"duels_enabled,omitempty"`
 	ProgressEnabled       bool                   `protobuf:"varint,2,opt,name=progress_enabled,json=progressEnabled,proto3" json:"progress_enabled,omitempty"`
-	CirclesEnabled        bool                   `protobuf:"varint,3,opt,name=circles_enabled,json=circlesEnabled,proto3" json:"circles_enabled,omitempty"`
+	GuildsEnabled        bool                   `protobuf:"varint,3,opt,name=guilds_enabled,json=guildsEnabled,proto3" json:"guilds_enabled,omitempty"`
 	DailyChallengeEnabled bool                   `protobuf:"varint,4,opt,name=daily_challenge_enabled,json=dailyChallengeEnabled,proto3" json:"daily_challenge_enabled,omitempty"`
 	QuietHoursStart       int32                  `protobuf:"varint,5,opt,name=quiet_hours_start,json=quietHoursStart,proto3" json:"quiet_hours_start,omitempty"`
 	QuietHoursEnd         int32                  `protobuf:"varint,6,opt,name=quiet_hours_end,json=quietHoursEnd,proto3" json:"quiet_hours_end,omitempty"`
@@ -785,9 +785,9 @@ func (x *GetSettingsResponse) GetProgressEnabled() bool {
 	return false
 }
 
-func (x *GetSettingsResponse) GetCirclesEnabled() bool {
+func (x *GetSettingsResponse) GetGuildsEnabled() bool {
 	if x != nil {
-		return x.CirclesEnabled
+		return x.GuildsEnabled
 	}
 	return false
 }
@@ -827,10 +827,10 @@ func (x *GetSettingsResponse) GetTelegramChatId() int64 {
 	return 0
 }
 
-type UpdateCircleSettingsRequest struct {
+type UpdateGuildSettingsRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	UserId          string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	CircleId        string                 `protobuf:"bytes,2,opt,name=circle_id,json=circleId,proto3" json:"circle_id,omitempty"`
+	GuildId        string                 `protobuf:"bytes,2,opt,name=guild_id,json=guildId,proto3" json:"guild_id,omitempty"`
 	EventsEnabled   *bool                  `protobuf:"varint,3,opt,name=events_enabled,json=eventsEnabled,proto3,oneof" json:"events_enabled,omitempty"`
 	ActivityEnabled *bool                  `protobuf:"varint,4,opt,name=activity_enabled,json=activityEnabled,proto3,oneof" json:"activity_enabled,omitempty"`
 	DigestEnabled   *bool                  `protobuf:"varint,5,opt,name=digest_enabled,json=digestEnabled,proto3,oneof" json:"digest_enabled,omitempty"`
@@ -839,20 +839,20 @@ type UpdateCircleSettingsRequest struct {
 	sizeCache       protoimpl.SizeCache
 }
 
-func (x *UpdateCircleSettingsRequest) Reset() {
-	*x = UpdateCircleSettingsRequest{}
+func (x *UpdateGuildSettingsRequest) Reset() {
+	*x = UpdateGuildSettingsRequest{}
 	mi := &file_notification_v1_notification_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UpdateCircleSettingsRequest) String() string {
+func (x *UpdateGuildSettingsRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UpdateCircleSettingsRequest) ProtoMessage() {}
+func (*UpdateGuildSettingsRequest) ProtoMessage() {}
 
-func (x *UpdateCircleSettingsRequest) ProtoReflect() protoreflect.Message {
+func (x *UpdateGuildSettingsRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_notification_v1_notification_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -864,73 +864,73 @@ func (x *UpdateCircleSettingsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateCircleSettingsRequest.ProtoReflect.Descriptor instead.
-func (*UpdateCircleSettingsRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use UpdateGuildSettingsRequest.ProtoReflect.Descriptor instead.
+func (*UpdateGuildSettingsRequest) Descriptor() ([]byte, []int) {
 	return file_notification_v1_notification_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *UpdateCircleSettingsRequest) GetUserId() string {
+func (x *UpdateGuildSettingsRequest) GetUserId() string {
 	if x != nil {
 		return x.UserId
 	}
 	return ""
 }
 
-func (x *UpdateCircleSettingsRequest) GetCircleId() string {
+func (x *UpdateGuildSettingsRequest) GetGuildId() string {
 	if x != nil {
-		return x.CircleId
+		return x.GuildId
 	}
 	return ""
 }
 
-func (x *UpdateCircleSettingsRequest) GetEventsEnabled() bool {
+func (x *UpdateGuildSettingsRequest) GetEventsEnabled() bool {
 	if x != nil && x.EventsEnabled != nil {
 		return *x.EventsEnabled
 	}
 	return false
 }
 
-func (x *UpdateCircleSettingsRequest) GetActivityEnabled() bool {
+func (x *UpdateGuildSettingsRequest) GetActivityEnabled() bool {
 	if x != nil && x.ActivityEnabled != nil {
 		return *x.ActivityEnabled
 	}
 	return false
 }
 
-func (x *UpdateCircleSettingsRequest) GetDigestEnabled() bool {
+func (x *UpdateGuildSettingsRequest) GetDigestEnabled() bool {
 	if x != nil && x.DigestEnabled != nil {
 		return *x.DigestEnabled
 	}
 	return false
 }
 
-func (x *UpdateCircleSettingsRequest) GetMuted() bool {
+func (x *UpdateGuildSettingsRequest) GetMuted() bool {
 	if x != nil && x.Muted != nil {
 		return *x.Muted
 	}
 	return false
 }
 
-type UpdateCircleSettingsResponse struct {
+type UpdateGuildSettingsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UpdateCircleSettingsResponse) Reset() {
-	*x = UpdateCircleSettingsResponse{}
+func (x *UpdateGuildSettingsResponse) Reset() {
+	*x = UpdateGuildSettingsResponse{}
 	mi := &file_notification_v1_notification_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UpdateCircleSettingsResponse) String() string {
+func (x *UpdateGuildSettingsResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UpdateCircleSettingsResponse) ProtoMessage() {}
+func (*UpdateGuildSettingsResponse) ProtoMessage() {}
 
-func (x *UpdateCircleSettingsResponse) ProtoReflect() protoreflect.Message {
+func (x *UpdateGuildSettingsResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_notification_v1_notification_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -942,8 +942,8 @@ func (x *UpdateCircleSettingsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateCircleSettingsResponse.ProtoReflect.Descriptor instead.
-func (*UpdateCircleSettingsResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use UpdateGuildSettingsResponse.ProtoReflect.Descriptor instead.
+func (*UpdateGuildSettingsResponse) Descriptor() ([]byte, []int) {
 	return file_notification_v1_notification_proto_rawDescGZIP(), []int{13}
 }
 
@@ -983,14 +983,14 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12(\n" +
 	"\rduels_enabled\x18\x02 \x01(\bH\x00R\fduelsEnabled\x88\x01\x01\x12.\n" +
 	"\x10progress_enabled\x18\x03 \x01(\bH\x01R\x0fprogressEnabled\x88\x01\x01\x12,\n" +
-	"\x0fcircles_enabled\x18\x04 \x01(\bH\x02R\x0ecirclesEnabled\x88\x01\x01\x12;\n" +
+	"\x0fguilds_enabled\x18\x04 \x01(\bH\x02R\x0eguildsEnabled\x88\x01\x01\x12;\n" +
 	"\x17daily_challenge_enabled\x18\x05 \x01(\bH\x03R\x15dailyChallengeEnabled\x88\x01\x01\x12/\n" +
 	"\x11quiet_hours_start\x18\x06 \x01(\x05H\x04R\x0fquietHoursStart\x88\x01\x01\x12+\n" +
 	"\x0fquiet_hours_end\x18\a \x01(\x05H\x05R\rquietHoursEnd\x88\x01\x01\x12\x1f\n" +
 	"\btimezone\x18\b \x01(\tH\x06R\btimezone\x88\x01\x01B\x10\n" +
 	"\x0e_duels_enabledB\x13\n" +
 	"\x11_progress_enabledB\x12\n" +
-	"\x10_circles_enabledB\x1a\n" +
+	"\x10_guilds_enabledB\x1a\n" +
 	"\x18_daily_challenge_enabledB\x14\n" +
 	"\x12_quiet_hours_startB\x12\n" +
 	"\x10_quiet_hours_endB\v\n" +
@@ -1001,15 +1001,15 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\x13GetSettingsResponse\x12#\n" +
 	"\rduels_enabled\x18\x01 \x01(\bR\fduelsEnabled\x12)\n" +
 	"\x10progress_enabled\x18\x02 \x01(\bR\x0fprogressEnabled\x12'\n" +
-	"\x0fcircles_enabled\x18\x03 \x01(\bR\x0ecirclesEnabled\x126\n" +
+	"\x0fguilds_enabled\x18\x03 \x01(\bR\x0eguildsEnabled\x126\n" +
 	"\x17daily_challenge_enabled\x18\x04 \x01(\bR\x15dailyChallengeEnabled\x12*\n" +
 	"\x11quiet_hours_start\x18\x05 \x01(\x05R\x0fquietHoursStart\x12&\n" +
 	"\x0fquiet_hours_end\x18\x06 \x01(\x05R\rquietHoursEnd\x12\x1a\n" +
 	"\btimezone\x18\a \x01(\tR\btimezone\x12(\n" +
 	"\x10telegram_chat_id\x18\b \x01(\x03R\x0etelegramChatId\"\xbb\x02\n" +
-	"\x1bUpdateCircleSettingsRequest\x12\x17\n" +
+	"\x1bUpdateGuildSettingsRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
-	"\tcircle_id\x18\x02 \x01(\tR\bcircleId\x12*\n" +
+	"\tguild_id\x18\x02 \x01(\tR\bguildId\x12*\n" +
 	"\x0eevents_enabled\x18\x03 \x01(\bH\x00R\reventsEnabled\x88\x01\x01\x12.\n" +
 	"\x10activity_enabled\x18\x04 \x01(\bH\x01R\x0factivityEnabled\x88\x01\x01\x12*\n" +
 	"\x0edigest_enabled\x18\x05 \x01(\bH\x02R\rdigestEnabled\x88\x01\x01\x12\x19\n" +
@@ -1018,7 +1018,7 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\x11_activity_enabledB\x11\n" +
 	"\x0f_digest_enabledB\b\n" +
 	"\x06_muted\"\x1e\n" +
-	"\x1cUpdateCircleSettingsResponse*\xc1\x06\n" +
+	"\x1cUpdateGuildSettingsResponse*\xc1\x06\n" +
 	"\x10NotificationKind\x12!\n" +
 	"\x1dNOTIFICATION_KIND_UNSPECIFIED\x10\x00\x12!\n" +
 	"\x1dNOTIFICATION_KIND_DUEL_INVITE\x10\x01\x12&\n" +
@@ -1030,16 +1030,16 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\"NOTIFICATION_KIND_RATING_MILESTONE\x10\a\x12!\n" +
 	"\x1dNOTIFICATION_KIND_MOCK_RESULT\x10\b\x12\"\n" +
 	"\x1eNOTIFICATION_KIND_REVIEW_READY\x10\t\x12*\n" +
-	"&NOTIFICATION_KIND_CIRCLE_EVENT_CREATED\x10\n" +
+	"&NOTIFICATION_KIND_GUILD_EVENT_CREATED\x10\n" +
 	"\x12+\n" +
-	"'NOTIFICATION_KIND_CIRCLE_EVENT_REMINDER\x10\v\x12#\n" +
-	"\x1fNOTIFICATION_KIND_CIRCLE_INVITE\x10\f\x120\n" +
-	",NOTIFICATION_KIND_CIRCLE_CHALLENGE_COMPLETED\x10\r\x12*\n" +
-	"&NOTIFICATION_KIND_CIRCLE_MEMBER_JOINED\x10\x0e\x12/\n" +
-	"+NOTIFICATION_KIND_CIRCLE_CHALLENGE_PROGRESS\x10\x0f\x12*\n" +
-	"&NOTIFICATION_KIND_CIRCLE_WEEKLY_DIGEST\x10\x10\x12%\n" +
+	"'NOTIFICATION_KIND_GUILD_EVENT_REMINDER\x10\v\x12#\n" +
+	"\x1fNOTIFICATION_KIND_GUILD_INVITE\x10\f\x120\n" +
+	",NOTIFICATION_KIND_GUILD_CHALLENGE_COMPLETED\x10\r\x12*\n" +
+	"&NOTIFICATION_KIND_GUILD_MEMBER_JOINED\x10\x0e\x12/\n" +
+	"+NOTIFICATION_KIND_GUILD_CHALLENGE_PROGRESS\x10\x0f\x12*\n" +
+	"&NOTIFICATION_KIND_GUILD_WEEKLY_DIGEST\x10\x10\x12%\n" +
 	"!NOTIFICATION_KIND_DAILY_CHALLENGE\x10\x11\x12*\n" +
-	"&NOTIFICATION_KIND_RE_ENGAGEMENT_CIRCLE\x10\x12\x12,\n" +
+	"&NOTIFICATION_KIND_RE_ENGAGEMENT_GUILD\x10\x12\x12,\n" +
 	"(NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL\x10\x132\x9a\x05\n" +
 	"\x13NotificationService\x12C\n" +
 	"\x04Send\x12\x1c.notification.v1.SendRequest\x1a\x1d.notification.v1.SendResponse\x12R\n" +
@@ -1048,7 +1048,7 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\fLinkTelegram\x12$.notification.v1.LinkTelegramRequest\x1a%.notification.v1.LinkTelegramResponse\x12a\n" +
 	"\x0eUpdateSettings\x12&.notification.v1.UpdateSettingsRequest\x1a'.notification.v1.UpdateSettingsResponse\x12X\n" +
 	"\vGetSettings\x12#.notification.v1.GetSettingsRequest\x1a$.notification.v1.GetSettingsResponse\x12s\n" +
-	"\x14UpdateCircleSettings\x12,.notification.v1.UpdateCircleSettingsRequest\x1a-.notification.v1.UpdateCircleSettingsResponseB-Z+notification-service/pkg/notification/v1;v1b\x06proto3"
+	"\x14UpdateGuildSettings\x12,.notification.v1.UpdateGuildSettingsRequest\x1a-.notification.v1.UpdateGuildSettingsResponseB-Z+notification-service/pkg/notification/v1;v1b\x06proto3"
 
 var (
 	file_notification_v1_notification_proto_rawDescOnce sync.Once
@@ -1078,8 +1078,8 @@ var file_notification_v1_notification_proto_goTypes = []any{
 	(*UpdateSettingsResponse)(nil),       // 10: notification.v1.UpdateSettingsResponse
 	(*GetSettingsRequest)(nil),           // 11: notification.v1.GetSettingsRequest
 	(*GetSettingsResponse)(nil),          // 12: notification.v1.GetSettingsResponse
-	(*UpdateCircleSettingsRequest)(nil),  // 13: notification.v1.UpdateCircleSettingsRequest
-	(*UpdateCircleSettingsResponse)(nil), // 14: notification.v1.UpdateCircleSettingsResponse
+	(*UpdateGuildSettingsRequest)(nil),  // 13: notification.v1.UpdateGuildSettingsRequest
+	(*UpdateGuildSettingsResponse)(nil), // 14: notification.v1.UpdateGuildSettingsResponse
 	(*structpb.Struct)(nil),              // 15: google.protobuf.Struct
 	(*timestamppb.Timestamp)(nil),        // 16: google.protobuf.Timestamp
 }
@@ -1095,14 +1095,14 @@ var file_notification_v1_notification_proto_depIdxs = []int32{
 	7,  // 8: notification.v1.NotificationService.LinkTelegram:input_type -> notification.v1.LinkTelegramRequest
 	9,  // 9: notification.v1.NotificationService.UpdateSettings:input_type -> notification.v1.UpdateSettingsRequest
 	11, // 10: notification.v1.NotificationService.GetSettings:input_type -> notification.v1.GetSettingsRequest
-	13, // 11: notification.v1.NotificationService.UpdateCircleSettings:input_type -> notification.v1.UpdateCircleSettingsRequest
+	13, // 11: notification.v1.NotificationService.UpdateGuildSettings:input_type -> notification.v1.UpdateGuildSettingsRequest
 	2,  // 12: notification.v1.NotificationService.Send:output_type -> notification.v1.SendResponse
 	4,  // 13: notification.v1.NotificationService.SendBatch:output_type -> notification.v1.SendBatchResponse
 	6,  // 14: notification.v1.NotificationService.RegisterChat:output_type -> notification.v1.RegisterChatResponse
 	8,  // 15: notification.v1.NotificationService.LinkTelegram:output_type -> notification.v1.LinkTelegramResponse
 	10, // 16: notification.v1.NotificationService.UpdateSettings:output_type -> notification.v1.UpdateSettingsResponse
 	12, // 17: notification.v1.NotificationService.GetSettings:output_type -> notification.v1.GetSettingsResponse
-	14, // 18: notification.v1.NotificationService.UpdateCircleSettings:output_type -> notification.v1.UpdateCircleSettingsResponse
+	14, // 18: notification.v1.NotificationService.UpdateGuildSettings:output_type -> notification.v1.UpdateGuildSettingsResponse
 	12, // [12:19] is the sub-list for method output_type
 	5,  // [5:12] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name

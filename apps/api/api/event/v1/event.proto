@@ -85,6 +85,16 @@ enum EventRepeat {
   EVENT_REPEAT_MONTHLY     = 4;
 }
 
+// EventStatus is the moderation/lifecycle status of an Event row.
+// Replaces the legacy `string status` field — clients no longer have to
+// guess valid values.
+enum EventStatus {
+  EVENT_STATUS_UNSPECIFIED = 0;
+  EVENT_STATUS_PENDING     = 1;  // awaiting moderator approval
+  EVENT_STATUS_APPROVED    = 2;  // visible publicly
+  EVENT_STATUS_REJECTED    = 3;  // hidden, shown only to creator
+}
+
 // ── Request messages ───────────────────────────────────────────────────────
 
 message ListEventsRequest {
@@ -184,7 +194,7 @@ message Event {
   string                    description       = 17;
   string                    meeting_link      = 18;
   bool                      is_public         = 19;
-  string                    status            = 20;
+  EventStatus               status            = 20;
 }
 
 message EventParticipant {

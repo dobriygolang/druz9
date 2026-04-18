@@ -38,6 +38,12 @@ run:
 run-sandbox-runner:
 	GOCACHE=$(GOCACHE_DIR) go run ./cmd/sandbox-runner
 
+.PHONY: migrate-create
+# create new migration (timestamp-based name, no conflicts between contributors). usage: make migrate-create name=<migration_name>
+migrate-create:
+	@test -n "$(name)" || (echo 'usage: make migrate-create name=<migration_name> (lowercase_with_underscores)'; exit 1)
+	GOCACHE=$(GOCACHE_DIR) go run github.com/pressly/goose/v3/cmd/goose@latest -dir ./scripts/migrations create $(name) sql
+
 .PHONY: migrate-up
 # apply goose migrations to local database
 migrate-up:

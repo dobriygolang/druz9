@@ -51,10 +51,41 @@ func ReadinessLevelFromScore(score int32) ReadinessLevel {
 	}
 }
 
+// Readiness represents the user's overall interview readiness assessment.
+type Readiness struct {
+	Score            int32                    `json:"score"`
+	Level            string                   `json:"level"`
+	LevelLabel       string                   `json:"levelLabel"`
+	WeakestSkill     *model.ProfileCompetency `json:"weakestSkill,omitempty"`
+	StrongestSkill   *model.ProfileCompetency `json:"strongestSkill,omitempty"`
+	NextAction       *ReadinessNextAction     `json:"nextAction,omitempty"`
+	CompanyReadiness []*CompanyReadiness      `json:"companyReadiness,omitempty"`
+	StreakDays       int32                    `json:"streakDays"`
+	ActiveDays       int32                    `json:"activeDays"`
+}
+
+// ReadinessNextAction represents the single most impactful next step.
+type ReadinessNextAction struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	ActionType  string `json:"actionType"`
+	ActionURL   string `json:"actionUrl"`
+	SkillKey    string `json:"skillKey,omitempty"`
+}
+
+// CompanyReadiness tracks mock interview progress per company.
+type CompanyReadiness struct {
+	Company         string `json:"company"`
+	TotalStages     int32  `json:"totalStages"`
+	CompletedStages int32  `json:"completedStages"`
+	Percent         int32  `json:"percent"`
+	HasActive       bool   `json:"hasActive"`
+}
+
 // ComputeReadiness calculates the overall readiness from existing ProfileProgress data.
-func ComputeReadiness(p *model.ProfileProgress) *model.Readiness {
+func ComputeReadiness(p *model.ProfileProgress) *Readiness {
 	if p == nil {
-		return &model.Readiness{Level: string(ReadinessLevelNovice), LevelLabel: ReadinessLevelLabel(ReadinessLevelNovice)}
+		return &Readiness{Level: string(ReadinessLevelNovice), LevelLabel: ReadinessLevelLabel(ReadinessLevelNovice)}
 	}
 
 	// 1. Competency average (40% weight)
@@ -102,7 +133,7 @@ func ComputeReadiness(p *model.ProfileProgress) *model.Readiness {
 	// Build company readiness
 	companyReadiness := buildCompanyReadiness(p)
 
-	return &model.Readiness{
+	return &Readiness{
 		Score:            score,
 		Level:            string(level),
 		LevelLabel:       ReadinessLevelLabel(level),
@@ -163,10 +194,10 @@ func computeCheckpointCoverage(checkpoints []*model.ProfileCheckpointProgress) f
 	return float64(len(passed)) / float64(totalSkills) * 100
 }
 
-func buildNextAction(p *model.ProfileProgress, weakest *model.ProfileCompetency) *model.ReadinessNextAction {
+func buildNextAction(p *model.ProfileProgress, weakest *model.ProfileCompetency) *ReadinessNextAction {
 	// Priority 1: No mock sessions at all → start a mock
 	if p.Overview.CompletedMockStages == 0 && p.Overview.PracticeSessions >= 3 {
-		return &model.ReadinessNextAction{
+		return &ReadinessNextAction{
 			Title:       "Пройди первый mock interview",
 			Description: "У тебя уже есть базовая практика. Mock interview покажет реальный уровень.",
 			ActionType:  "mock",
@@ -179,7 +210,7 @@ func buildNextAction(p *model.ProfileProgress, weakest *model.ProfileCompetency)
 	if weakest != nil && weakest.Score < 50 {
 		href := RecommendationHref(weakest.Key)
 		estGain := estimateGain(weakest)
-		return &model.ReadinessNextAction{
+		return &ReadinessNextAction{
 			Title:       RecommendationTitle(weakest.Key, weakest.Label),
 			Description: descriptionForWeakest(weakest, estGain),
 			ActionType:  "practice",
@@ -190,7 +221,7 @@ func buildNextAction(p *model.ProfileProgress, weakest *model.ProfileCompetency)
 
 	// Priority 3: Has practice but no verified → checkpoint
 	if weakest != nil && weakest.Confidence != "verified" && weakest.PracticeDays >= 3 {
-		return &model.ReadinessNextAction{
+		return &ReadinessNextAction{
 			Title:       "Подтверди навык: " + weakest.Label,
 			Description: "Practice volume набран — пройди checkpoint, чтобы зафиксировать результат.",
 			ActionType:  "checkpoint",
@@ -201,7 +232,7 @@ func buildNextAction(p *model.ProfileProgress, weakest *model.ProfileCompetency)
 
 	// Priority 4: Strong overall → try arena for stress test
 	if p.Overview.AverageStageScore >= 6.0 {
-		return &model.ReadinessNextAction{
+		return &ReadinessNextAction{
 			Title:       "Проверь себя в дуэли",
 			Description: "Твой средний скор высокий. Дуэль покажет, как ты работаешь под давлением.",
 			ActionType:  "arena",
@@ -211,7 +242,7 @@ func buildNextAction(p *model.ProfileProgress, weakest *model.ProfileCompetency)
 	}
 
 	// Default: practice more
-	return &model.ReadinessNextAction{
+	return &ReadinessNextAction{
 		Title:       "Продолжай практику",
 		Description: "Решай задачи каждый день — стабильность важнее скорости.",
 		ActionType:  "practice",
@@ -251,14 +282,14 @@ func itoa(n int32) string {
 	return itoa(n/10) + string(rune('0'+n%10))
 }
 
-func buildCompanyReadiness(p *model.ProfileProgress) []*model.CompanyReadiness {
+func buildCompanyReadiness(p *model.ProfileProgress) []*CompanyReadiness {
 	if len(p.Companies) == 0 && len(p.MockSessions) == 0 {
 		return nil
 	}
 
-	byCompany := make(map[string]*model.CompanyReadiness)
+	byCompany := make(map[string]*CompanyReadiness)
 	for _, name := range p.Companies {
-		byCompany[name] = &model.CompanyReadiness{
+		byCompany[name] = &CompanyReadiness{
 			Company: name,
 		}
 	}
@@ -273,7 +304,7 @@ func buildCompanyReadiness(p *model.ProfileProgress) []*model.CompanyReadiness {
 		}
 		cr, ok := byCompany[key]
 		if !ok {
-			cr = &model.CompanyReadiness{Company: key}
+			cr = &CompanyReadiness{Company: key}
 			byCompany[key] = cr
 		}
 		totalStages := session.TotalStages
@@ -291,7 +322,7 @@ func buildCompanyReadiness(p *model.ProfileProgress) []*model.CompanyReadiness {
 		}
 	}
 
-	result := make([]*model.CompanyReadiness, 0, len(byCompany))
+	result := make([]*CompanyReadiness, 0, len(byCompany))
 	for _, cr := range byCompany {
 		denom := cr.TotalStages
 		if denom < 1 {

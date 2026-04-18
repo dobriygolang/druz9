@@ -121,12 +121,12 @@ func TestScanPlayerTask_TrimsSensitiveFields(t *testing.T) {
 	// Test that creating a CodeTask with sensitive fields works
 	// (actual trimming is tested via integration tests)
 	task := &model.CodeTask{
-		FixtureFiles:   []string{"file1.txt"},
-		ReadablePaths:  []string{"/read"},
-		WritablePaths:  []string{"/write"},
-		AllowedHosts:   []string{"localhost"},
-		AllowedPorts:   []int32{8080},
-		MockEndpoints:  []string{"/api"},
+		FixtureFiles:    []string{"file1.txt"},
+		ReadablePaths:   []string{"/read"},
+		WritablePaths:   []string{"/write"},
+		AllowedHosts:    []string{"localhost"},
+		AllowedPorts:    []int32{8080},
+		MockEndpoints:   []string{"/api"},
 		WritableTempDir: true,
 	}
 

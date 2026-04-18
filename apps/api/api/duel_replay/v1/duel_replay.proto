@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package duel_replay.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "api/pkg/api/duel_replay/v1;v1";
+
+// DuelReplayService stores and serves time-series replay data for arena
+// duels and friend challenges. Events are append-only keystroke/run/submit
+// entries timestamped as millisecond offsets from the match start; the
+// client replay viewer scrubs through them on a timeline.
+service DuelReplayService {
+  // GetReplay returns a single replay's metadata plus the full event stream.
+  rpc GetReplay(GetReplayRequest) returns (GetReplayResponse) {
+    option (google.api.http) = { get: "/api/v1/duel-replays/{replay_id}" };
+  }
+
+  // ListMyReplays returns replays the authenticated user participated in,
+  // newest first. Used by the profile + arena history tabs.
+  rpc ListMyReplays(ListMyReplaysRequest) returns (ListReplaysResponse) {
+    option (google.api.http) = { get: "/api/v1/duel-replays" };
+  }
+
+  // RecordEvent appends a single event to a replay during live play.
+  // Caller must be a participant of the replay.
+  rpc RecordEvent(RecordEventRequest) returns (RecordEventResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/duel-replays/{replay_id}/events"
+      body: "*"
+    };
+  }
+}
+
+// ReplaySourceKind tracks which entity a replay was derived from so the
+// replay can link back to the source (arena match vs friend challenge).
+enum ReplaySourceKind {
+  REPLAY_SOURCE_UNSPECIFIED = 0;
+  REPLAY_SOURCE_ARENA       = 1;
+  REPLAY_SOURCE_CHALLENGE   = 2;
+}
+
+// EventKind is the palette the replay viewer renders as coloured markers.
+enum EventKind {
+  EVENT_KIND_UNSPECIFIED = 0;
+  EVENT_KIND_KEYSTROKE   = 1;  // incremental typing snapshot
+  EVENT_KIND_RUN         = 2;  // user hit "run tests"
+  EVENT_KIND_SUBMIT_PASS = 3;  // submit accepted
+  EVENT_KIND_SUBMIT_FAIL = 4;  // submit rejected
+  EVENT_KIND_HINT        = 5;  // hint revealed
+  EVENT_KIND_MILESTONE   = 6;  // first-keystroke / halfway / etc
+}
+
+// ReplaySummary is the lightweight list item.
+message ReplaySummary {
+  string                    id               = 1;
+  ReplaySourceKind          source_kind      = 2;
+  string                    source_id        = 3;
+  string                    player1_id       = 4;
+  string                    player1_username = 5;
+  string                    player2_id       = 6;
+  string                    player2_username = 7;
+  string                    task_title       = 8;
+  string                    task_topic       = 9;
+  int32                     task_difficulty  = 10;
+  int32                     duration_ms      = 11;
+  string                    winner_id        = 12;
+  google.protobuf.Timestamp completed_at     = 13;
+}
+
+// ReplayEvent is a single point on the timeline.
+message ReplayEvent {
+  string    id         = 1;
+  string    user_id    = 2;
+  int32     t_ms       = 3;  // offset from match start
+  EventKind kind       = 4;
+  string    label      = 5;
+  int32     lines_count = 6;  // optional progression counter
+}
+
+message GetReplayRequest {
+  string replay_id = 1;
+}
+
+message GetReplayResponse {
+  ReplaySummary         summary = 1;
+  repeated ReplayEvent  events  = 2;
+}
+
+message ListMyReplaysRequest {
+  int32 limit  = 1;
+  int32 offset = 2;
+}
+
+message ListReplaysResponse {
+  repeated ReplaySummary replays = 1;
+  int32                  total   = 2;
+}
+
+message RecordEventRequest {
+  string    replay_id   = 1;
+  int32     t_ms        = 2;
+  EventKind kind        = 3;
+  string    label       = 4;
+  int32     lines_count = 5;
+}
+
+message RecordEventResponse {
+  ReplayEvent event = 1;
+}

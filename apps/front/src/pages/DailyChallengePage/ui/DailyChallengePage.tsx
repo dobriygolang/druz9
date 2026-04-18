@@ -1,19 +1,17 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
-import { Calendar, Clock } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Editor from '@monaco-editor/react'
-import { Badge } from '@/shared/ui/Badge'
-import { Button } from '@/shared/ui/Button'
-import { Spinner } from '@/shared/ui/Spinner'
+import type * as Monaco from 'monaco-editor'
+import { useTranslation } from 'react-i18next'
+
+import { Panel, RpgButton, Badge, PageHeader } from '@/shared/ui/pixel'
 import { apiClient } from '@/shared/api/base'
 import { useTheme } from '@/app/providers/ThemeProvider'
-import { useTranslation } from 'react-i18next'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import { registerFormatKeybinding } from '@/shared/lib/editorFormat'
-import { DIFF_LABELS, DIFF_VARIANTS } from '@/shared/lib/taskLabels'
+import { DIFF_LABELS } from '@/shared/lib/taskLabels'
 import { formatDateRu } from '@/shared/lib/dateFormat'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { PageMeta } from '@/shared/ui/PageMeta'
-import type * as Monaco from 'monaco-editor'
 
 interface DailyTask {
   task: {
@@ -30,16 +28,18 @@ interface DailyTask {
   expiresAt: string
 }
 
+// Raw API shape uses snake_case in some environments + numeric lang codes; the
+// normalizer shields the rest of the component from that.
 const LANG_MAP: Record<string | number, string> = {
   1: 'python', 2: 'javascript', 3: 'typescript', 4: 'go', 5: 'rust', 6: 'java',
   python: 'python', go: 'go', javascript: 'javascript', typescript: 'typescript',
 }
 
 function normalizeTask(raw: any): DailyTask {
-  const t = raw.task ?? {}
+  const t = raw?.task ?? {}
   return {
-    date: raw.date ?? raw.Date ?? '',
-    expiresAt: raw.expiresAt ?? '',
+    date: raw?.date ?? raw?.Date ?? '',
+    expiresAt: raw?.expiresAt ?? '',
     task: {
       id: t.id ?? t.ID ?? '',
       title: t.title ?? t.Title ?? '',
@@ -66,31 +66,25 @@ export function DailyChallengePage() {
   const [review, setReview] = useState<any>(null)
   const saveDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Clean up draft save timer on unmount
   useEffect(() => () => {
     if (saveDraftTimer.current) clearTimeout(saveDraftTimer.current)
   }, [])
 
-  // Fetch daily task, restore draft + review from localStorage
   useEffect(() => {
     apiClient.get('/api/v1/code-editor/daily')
-      .then(res => {
+      .then((res) => {
         const normalized = normalizeTask(res.data)
         setTask(normalized)
         const id = normalized.task.id
         if (id) {
           const codeKey = `daily:code:${id}`
           const reviewKey = `daily:review:${id}`
-          const savedCode = localStorage.getItem(codeKey)
+          setCode(localStorage.getItem(codeKey) ?? normalized.task.starterCode ?? '')
           const savedReview = localStorage.getItem(reviewKey)
-          setCode(savedCode ?? normalized.task.starterCode ?? '')
           if (savedReview) {
-            try {
-              const parsed = JSON.parse(savedReview)
-              setReview(parsed)
-            } catch { /* ignore corrupt cache */ }
+            try { setReview(JSON.parse(savedReview)) } catch { /* corrupt cache */ }
           }
-          // Purge stale entries from previous days
+          // Purge stale drafts from previous days.
           Object.keys(localStorage)
             .filter(k => (k.startsWith('daily:code:') && k !== codeKey) || (k.startsWith('daily:review:') && k !== reviewKey))
             .forEach(k => localStorage.removeItem(k))
@@ -102,7 +96,7 @@ export function DailyChallengePage() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Countdown timer
+  // Midnight countdown — daily task rotates at 00:00 UTC.
   useEffect(() => {
     const tick = () => {
       const now = new Date()
@@ -122,17 +116,18 @@ export function DailyChallengePage() {
   }, [])
 
   const handleSubmit = async () => {
+    if (!task) return
     setReviewing(true)
     try {
       const res = await apiClient.post('/api/v1/code-editor/ai-review', {
-        language: task?.task.language ?? 'python',
+        language: task.task.language,
         code,
-        taskTitle: task?.task.title ?? '',
-        statement: task?.task.statement ?? '',
+        taskTitle: task.task.title,
+        statement: task.task.statement,
       })
       const reviewData = res.data?.review ?? res.data
       setReview(reviewData)
-      if (task?.task.id) {
+      if (task.task.id) {
         try { localStorage.setItem(`daily:review:${task.task.id}`, JSON.stringify(reviewData)) } catch { /* quota */ }
       }
     } catch {
@@ -142,240 +137,185 @@ export function DailyChallengePage() {
     }
   }
 
-  const handleEditorMount = useCallback((editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof import('monaco-editor')) => {
-    registerDarkTheme(monaco)
-    registerFormatKeybinding(editor, monaco)
-    monaco.editor.setTheme(theme === 'dark' ? 'druzya-dark' : 'vs')
-  }, [theme])
+  const handleEditorMount = useCallback(
+    (editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof import('monaco-editor')) => {
+      registerDarkTheme(monaco)
+      registerFormatKeybinding(editor, monaco)
+      monaco.editor.setTheme(theme === 'dark' ? 'druzya-dark' : 'vs')
+    },
+    [theme],
+  )
 
   const today = formatDateRu(task?.date ?? new Date().toISOString())
-  const langExt = task?.task.language === 'python' ? 'py'
-    : task?.task.language === 'javascript' ? 'js'
-    : task?.task.language === 'typescript' ? 'ts'
-    : (task?.task.language ?? 'go')
+  const langExt = task?.task.language === 'python'      ? 'py'
+                : task?.task.language === 'javascript'  ? 'js'
+                : task?.task.language === 'typescript'  ? 'ts'
+                : (task?.task.language ?? 'go')
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 pt-4 pb-24 md:px-6 md:pb-6">
+    <>
       <PageMeta title={t('daily.meta.title')} description={t('daily.meta.description')} canonicalPath="/daily-challenge" />
-      {/* Header bar — full width */}
-      <div className={`mb-4 bg-white border dark:bg-[#0B1210] dark:border-[#1E4035] px-5 py-4 ${
-        isMobile
-          ? 'flex flex-col items-start gap-4 rounded-[28px] border-[#d8d9d6] shadow-[0_16px_30px_rgba(15,23,42,0.06)]'
-          : 'flex items-center justify-between rounded-2xl border-[#C1CFC4]'
-      }`}>
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-[#ecfdf5] dark:bg-[#1e2a4a] rounded-lg flex items-center justify-center">
-            <Calendar className="w-4 h-4 text-[#059669]" />
-          </div>
-          <div>
-            <h1 className="text-base font-bold text-[#111111] dark:text-[#E2F0E8] leading-tight">{t('daily.title')}</h1>
-            <p className="text-xs text-[#4B6B52] dark:text-[#94a3b8]">{today}</p>
-          </div>
-        </div>
-        <div className={`flex items-center gap-2 rounded-lg bg-[#F0F5F1] dark:bg-[#1e293b] px-3 py-2 ${isMobile ? 'self-stretch justify-center' : ''}`}>
-          <Clock className="w-3.5 h-3.5 text-[#4B6B52] dark:text-[#94a3b8]" />
-          <span className="text-sm font-mono font-semibold text-[#111111] dark:text-[#E2F0E8]">{timeLeft}</span>
-        </div>
-      </div>
+      <PageHeader
+        eyebrow={`Town Board · ${today}`}
+        title={t('daily.title', 'Daily Challenge')}
+        subtitle="One curated task per day. Solve it before midnight to claim the scroll."
+        right={
+          <Badge variant="ember" style={{ fontFamily: 'Pixelify Sans, monospace' }}>
+            ⏱ {timeLeft}
+          </Badge>
+        }
+      />
 
-      {/* Content */}
-      {loading ? (
-        <div className={isMobile ? 'flex flex-col gap-4' : 'grid grid-cols-[1fr_360px] gap-4'}>
-          <div className="flex flex-col gap-4">
-            <div className="bg-white rounded-2xl border border-[#C1CFC4] p-5 animate-pulse">
-              <div className="flex items-center justify-between mb-3">
-                <div className="h-5 w-48 bg-[#E4EBE5] rounded" />
-                <div className="h-5 w-16 bg-[#E4EBE5] rounded-full" />
-              </div>
-              <div className="space-y-2">
-                <div className="h-3 bg-[#E4EBE5] rounded w-full" />
-                <div className="h-3 bg-[#E4EBE5] rounded w-5/6" />
-                <div className="h-3 bg-[#E4EBE5] rounded w-4/6" />
-              </div>
-            </div>
-            <div className="bg-white rounded-2xl border border-[#C1CFC4] animate-pulse">
-              <div className="h-9 bg-[#E4EBE5]" />
-              <div className="h-[400px] bg-[#F0F5F1]" />
-            </div>
+      {loading && (
+        <Panel>
+          <div style={{ padding: 40, textAlign: 'center', color: 'var(--ink-2)' }}>Loading today's scroll…</div>
+        </Panel>
+      )}
+
+      {!loading && error && (
+        <Panel>
+          <div style={{ padding: 40, textAlign: 'center', color: 'var(--ink-2)' }}>
+            {t('daily.comingSoon', 'No daily task available yet. Come back tomorrow.')}
           </div>
-          {!isMobile && <div className="bg-white rounded-2xl border border-[#C1CFC4] animate-pulse h-48" />}
-        </div>
-      ) : error ? (
-        <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] p-12 text-center">
-          <p className="text-sm text-[#94a3b8]">{t('daily.comingSoon')}</p>
-        </div>
-      ) : task ? (
-        isMobile ? (
-          /* ── Mobile: single column ── */
-          <div className="flex flex-col gap-4">
-            <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] p-5">
-              <div className="flex flex-col items-start gap-2 mb-3">
-                <h2 className="text-base font-bold text-[#111111] dark:text-[#E2F0E8]">{task.task.title}</h2>
+        </Panel>
+      )}
+
+      {!loading && !error && task && (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 360px',
+            gap: 18,
+          }}
+        >
+          {/* Left column: statement + editor */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <Panel>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 10 }}>
+                <h2 className="font-display" style={{ fontSize: 20, margin: 0 }}>{task.task.title}</h2>
                 {task.task.difficulty && task.task.difficulty !== 'TASK_DIFFICULTY_UNSPECIFIED' && (
-                  <Badge variant={DIFF_VARIANTS[task.task.difficulty] ?? 'default'}>
+                  <Badge variant={task.task.difficulty.toLowerCase().includes('hard') ? 'ember' : 'dark'}>
                     {DIFF_LABELS[task.task.difficulty] ?? task.task.difficulty}
                   </Badge>
                 )}
               </div>
-              <p className="text-sm text-[#4B6B52] dark:text-[#94a3b8] leading-relaxed whitespace-pre-wrap">{task.task.statement}</p>
-            </div>
-            <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] overflow-hidden">
-              <div className="h-9 bg-[#1e293b] flex items-center px-4">
-                <span className="text-xs text-[#94a3b8] font-mono">solution.{langExt}</span>
+              <div style={{ fontSize: 13, color: 'var(--ink-1)', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                {task.task.statement}
+              </div>
+              {task.task.topics.length > 0 && (
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 12 }}>
+                  {task.task.topics.map((topic) => (
+                    <span key={topic} className="rpg-tweak-chip rpg-tweak-chip--on">{topic}</span>
+                  ))}
+                </div>
+              )}
+            </Panel>
+
+            <Panel style={{ padding: 0, overflow: 'hidden' }}>
+              <div
+                style={{
+                  padding: '6px 12px',
+                  background: 'var(--parch-2)',
+                  borderBottom: '2px solid var(--ink-0)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                <span
+                  className="font-silkscreen uppercase"
+                  style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.1em' }}
+                >
+                  solution.{langExt}
+                </span>
               </div>
               <Editor
-                height="340px"
+                height={isMobile ? '340px' : '440px'}
                 language={task.task.language}
                 value={code}
-                onChange={v => {
+                onChange={(v) => {
                   const next = v ?? ''
                   setCode(next)
                   if (task.task.id) {
                     if (saveDraftTimer.current) clearTimeout(saveDraftTimer.current)
-                    saveDraftTimer.current = setTimeout(() => { localStorage.setItem(`daily:code:${task.task.id}`, next) }, 1000)
+                    saveDraftTimer.current = setTimeout(() => {
+                      localStorage.setItem(`daily:code:${task.task.id}`, next)
+                    }, 1000)
                   }
                 }}
                 onMount={handleEditorMount}
                 theme={theme === 'dark' ? 'druzya-dark' : 'vs'}
-                options={{ fontSize: 13, fontFamily: '"JetBrains Mono", monospace', minimap: { enabled: false }, scrollBeyondLastLine: false, lineNumbers: 'on', padding: { top: 12 } }}
+                options={{
+                  fontSize: 13,
+                  fontFamily: '"JetBrains Mono", monospace',
+                  minimap: { enabled: false },
+                  scrollBeyondLastLine: false,
+                  lineNumbers: 'on',
+                  padding: { top: 12 },
+                }}
               />
-            </div>
-            <Button variant="orange" size="md" onClick={handleSubmit} loading={reviewing} disabled={!code.trim()} className="w-full justify-center rounded-2xl">
-              {t('daily.submit')}
-            </Button>
-            <ReviewPanel review={review} reviewing={reviewing} />
+            </Panel>
+
+            <RpgButton
+              variant="primary"
+              onClick={() => void handleSubmit()}
+              disabled={reviewing || !code.trim()}
+              style={{ width: '100%' }}
+            >
+              {reviewing ? 'Reviewing…' : t('daily.submit', 'Submit for AI review')}
+            </RpgButton>
           </div>
-        ) : (
-          /* ── Desktop: 2-column ── */
-          <div className="grid grid-cols-[1fr_360px] gap-4 items-start">
-            {/* Left column: task + editor + submit */}
-            <div className="flex flex-col gap-4">
-              <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] p-5">
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <h2 className="text-base font-bold text-[#111111] dark:text-[#E2F0E8]">{task.task.title}</h2>
-                  {task.task.difficulty && task.task.difficulty !== 'TASK_DIFFICULTY_UNSPECIFIED' && (
-                    <Badge variant={DIFF_VARIANTS[task.task.difficulty] ?? 'default'}>
-                      {DIFF_LABELS[task.task.difficulty] ?? task.task.difficulty}
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-sm text-[#4B6B52] dark:text-[#94a3b8] leading-relaxed whitespace-pre-wrap">{task.task.statement}</p>
-              </div>
 
-              <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] overflow-hidden">
-                <div className="h-9 bg-[#1e293b] flex items-center justify-between px-4">
-                  <span className="text-xs text-[#94a3b8] font-mono">solution.{langExt}</span>
-                  <span className="text-[10px] text-[#4B6B52] uppercase tracking-widest">{task.task.language}</span>
-                </div>
-                <Editor
-                  height="460px"
-                  language={task.task.language}
-                  value={code}
-                  onChange={v => {
-                    const next = v ?? ''
-                    setCode(next)
-                    if (task.task.id) {
-                      if (saveDraftTimer.current) clearTimeout(saveDraftTimer.current)
-                      saveDraftTimer.current = setTimeout(() => { localStorage.setItem(`daily:code:${task.task.id}`, next) }, 1000)
-                    }
-                  }}
-                  onMount={handleEditorMount}
-                  theme={theme === 'dark' ? 'druzya-dark' : 'vs'}
-                  options={{ fontSize: 13, fontFamily: '"JetBrains Mono", monospace', minimap: { enabled: false }, scrollBeyondLastLine: false, lineNumbers: 'on', padding: { top: 12 } }}
-                />
-              </div>
-
-              <Button variant="orange" size="md" onClick={handleSubmit} loading={reviewing} disabled={!code.trim()}>
-                {t('daily.submit')}
-              </Button>
+          {/* Right column: AI review */}
+          <Panel>
+            <div
+              className="font-silkscreen uppercase"
+              style={{ fontSize: 10, color: 'var(--ember-1)', letterSpacing: '0.1em', marginBottom: 8 }}
+            >
+              mentor ai · review
             </div>
-
-            {/* Right column: AI Review */}
-            <div className="sticky top-4">
-              <ReviewPanel review={review} reviewing={reviewing} />
-            </div>
-          </div>
-        )
-      ) : null}
-    </div>
-  )
-}
-
-/* ── ReviewPanel sub-component ── */
-function ReviewPanel({ review, reviewing }: { review: any; reviewing: boolean }) {
-  const { t } = useTranslation()
-  if (reviewing) {
-    return (
-      <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] p-5 flex items-center gap-3">
-        <Spinner size="sm" />
-        <p className="text-sm text-[#4B6B52] dark:text-[#94a3b8]">{t('daily.review.analyzing')}</p>
-      </div>
-    )
-  }
-  if (!review) {
-    return (
-      <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] p-6 flex flex-col items-center gap-3 text-center">
-        <div className="w-10 h-10 rounded-xl bg-[#ecfdf5] dark:bg-[#1e2a4a] flex items-center justify-center">
-          <span className="text-lg">✦</span>
-        </div>
-        <p className="text-sm font-medium text-[#111111] dark:text-[#E2F0E8]">{t('daily.review.title')}</p>
-        <p className="text-xs text-[#94a3b8] leading-relaxed">{t('daily.review.empty')}</p>
-      </div>
-    )
-  }
-  return (
-    <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] p-5 flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">{t('daily.review.title')}</h3>
-        {review.score != null && (
-          <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-            review.score >= 8 ? 'bg-[#dcfce7] text-[#16a34a]'
-            : review.score >= 5 ? 'bg-[#fef9c3] text-[#854d0e]'
-            : 'bg-[#fee2e2] text-[#dc2626]'
-          }`}>{review.score}/10</span>
-        )}
-      </div>
-      {(review.summary ?? review.review ?? review.feedback) && (
-        <p className="text-xs text-[#4B6B52] dark:text-[#94a3b8] leading-relaxed whitespace-pre-wrap">
-          {review.summary ?? review.review ?? review.feedback}
-        </p>
-      )}
-      {Array.isArray(review.strengths) && review.strengths.length > 0 && (
-        <div>
-          <p className="text-[10px] font-semibold text-[#16a34a] uppercase tracking-widest mb-2">{t('daily.review.strengths')}</p>
-          <ul className="flex flex-col gap-1.5">
-            {review.strengths.map((s: string, i: number) => (
-              <li key={i} className="text-xs text-[#4B6B52] dark:text-[#94a3b8] flex gap-2">
-                <span className="text-[#16a34a] flex-shrink-0 mt-px">✓</span>{s}
-              </li>
-            ))}
-          </ul>
+            {review ? (
+              <div style={{ fontSize: 13, color: 'var(--ink-1)', lineHeight: 1.6 }}>
+                {typeof review === 'string' ? review : (
+                  <>
+                    {review.summary && <p style={{ marginTop: 0 }}>{review.summary}</p>}
+                    {Array.isArray(review.issues) && review.issues.length > 0 && (
+                      <>
+                        <div
+                          className="font-silkscreen uppercase"
+                          style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em', marginTop: 12, marginBottom: 4 }}
+                        >
+                          issues
+                        </div>
+                        <ul style={{ paddingLeft: 18, margin: 0 }}>
+                          {review.issues.map((i: string, idx: number) => <li key={idx}>{i}</li>)}
+                        </ul>
+                      </>
+                    )}
+                    {Array.isArray(review.suggestions) && review.suggestions.length > 0 && (
+                      <>
+                        <div
+                          className="font-silkscreen uppercase"
+                          style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em', marginTop: 12, marginBottom: 4 }}
+                        >
+                          suggestions
+                        </div>
+                        <ul style={{ paddingLeft: 18, margin: 0 }}>
+                          {review.suggestions.map((s: string, idx: number) => <li key={idx}>{s}</li>)}
+                        </ul>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
+            ) : (
+              <div style={{ fontSize: 12, color: 'var(--ink-3)', fontStyle: 'italic' }}>
+                Submit your solution to receive mentor feedback.
+              </div>
+            )}
+          </Panel>
         </div>
       )}
-      {Array.isArray(review.issues) && review.issues.length > 0 && (
-        <div>
-          <p className="text-[10px] font-semibold text-[#dc2626] uppercase tracking-widest mb-2">{t('daily.review.issues')}</p>
-          <ul className="flex flex-col gap-1.5">
-            {review.issues.map((s: string, i: number) => (
-              <li key={i} className="text-xs text-[#4B6B52] dark:text-[#94a3b8] flex gap-2">
-                <span className="text-[#dc2626] flex-shrink-0 mt-px">✗</span>{s}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {Array.isArray(review.followUpQuestions) && review.followUpQuestions.length > 0 && (
-        <div>
-          <p className="text-[10px] font-semibold text-[#059669] uppercase tracking-widest mb-2">{t('daily.review.followups')}</p>
-          <ul className="flex flex-col gap-1.5">
-            {review.followUpQuestions.map((q: string, i: number) => (
-              <li key={i} className="text-xs text-[#4B6B52] dark:text-[#94a3b8] flex gap-2">
-                <span className="text-[#059669] flex-shrink-0 mt-px">?</span>{q}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+    </>
   )
 }

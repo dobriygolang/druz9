@@ -14,6 +14,7 @@ type Service interface {
 	Resolve(context.Context, string) (*model.GeoResolveResponse, error)
 	CommunityMap(context.Context, string) (*model.CommunityMapResponse, error)
 	EnrichCommunityMapWithAvatarURLs(context.Context, *model.CommunityMapResponse) error
+	WorldPins(ctx context.Context) ([]*model.WorldPin, error)
 }
 
 // Implementation of geo service.

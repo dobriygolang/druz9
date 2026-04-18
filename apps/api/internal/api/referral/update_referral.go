@@ -3,21 +3,19 @@ package referral
 import (
 	"context"
 
+	"api/internal/apihelpers"
 	"api/internal/model"
 	v1 "api/pkg/api/referral/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 )
 
 func (i *Implementation) UpdateReferral(ctx context.Context, req *v1.UpdateReferralRequest) (*v1.ReferralResponse, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
-	}
-	referralID, err := uuid.Parse(req.ReferralId)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, errors.BadRequest("INVALID_REFERRAL_ID", "invalid referral id")
+		return nil, err
+	}
+	referralID, err := apihelpers.ParseUUID(req.ReferralId, "INVALID_REFERRAL_ID", "referral_id")
+	if err != nil {
+		return nil, err
 	}
 	item, err := i.service.UpdateReferral(ctx, referralID, user, model.UpdateReferralRequest{
 		Title:          req.Referral.Title,

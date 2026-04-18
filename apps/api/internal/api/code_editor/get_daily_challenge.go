@@ -6,7 +6,7 @@ import (
 
 	codeeditordomain "api/internal/domain/codeeditor"
 	v1 "api/pkg/api/code_editor/v1"
-	
+
 	kratosErrors "github.com/go-kratos/kratos/v2/errors"
 )
 

@@ -2,21 +2,32 @@ package main
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/google/uuid"
 
 	"api/internal/clients/geocoder"
 	"api/internal/closer"
 	arenadata "api/internal/data/arena"
-	circledata "api/internal/data/circle"
-	codeeditordata "api/internal/data/code_editor"
-	eventdata "api/internal/data/event"
-	geodata "api/internal/data/geo"
-	interviewprepdata "api/internal/data/interviewprep"
 	challengedata "api/internal/data/challenge"
+	guilddata "api/internal/data/guild"
+	codeeditordata "api/internal/data/code_editor"
+	duelreplaydata "api/internal/data/duel_replay"
+	eventdata "api/internal/data/event"
+	friendchallengedata "api/internal/data/friend_challenge"
+	geodata "api/internal/data/geo"
+	inboxdata "api/internal/data/inbox"
+	interviewprepdata "api/internal/data/interviewprep"
 	missiondata "api/internal/data/mission"
 	podcastdata "api/internal/data/podcast"
 	profiledata "api/internal/data/profile"
 	referraldata "api/internal/data/referral"
+	seasonpassdata "api/internal/data/season_pass"
+	shopdata "api/internal/data/shop"
+	socialdata "api/internal/data/social"
 	solutionreviewdata "api/internal/data/solution_review"
+	streakdata "api/internal/data/streak"
+	walletdata "api/internal/data/wallet"
 	geodomain "api/internal/domain/geo"
 	referraldomainservice "api/internal/domain/referral"
 	"api/internal/model"
@@ -30,7 +41,7 @@ type storageContext struct {
 	geoResolver        geodomain.Resolver
 	profileRepo        *profiledata.Repo
 	eventRepo          *eventdata.Repo
-	circleRepo         *circledata.Repo
+	guildRepo         *guilddata.Repo
 	podcastRepo        *podcastdata.Repo
 	referralRepo       referraldomainservice.Repository
 	codeEditorRepo     *codeeditordata.Repo
@@ -39,6 +50,17 @@ type storageContext struct {
 	solutionReviewRepo *solutionreviewdata.Repo
 	missionRepo        *missiondata.Repo
 	challengeRepo      *challengedata.Repo
+	inboxRepo          *inboxdata.Repo
+	friendChallengeRepo *friendchallengedata.Repo
+	friendChallengeUsers *friendchallengedata.UserLookupAdapter
+	duelReplayRepo     *duelreplaydata.Repo
+	seasonPassRepo     *seasonpassdata.Repo
+	streakRepo         *streakdata.Repo
+	streakStats        *streakdata.StatsAdapter
+	shopRepo           *shopdata.Repo
+	socialRepo         *socialdata.Repo
+	socialUsers        *socialdata.UserLookupAdapter
+	walletRepo         *walletdata.Repo
 }
 
 func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
@@ -84,7 +106,7 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 		geoResolver:        newGeoResolver(geocoder.New(bootstrap.cfg, bootstrap.kratosLogger), geodata.NewRepo(store)),
 		profileRepo:        profiledata.NewRepo(store, bootstrap.kratosLogger),
 		eventRepo:          eventdata.NewRepo(store, bootstrap.kratosLogger),
-		circleRepo:         circledata.NewRepo(store, bootstrap.kratosLogger),
+		guildRepo:         guilddata.NewRepo(store, bootstrap.kratosLogger),
 		podcastRepo:        podcastdata.NewRepo(store, bootstrap.kratosLogger),
 		referralRepo:       referraldata.NewRepo(store, bootstrap.kratosLogger),
 		codeEditorRepo:     codeeditordata.NewRepo(store, bootstrap.kratosLogger),
@@ -93,6 +115,27 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 		solutionReviewRepo: solutionreviewdata.NewRepo(store),
 		missionRepo:        missiondata.NewRepo(store, bootstrap.kratosLogger),
 		challengeRepo:      challengedata.NewRepo(store, bootstrap.kratosLogger),
+		inboxRepo:          inboxdata.NewRepo(store, bootstrap.kratosLogger),
+		friendChallengeRepo: friendchallengedata.NewRepo(store, bootstrap.kratosLogger),
+		friendChallengeUsers: friendchallengedata.NewUserLookupAdapter(profiledata.NewRepo(store, bootstrap.kratosLogger)),
+		duelReplayRepo:     duelreplaydata.NewRepo(store, bootstrap.kratosLogger),
+		seasonPassRepo:     seasonpassdata.NewRepo(store, bootstrap.kratosLogger),
+		streakRepo:         streakdata.NewRepo(store, bootstrap.kratosLogger),
+		streakStats:        streakdata.NewStatsAdapter(profiledata.NewRepo(store, bootstrap.kratosLogger)),
+		shopRepo:           shopdata.NewRepo(store, bootstrap.kratosLogger),
+		socialRepo:         socialdata.NewRepo(store, bootstrap.kratosLogger),
+		socialUsers: socialdata.NewUserLookupAdapter(func(ctx context.Context, username string) (uuid.UUID, string, error) {
+			pr := profiledata.NewRepo(store, bootstrap.kratosLogger)
+			u, err := pr.FindUserByUsername(ctx, username)
+			if err != nil {
+				return uuid.Nil, "", err
+			}
+			if u == nil {
+				return uuid.Nil, "", fmt.Errorf("user %q not found", username)
+			}
+			return u.ID, u.Username, nil
+		}),
+		walletRepo: walletdata.NewRepo(store, bootstrap.kratosLogger),
 	}, nil
 }
 
@@ -111,4 +154,8 @@ func (r *geoResolver) Resolve(ctx context.Context, query string, limit int) ([]*
 
 func (r *geoResolver) ListCommunityPoints(ctx context.Context, currentUserID string) ([]*model.CommunityMapPoint, error) {
 	return r.repo.ListCommunityPoints(ctx, currentUserID)
+}
+
+func (r *geoResolver) ListWorldPins(ctx context.Context) ([]*model.WorldPin, error) {
+	return r.repo.ListWorldPins(ctx)
 }

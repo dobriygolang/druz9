@@ -86,29 +86,29 @@ func (_c *Service_CreateMatch_Call) RunAndReturn(run func(context.Context, *mode
 	return _c
 }
 
-// EnqueueMatchmaking provides a mock function with given fields: ctx, user, topic, difficulty, obfuscateOpponent
-func (_m *Service) EnqueueMatchmaking(ctx context.Context, user *model.User, topic string, difficulty string, obfuscateOpponent bool) (*model.ArenaQueueState, error) {
-	ret := _m.Called(ctx, user, topic, difficulty, obfuscateOpponent)
+// GetActiveSeason provides a mock function with given fields: ctx
+func (_m *Service) GetActiveSeason(ctx context.Context) (*model.ArenaSeason, error) {
+	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
-		panic("no return value specified for EnqueueMatchmaking")
+		panic("no return value specified for GetActiveSeason")
 	}
 
-	var r0 *model.ArenaQueueState
+	var r0 *model.ArenaSeason
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *model.User, string, string, bool) (*model.ArenaQueueState, error)); ok {
-		return rf(ctx, user, topic, difficulty, obfuscateOpponent)
+	if rf, ok := ret.Get(0).(func(context.Context) (*model.ArenaSeason, error)); ok {
+		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *model.User, string, string, bool) *model.ArenaQueueState); ok {
-		r0 = rf(ctx, user, topic, difficulty, obfuscateOpponent)
+	if rf, ok := ret.Get(0).(func(context.Context) *model.ArenaSeason); ok {
+		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*model.ArenaQueueState)
+			r0 = ret.Get(0).(*model.ArenaSeason)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *model.User, string, string, bool) error); ok {
-		r1 = rf(ctx, user, topic, difficulty, obfuscateOpponent)
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -116,34 +116,89 @@ func (_m *Service) EnqueueMatchmaking(ctx context.Context, user *model.User, top
 	return r0, r1
 }
 
-// Service_EnqueueMatchmaking_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'EnqueueMatchmaking'
-type Service_EnqueueMatchmaking_Call struct {
+// Service_GetActiveSeason_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetActiveSeason'
+type Service_GetActiveSeason_Call struct {
 	*mock.Call
 }
 
-// EnqueueMatchmaking is a helper method to define mock.On call
+// GetActiveSeason is a helper method to define mock.On call
 //   - ctx context.Context
-//   - user *model.User
-//   - topic string
-//   - difficulty string
-//   - obfuscateOpponent bool
-func (_e *Service_Expecter) EnqueueMatchmaking(ctx interface{}, user interface{}, topic interface{}, difficulty interface{}, obfuscateOpponent interface{}) *Service_EnqueueMatchmaking_Call {
-	return &Service_EnqueueMatchmaking_Call{Call: _e.mock.On("EnqueueMatchmaking", ctx, user, topic, difficulty, obfuscateOpponent)}
+func (_e *Service_Expecter) GetActiveSeason(ctx interface{}) *Service_GetActiveSeason_Call {
+	return &Service_GetActiveSeason_Call{Call: _e.mock.On("GetActiveSeason", ctx)}
 }
 
-func (_c *Service_EnqueueMatchmaking_Call) Run(run func(ctx context.Context, user *model.User, topic string, difficulty string, obfuscateOpponent bool)) *Service_EnqueueMatchmaking_Call {
+func (_c *Service_GetActiveSeason_Call) Run(run func(ctx context.Context)) *Service_GetActiveSeason_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*model.User), args[2].(string), args[3].(string), args[4].(bool))
+		run(args[0].(context.Context))
 	})
 	return _c
 }
 
-func (_c *Service_EnqueueMatchmaking_Call) Return(_a0 *model.ArenaQueueState, _a1 error) *Service_EnqueueMatchmaking_Call {
+func (_c *Service_GetActiveSeason_Call) Return(_a0 *model.ArenaSeason, _a1 error) *Service_GetActiveSeason_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Service_EnqueueMatchmaking_Call) RunAndReturn(run func(context.Context, *model.User, string, string, bool) (*model.ArenaQueueState, error)) *Service_EnqueueMatchmaking_Call {
+func (_c *Service_GetActiveSeason_Call) RunAndReturn(run func(context.Context) (*model.ArenaSeason, error)) *Service_GetActiveSeason_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetGuildLeaderboard provides a mock function with given fields: ctx, limit
+func (_m *Service) GetGuildLeaderboard(ctx context.Context, limit int32) ([]*model.GuildLeaderboardEntry, error) {
+	ret := _m.Called(ctx, limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetGuildLeaderboard")
+	}
+
+	var r0 []*model.GuildLeaderboardEntry
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, int32) ([]*model.GuildLeaderboardEntry, error)); ok {
+		return rf(ctx, limit)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, int32) []*model.GuildLeaderboardEntry); ok {
+		r0 = rf(ctx, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*model.GuildLeaderboardEntry)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, int32) error); ok {
+		r1 = rf(ctx, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_GetGuildLeaderboard_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetGuildLeaderboard'
+type Service_GetGuildLeaderboard_Call struct {
+	*mock.Call
+}
+
+// GetGuildLeaderboard is a helper method to define mock.On call
+//   - ctx context.Context
+//   - limit int32
+func (_e *Service_Expecter) GetGuildLeaderboard(ctx interface{}, limit interface{}) *Service_GetGuildLeaderboard_Call {
+	return &Service_GetGuildLeaderboard_Call{Call: _e.mock.On("GetGuildLeaderboard", ctx, limit)}
+}
+
+func (_c *Service_GetGuildLeaderboard_Call) Run(run func(ctx context.Context, limit int32)) *Service_GetGuildLeaderboard_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(int32))
+	})
+	return _c
+}
+
+func (_c *Service_GetGuildLeaderboard_Call) Return(_a0 []*model.GuildLeaderboardEntry, _a1 error) *Service_GetGuildLeaderboard_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_GetGuildLeaderboard_Call) RunAndReturn(run func(context.Context, int32) ([]*model.GuildLeaderboardEntry, error)) *Service_GetGuildLeaderboard_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -203,6 +258,71 @@ func (_c *Service_GetLeaderboard_Call) Return(_a0 []*model.ArenaLeaderboardEntry
 }
 
 func (_c *Service_GetLeaderboard_Call) RunAndReturn(run func(context.Context, int32) ([]*model.ArenaLeaderboardEntry, error)) *Service_GetLeaderboard_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetLeaguePosition provides a mock function with given fields: ctx, userID, rating
+func (_m *Service) GetLeaguePosition(ctx context.Context, userID string, rating int32) (int32, int32, error) {
+	ret := _m.Called(ctx, userID, rating)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetLeaguePosition")
+	}
+
+	var r0 int32
+	var r1 int32
+	var r2 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, int32) (int32, int32, error)); ok {
+		return rf(ctx, userID, rating)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, int32) int32); ok {
+		r0 = rf(ctx, userID, rating)
+	} else {
+		r0 = ret.Get(0).(int32)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, int32) int32); ok {
+		r1 = rf(ctx, userID, rating)
+	} else {
+		r1 = ret.Get(1).(int32)
+	}
+
+	if rf, ok := ret.Get(2).(func(context.Context, string, int32) error); ok {
+		r2 = rf(ctx, userID, rating)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
+// Service_GetLeaguePosition_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetLeaguePosition'
+type Service_GetLeaguePosition_Call struct {
+	*mock.Call
+}
+
+// GetLeaguePosition is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID string
+//   - rating int32
+func (_e *Service_Expecter) GetLeaguePosition(ctx interface{}, userID interface{}, rating interface{}) *Service_GetLeaguePosition_Call {
+	return &Service_GetLeaguePosition_Call{Call: _e.mock.On("GetLeaguePosition", ctx, userID, rating)}
+}
+
+func (_c *Service_GetLeaguePosition_Call) Run(run func(ctx context.Context, userID string, rating int32)) *Service_GetLeaguePosition_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(int32))
+	})
+	return _c
+}
+
+func (_c *Service_GetLeaguePosition_Call) Return(rank int32, total int32, err error) *Service_GetLeaguePosition_Call {
+	_c.Call.Return(rank, total, err)
+	return _c
+}
+
+func (_c *Service_GetLeaguePosition_Call) RunAndReturn(run func(context.Context, string, int32) (int32, int32, error)) *Service_GetLeaguePosition_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -325,120 +445,68 @@ func (_c *Service_GetPlayerStats_Call) RunAndReturn(run func(context.Context, uu
 	return _c
 }
 
-// GetPlayerStatsBatch provides a mock function with given fields: ctx, userIDs
-func (_m *Service) GetPlayerStatsBatch(ctx context.Context, userIDs []uuid.UUID) (map[uuid.UUID]*model.ArenaPlayerStats, error) {
-	ret := _m.Called(ctx, userIDs)
+// GetSeasonXPLeaderboard provides a mock function with given fields: ctx, limit
+func (_m *Service) GetSeasonXPLeaderboard(ctx context.Context, limit int32) ([]*model.SeasonXPEntry, int32, error) {
+	ret := _m.Called(ctx, limit)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetPlayerStatsBatch")
+		panic("no return value specified for GetSeasonXPLeaderboard")
 	}
 
-	var r0 map[uuid.UUID]*model.ArenaPlayerStats
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, []uuid.UUID) (map[uuid.UUID]*model.ArenaPlayerStats, error)); ok {
-		return rf(ctx, userIDs)
+	var r0 []*model.SeasonXPEntry
+	var r1 int32
+	var r2 error
+	if rf, ok := ret.Get(0).(func(context.Context, int32) ([]*model.SeasonXPEntry, int32, error)); ok {
+		return rf(ctx, limit)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, []uuid.UUID) map[uuid.UUID]*model.ArenaPlayerStats); ok {
-		r0 = rf(ctx, userIDs)
+	if rf, ok := ret.Get(0).(func(context.Context, int32) []*model.SeasonXPEntry); ok {
+		r0 = rf(ctx, limit)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(map[uuid.UUID]*model.ArenaPlayerStats)
+			r0 = ret.Get(0).([]*model.SeasonXPEntry)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, []uuid.UUID) error); ok {
-		r1 = rf(ctx, userIDs)
+	if rf, ok := ret.Get(1).(func(context.Context, int32) int32); ok {
+		r1 = rf(ctx, limit)
 	} else {
-		r1 = ret.Error(1)
+		r1 = ret.Get(1).(int32)
 	}
 
-	return r0, r1
+	if rf, ok := ret.Get(2).(func(context.Context, int32) error); ok {
+		r2 = rf(ctx, limit)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
 }
 
-// Service_GetPlayerStatsBatch_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPlayerStatsBatch'
-type Service_GetPlayerStatsBatch_Call struct {
+// Service_GetSeasonXPLeaderboard_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSeasonXPLeaderboard'
+type Service_GetSeasonXPLeaderboard_Call struct {
 	*mock.Call
 }
 
-// GetPlayerStatsBatch is a helper method to define mock.On call
+// GetSeasonXPLeaderboard is a helper method to define mock.On call
 //   - ctx context.Context
-//   - userIDs []uuid.UUID
-func (_e *Service_Expecter) GetPlayerStatsBatch(ctx interface{}, userIDs interface{}) *Service_GetPlayerStatsBatch_Call {
-	return &Service_GetPlayerStatsBatch_Call{Call: _e.mock.On("GetPlayerStatsBatch", ctx, userIDs)}
+//   - limit int32
+func (_e *Service_Expecter) GetSeasonXPLeaderboard(ctx interface{}, limit interface{}) *Service_GetSeasonXPLeaderboard_Call {
+	return &Service_GetSeasonXPLeaderboard_Call{Call: _e.mock.On("GetSeasonXPLeaderboard", ctx, limit)}
 }
 
-func (_c *Service_GetPlayerStatsBatch_Call) Run(run func(ctx context.Context, userIDs []uuid.UUID)) *Service_GetPlayerStatsBatch_Call {
+func (_c *Service_GetSeasonXPLeaderboard_Call) Run(run func(ctx context.Context, limit int32)) *Service_GetSeasonXPLeaderboard_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].([]uuid.UUID))
+		run(args[0].(context.Context), args[1].(int32))
 	})
 	return _c
 }
 
-func (_c *Service_GetPlayerStatsBatch_Call) Return(_a0 map[uuid.UUID]*model.ArenaPlayerStats, _a1 error) *Service_GetPlayerStatsBatch_Call {
-	_c.Call.Return(_a0, _a1)
+func (_c *Service_GetSeasonXPLeaderboard_Call) Return(_a0 []*model.SeasonXPEntry, _a1 int32, _a2 error) *Service_GetSeasonXPLeaderboard_Call {
+	_c.Call.Return(_a0, _a1, _a2)
 	return _c
 }
 
-func (_c *Service_GetPlayerStatsBatch_Call) RunAndReturn(run func(context.Context, []uuid.UUID) (map[uuid.UUID]*model.ArenaPlayerStats, error)) *Service_GetPlayerStatsBatch_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetQueueStatus provides a mock function with given fields: ctx, user
-func (_m *Service) GetQueueStatus(ctx context.Context, user *model.User) (*model.ArenaQueueState, error) {
-	ret := _m.Called(ctx, user)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetQueueStatus")
-	}
-
-	var r0 *model.ArenaQueueState
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *model.User) (*model.ArenaQueueState, error)); ok {
-		return rf(ctx, user)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, *model.User) *model.ArenaQueueState); ok {
-		r0 = rf(ctx, user)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*model.ArenaQueueState)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, *model.User) error); ok {
-		r1 = rf(ctx, user)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// Service_GetQueueStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetQueueStatus'
-type Service_GetQueueStatus_Call struct {
-	*mock.Call
-}
-
-// GetQueueStatus is a helper method to define mock.On call
-//   - ctx context.Context
-//   - user *model.User
-func (_e *Service_Expecter) GetQueueStatus(ctx interface{}, user interface{}) *Service_GetQueueStatus_Call {
-	return &Service_GetQueueStatus_Call{Call: _e.mock.On("GetQueueStatus", ctx, user)}
-}
-
-func (_c *Service_GetQueueStatus_Call) Run(run func(ctx context.Context, user *model.User)) *Service_GetQueueStatus_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*model.User))
-	})
-	return _c
-}
-
-func (_c *Service_GetQueueStatus_Call) Return(_a0 *model.ArenaQueueState, _a1 error) *Service_GetQueueStatus_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Service_GetQueueStatus_Call) RunAndReturn(run func(context.Context, *model.User) (*model.ArenaQueueState, error)) *Service_GetQueueStatus_Call {
+func (_c *Service_GetSeasonXPLeaderboard_Call) RunAndReturn(run func(context.Context, int32) ([]*model.SeasonXPEntry, int32, error)) *Service_GetSeasonXPLeaderboard_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -559,53 +627,6 @@ func (_c *Service_LeaveMatch_Call) Return(_a0 *model.ArenaMatch, _a1 error) *Ser
 }
 
 func (_c *Service_LeaveMatch_Call) RunAndReturn(run func(context.Context, uuid.UUID, *model.User) (*model.ArenaMatch, error)) *Service_LeaveMatch_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// LeaveQueue provides a mock function with given fields: ctx, user
-func (_m *Service) LeaveQueue(ctx context.Context, user *model.User) error {
-	ret := _m.Called(ctx, user)
-
-	if len(ret) == 0 {
-		panic("no return value specified for LeaveQueue")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *model.User) error); ok {
-		r0 = rf(ctx, user)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// Service_LeaveQueue_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LeaveQueue'
-type Service_LeaveQueue_Call struct {
-	*mock.Call
-}
-
-// LeaveQueue is a helper method to define mock.On call
-//   - ctx context.Context
-//   - user *model.User
-func (_e *Service_Expecter) LeaveQueue(ctx interface{}, user interface{}) *Service_LeaveQueue_Call {
-	return &Service_LeaveQueue_Call{Call: _e.mock.On("LeaveQueue", ctx, user)}
-}
-
-func (_c *Service_LeaveQueue_Call) Run(run func(ctx context.Context, user *model.User)) *Service_LeaveQueue_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*model.User))
-	})
-	return _c
-}
-
-func (_c *Service_LeaveQueue_Call) Return(_a0 error) *Service_LeaveQueue_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Service_LeaveQueue_Call) RunAndReturn(run func(context.Context, *model.User) error) *Service_LeaveQueue_Call {
 	_c.Call.Return(run)
 	return _c
 }

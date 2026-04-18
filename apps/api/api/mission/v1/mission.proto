@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package mission.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "api/pkg/api/mission/v1;v1";
+
+service MissionService {
+  // GetDailyMissions returns today's daily missions with current progress
+  // for the authenticated user.
+  rpc GetDailyMissions(GetDailyMissionsRequest) returns (GetDailyMissionsResponse) {
+    option (google.api.http) = { get: "/api/v1/missions/daily" };
+  }
+
+  // CompleteMission explicitly marks a mission as done for the current day.
+  // Used for missions that can't be computed from existing tables (e.g. daily_challenge).
+  rpc CompleteMission(CompleteMissionRequest) returns (CompleteMissionResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/missions/{mission_key}/complete"
+      body: "*"
+    };
+  }
+}
+
+message GetDailyMissionsRequest {}
+
+message GetDailyMissionsResponse {
+  repeated DailyMission missions        = 1;
+  bool                  all_complete    = 2;
+  int32                 completed_count = 3;
+  int32                 bonus_xp        = 4;
+  int32                 total_xp_earned = 5;
+}
+
+message DailyMission {
+  string key          = 1;
+  string title        = 2;
+  string description  = 3;
+  int32  target_value = 4;
+  int32  current      = 5;
+  bool   completed    = 6;
+  int32  xp_reward    = 7;
+  string action_url   = 8;
+  string icon         = 9;
+}
+
+message CompleteMissionRequest {
+  string mission_key = 1;
+}
+
+message CompleteMissionResponse {
+  bool ok = 1;
+}

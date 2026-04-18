@@ -1,5 +1,6 @@
 import { Mic, Pause, Play, X } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAudioPlayer } from '@/features/Podcast/providers/AudioPlayerProvider'
 
 const SPEEDS = [0.75, 1, 1.25, 1.5, 2]
@@ -11,6 +12,7 @@ function fmt(sec: number) {
 }
 
 export function AudioPlayerBar() {
+  const { t } = useTranslation()
   const { playing, isPlaying, progress, currentTime, duration, speed, pause, resume, stop, seek, setSpeed } = useAudioPlayer()
   const location = useLocation()
 
@@ -85,7 +87,7 @@ export function AudioPlayerBar() {
         <button
           onClick={stop}
           className="w-7 h-7 rounded-full hover:bg-[#1e293b] flex items-center justify-center transition-colors"
-          title="Close player"
+          title={t('podcast.player.close')}
         >
           <X className="w-3.5 h-3.5 text-[#4B6B52] hover:text-white" />
         </button>

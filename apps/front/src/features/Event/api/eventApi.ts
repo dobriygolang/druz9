@@ -21,7 +21,7 @@ export interface Event {
   description: string
   meetingLink: string
   repeat: string
-  circleId?: string
+  guildId?: string
   status: string
 }
 
@@ -44,8 +44,20 @@ type BackendEvent = {
   description?: string
   meetingLink?: string
   repeat?: string
-  circleId?: string
+  guildId?: string
   status?: string
+}
+
+// Backend switched Event.status from a bare string to the EventStatus
+// proto enum. grpc-gateway emits either the canonical name
+// ("EVENT_STATUS_APPROVED") or a number. Normalise back to the legacy
+// lowercase values so the rest of the frontend keeps working unchanged.
+function normalizeEventStatus(raw: unknown): 'pending' | 'approved' | 'rejected' {
+  const s = typeof raw === 'string' ? raw.toUpperCase() : ''
+  if (s === 'EVENT_STATUS_PENDING' || s === 'PENDING' || raw === 1) return 'pending'
+  if (s === 'EVENT_STATUS_REJECTED' || s === 'REJECTED' || raw === 3) return 'rejected'
+  // default = approved (covers both new 'EVENT_STATUS_APPROVED' and legacy 'approved')
+  return 'approved'
 }
 
 function normalizeEvent(e: BackendEvent): Event {
@@ -59,19 +71,19 @@ function normalizeEvent(e: BackendEvent): Event {
     participantCount: e.participantCount ?? 0,
     description: e.description ?? '', meetingLink: e.meetingLink ?? '',
     repeat: e.repeat ?? 'none',
-    circleId: e.circleId,
-    status: e.status ?? 'approved',
+    guildId: e.guildId,
+    status: normalizeEventStatus(e.status),
   }
 }
 
 export type EventRepeat = 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly'
 
 export const REPEAT_LABELS: Record<EventRepeat, string> = {
-  none: 'Do not repeat',
-  daily: 'Daily (14 days)',
-  weekly: 'Weekly (8 weeks)',
-  monthly: 'Monthly (6 months)',
-  yearly: 'Yearly (2 years)',
+  none: 'Не повторять',
+  daily: 'Каждый день (14 дней)',
+  weekly: 'Каждую неделю (8 недель)',
+  monthly: 'Каждый месяц (6 месяцев)',
+  yearly: 'Каждый год (2 года)',
 }
 
 export interface CreateEventPayload {
@@ -126,14 +138,21 @@ export const eventApi = {
   inviteToEvent: async (eventId: string, userId: string): Promise<void> => {
     await apiClient.post(`/api/v1/events/${eventId}/invite`, { userId })
   },
-  listCircleEvents: async (circleId: string, status?: string): Promise<Event[]> => {
-    const r = await apiClient.get<{ events?: BackendEvent[] }>(`/api/v1/circles/${circleId}/events`, {
-      params: status ? { status } : undefined,
+  listGuildEvents: async (guildId: string, status?: 'upcoming' | 'past'): Promise<Event[]> => {
+    // Backend expects the EventListFilter proto enum; send the canonical
+    // uppercase name so grpc-gateway parses it without guessing.
+    const proto = status === 'past'
+      ? 'EVENT_LIST_FILTER_PAST'
+      : status === 'upcoming'
+        ? 'EVENT_LIST_FILTER_UPCOMING'
+        : undefined
+    const r = await apiClient.get<{ events?: BackendEvent[] }>(`/api/v1/guilds/${guildId}/events`, {
+      params: proto ? { status: proto } : undefined,
     })
     return (r.data.events ?? []).map(normalizeEvent)
   },
-  createCircleEvent: async (circleId: string, payload: CreateEventPayload): Promise<Event> => {
-    const r = await apiClient.post<{ event: BackendEvent }>(`/api/v1/circles/${circleId}/events`, {
+  createGuildEvent: async (guildId: string, payload: CreateEventPayload): Promise<Event> => {
+    const r = await apiClient.post<{ event: BackendEvent }>(`/api/v1/guilds/${guildId}/events`, {
       title: payload.title,
       description: payload.description,
       meetingLink: payload.meetingLink,

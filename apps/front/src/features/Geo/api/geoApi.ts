@@ -87,4 +87,55 @@ export const geoApi = {
       telegramUsername: p.telegramUsername ?? '',
     }))
   },
+
+  // World map pins — guild halls + upcoming events aggregated server-side.
+  listWorldPins: async (): Promise<WorldPin[]> => {
+    const { data } = await apiClient.get<{ pins?: WorldPinRaw[] }>('/api/v1/geo/world-pins')
+    return (data.pins ?? []).map((p) => ({
+      id: p.id ?? '',
+      kind: (p.kind ?? 0) as WorldPinKind,
+      title: p.title ?? '',
+      subtitle: p.subtitle ?? '',
+      latitude: p.latitude ?? 0,
+      longitude: p.longitude ?? 0,
+      region: p.region ?? '',
+      iconRef: p.iconRef ?? '',
+      linkPath: p.linkPath ?? '',
+      isHot: p.isHot ?? false,
+    }))
+  },
+}
+
+// ---------- World pin types ----------
+export enum WorldPinKind {
+  UNSPECIFIED = 0,
+  GUILD = 1,
+  EVENT = 2,
+  PLAYER = 3,
+}
+
+export interface WorldPin {
+  id: string
+  kind: WorldPinKind
+  title: string
+  subtitle: string
+  latitude: number
+  longitude: number
+  region: string
+  iconRef: string
+  linkPath: string
+  isHot: boolean
+}
+
+interface WorldPinRaw {
+  id?: string
+  kind?: number
+  title?: string
+  subtitle?: string
+  latitude?: number
+  longitude?: number
+  region?: string
+  iconRef?: string
+  linkPath?: string
+  isHot?: boolean
 }

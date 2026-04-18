@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>druz9 · Pixel RPG · Sprint 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;700&family=Silkscreen:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- shared primitives -->
+<script type="text/babel" src="sprites.jsx"></script>
+<script type="text/babel" src="shell.jsx"></script>
+
+<!-- existing screens -->
+<script type="text/babel" src="screens_a.jsx"></script>
+<script type="text/babel" src="screens_b.jsx"></script>
+<script type="text/babel" src="screens_c.jsx"></script>
+<script type="text/babel" src="screens_d.jsx"></script>
+<script type="text/babel" src="screens_e.jsx"></script>
+<script type="text/babel" src="screens_f.jsx"></script>
+<script type="text/babel" src="screens_g.jsx"></script>
+
+<!-- new sprint 3 screens -->
+<script type="text/babel" src="screens_new.jsx"></script>
+<script type="text/babel" src="screens_hub_polished.jsx"></script>
+<script type="text/babel" src="screens_h.jsx"></script>
+
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "roomLayout": "scholar",
+  "heroPose": "idle",
+  "pet": "raven",
+  "seasonOverlay": "none",
+  "density": "normal",
+  "hubVariant": "polished",
+  "guildHallTheme": "moss"
+}/*EDITMODE-END*/;
+
+const DEFAULT_USER = {
+  name: 'Thornmoss',
+  level: 24,
+  title: 'Siegebreaker',
+  streak: 42,
+  streakCap: 240,
+  achievements: 128,
+  duelsWon: 86,
+  duelsLost: 54,
+  guild: 'Mossveil ▸',
+  xp: 3420, xpMax: 5000, xpPct: 68,
+  gold: 8420, gems: 124,
+};
+
+const ROUTES = [
+  'hub', 'profile', 'guild', 'arena', 'training', 'interview',
+  'leaderboards', 'social', 'events', 'podcasts', 'map', 'shop',
+  // sprint 3 new:
+  'training-task', 'interview-live', 'states', 'mobile',
+  // existing modals-as-routes:
+  'ds', 'season',
+];
+
+function App() {
+  const [current, setCurrent] = React.useState(() => localStorage.getItem('druz9:route') || 'hub');
+  const [tweaks, setTweaks] = React.useState(TWEAK_DEFAULTS);
+  const [editMode, setEditMode] = React.useState(false);
+  const [tweaksOpen, setTweaksOpen] = React.useState(false);
+  const [visitorMode, setVisitorMode] = React.useState(false);
+  const [toasts, setToasts] = React.useState([]);
+  const [notifsOpen, setNotifsOpen] = React.useState(false);
+  const [levelUpOpen, setLevelUpOpen] = React.useState(false);
+  const [showOnboarding, setShowOnboarding] = React.useState(false);
+
+  const fireToast = React.useCallback((t) => {
+    const id = Date.now() + Math.random();
+    setToasts(prev => [...prev, { id, ...t }]);
+    setTimeout(() => setToasts(prev => prev.filter(x => x.id !== id)), 5000);
+  }, []);
+  const dismissToast = (id) => setToasts(prev => prev.filter(x => x.id !== id));
+
+  const nav = React.useCallback((r) => {
+    setCurrent(r);
+    localStorage.setItem('druz9:route', r);
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, []);
+
+  // expose for legacy screens that need to trigger nav
+  React.useEffect(() => { window.__druz9_nav = nav; return () => { delete window.__druz9_nav; }; }, [nav]);
+
+  // edit-mode bridge
+  React.useEffect(() => {
+    const h = (e) => {
+      if (e.data?.type === '__activate_edit_mode') setEditMode(true);
+      if (e.data?.type === '__deactivate_edit_mode') setEditMode(false);
+    };
+    window.addEventListener('message', h);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', h);
+  }, []);
+
+  const updateTweak = (k, v) => {
+    const next = { ...tweaks, [k]: v };
+    setTweaks(next);
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [k]: v } }, '*');
+  };
+
+  const user = DEFAULT_USER;
+
+  // body class for season overlay
+  React.useEffect(() => {
+    document.body.className = '';
+    if (tweaks.seasonOverlay && tweaks.seasonOverlay !== 'none') document.body.classList.add('season-' + tweaks.seasonOverlay);
+    if (tweaks.density && tweaks.density !== 'normal') document.body.classList.add('density-' + tweaks.density);
+  }, [tweaks.seasonOverlay, tweaks.density]);
+
+  const renderScreen = () => {
+    const hubProps = { user, tweaks, onNav: nav };
+    switch (current) {
+      case 'hub':
+        return tweaks.hubVariant === 'polished'
+          ? <HubPolishedScreen {...hubProps} />
+          : <HubScreen {...hubProps} />;
+      case 'profile': return <ProfileScreen user={user} tweaks={tweaks} visitorMode={visitorMode} onToggleVisitor={() => setVisitorMode(v => !v)} />;
+      case 'guild': return <GuildScreen tweaks={tweaks} />;
+      case 'arena': return <ArenaScreen user={user} onEnterDuel={() => nav('arena')} />;
+      case 'training': return <TrainingScreen />;
+      case 'training-task': return <TaskSolverScreen onExit={() => nav('training')} />;
+      case 'interview': return <InterviewScreen />;
+      case 'interview-live': return <MentorLiveScreen onExit={() => nav('interview')} />;
+      case 'states': return <StatesScreen onNav={nav} />;
+      case 'mobile': return <MobileMockScreen />;
+      case 'leaderboards': return <LeaderboardsScreen />;
+      case 'social': return <SocialScreen />;
+      case 'events': return <EventsScreen />;
+      case 'podcasts': return <PodcastsScreen />;
+      case 'map': return <MapScreen />;
+      case 'shop': return <ShopScreen tweaks={tweaks} onNav={nav} />;
+      case 'ds': return <DSScreen />;
+      case 'season': return <SeasonPassScreen />;
+      case 'settings': return <SettingsScreen />;
+      default: return <HubPolishedScreen {...hubProps} />;
+    }
+  };
+
+  return (
+    <div>
+      <HeroStrip user={user} tweaks={tweaks} />
+
+      <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+        <SideNav current={current} onNav={nav} />
+        <main className="app-main" style={{ flex: 1, padding: '28px 32px 60px', minWidth: 0 }}>
+          {renderScreen()}
+
+          {/* debug / demo nav strip (always present at page bottom) */}
+          <div className="divider" style={{ marginTop: 40 }} />
+          <div className="row items-end justify-between gap-3" style={{ flexWrap: 'wrap' }}>
+            <div>
+              <div className="mono text-mute">druz9 · pixel concept · season iii</div>
+              <div className="mono text-mute" style={{ fontSize: 9, marginTop: 4 }}>sprint 3 additions · enable tweaks for variants</div>
+            </div>
+            <div className="row gap-2" style={{ flexWrap: 'wrap', maxWidth: 820, justifyContent: 'flex-end' }}>
+              {[
+                ['hub', 'HUB'],
+                ['training-task', 'TASK SOLVER'],
+                ['interview-live', 'MENTOR LIVE'],
+                ['states', 'STATES'],
+                ['mobile', 'MOBILE'],
+                ['settings', 'SETTINGS'],
+                ['ds', 'DESIGN SYSTEM'],
+                ['season', 'SEASON PASS'],
+                ['guild', 'GUILD'],
+                ['shop', 'SHOP'],
+              ].map(([r, l]) => (
+                <button key={r}
+                  className={`btn btn--sm ${current === r ? 'btn--primary' : ''}`}
+                  onClick={() => nav(r)}>{l}</button>
+              ))}
+            </div>
+          </div>
+        </main>
+      </div>
+
+      {editMode && (
+        <TweaksPanel
+          tweaks={tweaks}
+          updateTweak={updateTweak}
+          current={current}
+          nav={nav}
+          onClose={() => setEditMode(false)}
+          fireToast={fireToast}
+          openNotifs={() => setNotifsOpen(true)}
+          openLevelUp={() => setLevelUpOpen(true)}
+          openOnboarding={() => setShowOnboarding(true)}
+        />
+      )}
+
+      {/* global overlays */}
+      <ToastStack toasts={toasts} onDismiss={dismissToast} />
+      {notifsOpen && <NotificationsPanel onClose={() => setNotifsOpen(false)} />}
+      <LevelUpModal open={levelUpOpen} level={25} onClose={() => setLevelUpOpen(false)} />
+      {showOnboarding && <OnboardingScreen onFinish={() => { setShowOnboarding(false); nav('hub'); fireToast({ kind: 'WELCOME', title: 'Initiation complete', body: '+100 gold · companion unlocked', icon: '✦', color: 'var(--ember-1)' }); }} />}
+    </div>
+  );
+}
+
+function TweaksPanel({ tweaks, updateTweak, current, nav, onClose, fireToast, openNotifs, openLevelUp, openOnboarding }) {
+  return (
+    <div className="tweaks-panel">
+      <div className="row items-center justify-between">
+        <h4 style={{ margin: 0, borderBottom: 'none', padding: 0 }}>Tweaks</h4>
+        <button className="btn btn--sm" onClick={onClose}>✕</button>
+      </div>
+      <div className="mono text-mute mb-3" style={{ fontSize: 9 }}>variants · live</div>
+
+      <div className="group">
+        <div className="group-label">hub variant</div>
+        <div className="row gap-2" style={{ flexWrap: 'wrap' }}>
+          {['polished', 'original'].map(v => (
+            <span key={v}
+              className={`tweak-chip ${tweaks.hubVariant === v ? 'tweak-chip--on' : ''}`}
+              onClick={() => updateTweak('hubVariant', v)}>{v}</span>
+          ))}
+        </div>
+        <div className="mono text-mute" style={{ fontSize: 9, marginTop: 4 }}>polished = season pass, live duels, friend feed</div>
+      </div>
+
+      <div className="group">
+        <div className="group-label">room layout</div>
+        <div className="row gap-2" style={{ flexWrap: 'wrap' }}>
+          {['cozy', 'scholar', 'warrior'].map(v => (
+            <span key={v}
+              className={`tweak-chip ${tweaks.roomLayout === v ? 'tweak-chip--on' : ''}`}
+              onClick={() => updateTweak('roomLayout', v)}>{v}</span>
+          ))}
+        </div>
+      </div>
+
+      <div className="group">
+        <div className="group-label">companion</div>
+        <div className="row gap-2" style={{ flexWrap: 'wrap' }}>
+          {['none', 'slime', 'raven', 'orb'].map(v => (
+            <span key={v}
+              className={`tweak-chip ${tweaks.pet === v ? 'tweak-chip--on' : ''}`}
+              onClick={() => updateTweak('pet', v)}>{v}</span>
+          ))}
+        </div>
+      </div>
+
+      <div className="group">
+        <div className="group-label">hero pose</div>
+        <div className="row gap-2" style={{ flexWrap: 'wrap' }}>
+          {['idle', 'wave', 'trophy'].map(v => (
+            <span key={v}
+              className={`tweak-chip ${tweaks.heroPose === v ? 'tweak-chip--on' : ''}`}
+              onClick={() => updateTweak('heroPose', v)}>{v}</span>
+          ))}
+        </div>
+      </div>
+
+      <div className="group">
+        <div className="group-label">season overlay</div>
+        <div className="row gap-2" style={{ flexWrap: 'wrap' }}>
+          {['none', 'dusk', 'night', 'winter'].map(v => (
+            <span key={v}
+              className={`tweak-chip ${tweaks.seasonOverlay === v ? 'tweak-chip--on' : ''}`}
+              onClick={() => updateTweak('seasonOverlay', v)}>{v}</span>
+          ))}
+        </div>
+      </div>
+
+      <div className="group">
+        <div className="group-label">density</div>
+        <div className="row gap-2" style={{ flexWrap: 'wrap' }}>
+          {['compact', 'normal', 'roomy'].map(v => (
+            <span key={v}
+              className={`tweak-chip ${tweaks.density === v ? 'tweak-chip--on' : ''}`}
+              onClick={() => updateTweak('density', v)}>{v}</span>
+          ))}
+        </div>
+      </div>
+
+      <div className="group">
+        <div className="group-label">jump to new screens</div>
+        <div className="row gap-2" style={{ flexWrap: 'wrap' }}>
+          {[
+            ['training-task', 'task solver'],
+            ['interview-live', 'mentor live'],
+            ['states', 'empty states'],
+            ['mobile', 'mobile mock'],
+            ['settings', 'settings'],
+          ].map(([r, l]) => (
+            <span key={r} className="tweak-chip" onClick={() => nav(r)}>{l} →</span>
+          ))}
+          <span className="tweak-chip" onClick={openOnboarding}>onboarding →</span>
+        </div>
+      </div>
+
+      <DemoTweaksSection fireToast={fireToast} openNotifs={openNotifs} openLevelUp={openLevelUp} />
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>

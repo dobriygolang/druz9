@@ -1,0 +1,170 @@
+syntax = "proto3";
+
+package training.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "api/pkg/api/training/v1;v1";
+
+service TrainingService {
+  rpc GetSkillTree(GetSkillTreeRequest) returns (GetSkillTreeResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/training/skill-tree"
+    };
+  }
+
+  rpc GetTask(GetTaskRequest) returns (GetTaskResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/training/tasks/{module_id}"
+    };
+  }
+
+  rpc EvaluateTaskSolution(EvaluateTaskSolutionRequest) returns (EvaluateTaskSolutionResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/training/tasks/{module_id}/evaluate"
+      body: "*"
+    };
+  }
+}
+
+message GetSkillTreeRequest {}
+
+message GetSkillTreeResponse {
+  string selected_node_id = 1;
+  repeated TrainingBranchStat branch_stats = 2;
+  repeated TrainingNode nodes = 3;
+  repeated TrainingEdge edges = 4;
+  repeated TrainingModule modules = 5;
+}
+
+message TrainingBranchStat {
+  string branch = 1;
+  string name = 2;
+  int32 done = 3;
+  int32 total = 4;
+  string color_token = 5;
+}
+
+message TrainingNode {
+  string id = 1;
+  int32 x = 2;
+  int32 y = 3;
+  string label = 4;
+  string state = 5;
+  string branch = 6;
+  bool keystone = 7;
+}
+
+message TrainingEdge {
+  string from_node_id = 1;
+  string to_node_id = 2;
+}
+
+message TrainingModule {
+  string node_id = 1;
+  string title = 2;
+  string description = 3;
+  int32 tasks = 4;
+  int32 projects = 5;
+  string hours = 6;
+  repeated string rewards = 7;
+  repeated string prereq = 8;
+  repeated string unlocks = 9;
+  optional int32 progress_pct = 10;
+  int32 tasks_solved = 11;
+  int32 projects_done = 12;
+  string action_url = 13;
+}
+
+enum TrainingTaskDifficulty {
+  TRAINING_TASK_DIFFICULTY_UNSPECIFIED = 0;
+  TRAINING_TASK_DIFFICULTY_EASY = 1;
+  TRAINING_TASK_DIFFICULTY_MEDIUM = 2;
+  TRAINING_TASK_DIFFICULTY_HARD = 3;
+}
+
+enum TrainingProgrammingLanguage {
+  TRAINING_PROGRAMMING_LANGUAGE_UNSPECIFIED = 0;
+  TRAINING_PROGRAMMING_LANGUAGE_PYTHON = 1;
+  TRAINING_PROGRAMMING_LANGUAGE_GO = 2;
+}
+
+enum TrainingEvaluationMode {
+  TRAINING_EVALUATION_MODE_UNSPECIFIED = 0;
+  TRAINING_EVALUATION_MODE_RUN_VISIBLE = 1;
+  TRAINING_EVALUATION_MODE_SUBMIT_ALL = 2;
+}
+
+enum TrainingTestStatus {
+  TRAINING_TEST_STATUS_UNSPECIFIED = 0;
+  TRAINING_TEST_STATUS_PASS = 1;
+  TRAINING_TEST_STATUS_FAIL = 2;
+}
+
+message GetTaskRequest {
+  string module_id = 1;
+}
+
+message GetTaskResponse {
+  TrainingTask task = 1;
+}
+
+message EvaluateTaskSolutionRequest {
+  string module_id = 1;
+  TrainingProgrammingLanguage language = 2;
+  string code = 3;
+  TrainingEvaluationMode mode = 4;
+}
+
+message EvaluateTaskSolutionResponse {
+  repeated TrainingTestResult test_results = 1;
+  bool accepted = 2;
+  string error = 3;
+  int32 passed_count = 4;
+  int32 total_count = 5;
+  string submission_id = 6;
+  repeated string reward_labels = 7;
+}
+
+message TrainingTask {
+  string module_id = 1;
+  string task_id = 2;
+  string title = 3;
+  string topic = 4;
+  TrainingTaskDifficulty difficulty = 5;
+  string statement = 6;
+  repeated TrainingTaskExample examples = 7;
+  repeated string constraints = 8;
+  repeated TrainingStarterCode starter_codes = 9;
+  repeated TrainingTestCase visible_test_cases = 10;
+  repeated string hints = 11;
+  repeated string reward_labels = 12;
+}
+
+message TrainingTaskExample {
+  string input = 1;
+  string output = 2;
+  string note = 3;
+}
+
+message TrainingStarterCode {
+  TrainingProgrammingLanguage language = 1;
+  string code = 2;
+}
+
+message TrainingTestCase {
+  string id = 1;
+  string input = 2;
+  string expected = 3;
+  bool hidden = 4;
+}
+
+message TrainingTestResult {
+  string id = 1;
+  string input = 2;
+  string expected = 3;
+  bool hidden = 4;
+  TrainingTestStatus status = 5;
+  int64 runtime_ms = 6;
+  string actual = 7;
+}

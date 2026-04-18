@@ -323,7 +323,69 @@ func (r *Repo) loadProfileCheckpointProgress(ctx context.Context, userID uuid.UU
 	return []*model.ProfileCheckpointProgress{}, nil
 }
 
-func (r *Repo) loadProfileProgressStreak(ctx context.Context, userID uuid.UUID, now time.Time) (current int32, longest int32, err error) {
+// GetStreakStats exposes the streak computation (used by the streak
+// package's shield-protection layer) without dragging in the full
+// ProfileProgress pipeline.
+func (r *Repo) GetStreakStats(ctx context.Context, userID uuid.UUID, now time.Time) (current, longest int32, lastActiveAt *time.Time, err error) {
+	dates, err := r.queryProfileStreakDates(ctx, userID)
+	if err != nil {
+		return 0, 0, nil, err
+	}
+	current = profiledomain.ComputeCurrentStreak(dates, now.UTC())
+	longest = profiledomain.ComputeLongestStreak(dates)
+	if len(dates) > 0 {
+		t := dates[0] // sorted DESC, so first is most recent
+		lastActiveAt = &t
+	}
+	current = r.applyShieldRestore(ctx, userID, current, now)
+	if current > longest {
+		longest = current
+	}
+	return current, longest, lastActiveAt, nil
+}
+
+// applyShieldRestore bumps the computed streak when the user recently
+// consumed a shield. Formula: the shield's `last_used_at` must fall
+// within the CURRENT activity window (today back `current` days); if so
+// the effective streak becomes `last_restored_to + (current - 1)`, i.e.
+// the pre-break chain picks up from the shield day and each subsequent
+// active day still stacks. If the user breaks again after the shield,
+// `current` drops to 0 and the shield no longer applies.
+//
+// Returns `current` unchanged when no shield row exists, `last_used_at`
+// is NULL, the shield has expired out of the window, or the restore
+// value is not higher than what dates already show.
+func (r *Repo) applyShieldRestore(ctx context.Context, userID uuid.UUID, current int32, now time.Time) int32 {
+	if current <= 0 {
+		return current
+	}
+	var lastUsedAt *time.Time
+	var restoredTo *int32
+	err := r.data.DB.QueryRow(ctx, `
+		SELECT last_used_at, last_restored_to
+		FROM user_streak_shields
+		WHERE user_id = $1
+	`, userID).Scan(&lastUsedAt, &restoredTo)
+	if err != nil || lastUsedAt == nil || restoredTo == nil || *restoredTo <= 0 {
+		return current
+	}
+	today := profiledomain.TruncateDateUTC(now)
+	shieldDay := profiledomain.TruncateDateUTC(*lastUsedAt)
+	// shield day must sit inside the active streak window [today-(current-1) .. today]
+	windowStart := today.AddDate(0, 0, -int(current-1))
+	if shieldDay.Before(windowStart) || shieldDay.After(today) {
+		return current
+	}
+	effective := *restoredTo + current - 1
+	if effective > current {
+		return effective
+	}
+	return current
+}
+
+// queryProfileStreakDates extracts the date-list query from the legacy
+// loadProfileProgressStreak so both callers share the same SQL.
+func (r *Repo) queryProfileStreakDates(ctx context.Context, userID uuid.UUID) ([]time.Time, error) {
 	rows, err := r.data.DB.Query(ctx, `
 		SELECT DISTINCT DATE(activity_at AT TIME ZONE 'UTC') AS activity_date
 		FROM (
@@ -344,7 +406,7 @@ func (r *Repo) loadProfileProgressStreak(ctx context.Context, userID uuid.UUID, 
 		ORDER BY activity_date DESC
 	`, userID)
 	if err != nil {
-		return 0, 0, fmt.Errorf("query profile streak: %w", err)
+		return nil, fmt.Errorf("query profile streak: %w", err)
 	}
 	defer rows.Close()
 
@@ -352,16 +414,27 @@ func (r *Repo) loadProfileProgressStreak(ctx context.Context, userID uuid.UUID, 
 	for rows.Next() {
 		var value time.Time
 		if err := rows.Scan(&value); err != nil {
-			return 0, 0, fmt.Errorf("scan profile streak date: %w", err)
+			return nil, fmt.Errorf("scan profile streak date: %w", err)
 		}
 		dates = append(dates, value.UTC())
 	}
 	if err := rows.Err(); err != nil {
-		return 0, 0, fmt.Errorf("iterate profile streak dates: %w", err)
+		return nil, fmt.Errorf("iterate profile streak dates: %w", err)
 	}
+	return dates, nil
+}
 
+func (r *Repo) loadProfileProgressStreak(ctx context.Context, userID uuid.UUID, now time.Time) (current int32, longest int32, err error) {
+	dates, err := r.queryProfileStreakDates(ctx, userID)
+	if err != nil {
+		return 0, 0, err
+	}
 	current = profiledomain.ComputeCurrentStreak(dates, now.UTC())
 	longest = profiledomain.ComputeLongestStreak(dates)
+	current = r.applyShieldRestore(ctx, userID, current, now)
+	if current > longest {
+		longest = current
+	}
 	return current, longest, nil
 }
 

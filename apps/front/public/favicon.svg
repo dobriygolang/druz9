@@ -1,18 +1,20 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="64" height="64" rx="14" fill="#6366F1"/>
-  <rect x="2" y="2" width="60" height="60" rx="12" fill="url(#bg)" opacity="0.15"/>
-  <!-- Triangle network: 3 nodes connected by lines -->
-  <!-- Nodes: top-left (18,20), top-right (46,20), bottom-center (32,46) -->
-  <line x1="18" y1="20" x2="46" y2="20" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-opacity="0.7"/>
-  <line x1="18" y1="20" x2="32" y2="46" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-opacity="0.7"/>
-  <line x1="46" y1="20" x2="32" y2="46" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-opacity="0.7"/>
-  <circle cx="18" cy="20" r="6" fill="white"/>
-  <circle cx="46" cy="20" r="6" fill="white"/>
-  <circle cx="32" cy="46" r="6" fill="white"/>
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop stop-color="white"/>
-      <stop offset="1" stop-color="white" stop-opacity="0"/>
-    </linearGradient>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <!-- shield base -->
+  <path d="M6 4 h20 v14 q0 6 -10 10 q-10 -4 -10 -10 z" fill="#c85a2d" stroke="#2a1f14" stroke-width="2"/>
+  <!-- inner highlight -->
+  <path d="M8 6 h16 v12 q0 4 -8 8 q-8 -4 -8 -8 z" fill="none" stroke="#e9d9b8" stroke-width="1" opacity="0.4"/>
+  <!-- D letter -->
+  <rect x="10" y="10" width="2" height="10" fill="#2a1f14"/>
+  <rect x="10" y="10" width="5" height="2" fill="#2a1f14"/>
+  <rect x="10" y="18" width="5" height="2" fill="#2a1f14"/>
+  <rect x="15" y="12" width="2" height="6" fill="#2a1f14"/>
+  <!-- 9 -->
+  <rect x="19" y="10" width="5" height="2" fill="#2a1f14"/>
+  <rect x="19" y="10" width="2" height="5" fill="#2a1f14"/>
+  <rect x="22" y="10" width="2" height="10" fill="#2a1f14"/>
+  <rect x="19" y="13" width="5" height="2" fill="#2a1f14"/>
+  <rect x="19" y="18" width="5" height="2" fill="#2a1f14"/>
+  <!-- ember spark -->
+  <rect x="24" y="3" width="2" height="2" fill="#f0d878"/>
+  <rect x="25" y="2" width="2" height="2" fill="#f0d878" opacity="0.6"/>
 </svg>

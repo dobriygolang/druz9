@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package challenge.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "api/pkg/api/challenge/v1;v1";
+
+// ChallengeService hosts the read-only "mini-game" modes in druz9:
+// blind review, personal speed-run records, weekly boss info. Write
+// paths (SubmitDailyReview, SubmitWeeklyBoss, RecordSpeedRun,
+// GetDailyLeaderboard) existed historically but were never wired on
+// the frontend and have been removed — add them back only when a page
+// actually consumes them.
+service ChallengeService {
+  // ── Blind review ──────────────────────────────────────────────
+
+  rpc GetBlindReviewTask(GetBlindReviewTaskRequest) returns (BlindReviewTask) {
+    option (google.api.http) = { get: "/api/v1/challenges/blind-review" };
+  }
+
+  rpc SubmitBlindReview(SubmitBlindReviewRequest) returns (BlindReviewResult) {
+    option (google.api.http) = {
+      post: "/api/v1/challenges/blind-review/submit"
+      body: "*"
+    };
+  }
+
+  // ── Speed-run (read-only) ─────────────────────────────────────
+
+  rpc GetSpeedRunRecords(GetSpeedRunRecordsRequest) returns (GetSpeedRunRecordsResponse) {
+    option (google.api.http) = { get: "/api/v1/challenges/speed-run/records" };
+  }
+
+  // ── Weekly boss (read-only) ───────────────────────────────────
+
+  rpc GetWeeklyChallenge(GetWeeklyChallengeRequest) returns (GetWeeklyChallengeResponse) {
+    option (google.api.http) = { get: "/api/v1/challenges/weekly" };
+  }
+}
+
+// ── Blind review ──────────────────────────────────────────────
+
+message GetBlindReviewTaskRequest {}
+
+message BlindReviewTask {
+  string source_review_id = 1;
+  string task_id          = 2;
+  string task_title       = 3;
+  string task_statement   = 4;
+  string code             = 5;
+  string language         = 6;
+}
+
+message SubmitBlindReviewRequest {
+  string source_review_id = 1;
+  string task_id          = 2;
+  string source_code      = 3;
+  string source_language  = 4;
+  string user_review      = 5;
+}
+
+message BlindReviewResult {
+  string                    id           = 1;
+  int32                     ai_score     = 2;
+  string                    ai_feedback  = 3;
+  google.protobuf.Timestamp submitted_at = 4;
+}
+
+// ── Speed-run ─────────────────────────────────────────────────
+
+message GetSpeedRunRecordsRequest {}
+
+message GetSpeedRunRecordsResponse {
+  repeated TaskRecord records = 1;
+}
+
+message TaskRecord {
+  string                    task_id       = 1;
+  string                    task_title    = 2;
+  int64                     best_time_ms  = 3;
+  int32                     best_ai_score = 4;
+  int32                     attempts      = 5;
+  google.protobuf.Timestamp last_at       = 6;
+}
+
+// ── Weekly boss ───────────────────────────────────────────────
+
+message GetWeeklyChallengeRequest {}
+
+message GetWeeklyChallengeResponse {
+  string                    week_key    = 1;
+  google.protobuf.Timestamp ends_at     = 2;
+  repeated WeeklyEntry      leaderboard = 3;
+  WeeklyEntry               my_entry    = 4;
+  WeeklyInfo                weekly_task = 5;
+}
+
+message WeeklyEntry {
+  string                    user_id       = 1;
+  string                    display_name  = 2;
+  string                    avatar_url    = 3;
+  int32                     ai_score      = 4;
+  int64                     solve_time_ms = 5;
+  google.protobuf.Timestamp submitted_at  = 6;
+}
+
+message WeeklyInfo {
+  string                    week_key    = 1;
+  string                    task_id     = 2;
+  string                    task_title  = 3;
+  string                    task_slug   = 4;
+  string                    difficulty  = 5;
+  google.protobuf.Timestamp ends_at     = 6;
+}

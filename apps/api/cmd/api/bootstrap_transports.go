@@ -1,23 +1,32 @@
 package main
 
 import (
-	notifclient "api/internal/clients/notification"
 	"api/internal/closer"
-	challengedomain "api/internal/domain/challenge"
 	server "api/internal/server"
 	"api/internal/server/wshandler"
 	adminv1 "api/pkg/api/admin/v1"
 	arenav1 "api/pkg/api/arena/v1"
-	circlev1 "api/pkg/api/circle/v1"
+	challengev1 "api/pkg/api/challenge/v1"
+	guildv1 "api/pkg/api/guild/v1"
 	codeeditorv1 "api/pkg/api/code_editor/v1"
 	eventv1 "api/pkg/api/event/v1"
 	geov1 "api/pkg/api/geo/v1"
+	duelreplayv1 "api/pkg/api/duel_replay/v1"
+	friendchallengev1 "api/pkg/api/friend_challenge/v1"
+	hubv1 "api/pkg/api/hub/v1"
+	inboxv1 "api/pkg/api/inbox/v1"
 	interviewprepv1 "api/pkg/api/interview_prep/v1"
+	missionv1 "api/pkg/api/mission/v1"
+	notificationv1 "api/pkg/api/notification/v1"
 	podcastv1 "api/pkg/api/podcast/v1"
 	profilev1 "api/pkg/api/profile/v1"
 	referralv1 "api/pkg/api/referral/v1"
+	seasonpassv1 "api/pkg/api/season_pass/v1"
+	shopv1 "api/pkg/api/shop/v1"
+	socialv1 "api/pkg/api/social/v1"
+	streakv1 "api/pkg/api/streak/v1"
+	trainingv1 "api/pkg/api/training/v1"
 
-	"encoding/json"
 	"net/http"
 
 	"github.com/go-kratos/kratos/v2"
@@ -77,6 +86,7 @@ func registerBackgroundWorkers(bootstrap *bootstrapContext, storage *storageCont
 	closer.AddSync(startCodeRoomCleanupWorker(bootstrap.kratosLogger, bootstrap.rtcManager, services.codeEditorServiceDomain))
 	closer.AddSync(startArenaCleanupWorker(bootstrap.kratosLogger, bootstrap.rtcManager, services.arenaServiceDomain))
 	closer.AddSync(startContentCleanupWorker(bootstrap.kratosLogger, storage))
+	closer.AddSync(startFriendChallengeSweepWorker(bootstrap.kratosLogger, services.friendChallengeDomain))
 	closer.AddSync(startBusinessMetricsWorker(bootstrap.kratosLogger, bootstrap.rtcManager, storage))
 	// Start the Telegram bot only if notification-service is NOT running its own bot.
 	// When NOTIFICATION_SERVICE_ADDR is set, the bot lives in notification-service.
@@ -84,7 +94,7 @@ func registerBackgroundWorkers(bootstrap *bootstrapContext, storage *storageCont
 		closer.AddSync(startTelegramBotWorker(services.profileServiceDomain, services.notificationSender))
 	}
 	closer.AddSync(startStreakWarningWorker(services.notificationSender, storage.store.DB))
-	closer.AddSync(startCircleDigestWorker(services.notificationSender, storage.store.DB))
+	closer.AddSync(startGuildDigestWorker(services.notificationSender, storage.store.DB))
 }
 
 func registerManualHTTPRoutes(
@@ -96,64 +106,10 @@ func registerManualHTTPRoutes(
 	// Realtime WebSocket endpoints (cannot be expressed as proto RPCs).
 	wshandler.Register(httpServer, services.realtimeHub, services.arenaRealtimeHub, services.profileServiceDomain)
 
-	// Manual code-editor room routes not covered by proto HTTP annotations.
-	// Registered via Route() so they don't shadow proto-generated GET/POST/DELETE handlers.
-	auth := services.profileServiceDomain
-	svc := services.codeEditorServiceDomain
-
 	r := httpServer.Route("/")
 
-	// PATCH /api/v1/code-editor/rooms/{room_id} — update room task and/or privacy
-	r.PATCH("/api/v1/code-editor/rooms/{room_id}", func(ctx kratoshttp.Context) error {
-		req := ctx.Request()
-		userID, ok := server.Authenticate(req, auth)
-		if !ok {
-			ctx.Response().WriteHeader(http.StatusUnauthorized)
-			return nil
-		}
-		var body struct {
-			Task      string `json:"task"`
-			IsPrivate *bool  `json:"isPrivate,omitempty"`
-		}
-		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
-			ctx.Response().WriteHeader(http.StatusBadRequest)
-			return nil
-		}
-		roomID := server.PathSegment(req.URL.Path, "rooms", 1)
-		if body.Task != "" {
-			if err := svc.SetRoomTaskByString(req.Context(), roomID, userID, body.Task); err != nil {
-				ctx.Response().WriteHeader(http.StatusForbidden)
-				return nil
-			}
-		}
-		if body.IsPrivate != nil {
-			if err := svc.SetRoomPrivacyByString(req.Context(), roomID, userID, *body.IsPrivate); err != nil {
-				ctx.Response().WriteHeader(http.StatusForbidden)
-				return nil
-			}
-		}
-		ctx.Response().WriteHeader(http.StatusNoContent)
-		return nil
-	})
-
-	// POST /api/v1/code-editor/rooms/{room_id}/close — close room
-	r.POST("/api/v1/code-editor/rooms/{room_id}/close", func(ctx kratoshttp.Context) error {
-		req := ctx.Request()
-		userID, ok := server.Authenticate(req, auth)
-		if !ok {
-			ctx.Response().WriteHeader(http.StatusUnauthorized)
-			return nil
-		}
-		roomID := server.PathSegment(req.URL.Path, "rooms", 1)
-		if err := svc.CloseRoomByString(req.Context(), roomID, userID); err != nil {
-			ctx.Response().WriteHeader(http.StatusForbidden)
-			return nil
-		}
-		ctx.Response().WriteHeader(http.StatusNoContent)
-		return nil
-	})
-
-	// GET /api/v1/profile/avatar/{user_id} — serve a fresh Telegram avatar without exposing bot file URLs.
+	// GET /api/v1/profile/avatar/{user_id} — serves a fresh Telegram avatar.
+	// Stays manual: response is a binary image, not a JSON proto message.
 	r.GET("/api/v1/profile/avatar/{user_id}", func(ctx kratoshttp.Context) error {
 		req := ctx.Request()
 		userID, err := uuid.Parse(server.PathSegment(req.URL.Path, "avatar", 1))
@@ -177,333 +133,6 @@ func registerManualHTTPRoutes(
 		_, _ = ctx.Response().Write(body)
 		return nil
 	})
-
-	registerMissionRoutes(r, auth, services)
-	registerChallengeRoutes(r, auth, services)
-	registerNotificationRoutes(r, auth, services)
-}
-
-func registerMissionRoutes(
-	r *kratoshttp.Router,
-	auth server.Authorizer,
-	services *serviceContext,
-) {
-	missionSvc := services.missionServiceDomain
-
-	// GET /api/v1/missions/daily — get today's 3 daily missions with progress.
-	r.GET("/api/v1/missions/daily", func(ctx kratoshttp.Context) error {
-		req := ctx.Request()
-		userID, ok := server.Authenticate(req, auth)
-		if !ok {
-			ctx.Response().WriteHeader(http.StatusUnauthorized)
-			return nil
-		}
-		result, err := missionSvc.GetDailyMissions(req.Context(), *userID)
-		if err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
-			return nil
-		}
-		server.WriteJSON(ctx.Response(), http.StatusOK, result)
-		return nil
-	})
-
-	// POST /api/v1/missions/{mission_key}/complete — explicitly mark a mission as done.
-	r.POST("/api/v1/missions/{mission_key}/complete", func(ctx kratoshttp.Context) error {
-		req := ctx.Request()
-		userID, ok := server.Authenticate(req, auth)
-		if !ok {
-			ctx.Response().WriteHeader(http.StatusUnauthorized)
-			return nil
-		}
-		missionKey := server.PathSegment(req.URL.Path, "missions", 1)
-		if missionKey == "" {
-			ctx.Response().WriteHeader(http.StatusBadRequest)
-			return nil
-		}
-		if err := missionSvc.CompleteMission(req.Context(), *userID, missionKey); err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
-			return nil
-		}
-		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]bool{"ok": true})
-		return nil
-	})
-}
-
-func registerChallengeRoutes(
-	r *kratoshttp.Router,
-	auth server.Authorizer,
-	services *serviceContext,
-) {
-	svc := services.challengeServiceDomain
-
-	// POST /api/v1/challenges/daily/submit-review — record AI score for daily challenge
-	r.POST("/api/v1/challenges/daily/submit-review", func(ctx kratoshttp.Context) error {
-		req := ctx.Request()
-		userID, ok := server.Authenticate(req, auth)
-		if !ok {
-			ctx.Response().WriteHeader(http.StatusUnauthorized)
-			return nil
-		}
-		var body struct {
-			TaskID  string `json:"taskId"`
-			AIScore int32  `json:"aiScore"`
-		}
-		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
-			ctx.Response().WriteHeader(http.StatusBadRequest)
-			return nil
-		}
-		taskUUID, err := uuid.Parse(body.TaskID)
-		if err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusBadRequest, map[string]string{"error": "invalid task ID"})
-			return nil
-		}
-		if err := svc.SubmitDailyReview(req.Context(), *userID, taskUUID, body.AIScore); err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
-			return nil
-		}
-		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]bool{"ok": true})
-		return nil
-	})
-
-	// GET /api/v1/challenges/daily/leaderboard — today's top 10 by AI score
-	r.GET("/api/v1/challenges/daily/leaderboard", func(ctx kratoshttp.Context) error {
-		req := ctx.Request()
-		if _, ok := server.Authenticate(req, auth); !ok {
-			ctx.Response().WriteHeader(http.StatusUnauthorized)
-			return nil
-		}
-		results, err := svc.GetDailyLeaderboard(req.Context(), 10)
-		if err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
-			return nil
-		}
-		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]any{"entries": results})
-		return nil
-	})
-
-	// GET /api/v1/challenges/blind-review — get random code for review
-	r.GET("/api/v1/challenges/blind-review", func(ctx kratoshttp.Context) error {
-		req := ctx.Request()
-		userID, ok := server.Authenticate(req, auth)
-		if !ok {
-			ctx.Response().WriteHeader(http.StatusUnauthorized)
-			return nil
-		}
-		task, err := svc.GetBlindReviewTask(req.Context(), *userID)
-		if err != nil || task == nil {
-			server.WriteJSON(ctx.Response(), http.StatusNotFound, map[string]string{"error": "no tasks available"})
-			return nil
-		}
-		server.WriteJSON(ctx.Response(), http.StatusOK, task)
-		return nil
-	})
-
-	// POST /api/v1/challenges/blind-review/submit — submit code review for AI evaluation
-	r.POST("/api/v1/challenges/blind-review/submit", func(ctx kratoshttp.Context) error {
-		req := ctx.Request()
-		userID, ok := server.Authenticate(req, auth)
-		if !ok {
-			ctx.Response().WriteHeader(http.StatusUnauthorized)
-			return nil
-		}
-		var body struct {
-			SourceReviewID string `json:"sourceReviewId"`
-			TaskID         string `json:"taskId"`
-			SourceCode     string `json:"sourceCode"`
-			SourceLanguage string `json:"sourceLanguage"`
-			UserReview     string `json:"userReview"`
-		}
-		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
-			ctx.Response().WriteHeader(http.StatusBadRequest)
-			return nil
-		}
-		srcID, err := uuid.Parse(body.SourceReviewID)
-		if err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusBadRequest, map[string]string{"error": "invalid source review ID"})
-			return nil
-		}
-		taskUUID, err := uuid.Parse(body.TaskID)
-		if err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusBadRequest, map[string]string{"error": "invalid task ID"})
-			return nil
-		}
-		result, err := svc.SubmitBlindReview(req.Context(), *userID, srcID, taskUUID, body.SourceCode, body.SourceLanguage, body.UserReview)
-		if err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": err.Error()})
-			return nil
-		}
-		server.WriteJSON(ctx.Response(), http.StatusOK, result)
-		return nil
-	})
-
-	// GET /api/v1/challenges/speed-run/records — user's personal bests
-	r.GET("/api/v1/challenges/speed-run/records", func(ctx kratoshttp.Context) error {
-		req := ctx.Request()
-		userID, ok := server.Authenticate(req, auth)
-		if !ok {
-			ctx.Response().WriteHeader(http.StatusUnauthorized)
-			return nil
-		}
-		records, err := svc.GetUserRecords(req.Context(), *userID, 20)
-		if err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
-			return nil
-		}
-		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]any{"records": records})
-		return nil
-	})
-
-	// POST /api/v1/challenges/speed-run/record — record a speed-run attempt
-	r.POST("/api/v1/challenges/speed-run/record", func(ctx kratoshttp.Context) error {
-		req := ctx.Request()
-		userID, ok := server.Authenticate(req, auth)
-		if !ok {
-			ctx.Response().WriteHeader(http.StatusUnauthorized)
-			return nil
-		}
-		var body struct {
-			TaskID  string `json:"taskId"`
-			TimeMs  int64  `json:"timeMs"`
-			AIScore int32  `json:"aiScore"`
-		}
-		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
-			ctx.Response().WriteHeader(http.StatusBadRequest)
-			return nil
-		}
-		taskUUID, err := uuid.Parse(body.TaskID)
-		if err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusBadRequest, map[string]string{"error": "invalid task ID"})
-			return nil
-		}
-		result, err := svc.RecordSpeedRun(req.Context(), *userID, taskUUID, body.TimeMs, body.AIScore)
-		if err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
-			return nil
-		}
-		server.WriteJSON(ctx.Response(), http.StatusOK, result)
-		return nil
-	})
-
-	// GET /api/v1/challenges/weekly — current weekly boss challenge + leaderboard
-	r.GET("/api/v1/challenges/weekly", func(ctx kratoshttp.Context) error {
-		req := ctx.Request()
-		userID, ok := server.Authenticate(req, auth)
-		if !ok {
-			ctx.Response().WriteHeader(http.StatusUnauthorized)
-			return nil
-		}
-		weekKey := challengedomain.CurrentWeekKey()
-		leaderboard, _ := svc.GetWeeklyLeaderboard(req.Context(), weekKey, 10)
-		userEntry, _ := svc.GetUserWeeklyEntry(req.Context(), *userID, weekKey)
-		weeklyTask, _ := svc.GetWeeklyTask(req.Context(), weekKey)
-		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]any{
-			"weekKey":     weekKey,
-			"endsAt":      challengedomain.WeekEndsAt(),
-			"leaderboard": leaderboard,
-			"myEntry":     userEntry,
-			"weeklyTask":  weeklyTask,
-		})
-		return nil
-	})
-
-	// POST /api/v1/challenges/weekly/submit — submit a weekly boss attempt
-	r.POST("/api/v1/challenges/weekly/submit", func(ctx kratoshttp.Context) error {
-		req := ctx.Request()
-		userID, ok := server.Authenticate(req, auth)
-		if !ok {
-			ctx.Response().WriteHeader(http.StatusUnauthorized)
-			return nil
-		}
-		var body struct {
-			TaskID      string `json:"taskId"`
-			AIScore     int32  `json:"aiScore"`
-			SolveTimeMs int64  `json:"solveTimeMs"`
-			Code        string `json:"code"`
-			Language    string `json:"language"`
-		}
-		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
-			ctx.Response().WriteHeader(http.StatusBadRequest)
-			return nil
-		}
-		taskUUID, err := uuid.Parse(body.TaskID)
-		if err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusBadRequest, map[string]string{"error": "invalid task ID"})
-			return nil
-		}
-		weekKey := challengedomain.CurrentWeekKey()
-		if err := svc.SubmitWeeklyBoss(req.Context(), *userID, weekKey, taskUUID, body.AIScore, body.SolveTimeMs, body.Code, body.Language); err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
-			return nil
-		}
-		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]bool{"ok": true})
-		return nil
-	})
-}
-
-func registerNotificationRoutes(
-	r *kratoshttp.Router,
-	auth server.Authorizer,
-	services *serviceContext,
-) {
-	notif := services.notificationSender
-
-	// GET /api/v1/notifications/settings — get current notification preferences
-	r.GET("/api/v1/notifications/settings", func(ctx kratoshttp.Context) error {
-		req := ctx.Request()
-		userID, ok := server.Authenticate(req, auth)
-		if !ok {
-			ctx.Response().WriteHeader(http.StatusUnauthorized)
-			return nil
-		}
-		settings, err := notif.GetNotificationSettings(req.Context(), userID.String())
-		if err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
-			return nil
-		}
-		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]any{
-			"duelsEnabled":          settings.DuelsEnabled,
-			"progressEnabled":       settings.ProgressEnabled,
-			"circlesEnabled":        settings.CirclesEnabled,
-			"dailyChallengeEnabled": settings.DailyChallengeEnabled,
-			"quietHoursStart":       settings.QuietHoursStart,
-			"quietHoursEnd":         settings.QuietHoursEnd,
-			"timezone":              settings.Timezone,
-			"telegramLinked":        settings.TelegramLinked,
-		})
-		return nil
-	})
-
-	// PATCH /api/v1/notifications/settings — update notification preferences
-	r.PATCH("/api/v1/notifications/settings", func(ctx kratoshttp.Context) error {
-		req := ctx.Request()
-		userID, ok := server.Authenticate(req, auth)
-		if !ok {
-			ctx.Response().WriteHeader(http.StatusUnauthorized)
-			return nil
-		}
-		var body struct {
-			DuelsEnabled          *bool `json:"duelsEnabled"`
-			ProgressEnabled       *bool `json:"progressEnabled"`
-			CirclesEnabled        *bool `json:"circlesEnabled"`
-			DailyChallengeEnabled *bool `json:"dailyChallengeEnabled"`
-		}
-		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
-			ctx.Response().WriteHeader(http.StatusBadRequest)
-			return nil
-		}
-		upd := notifclient.SettingsUpdate{
-			DuelsEnabled:          body.DuelsEnabled,
-			ProgressEnabled:       body.ProgressEnabled,
-			CirclesEnabled:        body.CirclesEnabled,
-			DailyChallengeEnabled: body.DailyChallengeEnabled,
-		}
-		if err := notif.UpdateNotificationSettings(req.Context(), userID.String(), upd); err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
-			return nil
-		}
-		ctx.Response().WriteHeader(http.StatusNoContent)
-		return nil
-	})
 }
 
 func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.Server, services *serviceContext) {
@@ -522,8 +151,11 @@ func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.S
 	geov1.RegisterGeoServiceHTTPServer(httpServer, services.geoService)
 	geov1.RegisterGeoServiceServer(grpcServer, services.geoService)
 
-	circlev1.RegisterCircleServiceHTTPServer(httpServer, services.circleService)
-	circlev1.RegisterCircleServiceServer(grpcServer, services.circleService)
+	hubv1.RegisterHubServiceHTTPServer(httpServer, services.hubService)
+	hubv1.RegisterHubServiceServer(grpcServer, services.hubService)
+
+	guildv1.RegisterGuildServiceHTTPServer(httpServer, services.guildService)
+	guildv1.RegisterGuildServiceServer(grpcServer, services.guildService)
 
 	eventv1.RegisterEventServiceHTTPServer(httpServer, services.eventService)
 	eventv1.RegisterEventServiceServer(grpcServer, services.eventService)
@@ -534,6 +166,32 @@ func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.S
 	referralv1.RegisterReferralServiceHTTPServer(httpServer, services.referralService)
 	referralv1.RegisterReferralServiceServer(grpcServer, services.referralService)
 
+	trainingv1.RegisterTrainingServiceHTTPServer(httpServer, services.trainingService)
+	trainingv1.RegisterTrainingServiceServer(grpcServer, services.trainingService)
+
 	codeeditorv1.RegisterCodeEditorServiceHTTPServer(httpServer, services.codeEditorService)
 	codeeditorv1.RegisterCodeEditorServiceServer(grpcServer, services.codeEditorService)
+
+	missionv1.RegisterMissionServiceHTTPServer(httpServer, services.missionService)
+	missionv1.RegisterMissionServiceServer(grpcServer, services.missionService)
+	inboxv1.RegisterInboxServiceHTTPServer(httpServer, services.inboxService)
+	inboxv1.RegisterInboxServiceServer(grpcServer, services.inboxService)
+	friendchallengev1.RegisterFriendChallengeServiceHTTPServer(httpServer, services.friendChallengeService)
+	friendchallengev1.RegisterFriendChallengeServiceServer(grpcServer, services.friendChallengeService)
+	duelreplayv1.RegisterDuelReplayServiceHTTPServer(httpServer, services.duelReplayService)
+	duelreplayv1.RegisterDuelReplayServiceServer(grpcServer, services.duelReplayService)
+	seasonpassv1.RegisterSeasonPassServiceHTTPServer(httpServer, services.seasonPassService)
+	seasonpassv1.RegisterSeasonPassServiceServer(grpcServer, services.seasonPassService)
+	streakv1.RegisterStreakServiceHTTPServer(httpServer, services.streakService)
+	streakv1.RegisterStreakServiceServer(grpcServer, services.streakService)
+	shopv1.RegisterShopServiceHTTPServer(httpServer, services.shopService)
+	shopv1.RegisterShopServiceServer(grpcServer, services.shopService)
+	socialv1.RegisterSocialServiceHTTPServer(httpServer, services.socialService)
+	socialv1.RegisterSocialServiceServer(grpcServer, services.socialService)
+
+	notificationv1.RegisterNotificationSettingsServiceHTTPServer(httpServer, services.notificationSettings)
+	notificationv1.RegisterNotificationSettingsServiceServer(grpcServer, services.notificationSettings)
+
+	challengev1.RegisterChallengeServiceHTTPServer(httpServer, services.challengeService)
+	challengev1.RegisterChallengeServiceServer(grpcServer, services.challengeService)
 }

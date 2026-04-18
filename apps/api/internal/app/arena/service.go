@@ -6,8 +6,11 @@ import (
 	"time"
 
 	domain "api/internal/domain/arena"
+	"api/internal/model"
 	"api/internal/realtime/schema"
 	"api/internal/sandbox"
+
+	"github.com/google/uuid"
 )
 
 type Sandbox interface {
@@ -19,10 +22,25 @@ type RealtimePublisher interface {
 	PublishMatch(match *schema.ArenaMatch, codes []*schema.ArenaPlayerCode)
 }
 
+// SeasonPassAwarder is the narrow slice of season_pass/Service we need to
+// credit XP when a match finishes. Optional — nil means no-op.
+type SeasonPassAwarder interface {
+	AddXP(ctx context.Context, userID uuid.UUID, delta int32) error
+}
+
+// DuelReplayRecorder is the narrow slice of duel_replay/Service we need
+// to persist a replay header when a match finishes. Optional — nil means
+// replays are not auto-created (the match still finishes cleanly).
+type DuelReplayRecorder interface {
+	CreateReplay(ctx context.Context, r *model.DuelReplaySummary) error
+}
+
 type Config struct {
 	Repository       domain.Repository
 	Sandbox          Sandbox
 	Realtime         RealtimePublisher
+	SeasonPass       SeasonPassAwarder
+	DuelReplay       DuelReplayRecorder
 	AllowGuestAccess func() bool
 	AntiCheatEnabled func() bool
 }
@@ -36,6 +54,8 @@ type Service struct {
 	repo             domain.Repository
 	sandbox          Sandbox
 	realtime         RealtimePublisher
+	seasonPass       SeasonPassAwarder
+	duelReplay       DuelReplayRecorder
 	allowGuestAccess func() bool
 	antiCheatEnabled func() bool
 
@@ -58,6 +78,8 @@ func New(c Config) *Service {
 		repo:             c.Repository,
 		sandbox:          c.Sandbox,
 		realtime:         c.Realtime,
+		seasonPass:       c.SeasonPass,
+		duelReplay:       c.DuelReplay,
 		allowGuestAccess: allowGuestAccess,
 		antiCheatEnabled: antiCheatEnabled,
 	}

@@ -23,6 +23,58 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type WorldPinKind int32
+
+const (
+	WorldPinKind_WORLD_PIN_KIND_UNSPECIFIED WorldPinKind = 0
+	WorldPinKind_WORLD_PIN_KIND_GUILD       WorldPinKind = 1
+	WorldPinKind_WORLD_PIN_KIND_EVENT       WorldPinKind = 2
+	WorldPinKind_WORLD_PIN_KIND_PLAYER      WorldPinKind = 3 // reserved: current viewer's location
+)
+
+// Enum value maps for WorldPinKind.
+var (
+	WorldPinKind_name = map[int32]string{
+		0: "WORLD_PIN_KIND_UNSPECIFIED",
+		1: "WORLD_PIN_KIND_GUILD",
+		2: "WORLD_PIN_KIND_EVENT",
+		3: "WORLD_PIN_KIND_PLAYER",
+	}
+	WorldPinKind_value = map[string]int32{
+		"WORLD_PIN_KIND_UNSPECIFIED": 0,
+		"WORLD_PIN_KIND_GUILD":       1,
+		"WORLD_PIN_KIND_EVENT":       2,
+		"WORLD_PIN_KIND_PLAYER":      3,
+	}
+)
+
+func (x WorldPinKind) Enum() *WorldPinKind {
+	p := new(WorldPinKind)
+	*p = x
+	return p
+}
+
+func (x WorldPinKind) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (WorldPinKind) Descriptor() protoreflect.EnumDescriptor {
+	return file_geo_v1_geo_proto_enumTypes[0].Descriptor()
+}
+
+func (WorldPinKind) Type() protoreflect.EnumType {
+	return &file_geo_v1_geo_proto_enumTypes[0]
+}
+
+func (x WorldPinKind) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use WorldPinKind.Descriptor instead.
+func (WorldPinKind) EnumDescriptor() ([]byte, []int) {
+	return file_geo_v1_geo_proto_rawDescGZIP(), []int{0}
+}
+
 type ResolveRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
@@ -407,6 +459,202 @@ func (x *CommunityMapPoint) GetTelegramUsername() string {
 	return ""
 }
 
+type WorldPin struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Kind          WorldPinKind           `protobuf:"varint,2,opt,name=kind,proto3,enum=geo.v1.WorldPinKind" json:"kind,omitempty"`
+	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
+	Subtitle      string                 `protobuf:"bytes,4,opt,name=subtitle,proto3" json:"subtitle,omitempty"` // "23 members · mossveil" / "Oct 18 · lecture"
+	Latitude      float64                `protobuf:"fixed64,5,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude     float64                `protobuf:"fixed64,6,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	Region        string                 `protobuf:"bytes,7,opt,name=region,proto3" json:"region,omitempty"`
+	IconRef       string                 `protobuf:"bytes,8,opt,name=icon_ref,json=iconRef,proto3" json:"icon_ref,omitempty"`    // sprite hint (banner/scroll/hero)
+	LinkPath      string                 `protobuf:"bytes,9,opt,name=link_path,json=linkPath,proto3" json:"link_path,omitempty"` // "/guild/<id>" or "/events/<id>"
+	IsHot         bool                   `protobuf:"varint,10,opt,name=is_hot,json=isHot,proto3" json:"is_hot,omitempty"`        // upcoming within 24h / user is member
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WorldPin) Reset() {
+	*x = WorldPin{}
+	mi := &file_geo_v1_geo_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WorldPin) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WorldPin) ProtoMessage() {}
+
+func (x *WorldPin) ProtoReflect() protoreflect.Message {
+	mi := &file_geo_v1_geo_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WorldPin.ProtoReflect.Descriptor instead.
+func (*WorldPin) Descriptor() ([]byte, []int) {
+	return file_geo_v1_geo_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *WorldPin) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *WorldPin) GetKind() WorldPinKind {
+	if x != nil {
+		return x.Kind
+	}
+	return WorldPinKind_WORLD_PIN_KIND_UNSPECIFIED
+}
+
+func (x *WorldPin) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *WorldPin) GetSubtitle() string {
+	if x != nil {
+		return x.Subtitle
+	}
+	return ""
+}
+
+func (x *WorldPin) GetLatitude() float64 {
+	if x != nil {
+		return x.Latitude
+	}
+	return 0
+}
+
+func (x *WorldPin) GetLongitude() float64 {
+	if x != nil {
+		return x.Longitude
+	}
+	return 0
+}
+
+func (x *WorldPin) GetRegion() string {
+	if x != nil {
+		return x.Region
+	}
+	return ""
+}
+
+func (x *WorldPin) GetIconRef() string {
+	if x != nil {
+		return x.IconRef
+	}
+	return ""
+}
+
+func (x *WorldPin) GetLinkPath() string {
+	if x != nil {
+		return x.LinkPath
+	}
+	return ""
+}
+
+func (x *WorldPin) GetIsHot() bool {
+	if x != nil {
+		return x.IsHot
+	}
+	return false
+}
+
+type WorldPinsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WorldPinsRequest) Reset() {
+	*x = WorldPinsRequest{}
+	mi := &file_geo_v1_geo_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WorldPinsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WorldPinsRequest) ProtoMessage() {}
+
+func (x *WorldPinsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_geo_v1_geo_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WorldPinsRequest.ProtoReflect.Descriptor instead.
+func (*WorldPinsRequest) Descriptor() ([]byte, []int) {
+	return file_geo_v1_geo_proto_rawDescGZIP(), []int{7}
+}
+
+type WorldPinsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pins          []*WorldPin            `protobuf:"bytes,1,rep,name=pins,proto3" json:"pins,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WorldPinsResponse) Reset() {
+	*x = WorldPinsResponse{}
+	mi := &file_geo_v1_geo_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WorldPinsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WorldPinsResponse) ProtoMessage() {}
+
+func (x *WorldPinsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_geo_v1_geo_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WorldPinsResponse.ProtoReflect.Descriptor instead.
+func (*WorldPinsResponse) Descriptor() ([]byte, []int) {
+	return file_geo_v1_geo_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *WorldPinsResponse) GetPins() []*WorldPin {
+	if x != nil {
+		return x.Pins
+	}
+	return nil
+}
+
 var File_geo_v1_geo_proto protoreflect.FileDescriptor
 
 const file_geo_v1_geo_proto_rawDesc = "" +
@@ -443,11 +691,32 @@ const file_geo_v1_geo_proto_rawDesc = "" +
 	"\tlast_name\x18\n" +
 	" \x01(\tR\blastName\x12F\n" +
 	"\x0factivity_status\x18\v \x01(\x0e2\x1d.common.v1.UserActivityStatusR\x0eactivityStatus\x12+\n" +
-	"\x11telegram_username\x18\f \x01(\tR\x10telegramUsername2\xd2\x01\n" +
+	"\x11telegram_username\x18\f \x01(\tR\x10telegramUsername\"\x97\x02\n" +
+	"\bWorldPin\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12(\n" +
+	"\x04kind\x18\x02 \x01(\x0e2\x14.geo.v1.WorldPinKindR\x04kind\x12\x14\n" +
+	"\x05title\x18\x03 \x01(\tR\x05title\x12\x1a\n" +
+	"\bsubtitle\x18\x04 \x01(\tR\bsubtitle\x12\x1a\n" +
+	"\blatitude\x18\x05 \x01(\x01R\blatitude\x12\x1c\n" +
+	"\tlongitude\x18\x06 \x01(\x01R\tlongitude\x12\x16\n" +
+	"\x06region\x18\a \x01(\tR\x06region\x12\x19\n" +
+	"\bicon_ref\x18\b \x01(\tR\aiconRef\x12\x1b\n" +
+	"\tlink_path\x18\t \x01(\tR\blinkPath\x12\x15\n" +
+	"\x06is_hot\x18\n" +
+	" \x01(\bR\x05isHot\"\x12\n" +
+	"\x10WorldPinsRequest\"9\n" +
+	"\x11WorldPinsResponse\x12$\n" +
+	"\x04pins\x18\x01 \x03(\v2\x10.geo.v1.WorldPinR\x04pins*}\n" +
+	"\fWorldPinKind\x12\x1e\n" +
+	"\x1aWORLD_PIN_KIND_UNSPECIFIED\x10\x00\x12\x18\n" +
+	"\x14WORLD_PIN_KIND_GUILD\x10\x01\x12\x18\n" +
+	"\x14WORLD_PIN_KIND_EVENT\x10\x02\x12\x19\n" +
+	"\x15WORLD_PIN_KIND_PLAYER\x10\x032\xb4\x02\n" +
 	"\n" +
 	"GeoService\x12Z\n" +
 	"\aResolve\x12\x16.geo.v1.ResolveRequest\x1a\x17.geo.v1.ResolveResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/geo/resolve\x12h\n" +
-	"\fCommunityMap\x12\x1b.geo.v1.CommunityMapRequest\x1a\x1c.geo.v1.CommunityMapResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v1/geo/communityB\x17Z\x15api/pkg/api/geo/v1;v1b\x06proto3"
+	"\fCommunityMap\x12\x1b.geo.v1.CommunityMapRequest\x1a\x1c.geo.v1.CommunityMapResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v1/geo/community\x12`\n" +
+	"\tWorldPins\x12\x18.geo.v1.WorldPinsRequest\x1a\x19.geo.v1.WorldPinsResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/geo/world-pinsB\x17Z\x15api/pkg/api/geo/v1;v1b\x06proto3"
 
 var (
 	file_geo_v1_geo_proto_rawDescOnce sync.Once
@@ -461,29 +730,38 @@ func file_geo_v1_geo_proto_rawDescGZIP() []byte {
 	return file_geo_v1_geo_proto_rawDescData
 }
 
-var file_geo_v1_geo_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_geo_v1_geo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_geo_v1_geo_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_geo_v1_geo_proto_goTypes = []any{
-	(*ResolveRequest)(nil),       // 0: geo.v1.ResolveRequest
-	(*ResolveResponse)(nil),      // 1: geo.v1.ResolveResponse
-	(*GeoCandidate)(nil),         // 2: geo.v1.GeoCandidate
-	(*CommunityMapRequest)(nil),  // 3: geo.v1.CommunityMapRequest
-	(*CommunityMapResponse)(nil), // 4: geo.v1.CommunityMapResponse
-	(*CommunityMapPoint)(nil),    // 5: geo.v1.CommunityMapPoint
-	(v1.UserActivityStatus)(0),   // 6: common.v1.UserActivityStatus
+	(WorldPinKind)(0),            // 0: geo.v1.WorldPinKind
+	(*ResolveRequest)(nil),       // 1: geo.v1.ResolveRequest
+	(*ResolveResponse)(nil),      // 2: geo.v1.ResolveResponse
+	(*GeoCandidate)(nil),         // 3: geo.v1.GeoCandidate
+	(*CommunityMapRequest)(nil),  // 4: geo.v1.CommunityMapRequest
+	(*CommunityMapResponse)(nil), // 5: geo.v1.CommunityMapResponse
+	(*CommunityMapPoint)(nil),    // 6: geo.v1.CommunityMapPoint
+	(*WorldPin)(nil),             // 7: geo.v1.WorldPin
+	(*WorldPinsRequest)(nil),     // 8: geo.v1.WorldPinsRequest
+	(*WorldPinsResponse)(nil),    // 9: geo.v1.WorldPinsResponse
+	(v1.UserActivityStatus)(0),   // 10: common.v1.UserActivityStatus
 }
 var file_geo_v1_geo_proto_depIdxs = []int32{
-	2, // 0: geo.v1.ResolveResponse.candidates:type_name -> geo.v1.GeoCandidate
-	5, // 1: geo.v1.CommunityMapResponse.points:type_name -> geo.v1.CommunityMapPoint
-	6, // 2: geo.v1.CommunityMapPoint.activity_status:type_name -> common.v1.UserActivityStatus
-	0, // 3: geo.v1.GeoService.Resolve:input_type -> geo.v1.ResolveRequest
-	3, // 4: geo.v1.GeoService.CommunityMap:input_type -> geo.v1.CommunityMapRequest
-	1, // 5: geo.v1.GeoService.Resolve:output_type -> geo.v1.ResolveResponse
-	4, // 6: geo.v1.GeoService.CommunityMap:output_type -> geo.v1.CommunityMapResponse
-	5, // [5:7] is the sub-list for method output_type
-	3, // [3:5] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	3,  // 0: geo.v1.ResolveResponse.candidates:type_name -> geo.v1.GeoCandidate
+	6,  // 1: geo.v1.CommunityMapResponse.points:type_name -> geo.v1.CommunityMapPoint
+	10, // 2: geo.v1.CommunityMapPoint.activity_status:type_name -> common.v1.UserActivityStatus
+	0,  // 3: geo.v1.WorldPin.kind:type_name -> geo.v1.WorldPinKind
+	7,  // 4: geo.v1.WorldPinsResponse.pins:type_name -> geo.v1.WorldPin
+	1,  // 5: geo.v1.GeoService.Resolve:input_type -> geo.v1.ResolveRequest
+	4,  // 6: geo.v1.GeoService.CommunityMap:input_type -> geo.v1.CommunityMapRequest
+	8,  // 7: geo.v1.GeoService.WorldPins:input_type -> geo.v1.WorldPinsRequest
+	2,  // 8: geo.v1.GeoService.Resolve:output_type -> geo.v1.ResolveResponse
+	5,  // 9: geo.v1.GeoService.CommunityMap:output_type -> geo.v1.CommunityMapResponse
+	9,  // 10: geo.v1.GeoService.WorldPins:output_type -> geo.v1.WorldPinsResponse
+	8,  // [8:11] is the sub-list for method output_type
+	5,  // [5:8] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_geo_v1_geo_proto_init() }
@@ -496,13 +774,14 @@ func file_geo_v1_geo_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_geo_v1_geo_proto_rawDesc), len(file_geo_v1_geo_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   6,
+			NumEnums:      1,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_geo_v1_geo_proto_goTypes,
 		DependencyIndexes: file_geo_v1_geo_proto_depIdxs,
+		EnumInfos:         file_geo_v1_geo_proto_enumTypes,
 		MessageInfos:      file_geo_v1_geo_proto_msgTypes,
 	}.Build()
 	File_geo_v1_geo_proto = out.File

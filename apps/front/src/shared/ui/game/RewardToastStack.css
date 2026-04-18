@@ -1,0 +1,11 @@
+.gm-toast-stack {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 8000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.gm-toast-stack > * { pointer-events: auto; }

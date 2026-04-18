@@ -1,0 +1,63 @@
+.gm-ach {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  filter: drop-shadow(var(--gm-shadow-sm));
+}
+
+.gm-ach-svg {
+  position: relative;
+}
+
+.gm-ach-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -55%);
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+  user-select: none;
+}
+
+.gm-ach-name {
+  font-family: var(--gm-font-display);
+  font-weight: 600;
+  font-size: 12px;
+  max-width: 90px;
+  text-align: center;
+  line-height: 1.2;
+  color: var(--gm-parchment-dark);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+  word-break: break-word;
+}
+
+.gm-ach.is-locked {
+  opacity: 0.55;
+}
+.gm-ach.is-locked .gm-ach-name {
+  color: var(--gm-ink-faint);
+  font-style: italic;
+}
+
+.gm-ach-legendary.is-unlocked {
+  filter: drop-shadow(0 0 10px rgba(255, 210, 100, 0.5)) drop-shadow(var(--gm-shadow-sm));
+}
+.gm-ach-dragon.is-unlocked {
+  filter: drop-shadow(0 0 14px rgba(255, 100, 40, 0.7)) drop-shadow(0 0 4px rgba(255,255,255,.4)) drop-shadow(var(--gm-shadow-sm));
+  animation: gm-ach-dragon-pulse 3s ease-in-out infinite;
+}
+
+.gm-ach-dragon.is-unlocked .gm-ach-name {
+  color: var(--gm-ember-bright);
+  text-shadow: 0 0 6px rgba(255, 100, 40, 0.8), 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+.gm-ach-legendary.is-unlocked .gm-ach-name {
+  color: var(--gm-gold-light);
+}
+
+@keyframes gm-ach-dragon-pulse {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 100, 40, 0.5)) drop-shadow(0 0 3px rgba(255,255,255,.4)) drop-shadow(var(--gm-shadow-sm)); }
+  50%      { filter: drop-shadow(0 0 22px rgba(255, 100, 40, 1.0)) drop-shadow(0 0 6px rgba(255,255,255,.6)) drop-shadow(var(--gm-shadow-sm)); }
+}

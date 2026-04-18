@@ -5,10 +5,12 @@ import { Avatar } from '@/shared/ui/Avatar'
 import { Badge } from '@/shared/ui/Badge'
 import { cn } from '@/shared/lib/cn'
 import { ADMIN_NAV } from '@/widgets/AdminSidebar/ui/AdminSidebar'
+import { useTranslation } from 'react-i18next'
 
 export function AdminLayout() {
   const location = useLocation()
   const { user } = useAuth()
+  const { t } = useTranslation()
   const displayName = user ? `${user.firstName} ${user.lastName}`.trim() || user.username : 'Admin'
 
   return (
@@ -20,7 +22,7 @@ export function AdminLayout() {
             <div className="w-7 h-7 bg-[#059669] rounded-lg flex items-center justify-center">
               <span className="text-xs font-bold text-white">D</span>
             </div>
-            <span className="text-sm font-semibold text-[#0B1210]">Druzya Admin</span>
+            <span className="text-sm font-semibold text-[#0B1210]">{t('admin.title')}</span>
           </div>
           <nav className="flex items-center gap-1">
             {ADMIN_NAV.map((tab) => (
@@ -34,13 +36,13 @@ export function AdminLayout() {
                     : 'text-[#4B6B52] hover:bg-[#F0F5F1]',
                 )}
               >
-                {tab.label}
+                {t(tab.labelKey)}
               </Link>
             ))}
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="warning" className="text-[11px] font-semibold bg-[#1a1a0e] text-[#fbbf24]">Admin</Badge>
+          <Badge variant="warning" className="text-[11px] font-semibold bg-[#1a1a0e] text-[#fbbf24]">{t('admin.badge')}</Badge>
           <Avatar name={displayName} size="xs" className="w-7 h-7 text-xs" />
         </div>
       </header>

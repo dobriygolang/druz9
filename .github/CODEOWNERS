@@ -1,0 +1,88 @@
+# CODEOWNERS для backend (apps/api).
+# Формат: путь @username. Несколько владельцев — через пробел.
+# Документация: https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# ВАЖНО для контрибьюторов:
+# Если PR затрагивает ваш домен — вы автоматически попадаете в ревьюеры.
+# Если меняется shared-код (cmd/api, middleware, server, model) — требуется ревью @dobriygolang.
+
+# ============================================================================
+# Default — всё, что не указано ниже, ревьюит мейнтейнер
+# ============================================================================
+*                                         @dobriygolang
+
+# ============================================================================
+# Backend: доменные слои (internal/domain, internal/data, internal/api)
+# Замените @dobriygolang на реальных владельцев доменов по мере формирования команд.
+# ============================================================================
+apps/api/internal/domain/achievement/     @dobriygolang
+apps/api/internal/domain/activity/        @dobriygolang
+apps/api/internal/domain/admin/           @dobriygolang
+apps/api/internal/domain/arena/           @dobriygolang
+apps/api/internal/domain/challenge/       @dobriygolang
+apps/api/internal/domain/circle/          @dobriygolang
+apps/api/internal/domain/codeeditor/      @dobriygolang
+apps/api/internal/domain/event/           @dobriygolang
+apps/api/internal/domain/geo/             @dobriygolang
+apps/api/internal/domain/interviewprep/   @dobriygolang
+apps/api/internal/domain/mission/         @dobriygolang
+apps/api/internal/domain/podcast/         @dobriygolang
+apps/api/internal/domain/profile/         @dobriygolang
+apps/api/internal/domain/referral/        @dobriygolang
+
+apps/api/internal/data/arena/             @dobriygolang
+apps/api/internal/data/challenge/         @dobriygolang
+apps/api/internal/data/circle/            @dobriygolang
+apps/api/internal/data/code_editor/       @dobriygolang
+apps/api/internal/data/codetasks/         @dobriygolang
+apps/api/internal/data/event/             @dobriygolang
+apps/api/internal/data/geo/               @dobriygolang
+apps/api/internal/data/interviewprep/     @dobriygolang
+apps/api/internal/data/mission/           @dobriygolang
+apps/api/internal/data/podcast/           @dobriygolang
+apps/api/internal/data/profile/           @dobriygolang
+apps/api/internal/data/referral/          @dobriygolang
+apps/api/internal/data/solution_review/   @dobriygolang
+
+apps/api/internal/api/admin/              @dobriygolang
+apps/api/internal/api/arena/              @dobriygolang
+apps/api/internal/api/circle/             @dobriygolang
+apps/api/internal/api/code_editor/        @dobriygolang
+apps/api/internal/api/event/              @dobriygolang
+apps/api/internal/api/geo/                @dobriygolang
+apps/api/internal/api/interview_prep/     @dobriygolang
+apps/api/internal/api/notification/       @dobriygolang
+apps/api/internal/api/podcast/            @dobriygolang
+apps/api/internal/api/profile/            @dobriygolang
+apps/api/internal/api/referral/           @dobriygolang
+
+# ============================================================================
+# Backend: shared — требует ревью от мейнтейнера, правки редкие и осознанные
+# ============================================================================
+apps/api/cmd/                             @dobriygolang
+apps/api/internal/app/                    @dobriygolang
+apps/api/internal/model/                  @dobriygolang
+apps/api/internal/middleware/             @dobriygolang
+apps/api/internal/server/                 @dobriygolang
+apps/api/internal/realtime/               @dobriygolang
+apps/api/internal/clients/                @dobriygolang
+apps/api/pkg/                             @dobriygolang
+apps/api/api/                             @dobriygolang
+apps/api/scripts/migrations/              @dobriygolang
+apps/api/scripts/seeds/                   @dobriygolang
+apps/api/.golangci.yml                    @dobriygolang
+apps/api/go.mod                           @dobriygolang
+apps/api/go.sum                           @dobriygolang
+apps/api/Dockerfile                       @dobriygolang
+apps/api/docker-compose.yaml              @dobriygolang
+apps/api/Makefile                         @dobriygolang
+
+# ============================================================================
+# Notification service
+# ============================================================================
+apps/notification-service/                @dobriygolang
+
+# ============================================================================
+# Репозиторий верхнего уровня
+# ============================================================================
+.github/                                  @dobriygolang

@@ -1,0 +1,147 @@
+syntax = "proto3";
+
+package friend_challenge.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "api/pkg/api/friend_challenge/v1;v1";
+
+// FriendChallengeService handles asynchronous 1v1 task duels between friends.
+// Unlike live arena matches, both players solve the same task on their own
+// schedule within a 48-hour window; the faster-and-more-correct submission
+// wins.
+service FriendChallengeService {
+  // ListIncoming returns challenges where the authenticated user is the
+  // opponent and hasn't yet submitted their solution.
+  rpc ListIncoming(ListIncomingRequest) returns (ListChallengesResponse) {
+    option (google.api.http) = { get: "/api/v1/challenges/incoming" };
+  }
+
+  // ListSent returns challenges the authenticated user originated (pending
+  // opponent response or in progress).
+  rpc ListSent(ListSentRequest) returns (ListChallengesResponse) {
+    option (google.api.http) = { get: "/api/v1/challenges/sent" };
+  }
+
+  // ListHistory returns completed (won/lost/expired/declined) challenges.
+  rpc ListHistory(ListHistoryRequest) returns (ListChallengesResponse) {
+    option (google.api.http) = { get: "/api/v1/challenges/history" };
+  }
+
+  // SendChallenge creates a new challenge addressed to a friend by username.
+  rpc SendChallenge(SendChallengeRequest) returns (SendChallengeResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/challenges"
+      body: "*"
+    };
+  }
+
+  // SubmitSolution records a player's completion time + score. When both
+  // sides have submitted, the row transitions to COMPLETED and a winner is
+  // assigned.
+  rpc SubmitSolution(SubmitSolutionRequest) returns (SubmitSolutionResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/challenges/{challenge_id}/submit"
+      body: "*"
+    };
+  }
+
+  // Decline lets the opponent refuse a challenge before they start.
+  rpc Decline(DeclineRequest) returns (DeclineResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/challenges/{challenge_id}/decline"
+      body: "*"
+    };
+  }
+}
+
+// ChallengeStatus is the server-side lifecycle; clients derive per-viewer
+// "your turn / their turn / won / lost" labels from this plus their user id.
+enum ChallengeStatus {
+  CHALLENGE_STATUS_UNSPECIFIED = 0;
+  CHALLENGE_STATUS_PENDING     = 1;  // neither side has submitted
+  CHALLENGE_STATUS_IN_PROGRESS = 2;  // exactly one side has submitted
+  CHALLENGE_STATUS_COMPLETED   = 3;  // both sides submitted → winner set
+  CHALLENGE_STATUS_EXPIRED     = 4;  // deadline passed
+  CHALLENGE_STATUS_DECLINED    = 5;  // opponent declined
+}
+
+// ChallengeDifficulty mirrors the training task difficulty enum values.
+enum ChallengeDifficulty {
+  CHALLENGE_DIFFICULTY_UNSPECIFIED = 0;
+  CHALLENGE_DIFFICULTY_EASY        = 1;
+  CHALLENGE_DIFFICULTY_MEDIUM      = 2;
+  CHALLENGE_DIFFICULTY_HARD        = 3;
+}
+
+// FriendChallenge is the full row as the server sees it. Clients render
+// status chips based on the current viewer's relationship to the row.
+message FriendChallenge {
+  string                    id                      = 1;
+  string                    challenger_id           = 2;
+  string                    challenger_username     = 3;
+  string                    opponent_id             = 4;
+  string                    opponent_username       = 5;
+  string                    task_title              = 6;
+  string                    task_topic              = 7;
+  ChallengeDifficulty       task_difficulty         = 8;
+  string                    task_ref                = 9;   // optional "training:graph-dfs" etc
+  string                    note                    = 10;
+  ChallengeStatus           status                  = 11;
+  google.protobuf.Timestamp challenger_submitted_at = 12;
+  int32                     challenger_time_ms      = 13;
+  int32                     challenger_score        = 14;  // 0..5
+  google.protobuf.Timestamp opponent_submitted_at   = 15;
+  int32                     opponent_time_ms        = 16;
+  int32                     opponent_score          = 17;
+  string                    winner_id               = 18;
+  google.protobuf.Timestamp deadline_at             = 19;
+  google.protobuf.Timestamp created_at              = 20;
+  google.protobuf.Timestamp completed_at            = 21;
+}
+
+message ListIncomingRequest {
+  int32 limit  = 1;
+  int32 offset = 2;
+}
+message ListSentRequest {
+  int32 limit  = 1;
+  int32 offset = 2;
+}
+message ListHistoryRequest {
+  int32 limit  = 1;
+  int32 offset = 2;
+}
+message ListChallengesResponse {
+  repeated FriendChallenge challenges = 1;
+  int32                    total      = 2;
+}
+
+message SendChallengeRequest {
+  string              opponent_username = 1;  // case-insensitive lookup
+  string              task_title        = 2;
+  string              task_topic        = 3;
+  ChallengeDifficulty task_difficulty   = 4;
+  string              task_ref          = 5;
+  string              note              = 6;
+}
+message SendChallengeResponse {
+  FriendChallenge challenge = 1;
+}
+
+message SubmitSolutionRequest {
+  string challenge_id = 1;
+  int32  time_ms      = 2;  // total solve time
+  int32  score        = 3;  // 0..5 (hidden tests passed)
+}
+message SubmitSolutionResponse {
+  FriendChallenge challenge = 1;
+}
+
+message DeclineRequest {
+  string challenge_id = 1;
+}
+message DeclineResponse {
+  FriendChallenge challenge = 1;
+}

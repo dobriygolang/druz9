@@ -69,37 +69,6 @@ func leagueByName(name string) arenarating.League {
 	return arenarating.Leagues[0]
 }
 
-func (r *Repo) GetSeasonHistory(ctx context.Context, userID string, limit int32) ([]*model.ArenaSeasonResult, error) {
-	if limit <= 0 {
-		limit = 10
-	}
-	rows, err := r.data.DB.Query(ctx, `
-		SELECT user_id, season_number, final_rating, final_league,
-		       COALESCE(league_rank, 0), peak_rating, wins, losses, matches
-		FROM arena_season_results
-		WHERE user_id = $1::uuid
-		ORDER BY season_number DESC
-		LIMIT $2
-	`, userID, limit)
-	if err != nil {
-		return nil, fmt.Errorf("get season history: %w", err)
-	}
-	defer rows.Close()
-
-	var results []*model.ArenaSeasonResult
-	for rows.Next() {
-		var sr model.ArenaSeasonResult
-		if err := rows.Scan(
-			&sr.UserID, &sr.SeasonNumber, &sr.FinalRating, &sr.FinalLeague,
-			&sr.LeagueRank, &sr.PeakRating, &sr.Wins, &sr.Losses, &sr.Matches,
-		); err != nil {
-			return nil, fmt.Errorf("scan season result: %w", err)
-		}
-		results = append(results, &sr)
-	}
-	return results, rows.Err()
-}
-
 func (r *Repo) RunSeasonReset(ctx context.Context, endingSeason int32, newSeason *model.ArenaSeason) error {
 	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {

@@ -212,7 +212,7 @@ func (b *Bot) handleCallback(ctx context.Context, cb *telegramCallback) {
 	case "toggle":
 		b.handleToggle(ctx, cb, parts[1])
 	case "mute":
-		klog.Infof("bot: mute circle %s for user %d", parts[1], cb.From.ID)
+		klog.Infof("bot: mute guild %s for user %d", parts[1], cb.From.ID)
 	}
 }
 
@@ -233,8 +233,8 @@ func (b *Bot) handleToggle(ctx context.Context, cb *telegramCallback, category s
 		settings.DuelsEnabled = !settings.DuelsEnabled
 	case "progress":
 		settings.ProgressEnabled = !settings.ProgressEnabled
-	case "circles":
-		settings.CirclesEnabled = !settings.CirclesEnabled
+	case "guilds":
+		settings.GuildsEnabled = !settings.GuildsEnabled
 	case "daily":
 		settings.DailyChallengeEnabled = !settings.DailyChallengeEnabled
 	default:
@@ -275,7 +275,7 @@ func buildSettingsMessage(s *data.UserSettings) (string, telegram.InlineKeyboard
 		"Нажми на категорию, чтобы включить или отключить:\n\n" +
 		fmt.Sprintf("%s Дуэли — вызовы и результаты\n", on(s.DuelsEnabled)) +
 		fmt.Sprintf("%s Прогресс — стрики, уровни\n", on(s.ProgressEnabled)) +
-		fmt.Sprintf("%s Круги — активность в кругах\n", on(s.CirclesEnabled)) +
+		fmt.Sprintf("%s Круги — активность в кругах\n", on(s.GuildsEnabled)) +
 		fmt.Sprintf("%s Daily — ежедневные задачи\n", on(s.DailyChallengeEnabled))
 
 	keyboard := telegram.InlineKeyboardMarkup{
@@ -285,7 +285,7 @@ func buildSettingsMessage(s *data.UserSettings) (string, telegram.InlineKeyboard
 				{Text: on(s.ProgressEnabled) + " Прогресс", CallbackData: "toggle:progress"},
 			},
 			{
-				{Text: on(s.CirclesEnabled) + " Круги", CallbackData: "toggle:circles"},
+				{Text: on(s.GuildsEnabled) + " Круги", CallbackData: "toggle:guilds"},
 				{Text: on(s.DailyChallengeEnabled) + " Daily", CallbackData: "toggle:daily"},
 			},
 		},

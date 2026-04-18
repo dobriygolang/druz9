@@ -81,11 +81,11 @@ type UserGoal struct {
 
 // FeedItem represents a single activity event in the user's profile feed.
 type FeedItem struct {
-	Type        string     `json:"type"`
-	Title       string     `json:"title"`
-	Description string     `json:"description"`
-	Score       *int32     `json:"score,omitempty"`
-	Timestamp   time.Time  `json:"timestamp"`
+	Type        string    `json:"type"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	Score       *int32    `json:"score,omitempty"`
+	Timestamp   time.Time `json:"timestamp"`
 }
 
 type ProfileProgress struct {

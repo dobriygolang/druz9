@@ -21,16 +21,21 @@ const _ = http.SupportPackageIsVersion1
 
 const OperationGeoServiceCommunityMap = "/geo.v1.GeoService/CommunityMap"
 const OperationGeoServiceResolve = "/geo.v1.GeoService/Resolve"
+const OperationGeoServiceWorldPins = "/geo.v1.GeoService/WorldPins"
 
 type GeoServiceHTTPServer interface {
 	CommunityMap(context.Context, *CommunityMapRequest) (*CommunityMapResponse, error)
 	Resolve(context.Context, *ResolveRequest) (*ResolveResponse, error)
+	// WorldPins WorldPins aggregates locations of guild halls and upcoming events so
+	// the front-end world map can render a single query per view.
+	WorldPins(context.Context, *WorldPinsRequest) (*WorldPinsResponse, error)
 }
 
 func RegisterGeoServiceHTTPServer(s *http.Server, srv GeoServiceHTTPServer) {
 	r := s.Route("/")
 	r.POST("/api/v1/geo/resolve", _GeoService_Resolve0_HTTP_Handler(srv))
 	r.GET("/api/v1/geo/community", _GeoService_CommunityMap0_HTTP_Handler(srv))
+	r.GET("/api/v1/geo/world-pins", _GeoService_WorldPins0_HTTP_Handler(srv))
 }
 
 func _GeoService_Resolve0_HTTP_Handler(srv GeoServiceHTTPServer) func(ctx http.Context) error {
@@ -74,9 +79,31 @@ func _GeoService_CommunityMap0_HTTP_Handler(srv GeoServiceHTTPServer) func(ctx h
 	}
 }
 
+func _GeoService_WorldPins0_HTTP_Handler(srv GeoServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in WorldPinsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGeoServiceWorldPins)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.WorldPins(ctx, req.(*WorldPinsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*WorldPinsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type GeoServiceHTTPClient interface {
 	CommunityMap(ctx context.Context, req *CommunityMapRequest, opts ...http.CallOption) (rsp *CommunityMapResponse, err error)
 	Resolve(ctx context.Context, req *ResolveRequest, opts ...http.CallOption) (rsp *ResolveResponse, err error)
+	// WorldPins WorldPins aggregates locations of guild halls and upcoming events so
+	// the front-end world map can render a single query per view.
+	WorldPins(ctx context.Context, req *WorldPinsRequest, opts ...http.CallOption) (rsp *WorldPinsResponse, err error)
 }
 
 type GeoServiceHTTPClientImpl struct {
@@ -107,6 +134,21 @@ func (c *GeoServiceHTTPClientImpl) Resolve(ctx context.Context, in *ResolveReque
 	opts = append(opts, http.Operation(OperationGeoServiceResolve))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// WorldPins WorldPins aggregates locations of guild halls and upcoming events so
+// the front-end world map can render a single query per view.
+func (c *GeoServiceHTTPClientImpl) WorldPins(ctx context.Context, in *WorldPinsRequest, opts ...http.CallOption) (*WorldPinsResponse, error) {
+	var out WorldPinsResponse
+	pattern := "/api/v1/geo/world-pins"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationGeoServiceWorldPins))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

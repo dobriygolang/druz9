@@ -2,16 +2,13 @@ package notification
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"time"
 
 	v1 "api/pkg/api/notification/v1"
 
 	klog "github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // GRPCAdapter implements Sender via gRPC to the notification-service.
@@ -22,14 +19,9 @@ type GRPCAdapter struct {
 
 // NewGRPCAdapter creates a gRPC adapter to the notification service.
 func NewGRPCAdapter(addr string) (*GRPCAdapter, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	conn, err := grpc.DialContext(
-		ctx,
+	conn, err := grpc.NewClient(
 		addr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("connect notification service: %w", err)
@@ -49,25 +41,22 @@ func (a *GRPCAdapter) Close() error {
 }
 
 // Send enqueues a notification. Fire-and-forget: errors are logged.
+// Payload used to be a free-form map — it's now a typed
+// NotificationPayload (see notification.proto). Callers pass the same
+// map[string]any they had before; it's converted here.
 func (a *GRPCAdapter) Send(ctx context.Context, userID, kind, title, body string, payload map[string]any) {
-	pbPayload, err := toStruct(payload)
-	if err != nil {
-		klog.Errorf("notification payload marshal: %v", err)
-		return
-	}
-
 	pbKind, ok := protoNotificationKind(kind)
 	if !ok {
 		klog.Errorf("notification send (user=%s): unknown kind %q", userID, kind)
 		return
 	}
 
-	_, err = a.client.Send(ctx, &v1.SendRequest{
+	_, err := a.client.Send(ctx, &v1.SendRequest{
 		UserId:  userID,
 		Kind:    pbKind,
 		Title:   title,
 		Body:    body,
-		Payload: pbPayload,
+		Payload: buildPayload(payload),
 	})
 	if err != nil {
 		klog.Errorf("notification send (user=%s kind=%s): %v", userID, kind, err)
@@ -80,24 +69,18 @@ func (a *GRPCAdapter) SendBatch(ctx context.Context, userIDs []string, kind, tit
 		return
 	}
 
-	pbPayload, err := toStruct(payload)
-	if err != nil {
-		klog.Errorf("notification payload marshal: %v", err)
-		return
-	}
-
 	pbKind, ok := protoNotificationKind(kind)
 	if !ok {
 		klog.Errorf("notification send batch: unknown kind %q", kind)
 		return
 	}
 
-	_, err = a.client.SendBatch(ctx, &v1.SendBatchRequest{
+	_, err := a.client.SendBatch(ctx, &v1.SendBatchRequest{
 		UserIds: userIDs,
 		Kind:    pbKind,
 		Title:   title,
 		Body:    body,
-		Payload: pbPayload,
+		Payload: buildPayload(payload),
 	})
 	if err != nil {
 		klog.Errorf("notification send batch (kind=%s count=%d): %v", kind, len(userIDs), err)
@@ -135,7 +118,7 @@ func (a *GRPCAdapter) GetNotificationSettings(ctx context.Context, userID string
 	return &Settings{
 		DuelsEnabled:          resp.GetDuelsEnabled(),
 		ProgressEnabled:       resp.GetProgressEnabled(),
-		CirclesEnabled:        resp.GetCirclesEnabled(),
+		GuildsEnabled:        resp.GetGuildsEnabled(),
 		DailyChallengeEnabled: resp.GetDailyChallengeEnabled(),
 		QuietHoursStart:       resp.GetQuietHoursStart(),
 		QuietHoursEnd:         resp.GetQuietHoursEnd(),
@@ -149,23 +132,62 @@ func (a *GRPCAdapter) UpdateNotificationSettings(ctx context.Context, userID str
 	req := &v1.UpdateSettingsRequest{UserId: userID}
 	req.DuelsEnabled = upd.DuelsEnabled
 	req.ProgressEnabled = upd.ProgressEnabled
-	req.CirclesEnabled = upd.CirclesEnabled
+	req.GuildsEnabled = upd.GuildsEnabled
 	req.DailyChallengeEnabled = upd.DailyChallengeEnabled
 	_, err := a.client.UpdateSettings(ctx, req)
 	return err
 }
 
-func toStruct(m map[string]any) (*structpb.Struct, error) {
-	if m == nil {
-		return nil, nil
+// buildPayload copies well-known deep-link keys from the legacy
+// map[string]any callsites into the typed NotificationPayload. Unknown
+// keys are dropped with a warning — this is intentional: if a new key
+// is needed, add it to the proto message first so the contract stays
+// the source of truth.
+func buildPayload(m map[string]any) *v1.NotificationPayload {
+	if len(m) == 0 {
+		return nil
 	}
-	data, err := json.Marshal(m)
-	if err != nil {
-		return nil, err
+	p := &v1.NotificationPayload{}
+	for k, v := range m {
+		switch k {
+		case "match_id":
+			p.MatchId, _ = v.(string)
+		case "topic":
+			p.Topic, _ = v.(string)
+		case "is_winner":
+			p.IsWinner, _ = v.(bool)
+		case "session_id":
+			p.SessionId, _ = v.(string)
+		case "blueprint_title":
+			p.BlueprintTitle, _ = v.(string)
+		case "company_tag":
+			p.CompanyTag, _ = v.(string)
+		case "guild_id":
+			p.GuildId, _ = v.(string)
+		case "inviter_id":
+			p.InviterId, _ = v.(string)
+		case "challenge_id":
+			p.ChallengeId, _ = v.(string)
+		case "template_key":
+			p.TemplateKey, _ = v.(string)
+		case "target_value":
+			switch x := v.(type) {
+			case int64:
+				p.TargetValue = x
+			case int32:
+				p.TargetValue = int64(x)
+			case int:
+				p.TargetValue = int64(x)
+			}
+		case "event_id":
+			p.EventId, _ = v.(string)
+		default:
+			klog.Warnf("notification payload: dropping unknown key %q (add it to NotificationPayload in the proto first)", k)
+		}
 	}
-	s := &structpb.Struct{}
-	if err := s.UnmarshalJSON(data); err != nil {
-		return nil, err
-	}
-	return s, nil
+	return p
 }
+
+// Ensure the import is used even if buildPayload returns nil everywhere
+// (fmt is imported by the adapter for error formatting).
+var _ = fmt.Errorf

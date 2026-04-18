@@ -1,0 +1,213 @@
+/**
+ * GamePage — shared content canvas under the app shell.
+ */
+
+.gm-page {
+  position: relative;
+  min-height: 100%;
+  padding: 22px 20px 32px;
+  background:
+    linear-gradient(180deg, rgba(18, 13, 8, 0.88), rgba(10, 7, 4, 0.96)),
+    radial-gradient(circle at top, rgba(94, 74, 44, 0.12), transparent 34%);
+  color: #f4e8ce;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.gm-page-dragon {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.gm-page-dragon-tl {
+  top: 24px;
+  left: -28px;
+}
+
+.gm-page-dragon-br {
+  right: -10px;
+  bottom: 16px;
+}
+
+.gm-page-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.gm-page-intro {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 0 12px;
+  border-bottom: 1px solid rgba(132, 112, 78, 0.22);
+  flex-wrap: wrap;
+}
+
+.gm-page-intro-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.gm-page-intro-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(132, 112, 78, 0.24);
+  background: rgba(34, 25, 15, 0.58);
+  color: #d7c29a;
+  flex-shrink: 0;
+}
+
+.gm-page-intro-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.gm-page-title {
+  margin: 0;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: #f7efdf;
+  letter-spacing: 0.03em;
+}
+
+.gm-page-subtitle {
+  margin: 5px 0 0;
+  max-width: 820px;
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(220, 205, 178, 0.72);
+}
+
+.gm-page-intro-extra {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.gm-page-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gm-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  align-items: start;
+}
+
+.gm-grid-main,
+.gm-grid-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.gm-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.gm-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid rgba(132, 112, 78, 0.22);
+  background: rgba(24, 18, 11, 0.34);
+}
+
+.gm-metric-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(208, 190, 160, 0.52);
+}
+
+.gm-metric-value {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #f7efdf;
+}
+
+.gm-note-list,
+.gm-bullet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gm-note-list li,
+.gm-bullet-list li {
+  border-left: 2px solid rgba(132, 112, 78, 0.24);
+  padding-left: 10px;
+}
+
+.gm-bullet-label {
+  display: block;
+  margin-bottom: 3px;
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #f7efdf;
+}
+
+.gm-bullet-copy {
+  display: block;
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(220, 205, 178, 0.72);
+}
+
+@media (max-width: 1023px) {
+  .gm-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .gm-page {
+    padding: 14px 12px 22px;
+  }
+
+  .gm-page-title {
+    font-size: 18px;
+  }
+
+  .gm-page-subtitle {
+    font-size: 12px;
+  }
+
+  .gm-page-dragon {
+    display: none;
+  }
+
+  .gm-page-intro {
+    gap: 12px;
+  }
+}

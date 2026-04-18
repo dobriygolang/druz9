@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+package inbox.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "api/pkg/api/inbox/v1;v1";
+
+// InboxService delivers messages to the authenticated user. Each user sees
+// their own thread list: mentor feedback, guild notices, system events,
+// duel chat, friend-challenge conversations. Threads are per-user and own
+// their message list; cross-user threads are modeled by mirroring messages.
+service InboxService {
+  // ListThreads returns the authenticated user's threads, newest activity first.
+  rpc ListThreads(ListThreadsRequest) returns (ListThreadsResponse) {
+    option (google.api.http) = { get: "/api/v1/inbox/threads" };
+  }
+
+  // GetThread returns a single thread with its full message list.
+  // Does NOT implicitly mark messages as read; use MarkThreadRead for that.
+  rpc GetThread(GetThreadRequest) returns (GetThreadResponse) {
+    option (google.api.http) = { get: "/api/v1/inbox/threads/{thread_id}" };
+  }
+
+  // MarkThreadRead zeroes the thread's unread counter and flags every message
+  // in it as read for the current user.
+  rpc MarkThreadRead(MarkThreadReadRequest) returns (MarkThreadReadResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/inbox/threads/{thread_id}/read"
+      body: "*"
+    };
+  }
+
+  // SendMessage appends a user-authored message to an interactive thread
+  // (mentor, challenge, duel). Non-interactive threads (system, guild-bot)
+  // reject this call.
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/inbox/threads/{thread_id}/messages"
+      body: "*"
+    };
+  }
+
+  // GetUnreadCount returns the total unread thread count for badge rendering.
+  rpc GetUnreadCount(GetUnreadCountRequest) returns (GetUnreadCountResponse) {
+    option (google.api.http) = { get: "/api/v1/inbox/unread" };
+  }
+}
+
+// ThreadKind classifies inbox threads so the client can route icons, avatars
+// and interactivity (only some kinds accept user replies).
+enum ThreadKind {
+  THREAD_KIND_UNSPECIFIED = 0;
+  THREAD_KIND_MENTOR      = 1;  // AI or human mentor feedback
+  THREAD_KIND_GUILD       = 2;  // Guild bot / raid notices
+  THREAD_KIND_SYSTEM      = 3;  // Level-up, achievement, season events
+  THREAD_KIND_DUEL        = 4;  // Post-match chat with opponent
+  THREAD_KIND_CHALLENGE   = 5;  // Async friend challenge conversation
+}
+
+enum SenderKind {
+  SENDER_KIND_UNSPECIFIED = 0;
+  SENDER_KIND_USER        = 1;
+  SENDER_KIND_SYSTEM      = 2;
+  SENDER_KIND_MENTOR_BOT  = 3;
+  SENDER_KIND_GUILD_BOT   = 4;
+}
+
+message InboxThread {
+  string                    id               = 1;
+  ThreadKind                kind             = 2;
+  string                    subject          = 3;  // display title ("Varek · Mentor")
+  string                    avatar           = 4;  // emoji or 2-letter initials
+  string                    preview          = 5;  // last-message snippet
+  int32                     unread_count     = 6;
+  google.protobuf.Timestamp last_message_at  = 7;
+  string                    external_id      = 8;  // optional link to source entity
+  bool                      interactive      = 9;  // can the user reply?
+}
+
+message InboxMessage {
+  string                    id          = 1;
+  string                    thread_id   = 2;
+  SenderKind                sender_kind = 3;
+  string                    sender_id   = 4;  // empty for system/bot
+  string                    sender_name = 5;
+  string                    body        = 6;
+  bool                      read        = 7;
+  google.protobuf.Timestamp created_at  = 8;
+}
+
+message ListThreadsRequest {
+  int32 limit  = 1;  // default 50, max 100
+  int32 offset = 2;
+}
+
+message ListThreadsResponse {
+  repeated InboxThread threads     = 1;
+  int32                total       = 2;
+  int32                unread_total = 3;
+}
+
+message GetThreadRequest {
+  string thread_id = 1;
+}
+
+message GetThreadResponse {
+  InboxThread           thread   = 1;
+  repeated InboxMessage messages = 2;
+}
+
+message MarkThreadReadRequest {
+  string thread_id = 1;
+}
+
+message MarkThreadReadResponse {
+  bool ok = 1;
+  int32 unread_total = 2;  // updated badge count after marking
+}
+
+message SendMessageRequest {
+  string thread_id = 1;
+  string body      = 2;
+}
+
+message SendMessageResponse {
+  InboxMessage message = 1;
+}
+
+message GetUnreadCountRequest {}
+
+message GetUnreadCountResponse {
+  int32 unread_total = 1;
+}

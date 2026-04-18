@@ -105,13 +105,6 @@ service InterviewPrepService {
     option (google.api.http) = { delete: "/api/admin/interview-prep/mock-company-presets/{id}" };
   }
 
-  rpc StartCheckpointSession(StartCheckpointSessionRequest) returns (CheckpointSessionResponse) {
-    option (google.api.http) = { post: "/api/v1/interview-prep/checkpoints/start" body: "*" };
-  }
-
-  rpc GetCheckpointBySession(GetCheckpointBySessionRequest) returns (CheckpointSessionResponse) {
-    option (google.api.http) = { get: "/api/v1/interview-prep/checkpoints/session/{session_id}" };
-  }
 }
 
 // ── Enums ──────────────────────────────────────────────────────────────────
@@ -162,14 +155,6 @@ enum SelfAssessment {
   SELF_ASSESSMENT_UNSPECIFIED = 0;
   SELF_ASSESSMENT_ANSWERED    = 1;
   SELF_ASSESSMENT_SKIPPED     = 2;
-}
-
-enum CheckpointStatus {
-  CHECKPOINT_STATUS_UNSPECIFIED = 0;
-  CHECKPOINT_STATUS_ACTIVE      = 1;
-  CHECKPOINT_STATUS_PASSED      = 2;
-  CHECKPOINT_STATUS_FAILED      = 3;
-  CHECKPOINT_STATUS_EXPIRED     = 4;
 }
 
 // ── Request messages ───────────────────────────────────────────────────────
@@ -545,34 +530,3 @@ message MockCompanyPreset {
   google.protobuf.Timestamp updated_at        = 9;  // was: string
 }
 
-// ── Checkpoint messages ────────────────────────────────────────────────────
-
-message StartCheckpointSessionRequest {
-  string task_id = 1;
-}
-
-message GetCheckpointBySessionRequest {
-  string session_id = 1;
-}
-
-message CheckpointProgress {
-  string                    id               = 1;
-  string                    user_id          = 2;
-  string                    task_id          = 3;
-  string                    session_id       = 4;
-  string                    skill_key        = 5;
-  CheckpointStatus          status           = 6;
-  int32                     duration_seconds = 7;
-  int32                     attempts_used    = 8;
-  int32                     max_attempts     = 9;
-  int32                     score            = 10;
-  google.protobuf.Timestamp started_at       = 11;
-  google.protobuf.Timestamp finished_at      = 12;
-  google.protobuf.Timestamp created_at       = 13;
-  google.protobuf.Timestamp updated_at       = 14;
-}
-
-message CheckpointSessionResponse {
-  InterviewPrepSession session    = 1;
-  CheckpointProgress   checkpoint = 2;
-}

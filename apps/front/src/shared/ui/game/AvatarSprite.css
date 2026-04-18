@@ -1,0 +1,14 @@
+.gm-avatar {
+  display: block;
+  user-select: none;
+}
+
+.gm-avatar-idle {
+  animation: gm-avatar-bob 2.4s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+@keyframes gm-avatar-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}

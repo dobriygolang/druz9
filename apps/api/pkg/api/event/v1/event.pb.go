@@ -234,6 +234,61 @@ func (EventRepeat) EnumDescriptor() ([]byte, []int) {
 	return file_event_v1_event_proto_rawDescGZIP(), []int{3}
 }
 
+// EventStatus is the moderation/lifecycle status of an Event row.
+// Replaces the legacy `string status` field — clients no longer have to
+// guess valid values.
+type EventStatus int32
+
+const (
+	EventStatus_EVENT_STATUS_UNSPECIFIED EventStatus = 0
+	EventStatus_EVENT_STATUS_PENDING     EventStatus = 1 // awaiting moderator approval
+	EventStatus_EVENT_STATUS_APPROVED    EventStatus = 2 // visible publicly
+	EventStatus_EVENT_STATUS_REJECTED    EventStatus = 3 // hidden, shown only to creator
+)
+
+// Enum value maps for EventStatus.
+var (
+	EventStatus_name = map[int32]string{
+		0: "EVENT_STATUS_UNSPECIFIED",
+		1: "EVENT_STATUS_PENDING",
+		2: "EVENT_STATUS_APPROVED",
+		3: "EVENT_STATUS_REJECTED",
+	}
+	EventStatus_value = map[string]int32{
+		"EVENT_STATUS_UNSPECIFIED": 0,
+		"EVENT_STATUS_PENDING":     1,
+		"EVENT_STATUS_APPROVED":    2,
+		"EVENT_STATUS_REJECTED":    3,
+	}
+)
+
+func (x EventStatus) Enum() *EventStatus {
+	p := new(EventStatus)
+	*p = x
+	return p
+}
+
+func (x EventStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (EventStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_event_v1_event_proto_enumTypes[4].Descriptor()
+}
+
+func (EventStatus) Type() protoreflect.EnumType {
+	return &file_event_v1_event_proto_enumTypes[4]
+}
+
+func (x EventStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use EventStatus.Descriptor instead.
+func (EventStatus) EnumDescriptor() ([]byte, []int) {
+	return file_event_v1_event_proto_rawDescGZIP(), []int{4}
+}
+
 type ListEventsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
@@ -952,7 +1007,7 @@ type Event struct {
 	Description      string                 `protobuf:"bytes,17,opt,name=description,proto3" json:"description,omitempty"`
 	MeetingLink      string                 `protobuf:"bytes,18,opt,name=meeting_link,json=meetingLink,proto3" json:"meeting_link,omitempty"`
 	IsPublic         bool                   `protobuf:"varint,19,opt,name=is_public,json=isPublic,proto3" json:"is_public,omitempty"`
-	Status           string                 `protobuf:"bytes,20,opt,name=status,proto3" json:"status,omitempty"`
+	Status           EventStatus            `protobuf:"varint,20,opt,name=status,proto3,enum=event.v1.EventStatus" json:"status,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -1120,11 +1175,11 @@ func (x *Event) GetIsPublic() bool {
 	return false
 }
 
-func (x *Event) GetStatus() string {
+func (x *Event) GetStatus() EventStatus {
 	if x != nil {
 		return x.Status
 	}
-	return ""
+	return EventStatus_EVENT_STATUS_UNSPECIFIED
 }
 
 type EventParticipant struct {
@@ -1257,7 +1312,7 @@ const file_event_v1_event_proto_rawDesc = "" +
 	"totalCount\x12\"\n" +
 	"\rhas_next_page\x18\x05 \x01(\bR\vhasNextPage\"6\n" +
 	"\rEventResponse\x12%\n" +
-	"\x05event\x18\x01 \x01(\v2\x0f.event.v1.EventR\x05event\"\x95\x05\n" +
+	"\x05event\x18\x01 \x01(\v2\x0f.event.v1.EventR\x05event\"\xc4\x05\n" +
 	"\x05Event\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1f\n" +
@@ -1282,7 +1337,8 @@ const file_event_v1_event_proto_rawDesc = "" +
 	"\fparticipants\x18\x10 \x03(\v2\x1a.event.v1.EventParticipantR\fparticipants\x12 \n" +
 	"\vdescription\x18\x11 \x01(\tR\vdescription\x12!\n" +
 	"\fmeeting_link\x18\x12 \x01(\tR\vmeetingLink\x12\x1b\n" +
-	"\tis_public\x18\x13 \x01(\bR\bisPublic\"\xa2\x01\n" +
+	"\tis_public\x18\x13 \x01(\bR\bisPublic\x12-\n" +
+	"\x06status\x18\x14 \x01(\x0e2\x15.event.v1.EventStatusR\x06status\"\xa2\x01\n" +
 	"\x10EventParticipant\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
 	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x1d\n" +
@@ -1308,7 +1364,12 @@ const file_event_v1_event_proto_rawDesc = "" +
 	"\x11EVENT_REPEAT_NONE\x10\x01\x12\x16\n" +
 	"\x12EVENT_REPEAT_DAILY\x10\x02\x12\x17\n" +
 	"\x13EVENT_REPEAT_WEEKLY\x10\x03\x12\x18\n" +
-	"\x14EVENT_REPEAT_MONTHLY\x10\x042\x8b\x06\n" +
+	"\x14EVENT_REPEAT_MONTHLY\x10\x04*{\n" +
+	"\vEventStatus\x12\x1c\n" +
+	"\x18EVENT_STATUS_UNSPECIFIED\x10\x00\x12\x18\n" +
+	"\x14EVENT_STATUS_PENDING\x10\x01\x12\x19\n" +
+	"\x15EVENT_STATUS_APPROVED\x10\x02\x12\x19\n" +
+	"\x15EVENT_STATUS_REJECTED\x10\x032\x8b\x06\n" +
 	"\fEventService\x12_\n" +
 	"\n" +
 	"ListEvents\x12\x1b.event.v1.ListEventsRequest\x1a\x1c.event.v1.ListEventsResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/api/v1/events\x12_\n" +
@@ -1332,60 +1393,62 @@ func file_event_v1_event_proto_rawDescGZIP() []byte {
 	return file_event_v1_event_proto_rawDescData
 }
 
-var file_event_v1_event_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_event_v1_event_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
 var file_event_v1_event_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_event_v1_event_proto_goTypes = []any{
 	(EventListFilter)(0),          // 0: event.v1.EventListFilter
 	(ParticipantStatus)(0),        // 1: event.v1.ParticipantStatus
 	(DeleteEventScope)(0),         // 2: event.v1.DeleteEventScope
 	(EventRepeat)(0),              // 3: event.v1.EventRepeat
-	(*ListEventsRequest)(nil),     // 4: event.v1.ListEventsRequest
-	(*CreateEventRequest)(nil),    // 5: event.v1.CreateEventRequest
-	(*JoinEventRequest)(nil),      // 6: event.v1.JoinEventRequest
-	(*LeaveEventRequest)(nil),     // 7: event.v1.LeaveEventRequest
-	(*UpdateEventRequest)(nil),    // 8: event.v1.UpdateEventRequest
-	(*DeleteEventRequest)(nil),    // 9: event.v1.DeleteEventRequest
-	(*InviteToEventRequest)(nil),  // 10: event.v1.InviteToEventRequest
-	(*EventStatusResponse)(nil),   // 11: event.v1.EventStatusResponse
-	(*ListEventsResponse)(nil),    // 12: event.v1.ListEventsResponse
-	(*EventResponse)(nil),         // 13: event.v1.EventResponse
-	(*Event)(nil),                 // 14: event.v1.Event
-	(*EventParticipant)(nil),      // 15: event.v1.EventParticipant
-	(*timestamppb.Timestamp)(nil), // 16: google.protobuf.Timestamp
-	(v1.OperationStatus)(0),       // 17: common.v1.OperationStatus
+	(EventStatus)(0),              // 4: event.v1.EventStatus
+	(*ListEventsRequest)(nil),     // 5: event.v1.ListEventsRequest
+	(*CreateEventRequest)(nil),    // 6: event.v1.CreateEventRequest
+	(*JoinEventRequest)(nil),      // 7: event.v1.JoinEventRequest
+	(*LeaveEventRequest)(nil),     // 8: event.v1.LeaveEventRequest
+	(*UpdateEventRequest)(nil),    // 9: event.v1.UpdateEventRequest
+	(*DeleteEventRequest)(nil),    // 10: event.v1.DeleteEventRequest
+	(*InviteToEventRequest)(nil),  // 11: event.v1.InviteToEventRequest
+	(*EventStatusResponse)(nil),   // 12: event.v1.EventStatusResponse
+	(*ListEventsResponse)(nil),    // 13: event.v1.ListEventsResponse
+	(*EventResponse)(nil),         // 14: event.v1.EventResponse
+	(*Event)(nil),                 // 15: event.v1.Event
+	(*EventParticipant)(nil),      // 16: event.v1.EventParticipant
+	(*timestamppb.Timestamp)(nil), // 17: google.protobuf.Timestamp
+	(v1.OperationStatus)(0),       // 18: common.v1.OperationStatus
 }
 var file_event_v1_event_proto_depIdxs = []int32{
 	0,  // 0: event.v1.ListEventsRequest.status:type_name -> event.v1.EventListFilter
-	16, // 1: event.v1.CreateEventRequest.scheduled_at:type_name -> google.protobuf.Timestamp
+	17, // 1: event.v1.CreateEventRequest.scheduled_at:type_name -> google.protobuf.Timestamp
 	3,  // 2: event.v1.CreateEventRequest.repeat:type_name -> event.v1.EventRepeat
-	16, // 3: event.v1.UpdateEventRequest.scheduled_at:type_name -> google.protobuf.Timestamp
+	17, // 3: event.v1.UpdateEventRequest.scheduled_at:type_name -> google.protobuf.Timestamp
 	2,  // 4: event.v1.DeleteEventRequest.delete_scope:type_name -> event.v1.DeleteEventScope
-	17, // 5: event.v1.EventStatusResponse.status:type_name -> common.v1.OperationStatus
-	14, // 6: event.v1.ListEventsResponse.events:type_name -> event.v1.Event
-	14, // 7: event.v1.EventResponse.event:type_name -> event.v1.Event
-	16, // 8: event.v1.Event.scheduled_at:type_name -> google.protobuf.Timestamp
-	16, // 9: event.v1.Event.created_at:type_name -> google.protobuf.Timestamp
-	15, // 10: event.v1.Event.participants:type_name -> event.v1.EventParticipant
-	1,  // 11: event.v1.EventParticipant.status:type_name -> event.v1.ParticipantStatus
-	4,  // 12: event.v1.EventService.ListEvents:input_type -> event.v1.ListEventsRequest
-	5,  // 13: event.v1.EventService.CreateEvent:input_type -> event.v1.CreateEventRequest
-	6,  // 14: event.v1.EventService.JoinEvent:input_type -> event.v1.JoinEventRequest
-	7,  // 15: event.v1.EventService.LeaveEvent:input_type -> event.v1.LeaveEventRequest
-	8,  // 16: event.v1.EventService.UpdateEvent:input_type -> event.v1.UpdateEventRequest
-	9,  // 17: event.v1.EventService.DeleteEvent:input_type -> event.v1.DeleteEventRequest
-	10, // 18: event.v1.EventService.InviteToEvent:input_type -> event.v1.InviteToEventRequest
-	12, // 19: event.v1.EventService.ListEvents:output_type -> event.v1.ListEventsResponse
-	13, // 20: event.v1.EventService.CreateEvent:output_type -> event.v1.EventResponse
-	13, // 21: event.v1.EventService.JoinEvent:output_type -> event.v1.EventResponse
-	11, // 22: event.v1.EventService.LeaveEvent:output_type -> event.v1.EventStatusResponse
-	13, // 23: event.v1.EventService.UpdateEvent:output_type -> event.v1.EventResponse
-	11, // 24: event.v1.EventService.DeleteEvent:output_type -> event.v1.EventStatusResponse
-	11, // 25: event.v1.EventService.InviteToEvent:output_type -> event.v1.EventStatusResponse
-	19, // [19:26] is the sub-list for method output_type
-	12, // [12:19] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	18, // 5: event.v1.EventStatusResponse.status:type_name -> common.v1.OperationStatus
+	15, // 6: event.v1.ListEventsResponse.events:type_name -> event.v1.Event
+	15, // 7: event.v1.EventResponse.event:type_name -> event.v1.Event
+	17, // 8: event.v1.Event.scheduled_at:type_name -> google.protobuf.Timestamp
+	17, // 9: event.v1.Event.created_at:type_name -> google.protobuf.Timestamp
+	16, // 10: event.v1.Event.participants:type_name -> event.v1.EventParticipant
+	4,  // 11: event.v1.Event.status:type_name -> event.v1.EventStatus
+	1,  // 12: event.v1.EventParticipant.status:type_name -> event.v1.ParticipantStatus
+	5,  // 13: event.v1.EventService.ListEvents:input_type -> event.v1.ListEventsRequest
+	6,  // 14: event.v1.EventService.CreateEvent:input_type -> event.v1.CreateEventRequest
+	7,  // 15: event.v1.EventService.JoinEvent:input_type -> event.v1.JoinEventRequest
+	8,  // 16: event.v1.EventService.LeaveEvent:input_type -> event.v1.LeaveEventRequest
+	9,  // 17: event.v1.EventService.UpdateEvent:input_type -> event.v1.UpdateEventRequest
+	10, // 18: event.v1.EventService.DeleteEvent:input_type -> event.v1.DeleteEventRequest
+	11, // 19: event.v1.EventService.InviteToEvent:input_type -> event.v1.InviteToEventRequest
+	13, // 20: event.v1.EventService.ListEvents:output_type -> event.v1.ListEventsResponse
+	14, // 21: event.v1.EventService.CreateEvent:output_type -> event.v1.EventResponse
+	14, // 22: event.v1.EventService.JoinEvent:output_type -> event.v1.EventResponse
+	12, // 23: event.v1.EventService.LeaveEvent:output_type -> event.v1.EventStatusResponse
+	14, // 24: event.v1.EventService.UpdateEvent:output_type -> event.v1.EventResponse
+	12, // 25: event.v1.EventService.DeleteEvent:output_type -> event.v1.EventStatusResponse
+	12, // 26: event.v1.EventService.InviteToEvent:output_type -> event.v1.EventStatusResponse
+	20, // [20:27] is the sub-list for method output_type
+	13, // [13:20] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_event_v1_event_proto_init() }
@@ -1398,7 +1461,7 @@ func file_event_v1_event_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_event_v1_event_proto_rawDesc), len(file_event_v1_event_proto_rawDesc)),
-			NumEnums:      4,
+			NumEnums:      5,
 			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,

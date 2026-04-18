@@ -152,6 +152,7 @@ func (s *Service) buildDockerArgs() []string {
 }
 
 func (r dockerCommandRunner) Run(ctx context.Context, stdin []byte, args []string) ([]byte, error) {
+	//nolint:gosec // binary and args come from trusted config; user input is passed via stdin.
 	cmd := exec.CommandContext(ctx, r.binary, args...)
 	cmd.Stdin = bytes.NewReader(stdin)
 

@@ -4,6 +4,7 @@ run:
 linters:
   disable-all: true
   enable:
+    - depguard
     - errcheck
     - goconst
     - goimports
@@ -21,3 +22,303 @@ linters-settings:
     rules:
       - name: exported
         severity: warning
+
+  # Архитектурные правила для контрибьюторов.
+  # Каждый internal/domain/X не может импортировать internal/domain/Y — общайтесь через контракты/события/интерфейсы.
+  # Аналогично для internal/data/X → internal/data/Y (исключение: internal/data/codetasks — shared read-only catalog).
+  depguard:
+    rules:
+      achievement-domain:
+        list-mode: lax
+        files: ["**/internal/domain/achievement/**"]
+        deny: &deny-domains-except-achievement
+          - pkg: "api/internal/domain/activity"
+          - pkg: "api/internal/domain/admin"
+          - pkg: "api/internal/domain/arena"
+          - pkg: "api/internal/domain/challenge"
+          - pkg: "api/internal/domain/circle"
+          - pkg: "api/internal/domain/codeeditor"
+          - pkg: "api/internal/domain/event"
+          - pkg: "api/internal/domain/geo"
+          - pkg: "api/internal/domain/interviewprep"
+          - pkg: "api/internal/domain/mission"
+          - pkg: "api/internal/domain/podcast"
+          - pkg: "api/internal/domain/profile"
+          - pkg: "api/internal/domain/referral"
+
+      activity-domain:
+        list-mode: lax
+        files: ["**/internal/domain/activity/**"]
+        deny:
+          - pkg: "api/internal/domain/achievement"
+          - pkg: "api/internal/domain/admin"
+          - pkg: "api/internal/domain/arena"
+          - pkg: "api/internal/domain/challenge"
+          - pkg: "api/internal/domain/circle"
+          - pkg: "api/internal/domain/codeeditor"
+          - pkg: "api/internal/domain/event"
+          - pkg: "api/internal/domain/geo"
+          - pkg: "api/internal/domain/interviewprep"
+          - pkg: "api/internal/domain/mission"
+          - pkg: "api/internal/domain/podcast"
+          - pkg: "api/internal/domain/profile"
+          - pkg: "api/internal/domain/referral"
+
+      admin-domain:
+        list-mode: lax
+        files: ["**/internal/domain/admin/**"]
+        deny:
+          - pkg: "api/internal/domain/achievement"
+          - pkg: "api/internal/domain/activity"
+          - pkg: "api/internal/domain/arena"
+          - pkg: "api/internal/domain/challenge"
+          - pkg: "api/internal/domain/circle"
+          - pkg: "api/internal/domain/codeeditor"
+          - pkg: "api/internal/domain/event"
+          - pkg: "api/internal/domain/geo"
+          - pkg: "api/internal/domain/interviewprep"
+          - pkg: "api/internal/domain/mission"
+          - pkg: "api/internal/domain/podcast"
+          - pkg: "api/internal/domain/profile"
+          - pkg: "api/internal/domain/referral"
+
+      arena-domain:
+        list-mode: lax
+        files: ["**/internal/domain/arena/**"]
+        deny:
+          - pkg: "api/internal/domain/achievement"
+          - pkg: "api/internal/domain/activity"
+          - pkg: "api/internal/domain/admin"
+          - pkg: "api/internal/domain/challenge"
+          - pkg: "api/internal/domain/circle"
+          - pkg: "api/internal/domain/codeeditor"
+          - pkg: "api/internal/domain/event"
+          - pkg: "api/internal/domain/geo"
+          - pkg: "api/internal/domain/interviewprep"
+          - pkg: "api/internal/domain/mission"
+          - pkg: "api/internal/domain/podcast"
+          - pkg: "api/internal/domain/profile"
+          - pkg: "api/internal/domain/referral"
+
+      challenge-domain:
+        list-mode: lax
+        files: ["**/internal/domain/challenge/**"]
+        deny:
+          - pkg: "api/internal/domain/achievement"
+          - pkg: "api/internal/domain/activity"
+          - pkg: "api/internal/domain/admin"
+          - pkg: "api/internal/domain/arena"
+          - pkg: "api/internal/domain/circle"
+          - pkg: "api/internal/domain/codeeditor"
+          - pkg: "api/internal/domain/event"
+          - pkg: "api/internal/domain/geo"
+          - pkg: "api/internal/domain/interviewprep"
+          - pkg: "api/internal/domain/mission"
+          - pkg: "api/internal/domain/podcast"
+          - pkg: "api/internal/domain/profile"
+          - pkg: "api/internal/domain/referral"
+
+      circle-domain:
+        list-mode: lax
+        files: ["**/internal/domain/circle/**"]
+        deny:
+          - pkg: "api/internal/domain/achievement"
+          - pkg: "api/internal/domain/activity"
+          - pkg: "api/internal/domain/admin"
+          - pkg: "api/internal/domain/arena"
+          - pkg: "api/internal/domain/challenge"
+          - pkg: "api/internal/domain/codeeditor"
+          - pkg: "api/internal/domain/event"
+          - pkg: "api/internal/domain/geo"
+          - pkg: "api/internal/domain/interviewprep"
+          - pkg: "api/internal/domain/mission"
+          - pkg: "api/internal/domain/podcast"
+          - pkg: "api/internal/domain/profile"
+          - pkg: "api/internal/domain/referral"
+
+      codeeditor-domain:
+        list-mode: lax
+        files: ["**/internal/domain/codeeditor/**"]
+        deny:
+          - pkg: "api/internal/domain/achievement"
+          - pkg: "api/internal/domain/activity"
+          - pkg: "api/internal/domain/admin"
+          - pkg: "api/internal/domain/arena"
+          - pkg: "api/internal/domain/challenge"
+          - pkg: "api/internal/domain/circle"
+          - pkg: "api/internal/domain/event"
+          - pkg: "api/internal/domain/geo"
+          - pkg: "api/internal/domain/interviewprep"
+          - pkg: "api/internal/domain/mission"
+          - pkg: "api/internal/domain/podcast"
+          - pkg: "api/internal/domain/profile"
+          - pkg: "api/internal/domain/referral"
+
+      event-domain:
+        list-mode: lax
+        files: ["**/internal/domain/event/**"]
+        deny:
+          - pkg: "api/internal/domain/achievement"
+          - pkg: "api/internal/domain/activity"
+          - pkg: "api/internal/domain/admin"
+          - pkg: "api/internal/domain/arena"
+          - pkg: "api/internal/domain/challenge"
+          - pkg: "api/internal/domain/circle"
+          - pkg: "api/internal/domain/codeeditor"
+          - pkg: "api/internal/domain/geo"
+          - pkg: "api/internal/domain/interviewprep"
+          - pkg: "api/internal/domain/mission"
+          - pkg: "api/internal/domain/podcast"
+          - pkg: "api/internal/domain/profile"
+          - pkg: "api/internal/domain/referral"
+
+      geo-domain:
+        list-mode: lax
+        files: ["**/internal/domain/geo/**"]
+        deny:
+          - pkg: "api/internal/domain/achievement"
+          - pkg: "api/internal/domain/activity"
+          - pkg: "api/internal/domain/admin"
+          - pkg: "api/internal/domain/arena"
+          - pkg: "api/internal/domain/challenge"
+          - pkg: "api/internal/domain/circle"
+          - pkg: "api/internal/domain/codeeditor"
+          - pkg: "api/internal/domain/event"
+          - pkg: "api/internal/domain/interviewprep"
+          - pkg: "api/internal/domain/mission"
+          - pkg: "api/internal/domain/podcast"
+          - pkg: "api/internal/domain/profile"
+          - pkg: "api/internal/domain/referral"
+
+      interviewprep-domain:
+        list-mode: lax
+        files: ["**/internal/domain/interviewprep/**"]
+        deny:
+          - pkg: "api/internal/domain/achievement"
+          - pkg: "api/internal/domain/activity"
+          - pkg: "api/internal/domain/admin"
+          - pkg: "api/internal/domain/arena"
+          - pkg: "api/internal/domain/challenge"
+          - pkg: "api/internal/domain/circle"
+          - pkg: "api/internal/domain/codeeditor"
+          - pkg: "api/internal/domain/event"
+          - pkg: "api/internal/domain/geo"
+          - pkg: "api/internal/domain/mission"
+          - pkg: "api/internal/domain/podcast"
+          - pkg: "api/internal/domain/profile"
+          - pkg: "api/internal/domain/referral"
+
+      mission-domain:
+        list-mode: lax
+        files: ["**/internal/domain/mission/**"]
+        deny:
+          - pkg: "api/internal/domain/achievement"
+          - pkg: "api/internal/domain/activity"
+          - pkg: "api/internal/domain/admin"
+          - pkg: "api/internal/domain/arena"
+          - pkg: "api/internal/domain/challenge"
+          - pkg: "api/internal/domain/circle"
+          - pkg: "api/internal/domain/codeeditor"
+          - pkg: "api/internal/domain/event"
+          - pkg: "api/internal/domain/geo"
+          - pkg: "api/internal/domain/interviewprep"
+          - pkg: "api/internal/domain/podcast"
+          - pkg: "api/internal/domain/profile"
+          - pkg: "api/internal/domain/referral"
+
+      podcast-domain:
+        list-mode: lax
+        files: ["**/internal/domain/podcast/**"]
+        deny:
+          - pkg: "api/internal/domain/achievement"
+          - pkg: "api/internal/domain/activity"
+          - pkg: "api/internal/domain/admin"
+          - pkg: "api/internal/domain/arena"
+          - pkg: "api/internal/domain/challenge"
+          - pkg: "api/internal/domain/circle"
+          - pkg: "api/internal/domain/codeeditor"
+          - pkg: "api/internal/domain/event"
+          - pkg: "api/internal/domain/geo"
+          - pkg: "api/internal/domain/interviewprep"
+          - pkg: "api/internal/domain/mission"
+          - pkg: "api/internal/domain/profile"
+          - pkg: "api/internal/domain/referral"
+
+      profile-domain:
+        list-mode: lax
+        files: ["**/internal/domain/profile/**"]
+        deny:
+          - pkg: "api/internal/domain/achievement"
+          - pkg: "api/internal/domain/activity"
+          - pkg: "api/internal/domain/admin"
+          - pkg: "api/internal/domain/arena"
+          - pkg: "api/internal/domain/challenge"
+          - pkg: "api/internal/domain/circle"
+          - pkg: "api/internal/domain/codeeditor"
+          - pkg: "api/internal/domain/event"
+          - pkg: "api/internal/domain/geo"
+          - pkg: "api/internal/domain/interviewprep"
+          - pkg: "api/internal/domain/mission"
+          - pkg: "api/internal/domain/podcast"
+          - pkg: "api/internal/domain/referral"
+
+      referral-domain:
+        list-mode: lax
+        files: ["**/internal/domain/referral/**"]
+        deny:
+          - pkg: "api/internal/domain/achievement"
+          - pkg: "api/internal/domain/activity"
+          - pkg: "api/internal/domain/admin"
+          - pkg: "api/internal/domain/arena"
+          - pkg: "api/internal/domain/challenge"
+          - pkg: "api/internal/domain/circle"
+          - pkg: "api/internal/domain/codeeditor"
+          - pkg: "api/internal/domain/event"
+          - pkg: "api/internal/domain/geo"
+          - pkg: "api/internal/domain/interviewprep"
+          - pkg: "api/internal/domain/mission"
+          - pkg: "api/internal/domain/podcast"
+          - pkg: "api/internal/domain/profile"
+
+      # realtime/arena не может импортировать realtime/codeeditor и наоборот.
+      realtime-arena:
+        list-mode: lax
+        files: ["**/internal/realtime/arena/**"]
+        deny:
+          - pkg: "api/internal/realtime/codeeditor"
+
+      realtime-codeeditor:
+        list-mode: lax
+        files: ["**/internal/realtime/codeeditor/**"]
+        deny:
+          - pkg: "api/internal/realtime/arena"
+
+      # data/X не может импортировать data/Y (кроме codetasks — shared read-only каталог задач).
+      data-isolation:
+        list-mode: lax
+        files:
+          - "**/internal/data/arena/**"
+          - "**/internal/data/challenge/**"
+          - "**/internal/data/circle/**"
+          - "**/internal/data/code_editor/**"
+          - "**/internal/data/event/**"
+          - "**/internal/data/geo/**"
+          - "**/internal/data/interviewprep/**"
+          - "**/internal/data/mission/**"
+          - "**/internal/data/podcast/**"
+          - "**/internal/data/profile/**"
+          - "**/internal/data/referral/**"
+          - "**/internal/data/solution_review/**"
+        deny:
+          - pkg: "api/internal/data/arena"
+          - pkg: "api/internal/data/challenge"
+          - pkg: "api/internal/data/circle"
+          - pkg: "api/internal/data/code_editor"
+          - pkg: "api/internal/data/event"
+          - pkg: "api/internal/data/geo"
+          - pkg: "api/internal/data/interviewprep"
+          - pkg: "api/internal/data/mission"
+          - pkg: "api/internal/data/podcast"
+          - pkg: "api/internal/data/profile"
+          - pkg: "api/internal/data/referral"
+          - pkg: "api/internal/data/solution_review"

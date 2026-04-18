@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { authApi } from '@/features/Auth/api/authApi'
 import { useAuth } from '@/app/providers/AuthProvider'
-import { Spinner } from '@/shared/ui/Spinner'
+import { SpiritOrb } from '@/shared/ui/sprites'
 
 export function AuthCallbackPage() {
   const [params] = useSearchParams()
@@ -13,10 +13,13 @@ export function AuthCallbackPage() {
     const state = params.get('state')
     const code = params.get('code')
     if (state && code) {
-      authApi.yandexAuth(state, code)
+      authApi
+        .yandexAuth(state, code)
         .then(async (res) => {
           await refresh()
-          navigate(res.needsProfileComplete ? '/complete-registration' : '/home', { replace: true })
+          navigate(res.needsProfileComplete ? '/complete-registration' : '/hub', {
+            replace: true,
+          })
         })
         .catch(() => navigate('/login', { replace: true }))
     } else {
@@ -25,10 +28,28 @@ export function AuthCallbackPage() {
   }, [params, navigate, refresh])
 
   return (
-    <div className="min-h-screen bg-[#F0F5F1] flex items-center justify-center">
-      <div className="text-center">
-        <Spinner size="lg" className="mx-auto mb-4" />
-        <p className="text-[#4B6B52] text-sm">Signing you in...</p>
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        gap: 18,
+      }}
+    >
+      <SpiritOrb scale={6} />
+      <div
+        className="font-display uppercase"
+        style={{ fontSize: 16, color: 'var(--ink-1)', letterSpacing: '0.08em' }}
+      >
+        Opening the gate...
+      </div>
+      <div
+        className="font-silkscreen uppercase"
+        style={{ fontSize: 10, color: 'var(--ink-3)', letterSpacing: '0.1em' }}
+      >
+        Signing you in
       </div>
     </div>
   )

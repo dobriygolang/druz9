@@ -67,6 +67,8 @@ const (
 	S3Endpoint Key = "s3_endpoint"
 	// Public canonical endpoint for signed URLs
 	S3PublicEndpoint Key = "s3_public_endpoint"
+	// Comma-separated list of allowed CORS origins
+	ServerAllowedOrigins Key = "server_allowed_origins"
 	// Minimum requests before circuit breaker starts tripping
 	ServerCircuitBreakerRequest Key = "server_circuit_breaker_request"
 	// Required success ratio before the circuit opens
@@ -75,8 +77,6 @@ const (
 	ServerGrpcAddr Key = "server_grpc_addr"
 	// gRPC server request timeout
 	ServerGrpcTimeout Key = "server_grpc_timeout"
-	// Comma-separated list of allowed CORS origins
-	ServerAllowedOrigins Key = "server_allowed_origins"
 	// HTTP server listen address
 	ServerHttpAddr Key = "server_http_addr"
 	// HTTP server request timeout

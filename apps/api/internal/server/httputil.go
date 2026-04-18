@@ -8,7 +8,6 @@ import (
 
 	"api/internal/model"
 
-	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/google/uuid"
 )
 
@@ -17,14 +16,6 @@ import (
 type Authorizer interface {
 	AuthenticateByToken(context.Context, string) (*model.AuthState, error)
 	CookieName() string
-}
-
-// wrapKratos adapts a standard http.HandlerFunc to kratos route registration.
-func wrapKratos(h http.HandlerFunc) func(kratoshttp.Context) error {
-	return func(ctx kratoshttp.Context) error {
-		h(ctx.Response(), ctx.Request())
-		return nil
-	}
 }
 
 // WriteJSON encodes payload as JSON with the given status code.
@@ -61,28 +52,6 @@ func authenticate(r *http.Request, auth Authorizer) (*uuid.UUID, bool) {
 	return &id, true
 }
 
-// authenticateUser is like authenticate but returns the full User model.
-func authenticateUser(r *http.Request, auth Authorizer) (*model.User, bool) {
-	if r == nil || auth == nil {
-		return nil, false
-	}
-	token := sessionToken(r, auth.CookieName())
-	if token == "" {
-		return nil, false
-	}
-	state, err := auth.AuthenticateByToken(r.Context(), token)
-	if err != nil || state == nil || state.User == nil {
-		return nil, false
-	}
-	return state.User, true
-}
-
-// authenticateAdmin returns true only if the caller is an admin.
-func authenticateAdmin(r *http.Request, auth Authorizer) bool {
-	user, ok := authenticateUser(r, auth)
-	return ok && user.IsAdmin
-}
-
 // sessionToken extracts a Bearer token from the Authorization header or cookie.
 func sessionToken(r *http.Request, cookieName string) string {
 	if r == nil {
@@ -101,7 +70,7 @@ func sessionToken(r *http.Request, cookieName string) string {
 }
 
 // pathSegment returns the URL segment that appears `offset` positions after `key`.
-// Example: path="/api/v1/circles/abc/members", key="circles", offset=1 → "abc"
+// Example: path="/api/v1/guilds/abc/members", key="guilds", offset=1 → "abc"
 func pathSegment(path, key string, offset int) string {
 	parts := strings.Split(strings.Trim(path, "/"), "/")
 	for i, p := range parts {

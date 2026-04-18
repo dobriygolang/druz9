@@ -30,7 +30,7 @@ func (s *Service) Send(ctx context.Context, userID uuid.UUID, kind, title, body 
 	return n.ID, nil
 }
 
-// SendBatch enqueues notifications for multiple users (e.g. circle fan-out).
+// SendBatch enqueues notifications for multiple users (e.g. guild fan-out).
 func (s *Service) SendBatch(ctx context.Context, userIDs []uuid.UUID, kind, title, body string, payload json.RawMessage) (int, error) {
 	if len(userIDs) == 0 {
 		return 0, nil

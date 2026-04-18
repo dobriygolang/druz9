@@ -17,7 +17,7 @@ const (
 )
 
 // ShouldDeliver checks whether a notification should be delivered now.
-func ShouldDeliver(n *data.Notification, settings *data.UserSettings, dailyCount int, circleSettings *data.CircleSettings) FilterResult {
+func ShouldDeliver(n *data.Notification, settings *data.UserSettings, dailyCount int, guildSettings *data.GuildSettings) FilterResult {
 	// No Telegram chat linked.
 	if settings.TelegramChatID == 0 {
 		return FilterDrop
@@ -29,7 +29,7 @@ func ShouldDeliver(n *data.Notification, settings *data.UserSettings, dailyCount
 	}
 
 	// Rate limit: max N notifications per day.
-	// Circle events (invites, event created) bypass rate limit — they are transactional.
+	// Guild events (invites, event created) bypass rate limit — they are transactional.
 	if !isTransactional(n.Kind) && dailyCount >= maxDailyNotifications {
 		return FilterDrop
 	}
@@ -40,13 +40,13 @@ func ShouldDeliver(n *data.Notification, settings *data.UserSettings, dailyCount
 		return FilterDrop
 	}
 
-	// Per-circle settings.
-	if IsCircleKind(n.Kind) && circleSettings != nil {
-		if circleSettings.Muted {
+	// Per-guild settings.
+	if IsGuildKind(n.Kind) && guildSettings != nil {
+		if guildSettings.Muted {
 			return FilterDrop
 		}
-		sub := CircleSubForKind(n.Kind)
-		if !circleSubEnabled(sub, circleSettings) {
+		sub := GuildSubForKind(n.Kind)
+		if !guildSubEnabled(sub, guildSettings) {
 			return FilterDrop
 		}
 	}
@@ -95,8 +95,8 @@ func categoryEnabled(category string, s *data.UserSettings) bool {
 		return s.DuelsEnabled
 	case CategoryProgress:
 		return s.ProgressEnabled
-	case CategoryCircles:
-		return s.CirclesEnabled
+	case CategoryGuilds:
+		return s.GuildsEnabled
 	case CategoryDailyChallenge:
 		return s.DailyChallengeEnabled
 	default:
@@ -104,13 +104,13 @@ func categoryEnabled(category string, s *data.UserSettings) bool {
 	}
 }
 
-func circleSubEnabled(sub string, s *data.CircleSettings) bool {
+func guildSubEnabled(sub string, s *data.GuildSettings) bool {
 	switch sub {
-	case CircleSubEvents:
+	case GuildSubEvents:
 		return s.EventsEnabled
-	case CircleSubActivity:
+	case GuildSubActivity:
 		return s.ActivityEnabled
-	case CircleSubDigest:
+	case GuildSubDigest:
 		return s.DigestEnabled
 	default:
 		return true
@@ -121,7 +121,7 @@ func circleSubEnabled(sub string, s *data.CircleSettings) bool {
 func isTransactional(kind string) bool {
 	switch kind {
 	case KindDuelInvite, KindDuelMatchFound, KindDuelResult,
-		KindCircleInvite, KindCircleEventCreated, KindCircleEventReminder:
+		KindGuildInvite, KindGuildEventCreated, KindGuildEventReminder:
 		return true
 	default:
 		return false

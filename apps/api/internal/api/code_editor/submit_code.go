@@ -123,7 +123,6 @@ func (i *Implementation) triggerReview(ctx context.Context, submission *codeedit
 		TaskOptimalSpace: taskOptimalSpace,
 	}
 
-	if _, err := i.reviewService.StartReview(ctx, input); err != nil {
-		// Non-fatal: review failure should never block submission.
-	}
+	// Non-fatal: review failure should never block submission.
+	_, _ = i.reviewService.StartReview(ctx, input)
 }

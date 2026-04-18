@@ -1,0 +1,119 @@
+/**
+ * TaskRow — structured workspace row.
+ */
+
+.gm-task {
+  --task-accent: #d7c29a;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 13px;
+  background: transparent;
+  border: 1px solid rgba(132, 112, 78, 0.12);
+  border-left: 3px solid rgba(132, 112, 78, 0.32);
+  color: inherit;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.14s ease, background-color 0.14s ease;
+  box-sizing: border-box;
+}
+
+.gm-task:hover:not(.is-disabled) {
+  border-color: color-mix(in srgb, var(--task-accent) 42%, rgba(132, 112, 78, 0.18));
+  border-left-color: var(--task-accent);
+  background: color-mix(in srgb, var(--task-accent) 8%, transparent);
+}
+
+.gm-task.is-disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.gm-task-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid color-mix(in srgb, var(--task-accent) 28%, rgba(132, 112, 78, 0.18));
+  background: color-mix(in srgb, var(--task-accent) 10%, rgba(34, 25, 15, 0.4));
+  color: var(--task-accent);
+  flex-shrink: 0;
+}
+
+.gm-task-emoji {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.gm-task-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gm-task-title {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gm-task-hint {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(220, 205, 178, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gm-panel-parchment .gm-task-hint {
+  color: rgba(52, 39, 25, 0.64);
+}
+
+.gm-task-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 8px;
+  height: 24px;
+  border: 1px solid color-mix(in srgb, var(--task-accent) 32%, rgba(132, 112, 78, 0.12));
+  background: color-mix(in srgb, var(--task-accent) 10%, transparent);
+  color: var(--task-accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.gm-task-arrow {
+  width: 16px;
+  height: 16px;
+  color: rgba(208, 190, 160, 0.42);
+  transition: color 0.14s ease, transform 0.14s ease;
+  flex-shrink: 0;
+}
+
+.gm-task:hover:not(.is-disabled) .gm-task-arrow {
+  color: var(--task-accent);
+  transform: translateX(2px);
+}
+
+.gm-task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

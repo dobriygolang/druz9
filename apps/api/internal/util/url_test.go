@@ -38,8 +38,8 @@ func TestIsFullURL_ValidURLs(t *testing.T) {
 	t.Parallel()
 
 	// Test valid URLs with sufficient length
-	assert.True(t, IsFullURL("http://a"))   // http://a = 8 chars
-	assert.True(t, IsFullURL("https://a"))  // https://a = 9 chars
+	assert.True(t, IsFullURL("http://a"))  // http://a = 8 chars
+	assert.True(t, IsFullURL("https://a")) // https://a = 9 chars
 }
 
 func TestUniqueStrings(t *testing.T) {

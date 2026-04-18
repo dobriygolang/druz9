@@ -36,4 +36,3 @@ func NewEventService(c Config) *Service {
 		repo: c.Repository,
 	}
 }
-

@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+package social.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "api/pkg/api/social/v1;v1";
+
+// SocialService manages the friends graph: sending/accepting requests,
+// listing current friends with their online presence, and removing
+// friendships. Chat between friends happens in the inbox service; this
+// service is purely about the relationship edges.
+service SocialService {
+  rpc ListFriends(ListFriendsRequest) returns (ListFriendsResponse) {
+    option (google.api.http) = { get: "/api/v1/social/friends" };
+  }
+  rpc ListPendingRequests(ListPendingRequestsRequest) returns (ListPendingRequestsResponse) {
+    option (google.api.http) = { get: "/api/v1/social/requests" };
+  }
+  rpc SendFriendRequest(SendFriendRequestRequest) returns (SendFriendRequestResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/social/requests"
+      body: "*"
+    };
+  }
+  rpc AcceptFriendRequest(AcceptFriendRequestRequest) returns (AcceptFriendRequestResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/social/requests/{request_id}/accept"
+      body: "*"
+    };
+  }
+  rpc DeclineFriendRequest(DeclineFriendRequestRequest) returns (DeclineFriendRequestResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/social/requests/{request_id}/decline"
+      body: "*"
+    };
+  }
+  rpc RemoveFriend(RemoveFriendRequest) returns (RemoveFriendResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/social/friends/{user_id}/remove"
+      body: "*"
+    };
+  }
+}
+
+enum PresenceStatus {
+  PRESENCE_STATUS_UNSPECIFIED = 0;
+  PRESENCE_STATUS_ONLINE      = 1;
+  PRESENCE_STATUS_AWAY        = 2;
+  PRESENCE_STATUS_OFFLINE     = 3;
+}
+
+message Friend {
+  string                    user_id       = 1;
+  string                    username      = 2;
+  string                    display_name  = 3;
+  string                    avatar_url    = 4;
+  string                    guild_name    = 5;
+  PresenceStatus            presence      = 6;
+  string                    last_activity = 7;  // e.g. "training", "in duel" — derived
+  google.protobuf.Timestamp last_seen_at  = 8;
+  google.protobuf.Timestamp friends_since = 9;
+  bool                      is_favorite   = 10;
+}
+
+message FriendRequest {
+  string                    id          = 1;
+  string                    from_user_id = 2;
+  string                    from_username = 3;
+  string                    to_user_id  = 4;
+  string                    message     = 5;
+  google.protobuf.Timestamp created_at  = 6;
+}
+
+message ListFriendsRequest {
+  int32 limit  = 1;
+  int32 offset = 2;
+}
+message ListFriendsResponse {
+  repeated Friend friends       = 1;
+  int32           total         = 2;
+  int32           online_count  = 3;
+}
+
+message ListPendingRequestsRequest {}
+message ListPendingRequestsResponse {
+  repeated FriendRequest incoming = 1;
+  repeated FriendRequest outgoing = 2;
+}
+
+message SendFriendRequestRequest {
+  string to_username = 1;
+  string message     = 2;
+}
+message SendFriendRequestResponse {
+  FriendRequest request = 1;
+}
+
+message AcceptFriendRequestRequest {
+  string request_id = 1;
+}
+message AcceptFriendRequestResponse {
+  Friend friend = 1;
+}
+
+message DeclineFriendRequestRequest {
+  string request_id = 1;
+}
+message DeclineFriendRequestResponse {
+  bool ok = 1;
+}
+
+message RemoveFriendRequest {
+  string user_id = 1;
+}
+message RemoveFriendResponse {
+  bool ok = 1;
+}

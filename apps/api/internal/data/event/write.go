@@ -55,9 +55,9 @@ func (r *Repo) CreateEvent(ctx context.Context, creatorID uuid.UUID, req model.C
 		}
 		_, err = tx.Exec(
 			ctx,
-			`INSERT INTO events (id, creator_id, title, place_label, description, meeting_link, region, country, city, latitude, longitude, scheduled_at, series_id, repeat_rule, circle_id, is_public, status, created_at, updated_at)
+			`INSERT INTO events (id, creator_id, title, place_label, description, meeting_link, region, country, city, latitude, longitude, scheduled_at, series_id, repeat_rule, guild_id, is_public, status, created_at, updated_at)
 			 VALUES ($1,$2,$3,$4,NULLIF($5,''),NULLIF($6,''),NULLIF($7,''),NULLIF($8,''),NULLIF($9,''),$10,$11,$12,$13,$14,$15,$16,$17,NOW(),NOW())`,
-			eventID, creatorID, req.Title, req.PlaceLabel, req.Description, req.MeetingLink, req.Region, req.Country, req.City, req.Latitude, req.Longitude, scheduledAt, seriesID, normalizeRepeatRule(req.Repeat), req.CircleID, req.IsPublic, status,
+			eventID, creatorID, req.Title, req.PlaceLabel, req.Description, req.MeetingLink, req.Region, req.Country, req.City, req.Latitude, req.Longitude, scheduledAt, seriesID, normalizeRepeatRule(req.Repeat), req.GuildID, req.IsPublic, status,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("insert event: %w", err)
@@ -99,10 +99,11 @@ func normalizeRepeatRule(repeat string) string {
 
 // buildCreateEventScheduleTimes generates occurrence timestamps.
 // Horizons are intentionally short to avoid bloating the DB:
-//   daily   → 14 occurrences (2 weeks)
-//   weekly  → 8  occurrences (2 months)
-//   monthly → 6  occurrences (6 months)
-//   yearly  → 2  occurrences (2 years)
+//
+//	daily   → 14 occurrences (2 weeks)
+//	weekly  → 8  occurrences (2 months)
+//	monthly → 6  occurrences (6 months)
+//	yearly  → 2  occurrences (2 years)
 func buildCreateEventScheduleTimes(base *time.Time, repeat string) []*time.Time {
 	if base == nil {
 		return []*time.Time{nil}

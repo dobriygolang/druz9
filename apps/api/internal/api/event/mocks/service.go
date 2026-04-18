@@ -134,7 +134,6 @@ func (_c *Service_DeleteEvent_Call) RunAndReturn(run func(context.Context, uuid.
 	return _c
 }
 
-
 // JoinEvent provides a mock function with given fields: _a0, _a1, _a2
 func (_m *Service) JoinEvent(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) (*model.Event, error) {
 	ret := _m.Called(_a0, _a1, _a2)

@@ -4,14 +4,26 @@ import (
 	"api/internal/aireview"
 	adminservice "api/internal/api/admin"
 	arenaservice "api/internal/api/arena"
-	circleservice "api/internal/api/circle"
+	challengeservice "api/internal/api/challenge"
+	guildservice "api/internal/api/guild"
 	codeeditorservice "api/internal/api/code_editor"
 	eventservice "api/internal/api/event"
 	geoservice "api/internal/api/geo"
+	duelreplayservice "api/internal/api/duel_replay"
+	friendchallengeservice "api/internal/api/friend_challenge"
+	hubservice "api/internal/api/hub"
+	inboxservice "api/internal/api/inbox"
 	interviewprepservice "api/internal/api/interview_prep"
+	missionservice "api/internal/api/mission"
+	notificationservice "api/internal/api/notification"
 	podcastservice "api/internal/api/podcast"
 	profileservice "api/internal/api/profile"
 	referralservice "api/internal/api/referral"
+	seasonpassservice "api/internal/api/season_pass"
+	shopservice "api/internal/api/shop"
+	socialservice "api/internal/api/social"
+	streakservice "api/internal/api/streak"
+	trainingservice "api/internal/api/training"
 	apparenа "api/internal/app/arena"
 	appcodeeditor "api/internal/app/codeeditor"
 	appinterviewprep "api/internal/app/interviewprep"
@@ -19,15 +31,24 @@ import (
 	"api/internal/clients/notification"
 	"api/internal/closer"
 	admindomainservice "api/internal/domain/admin"
-	circledomainservice "api/internal/domain/circle"
-	eventdomainservice "api/internal/domain/event"
-	geodomainservice "api/internal/domain/geo"
 	challengedomainservice "api/internal/domain/challenge"
+	guilddomainservice "api/internal/domain/guild"
+	duelreplaydomain "api/internal/domain/duel_replay"
+	eventdomainservice "api/internal/domain/event"
+	friendchallengedomain "api/internal/domain/friend_challenge"
+	geodomainservice "api/internal/domain/geo"
+	inboxdomainservice "api/internal/domain/inbox"
 	missiondomainservice "api/internal/domain/mission"
 	podcastdomainservice "api/internal/domain/podcast"
 	profiledomainservice "api/internal/domain/profile"
 	referraldomainservice "api/internal/domain/referral"
-	"api/internal/realtime"
+	seasonpassdomain "api/internal/domain/season_pass"
+	shopdomain "api/internal/domain/shop"
+	socialdomain "api/internal/domain/social"
+	streakdomain "api/internal/domain/streak"
+	walletdomain "api/internal/domain/wallet"
+	arenart "api/internal/realtime/arena"
+	codeeditorrt "api/internal/realtime/codeeditor"
 	"api/internal/sandbox"
 	server "api/internal/server"
 	"context"
@@ -41,27 +62,47 @@ type serviceContext struct {
 	profileServiceDomain    *profiledomainservice.Service
 	adminServiceDomain      *admindomainservice.Service
 	geoServiceDomain        *geodomainservice.Service
-	circleServiceDomain     *circledomainservice.Service
+	guildServiceDomain     *guilddomainservice.Service
 	eventServiceDomain      *eventdomainservice.Service
 	podcastServiceDomain    *podcastdomainservice.Service
 	referralServiceDomain   *referraldomainservice.Service
 	codeEditorServiceDomain *appcodeeditor.Service
 	arenaServiceDomain      *apparenа.Service
 	interviewPrepDomain     *appinterviewprep.Service
-	realtimeHub             *realtime.CodeEditorHub
-	arenaRealtimeHub        *realtime.ArenaHub
+	realtimeHub             *codeeditorrt.Hub
+	arenaRealtimeHub        *arenart.Hub
 	adminService            *adminservice.Implementation
 	profileService          *profileservice.Implementation
 	geoService              *geoservice.Implementation
-	circleService           *circleservice.Implementation
+	hubService              *hubservice.Implementation
+	guildService           *guildservice.Implementation
 	eventService            *eventservice.Implementation
 	podcastService          *podcastservice.Implementation
 	referralService         *referralservice.Implementation
+	trainingService         *trainingservice.Implementation
 	codeEditorService       *codeeditorservice.Implementation
 	arenaService            *arenaservice.Implementation
 	interviewPrepService    *interviewprepservice.Implementation
 	missionServiceDomain    *missiondomainservice.Service
+	missionService          *missionservice.Implementation
+	notificationSettings    *notificationservice.SettingsImplementation
 	challengeServiceDomain  *challengedomainservice.Service
+	challengeService        *challengeservice.Implementation
+	inboxServiceDomain      *inboxdomainservice.Service
+	inboxService            *inboxservice.Implementation
+	friendChallengeDomain   *friendchallengedomain.Service
+	friendChallengeService  *friendchallengeservice.Implementation
+	duelReplayDomain        *duelreplaydomain.Service
+	duelReplayService       *duelreplayservice.Implementation
+	seasonPassDomain        *seasonpassdomain.Service
+	seasonPassService       *seasonpassservice.Implementation
+	streakDomain            *streakdomain.Service
+	streakService           *streakservice.Implementation
+	shopDomain              *shopdomain.Service
+	shopService             *shopservice.Implementation
+	socialDomain            *socialdomain.Service
+	socialService           *socialservice.Implementation
+	walletDomain            *walletdomain.Service
 }
 
 func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*serviceContext, error) {
@@ -115,8 +156,8 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		Resolver:      storage.geoResolver,
 		ActivityCache: profileServiceDomain.ActivityCache(),
 	})
-	circleServiceDomain := circledomainservice.NewService(circledomainservice.Config{
-		Repository: storage.circleRepo,
+	guildServiceDomain := guilddomainservice.NewService(guilddomainservice.Config{
+		Repository: storage.guildRepo,
 	})
 	eventServiceDomain := eventdomainservice.NewEventService(eventdomainservice.Config{
 		Repository: storage.eventRepo,
@@ -132,11 +173,28 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		Repository: storage.codeEditorRepo,
 		Sandbox:    sandboxService,
 	})
-	realtimeHub := realtime.NewCodeEditorHub(codeEditorServiceDomain, bootstrap.cfg.Server.AllowedOrigins)
+	realtimeHub := codeeditorrt.NewHub(codeEditorServiceDomain, bootstrap.cfg.Server.AllowedOrigins)
 	closer.AddSync(func() error { realtimeHub.Stop(); return nil })
+	// Wallet + SeasonPass are declared first so downstream services
+	// (arena, interview, training) can receive a SeasonPassAwarder and
+	// credit XP on match/session completion.
+	walletDomain := walletdomain.NewService(walletdomain.Config{
+		Repository: storage.walletRepo,
+	})
+	seasonPassDomain := seasonpassdomain.NewService(seasonpassdomain.Config{
+		Repository: storage.seasonPassRepo,
+		Wallet:     walletdomain.NewSeasonPassAdapter(walletDomain),
+	})
+	// duel_replay is declared next so arena can record a replay header
+	// when matches finish.
+	duelReplayDomain := duelreplaydomain.NewService(duelreplaydomain.Config{
+		Repository: storage.duelReplayRepo,
+	})
 	arenaServiceDomain := apparenа.New(apparenа.Config{
 		Repository: storage.arenaRepo,
 		Sandbox:    sandboxService,
+		SeasonPass: seasonPassDomain,
+		DuelReplay: duelReplayDomain,
 		AllowGuestAccess: func() bool {
 			return bootstrap.cfg.Arena != nil && !bootstrap.cfg.Arena.RequireAuth
 		},
@@ -148,6 +206,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		Repository:        storage.interviewRepo,
 		Sandbox:           sandboxService,
 		Reviewer:          aiReviewService,
+		SeasonPass:        seasonPassDomain,
 		AIReviewTimeout:   bootstrap.cfg.External.AIReview.Timeout,
 		MaxImageBytes:     bootstrap.cfg.External.AIReview.MaxImageBytes,
 		ModelCode:         bootstrap.cfg.External.AIReview.ModelCode,
@@ -158,11 +217,31 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 	missionServiceDomain := missiondomainservice.NewService(missiondomainservice.Config{
 		Repository: storage.missionRepo,
 	})
+	inboxServiceDomain := inboxdomainservice.NewService(inboxdomainservice.Config{
+		Repository: storage.inboxRepo,
+	})
+	friendChallengeDomain := friendchallengedomain.NewService(friendchallengedomain.Config{
+		Repository: storage.friendChallengeRepo,
+		Users:      storage.friendChallengeUsers,
+	})
+	streakDomain := streakdomain.NewService(streakdomain.Config{
+		Repository: storage.streakRepo,
+		Stats:      storage.streakStats,
+		Wallet:     walletdomain.NewStreakAdapter(walletDomain),
+	})
+	shopDomain := shopdomain.NewService(shopdomain.Config{
+		Repository: storage.shopRepo,
+		Wallet:     walletdomain.NewShopAdapter(walletDomain),
+	})
+	socialDomain := socialdomain.NewService(socialdomain.Config{
+		Repository: storage.socialRepo,
+		Users:      storage.socialUsers,
+	})
 	challengeServiceDomain := challengedomainservice.NewService(challengedomainservice.Config{
 		Repository: storage.challengeRepo,
 		Reviewer:   aiReviewService,
 	})
-	arenaRealtimeHub := realtime.NewArenaHub(arenaServiceDomain, bootstrap.cfg.Server.AllowedOrigins)
+	arenaRealtimeHub := arenart.NewHub(arenaServiceDomain, bootstrap.cfg.Server.AllowedOrigins)
 	closer.AddSync(func() error { arenaRealtimeHub.Stop(); return nil })
 	solutionReviewService := solutionreview.New(solutionreview.Config{
 		Repo:      storage.solutionReviewRepo,
@@ -189,7 +268,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		profileServiceDomain:    profileServiceDomain,
 		adminServiceDomain:      adminServiceDomain,
 		geoServiceDomain:        geoServiceDomain,
-		circleServiceDomain:     circleServiceDomain,
+		guildServiceDomain:     guildServiceDomain,
 		eventServiceDomain:      eventServiceDomain,
 		podcastServiceDomain:    podcastServiceDomain,
 		referralServiceDomain:   referralServiceDomain,
@@ -201,16 +280,36 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		adminService:            adminservice.New(adminServiceDomain, bootstrap.rtcManager, storage.profileRepo, profileServiceDomain),
 		profileService:          profileservice.New(profileServiceDomain, cookies, profileservice.NewCachedProgressRepository(storage.profileRepo), notifSender),
 		geoService:              geoservice.New(geoServiceDomain),
-		circleService:           circleservice.New(circleServiceDomain, eventServiceDomain, notifSender),
+		hubService:              hubservice.New(storage.profileRepo, missionServiceDomain, eventServiceDomain, arenaServiceDomain, guildServiceDomain),
+		guildService:           guildservice.New(guildServiceDomain, eventServiceDomain, notifSender),
 		eventService:            eventservice.New(eventServiceDomain),
 		podcastService:          podcastservice.New(podcastServiceDomain),
 		referralService:         referralservice.New(referralServiceDomain),
+		trainingService:         trainingservice.New(trainingservice.NewService(storage.profileRepo, codeEditorServiceDomain, sandboxService, solutionReviewService, seasonPassDomain)),
 		codeEditorService:       codeeditorservice.New(codeEditorServiceDomain, realtimeHub, aiReviewService, solutionReviewService),
 		arenaService: arenaservice.New(arenaServiceDomain, arenaRealtimeHub, func() bool {
 			return bootstrap.cfg.Arena != nil && !bootstrap.cfg.Arena.RequireAuth
 		}, solutionReviewService, notifSender),
-		interviewPrepService:    interviewprepservice.New(interviewPrepDomain, storage.interviewRepo, notifSender),
-		missionServiceDomain:    missionServiceDomain,
-		challengeServiceDomain:  challengeServiceDomain,
+		interviewPrepService:   interviewprepservice.New(interviewPrepDomain, storage.interviewRepo, notifSender),
+		missionServiceDomain:   missionServiceDomain,
+		missionService:         missionservice.New(missionServiceDomain),
+		notificationSettings:   notificationservice.NewSettings(notifSender),
+		challengeServiceDomain: challengeServiceDomain,
+		challengeService:       challengeservice.New(challengeServiceDomain),
+		inboxServiceDomain:     inboxServiceDomain,
+		inboxService:           inboxservice.New(inboxServiceDomain),
+		friendChallengeDomain:  friendChallengeDomain,
+		friendChallengeService: friendchallengeservice.New(friendChallengeDomain),
+		duelReplayDomain:       duelReplayDomain,
+		duelReplayService:      duelreplayservice.New(duelReplayDomain),
+		seasonPassDomain:       seasonPassDomain,
+		seasonPassService:      seasonpassservice.New(seasonPassDomain),
+		streakDomain:           streakDomain,
+		streakService:          streakservice.New(streakDomain),
+		shopDomain:             shopDomain,
+		shopService:            shopservice.New(shopDomain),
+		socialDomain:           socialDomain,
+		socialService:          socialservice.New(socialDomain),
+		walletDomain:           walletDomain,
 	}, nil
 }

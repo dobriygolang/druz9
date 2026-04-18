@@ -49,12 +49,20 @@ type Config struct {
 	Repository        Repository
 	Sandbox           Sandbox
 	Reviewer          Reviewer
+	SeasonPass        SeasonPassAwarder
 	AIReviewTimeout   time.Duration
 	MaxImageBytes     int64
 	ModelCode         string
 	ModelArchitecture string
 	ModelFollowup     string
 	ModelSystemDesign string
+}
+
+// SeasonPassAwarder is the narrow subset of season_pass/Service we need
+// to credit XP when an interview session finishes. Optional — nil means
+// no-op so the package stays standalone in tests.
+type SeasonPassAwarder interface {
+	AddXP(ctx context.Context, userID uuid.UUID, delta int32) error
 }
 
 type SystemDesignReviewInput struct {
@@ -116,6 +124,7 @@ type Service struct {
 	repo              Repository
 	sandbox           Sandbox
 	reviewer          Reviewer
+	seasonPass        SeasonPassAwarder
 	aiReviewTimeout   time.Duration
 	maxImageBytes     int64
 	taskListCache     *cache.TTLCache[[]*model.InterviewPrepTask]
@@ -131,6 +140,10 @@ const (
 	minPassingMockQuestionReviewScore = 6
 	defaultAIReviewTimeout            = 30 * time.Second
 	maxTransientAIReviewAttempts      = 2
+	// mockInterviewCompleteXP is awarded to the active Season Pass when
+	// a mock interview finishes. Set larger than an arena win because a
+	// full mock takes ~20× longer.
+	mockInterviewCompleteXP = int32(800)
 )
 
 func New(c Config) *Service {
@@ -138,6 +151,7 @@ func New(c Config) *Service {
 		repo:              c.Repository,
 		sandbox:           c.Sandbox,
 		reviewer:          c.Reviewer,
+		seasonPass:        c.SeasonPass,
 		aiReviewTimeout:   boundedAIReviewTimeout(c.AIReviewTimeout),
 		maxImageBytes:     maxImageBytesOrDefault(c.MaxImageBytes),
 		taskListCache:     cache.NewTTLCache[[]*model.InterviewPrepTask](8, time.Minute),

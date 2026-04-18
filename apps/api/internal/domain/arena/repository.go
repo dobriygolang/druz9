@@ -9,6 +9,12 @@ import (
 	"github.com/google/uuid"
 )
 
+// Repository is the persistence contract arena's app-service speaks to.
+// The queue/matchmaking set (MatchmakeOrEnqueue, GetQueueEntry,
+// CountQueueEntries, RemoveFromQueue, FindOpenMatchByUser) and
+// GetPlayerStatsBatch / GetSeasonHistory were removed with the
+// matchmaking / batch-stats / season-history RPCs. Restore along with
+// the transport RPCs if those features come back.
 type Repository interface {
 	PickRandomTask(ctx context.Context, topic, difficulty string) (*Task, error)
 	GetTask(ctx context.Context, taskID uuid.UUID) (*Task, error)
@@ -20,11 +26,6 @@ type Repository interface {
 	CleanupInactiveMatches(ctx context.Context, idleFor time.Duration) (int64, error)
 	CleanupOldSubmissions(ctx context.Context, idleFor time.Duration) (int64, error)
 	CleanupFinishedEditorStates(ctx context.Context, idleFor time.Duration) (int64, error)
-	MatchmakeOrEnqueue(ctx context.Context, user *User, task *Task, topic, difficulty string, obfuscateOpponent bool) (*Match, bool, error)
-	GetQueueEntry(ctx context.Context, userID uuid.UUID) (*QueueEntry, error)
-	CountQueueEntries(ctx context.Context) (int32, error)
-	RemoveFromQueue(ctx context.Context, userID uuid.UUID) error
-	FindOpenMatchByUser(ctx context.Context, userID uuid.UUID) (*Match, error)
 	JoinMatch(ctx context.Context, matchID uuid.UUID, player *Player, starterCode string) (*Match, error)
 	SavePlayerCode(ctx context.Context, matchID, userID uuid.UUID, code string) error
 	SavePlayerCodes(ctx context.Context, matchID uuid.UUID, codes map[uuid.UUID]string) error
@@ -34,7 +35,6 @@ type Repository interface {
 	CreateSubmission(ctx context.Context, submission *Submission) (*Submission, error)
 	GetLeaderboard(ctx context.Context, limit int32) ([]*LeaderboardEntry, error)
 	GetPlayerStats(ctx context.Context, userID uuid.UUID) (*PlayerStats, error)
-	GetPlayerStatsBatch(ctx context.Context, userIDs []uuid.UUID) (map[uuid.UUID]*PlayerStats, error)
 	ReportPlayerSuspicion(ctx context.Context, matchID, userID uuid.UUID, reason string) error
 	SetMatchRatingState(ctx context.Context, matchID uuid.UUID, isRated bool, unratedReason string) error
 	ApplyAntiCheatPenalty(ctx context.Context, matchID, userID uuid.UUID, delta int32, reason string) error
@@ -43,6 +43,10 @@ type Repository interface {
 	// Season operations.
 	GetActiveSeason(ctx context.Context) (*model.ArenaSeason, error)
 	GetLeaguePosition(ctx context.Context, userID string, rating int32) (rank int32, total int32, err error)
-	GetSeasonHistory(ctx context.Context, userID string, limit int32) ([]*model.ArenaSeasonResult, error)
 	RunSeasonReset(ctx context.Context, endingSeason int32, newSeason *model.ArenaSeason) error
+
+	// Cross-table leaderboards: guild-of-the-week and season-pass XP.
+	// Previously lived as a raw pgxpool aggregator in the api layer.
+	ListGuildLeaderboard(ctx context.Context, limit int32) ([]*model.GuildLeaderboardEntry, error)
+	ListSeasonXPLeaderboard(ctx context.Context, limit int32) ([]*model.SeasonXPEntry, int32, error)
 }

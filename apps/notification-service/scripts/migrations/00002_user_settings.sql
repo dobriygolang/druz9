@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS user_notification_settings (
 
   duels_enabled BOOLEAN NOT NULL DEFAULT true,
   progress_enabled BOOLEAN NOT NULL DEFAULT true,
-  circles_enabled BOOLEAN NOT NULL DEFAULT true,
+  guilds_enabled BOOLEAN NOT NULL DEFAULT true,
   daily_challenge_enabled BOOLEAN NOT NULL DEFAULT false,
 
   quiet_hours_start SMALLINT NOT NULL DEFAULT 23,
@@ -21,9 +21,9 @@ CREATE TABLE IF NOT EXISTS user_notification_settings (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS circle_notification_settings (
+CREATE TABLE IF NOT EXISTS guild_notification_settings (
   user_id UUID NOT NULL,
-  circle_id UUID NOT NULL,
+  guild_id UUID NOT NULL,
 
   events_enabled BOOLEAN NOT NULL DEFAULT true,
   activity_enabled BOOLEAN NOT NULL DEFAULT true,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS circle_notification_settings (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-  PRIMARY KEY (user_id, circle_id)
+  PRIMARY KEY (user_id, guild_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_notifications_user_sent
@@ -44,6 +44,6 @@ CREATE INDEX IF NOT EXISTS idx_notifications_user_sent
 -- +goose Down
 -- +goose StatementBegin
 DROP INDEX IF EXISTS idx_notifications_user_sent;
-DROP TABLE IF EXISTS circle_notification_settings;
+DROP TABLE IF EXISTS guild_notification_settings;
 DROP TABLE IF EXISTS user_notification_settings;
 -- +goose StatementEnd

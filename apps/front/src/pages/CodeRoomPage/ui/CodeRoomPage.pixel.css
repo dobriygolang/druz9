@@ -1,0 +1,80 @@
+/* ============================================================
+   CodeRoomPage — pixel-RPG skin
+   ------------------------------------------------------------
+   The page predates the pixel redesign and uses the legacy
+   shadcn-style chrome (rounded cards, soft shadows, Inter
+   font). Rewriting all 1862 lines is out of scope for this
+   pass; instead this stylesheet re-skins the page by overriding
+   visuals on elements under the .code-room-pixel wrapper.
+   Behaviour (keybindings, WS, Monaco) is untouched.
+   ============================================================ */
+
+.code-room-pixel {
+  background: var(--parch-1) !important;
+  color: var(--ink-0);
+  font-family: 'Pixelify Sans', 'JetBrains Mono', monospace;
+}
+
+/* Legacy rounded cards → square pixel panels */
+.code-room-pixel .rounded-2xl,
+.code-room-pixel .rounded-xl,
+.code-room-pixel .rounded-\[24px\],
+.code-room-pixel .rounded-\[30px\] {
+  border-radius: 0 !important;
+}
+
+/* Panel chrome: square borders + crisp pixel shadow */
+.code-room-pixel .bg-white {
+  background: var(--parch-0) !important;
+}
+.code-room-pixel .border-\[\#C1CFC4\],
+.code-room-pixel .border-\[\#d8d9d6\] {
+  border-color: var(--ink-0) !important;
+  border-width: 3px !important;
+}
+
+/* Soft shadows → none (pixel look is flat) */
+.code-room-pixel .shadow-\[0_12px_28px_rgba\(15\2c 23\2c 42\2c 0\.06\)\],
+.code-room-pixel .shadow-\[0_16px_32px_rgba\(15\2c 23\2c 42\2c 0\.08\)\] {
+  box-shadow: 3px 3px 0 var(--ink-0) !important;
+}
+
+/* Dark theme variants */
+.code-room-pixel.dark .bg-\[\#0d1117\],
+.code-room-pixel.dark .bg-\[\#132420\] {
+  background: var(--ink-0) !important;
+  color: var(--parch-0);
+}
+.code-room-pixel.dark .border-\[\#1E4035\] {
+  border-color: var(--parch-2) !important;
+}
+
+/* Buttons — keep the shared/ui Button geometry but square the
+   corners and give it a pixel shadow. Full migration to RpgButton
+   requires remapping variant names across ~20 call sites and is
+   deferred to a focused follow-up. */
+.code-room-pixel button {
+  border-radius: 0 !important;
+  font-family: 'Silkscreen', 'Pixelify Sans', monospace;
+  letter-spacing: 0.04em;
+}
+
+/* Badges — square + pixel font */
+.code-room-pixel [class*="inline-flex"][class*="items-center"][class*="rounded-lg"] {
+  border-radius: 0 !important;
+  font-family: 'Silkscreen', monospace;
+  letter-spacing: 0.06em;
+}
+
+/* Editor wrapper — Monaco's internal DOM stays as-is, only its
+   surrounding frame gets the pixel treatment. */
+.code-room-pixel .monaco-editor {
+  border: 2px solid var(--ink-0);
+}
+
+/* Header eyebrow text */
+.code-room-pixel h1,
+.code-room-pixel h2,
+.code-room-pixel h3 {
+  font-family: 'Pixelify Sans', monospace;
+}

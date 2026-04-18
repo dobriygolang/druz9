@@ -80,12 +80,12 @@ type ReviewInput struct {
 	TotalCount  int32
 
 	// Task metadata
-	TaskTitle             string
-	TaskStatement         string
-	TaskDifficulty        string
-	TaskPattern           string
-	TaskOptimalTime       string
-	TaskOptimalSpace      string
+	TaskTitle        string
+	TaskStatement    string
+	TaskDifficulty   string
+	TaskPattern      string
+	TaskOptimalTime  string
+	TaskOptimalSpace string
 
 	// Duel context (optional)
 	OpponentCode         string
@@ -188,18 +188,18 @@ func (s *Service) runAIReview(reviewID uuid.UUID, input ReviewInput, attemptNumb
 	}
 
 	update := &model.SolutionReview{
-		Status:            model.ReviewStatusReady,
-		AIVerdict:         model.AIVerdict(aiResult.Verdict),
-		AITimeComplexity:  aiResult.TimeComplexity,
-		AISpaceComplexity: aiResult.SpaceComplexity,
-		AIPattern:         aiResult.Pattern,
-		AIStrengths:       aiResult.Strengths,
-		AIWeaknesses:      aiResult.Weaknesses,
-		AIHint:            aiResult.Hint,
-		AISkillSignals:    aiResult.SkillSignals,
-		AIProvider:        aiResult.Provider,
-		AIModel:           aiResult.Model,
-		ComparisonSummary: aiResult.Comparison,
+		Status:               model.ReviewStatusReady,
+		AIVerdict:            model.AIVerdict(aiResult.Verdict),
+		AITimeComplexity:     aiResult.TimeComplexity,
+		AISpaceComplexity:    aiResult.SpaceComplexity,
+		AIPattern:            aiResult.Pattern,
+		AIStrengths:          aiResult.Strengths,
+		AIWeaknesses:         aiResult.Weaknesses,
+		AIHint:               aiResult.Hint,
+		AISkillSignals:       aiResult.SkillSignals,
+		AIProvider:           aiResult.Provider,
+		AIModel:              aiResult.Model,
+		ComparisonSummary:    aiResult.Comparison,
 		OpponentSubmissionID: input.OpponentSubmissionID,
 	}
 

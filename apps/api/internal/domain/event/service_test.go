@@ -237,4 +237,3 @@ func TestDeleteEvent(t *testing.T) {
 		mockRepo.AssertExpectations(t)
 	})
 }
-

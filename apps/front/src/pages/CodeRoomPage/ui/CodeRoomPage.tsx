@@ -25,6 +25,7 @@ import * as syncProtocol from 'y-protocols/sync'
 import * as encoding from 'lib0/encoding'
 import * as decoding from 'lib0/decoding'
 import { MonacoBinding } from '@/shared/lib/monacoTextBinding'
+import './CodeRoomPage.pixel.css'
 
 /* ─── Solo draft storage (LRU, max 10 tasks) ─── */
 const SOLO_DRAFT_MAX = 10
@@ -164,7 +165,7 @@ function GuestNamePrompt({ onSubmit }: { onSubmit: (name: string) => void }) {
   const [name, setName] = useState('')
   const { t } = useTranslation()
   return (
-    <div className="flex items-center justify-center h-screen bg-[#F0F5F1]">
+    <div className="code-room-pixel flex items-center justify-center h-screen bg-[#F0F5F1]">
       <div className="bg-white rounded-2xl border border-[#C1CFC4] p-8 w-full max-w-sm flex flex-col gap-4">
         <h2 className="text-lg font-bold text-[#111111]">{t('codeRoom.guest.title')}</h2>
         <p className="text-sm text-[#4B6B52]">{t('codeRoom.guest.subtitle')}</p>
@@ -434,7 +435,7 @@ export function CodeRoomPage() {
   const ws = useCodeRoomWs({
     roomId,
     userId: user?.id,
-    displayName: user?.firstName ?? guestNameRef.current ?? 'Guest',
+    displayName: user?.firstName ?? guestNameRef.current ?? t('codeRoom.guest.fallback'),
     guestName: guestNameRef.current,
     mode: room?.mode === 'ROOM_MODE_DUEL' ? 'ROOM_MODE_DUEL' : 'ROOM_MODE_ALL',
     enabled: !!roomId && !needsGuestName && !!room,
@@ -1059,7 +1060,7 @@ export function CodeRoomPage() {
 
   if (isMobile) {
     return (
-      <div className="flex min-h-screen flex-col bg-[#F0F5F1] dark:bg-[#0d1117]">
+      <div className="code-room-pixel flex min-h-screen flex-col bg-[#F0F5F1] dark:bg-[#0d1117]">
         <header className="border-b border-[#d8d9d6] bg-white px-4 pt-3 pb-4 shadow-[0_8px_24px_rgba(15,23,42,0.06)] dark:border-[#1E4035] dark:bg-[#132420]">
           <div className="flex items-start gap-3">
             <button
@@ -1224,9 +1225,9 @@ export function CodeRoomPage() {
                 <button
                   onClick={() => { if (editorRef.current && monacoRef.current) formatEditorCode(editorRef.current, monacoRef.current) }}
                   className="ml-auto rounded-lg px-2 py-1 text-[10px] font-medium text-[#94a3b8] transition-colors hover:bg-[#0B1210] hover:text-white"
-                  title="Format (Shift+Alt+F)"
+                  title={t('codeRoom.formatTooltip')}
                 >
-                  {t('codeRoom.format', 'Format')}
+                  {t('codeRoom.format')}
                 </button>
                 <div className="relative">
                   <button
@@ -1441,9 +1442,19 @@ export function CodeRoomPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-[#F0F5F1] dark:bg-[#0d1117] overflow-hidden">
-      {/* Top bar */}
-      <header className="h-[52px] bg-white dark:bg-[#132420] border-b border-[#C1CFC4] dark:border-[#1E4035] flex items-center justify-between px-5 flex-shrink-0 z-10">
+    <div
+      className="code-room-pixel flex flex-col h-screen overflow-hidden"
+      style={{ background: 'var(--parch-1)' }}
+    >
+      {/* Top bar — pixel chrome (minimal adaptation; full restyle in phase 2) */}
+      <header
+        className="h-[52px] flex items-center justify-between px-5 flex-shrink-0 z-10"
+        style={{
+          background: 'var(--parch-0)',
+          borderBottom: '4px solid var(--ink-0)',
+          boxShadow: 'inset 0 -8px 0 var(--parch-2)',
+        }}
+      >
         <div className="flex items-center gap-3">
           <button
             onClick={() => handleLeaveRoom(false)}
@@ -1532,7 +1543,7 @@ export function CodeRoomPage() {
       </header>
 
       {/* 3-panel layout */}
-      <div className="flex flex-1 min-h-0 bg-[#F0F5F1] dark:bg-[#0d1117]">
+      <div className="flex flex-1 min-h-0" style={{ background: 'var(--parch-1)' }}>
         {/* Problem panel — resizable */}
         <div className="flex-shrink-0 bg-white dark:bg-[#132420] border-r border-[#C1CFC4] dark:border-[#1E4035] flex flex-col" style={{ width: leftWidth }}>
           <div className="flex items-center justify-between border-b border-[#C1CFC4] dark:border-[#1E4035] px-1">
@@ -1545,7 +1556,7 @@ export function CodeRoomPage() {
             {canEditTask && (
               <button
                 onClick={openTaskEditor}
-                title="Edit task statement"
+                title={t('codeRoom.editTaskStatement')}
                 className="mr-2 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F0F5F1] dark:hover:bg-[#162E24] text-[#94a3b8] hover:text-[#059669] transition-colors"
               >
                 <Pencil className="w-3.5 h-3.5" />
@@ -1616,15 +1627,15 @@ export function CodeRoomPage() {
                       style={{ width: `${Math.min(100, ws.opponentCodeLen > 0 ? Math.round((ws.opponentCodeLen / Math.max(ws.opponentCodeLen, currentCodeRef.current.length || 1)) * 100) : 0)}%` }}
                     />
                   </div>
-                  <span className="text-[10px] tabular-nums text-[#7A9982]">{ws.opponentCodeLen} ch</span>
+                  <span className="text-[10px] tabular-nums text-[#7A9982]">{t('codeRoom.opponentChars', { count: ws.opponentCodeLen })}</span>
                 </div>
               )}
               <button
                 onClick={() => { if (editorRef.current && monacoRef.current) formatEditorCode(editorRef.current, monacoRef.current) }}
                 className="ml-auto rounded px-2 py-1 text-[10px] font-medium text-[#94a3b8] transition-colors hover:bg-[#0B1210] hover:text-white"
-                title="Format (Shift+Alt+F)"
+                title={t('codeRoom.formatTooltip')}
               >
-                {t('codeRoom.format', 'Format')}
+                {t('codeRoom.format')}
               </button>
               <div className="relative">
                 <button
@@ -1671,7 +1682,7 @@ export function CodeRoomPage() {
               {isDuelRoom && lockCountdown > 0 && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 pointer-events-none">
                   <div className="flex flex-col items-center gap-2 rounded-xl bg-[#1e293b] px-6 py-4 shadow-xl">
-                    <span className="text-2xl font-bold tabular-nums text-[#ef4444]">{lockCountdown}s</span>
+                    <span className="text-2xl font-bold tabular-nums text-[#ef4444]">{t('codeRoom.lockCountdown', { seconds: lockCountdown })}</span>
                     <span className="text-xs text-[#94a3b8]">{t('codeRoom.duel.editorLocked')}</span>
                   </div>
                 </div>

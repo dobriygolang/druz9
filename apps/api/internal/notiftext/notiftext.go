@@ -39,11 +39,11 @@ func DuelResultBody(topic string, isWinner bool, isDraw bool) string {
 	return fmt.Sprintf("Дуэль завершена. Тема: %s", topic)
 }
 
-// ── Circles ──────────────────────────────────────────────────────
+// ── Guilds ──────────────────────────────────────────────────────
 
-func CircleInviteTitle() string { return "Приглашение в круг" }
+func GuildInviteTitle() string { return "Приглашение в круг" }
 
-func CircleInviteBody(displayName string) string {
+func GuildInviteBody(displayName string) string {
 	if displayName == "" {
 		displayName = "Кто-то"
 	}
@@ -56,10 +56,10 @@ func ChallengeCreatedBody(templateKey string, targetValue int32) string {
 	return fmt.Sprintf("Новый challenge: %s (цель: %d)\nСтарт сейчас, 7 дней", templateKey, targetValue)
 }
 
-func CircleDigestTitle() string { return "Недельный digest" }
+func GuildDigestTitle() string { return "Недельный digest" }
 
-func CircleDigestBody(circleName string, memberCount int) string {
-	return fmt.Sprintf("Круг \"%s\" — итоги недели\nУчастников: %d", circleName, memberCount)
+func GuildDigestBody(guildName string, memberCount int) string {
+	return fmt.Sprintf("Круг \"%s\" — итоги недели\nУчастников: %d", guildName, memberCount)
 }
 
 // ── Interview Prep ───────────────────────────────────────────────

@@ -2,6 +2,52 @@ import { apiClient } from '@/shared/api/base'
 import { createCache } from '@/shared/api/cache'
 import type { CompleteProfilePayload, FeedItem, ProfileProgress, ProfileResponse, User, UserGoal } from '@/entities/User/model/types'
 
+// Lightweight shapes for achievements + activity feed. The backend payload is
+// loose (snake_case / camelCase mix across environments), so the normalizers
+// shield callers from that.
+export interface ProfileAchievement {
+  id: string
+  title: string
+  description: string
+  rarity: string
+  earnedAt: string | null
+  progress: number
+}
+export interface ProfileActivityEntry {
+  id: string
+  kind: string
+  title: string
+  subtitle: string
+  at: string
+}
+function normalizeAchievement(raw: unknown): ProfileAchievement | null {
+  if (!raw || typeof raw !== 'object') return null
+  const a = raw as Record<string, unknown>
+  const id = (a.id ?? a.ID ?? a.key) as string
+  if (!id) return null
+  return {
+    id,
+    title: (a.title as string) ?? (a.name as string) ?? id,
+    description: (a.description as string) ?? '',
+    rarity: (a.rarity as string) ?? 'common',
+    earnedAt: (a.earnedAt as string) ?? (a.earned_at as string) ?? null,
+    progress: (a.progress as number) ?? 0,
+  }
+}
+function normalizeActivity(raw: unknown): ProfileActivityEntry | null {
+  if (!raw || typeof raw !== 'object') return null
+  const a = raw as Record<string, unknown>
+  const id = (a.id ?? a.ID) as string
+  if (!id) return null
+  return {
+    id,
+    kind: (a.kind as string) ?? (a.type as string) ?? 'event',
+    title: (a.title as string) ?? '',
+    subtitle: (a.subtitle as string) ?? (a.description as string) ?? '',
+    at: (a.at as string) ?? (a.createdAt as string) ?? '',
+  }
+}
+
 type BackendUser = {
   id: string
   username?: string
@@ -181,6 +227,14 @@ export const authApi = {
       .finally(() => profileByIdCache.deleteInFlight(userId))
     profileByIdCache.setInFlight(userId, req)
     return req
+  },
+  getProfileAchievements: async (userId: string): Promise<ProfileAchievement[]> => {
+    const r = await apiClient.get<{ achievements?: unknown[] }>(`/api/v1/profile/${userId}/achievements`)
+    return (r.data.achievements ?? []).map(normalizeAchievement).filter(Boolean) as ProfileAchievement[]
+  },
+  getProfileActivity: async (userId: string): Promise<ProfileActivityEntry[]> => {
+    const r = await apiClient.get<{ entries?: unknown[] }>(`/api/v1/profile/${userId}/activity`)
+    return (r.data.entries ?? []).map(normalizeActivity).filter(Boolean) as ProfileActivityEntry[]
   },
   getProfileProgress: async (userId: string): Promise<ProfileProgress> => {
     const cached = profileProgressCache.get(userId)

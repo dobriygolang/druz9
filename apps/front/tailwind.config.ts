@@ -51,12 +51,41 @@ export default {
           700: '#dc2626',
           bg: '#fef2f2',
         },
+        // Pixel RPG redesign palette
+        parch: {
+          0: '#f6ead0', 1: '#ecdcb2', 2: '#dcc690', 3: '#c7ab6e', 4: '#a88850',
+        },
+        ink: {
+          0: '#3b2a1a', 1: '#5a3f27', 2: '#7a593a', 3: '#9a7a54',
+        },
+        moss: {
+          0: '#2d4a35', 1: '#3d6149', 2: '#6b8a6a', 3: '#9fb89a',
+        },
+        ember: {
+          0: '#7a3d12', 1: '#b8692a', 2: '#d48a3c', 3: '#e9b866',
+        },
+        rarity: {
+          common: '#8a735a', uncommon: '#5a7f4c', rare: '#3b6a8f',
+          epic: '#7a4a8f', legendary: '#b8782a',
+        },
       },
       fontFamily: {
         sans: ['Manrope', 'system-ui', 'sans-serif'],
         geist: ['Geist', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
         pixel: ['"Press Start 2P"', 'monospace'],
+        // Pixel RPG redesign fonts
+        display: ['"Pixelify Sans"', '"Silkscreen"', 'monospace'],
+        silkscreen: ['"Silkscreen"', '"JetBrains Mono"', 'monospace'],
+        body: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        'rpg-display': ['32px', { lineHeight: '1.1', fontWeight: '700' }],
+        'rpg-title':   ['22px', { lineHeight: '1.15', fontWeight: '600' }],
+        'rpg-heading': ['17px', { lineHeight: '1.25', fontWeight: '600' }],
+        'rpg-label':   ['14px', { lineHeight: '1.45' }],
+        'rpg-small':   ['12px', { lineHeight: '1.4' }],
+        'rpg-mono':    ['11px', { letterSpacing: '0.02em' }],
       },
       borderRadius: {
         '2xl': '14px',
@@ -66,6 +95,11 @@ export default {
       boxShadow: {
         card: '0 1px 3px 0 rgba(0,0,0,0.06), 0 1px 2px 0 rgba(0,0,0,0.04)',
         modal: '0 20px 60px rgba(0,0,0,0.15)',
+        panel: '4px 4px 0 0 #3b2a1a',
+      },
+      transitionTimingFunction: {
+        step: 'steps(4, end)',
+        'pixel-out': 'cubic-bezier(0.2, 0.8, 0.2, 1)',
       },
       keyframes: {
         'page-in': {

@@ -29,7 +29,7 @@ type UserSettings struct {
 	TelegramChatID         int64
 	DuelsEnabled           bool
 	ProgressEnabled        bool
-	CirclesEnabled         bool
+	GuildsEnabled         bool
 	DailyChallengeEnabled  bool
 	QuietHoursStart        int
 	QuietHoursEnd          int
@@ -39,9 +39,9 @@ type UserSettings struct {
 	ConsecutiveIgnored     int
 }
 
-type CircleSettings struct {
+type GuildSettings struct {
 	UserID          uuid.UUID
-	CircleID        uuid.UUID
+	GuildID        uuid.UUID
 	EventsEnabled   bool
 	ActivityEnabled bool
 	DigestEnabled   bool
@@ -159,17 +159,17 @@ func (r *Repo) GetUserSettings(ctx context.Context, userID uuid.UUID) (*UserSett
 		UserID:          userID,
 		DuelsEnabled:    true,
 		ProgressEnabled: true,
-		CirclesEnabled:  true,
+		GuildsEnabled:  true,
 		QuietHoursStart: 23,
 		QuietHoursEnd:   8,
 		Timezone:        "Europe/Moscow",
 	}
 
 	err := r.db.DB.QueryRow(ctx, `
-		SELECT telegram_chat_id, duels_enabled, progress_enabled, circles_enabled, daily_challenge_enabled,
+		SELECT telegram_chat_id, duels_enabled, progress_enabled, guilds_enabled, daily_challenge_enabled,
 		       quiet_hours_start, quiet_hours_end, timezone, engagement_paused, last_engagement_sent_at, consecutive_ignored
 		FROM user_notification_settings WHERE user_id = $1`, userID).Scan(
-		&s.TelegramChatID, &s.DuelsEnabled, &s.ProgressEnabled, &s.CirclesEnabled, &s.DailyChallengeEnabled,
+		&s.TelegramChatID, &s.DuelsEnabled, &s.ProgressEnabled, &s.GuildsEnabled, &s.DailyChallengeEnabled,
 		&s.QuietHoursStart, &s.QuietHoursEnd, &s.Timezone, &s.EngagementPaused, &s.LastEngagementSentAt, &s.ConsecutiveIgnored,
 	)
 	if err == pgx.ErrNoRows {
@@ -181,19 +181,19 @@ func (r *Repo) GetUserSettings(ctx context.Context, userID uuid.UUID) (*UserSett
 // UpsertUserSettings creates or updates user notification settings.
 func (r *Repo) UpsertUserSettings(ctx context.Context, s *UserSettings) error {
 	_, err := r.db.DB.Exec(ctx, `
-		INSERT INTO user_notification_settings (user_id, telegram_chat_id, duels_enabled, progress_enabled, circles_enabled, daily_challenge_enabled, quiet_hours_start, quiet_hours_end, timezone)
+		INSERT INTO user_notification_settings (user_id, telegram_chat_id, duels_enabled, progress_enabled, guilds_enabled, daily_challenge_enabled, quiet_hours_start, quiet_hours_end, timezone)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 		ON CONFLICT (user_id) DO UPDATE SET
 			telegram_chat_id = EXCLUDED.telegram_chat_id,
 			duels_enabled = EXCLUDED.duels_enabled,
 			progress_enabled = EXCLUDED.progress_enabled,
-			circles_enabled = EXCLUDED.circles_enabled,
+			guilds_enabled = EXCLUDED.guilds_enabled,
 			daily_challenge_enabled = EXCLUDED.daily_challenge_enabled,
 			quiet_hours_start = EXCLUDED.quiet_hours_start,
 			quiet_hours_end = EXCLUDED.quiet_hours_end,
 			timezone = EXCLUDED.timezone,
 			updated_at = NOW()`,
-		s.UserID, s.TelegramChatID, s.DuelsEnabled, s.ProgressEnabled, s.CirclesEnabled, s.DailyChallengeEnabled,
+		s.UserID, s.TelegramChatID, s.DuelsEnabled, s.ProgressEnabled, s.GuildsEnabled, s.DailyChallengeEnabled,
 		s.QuietHoursStart, s.QuietHoursEnd, s.Timezone,
 	)
 	return err
@@ -253,16 +253,16 @@ func (r *Repo) GetSettingsByTelegramChatID(ctx context.Context, chatID int64) (*
 		TelegramChatID:  chatID,
 		DuelsEnabled:    true,
 		ProgressEnabled: true,
-		CirclesEnabled:  true,
+		GuildsEnabled:  true,
 		QuietHoursStart: 23,
 		QuietHoursEnd:   8,
 		Timezone:        "Europe/Moscow",
 	}
 	err := r.db.DB.QueryRow(ctx, `
-		SELECT user_id, duels_enabled, progress_enabled, circles_enabled, daily_challenge_enabled,
+		SELECT user_id, duels_enabled, progress_enabled, guilds_enabled, daily_challenge_enabled,
 		       quiet_hours_start, quiet_hours_end, timezone
 		FROM user_notification_settings WHERE telegram_chat_id = $1`, chatID).Scan(
-		&s.UserID, &s.DuelsEnabled, &s.ProgressEnabled, &s.CirclesEnabled, &s.DailyChallengeEnabled,
+		&s.UserID, &s.DuelsEnabled, &s.ProgressEnabled, &s.GuildsEnabled, &s.DailyChallengeEnabled,
 		&s.QuietHoursStart, &s.QuietHoursEnd, &s.Timezone,
 	)
 	if err == pgx.ErrNoRows {
@@ -276,7 +276,7 @@ func (r *Repo) GetSettingsByTelegramChatID(ctx context.Context, chatID int64) (*
 func (r *Repo) EnableAllByTelegramChatID(ctx context.Context, chatID int64) error {
 	_, err := r.db.DB.Exec(ctx, `
 		UPDATE user_notification_settings
-		SET duels_enabled = true, progress_enabled = true, circles_enabled = true,
+		SET duels_enabled = true, progress_enabled = true, guilds_enabled = true,
 		    daily_challenge_enabled = true, updated_at = NOW()
 		WHERE telegram_chat_id = $1`, chatID)
 	return err
@@ -287,19 +287,19 @@ func (r *Repo) EnableAllByTelegramChatID(ctx context.Context, chatID int64) erro
 func (r *Repo) DisableAllByTelegramChatID(ctx context.Context, chatID int64) error {
 	_, err := r.db.DB.Exec(ctx, `
 		UPDATE user_notification_settings
-		SET duels_enabled = false, progress_enabled = false, circles_enabled = false,
+		SET duels_enabled = false, progress_enabled = false, guilds_enabled = false,
 		    daily_challenge_enabled = false, updated_at = NOW()
 		WHERE telegram_chat_id = $1`, chatID)
 	return err
 }
 
-// ── Circle Settings ───────────────────────────────────────────
+// ── Guild Settings ───────────────────────────────────────────
 
-// GetCircleSettings returns per-circle settings, or defaults if none exist.
-func (r *Repo) GetCircleSettings(ctx context.Context, userID, circleID uuid.UUID) (*CircleSettings, error) {
-	s := &CircleSettings{
+// GetGuildSettings returns per-guild settings, or defaults if none exist.
+func (r *Repo) GetGuildSettings(ctx context.Context, userID, guildID uuid.UUID) (*GuildSettings, error) {
+	s := &GuildSettings{
 		UserID:          userID,
-		CircleID:        circleID,
+		GuildID:        guildID,
 		EventsEnabled:   true,
 		ActivityEnabled: true,
 		DigestEnabled:   true,
@@ -307,7 +307,7 @@ func (r *Repo) GetCircleSettings(ctx context.Context, userID, circleID uuid.UUID
 
 	err := r.db.DB.QueryRow(ctx, `
 		SELECT events_enabled, activity_enabled, digest_enabled, muted
-		FROM circle_notification_settings WHERE user_id = $1 AND circle_id = $2`, userID, circleID).Scan(
+		FROM guild_notification_settings WHERE user_id = $1 AND guild_id = $2`, userID, guildID).Scan(
 		&s.EventsEnabled, &s.ActivityEnabled, &s.DigestEnabled, &s.Muted,
 	)
 	if err == pgx.ErrNoRows {
@@ -316,18 +316,18 @@ func (r *Repo) GetCircleSettings(ctx context.Context, userID, circleID uuid.UUID
 	return s, err
 }
 
-// UpsertCircleSettings creates or updates per-circle notification settings.
-func (r *Repo) UpsertCircleSettings(ctx context.Context, s *CircleSettings) error {
+// UpsertGuildSettings creates or updates per-guild notification settings.
+func (r *Repo) UpsertGuildSettings(ctx context.Context, s *GuildSettings) error {
 	_, err := r.db.DB.Exec(ctx, `
-		INSERT INTO circle_notification_settings (user_id, circle_id, events_enabled, activity_enabled, digest_enabled, muted)
+		INSERT INTO guild_notification_settings (user_id, guild_id, events_enabled, activity_enabled, digest_enabled, muted)
 		VALUES ($1, $2, $3, $4, $5, $6)
-		ON CONFLICT (user_id, circle_id) DO UPDATE SET
+		ON CONFLICT (user_id, guild_id) DO UPDATE SET
 			events_enabled = EXCLUDED.events_enabled,
 			activity_enabled = EXCLUDED.activity_enabled,
 			digest_enabled = EXCLUDED.digest_enabled,
 			muted = EXCLUDED.muted,
 			updated_at = NOW()`,
-		s.UserID, s.CircleID, s.EventsEnabled, s.ActivityEnabled, s.DigestEnabled, s.Muted,
+		s.UserID, s.GuildID, s.EventsEnabled, s.ActivityEnabled, s.DigestEnabled, s.Muted,
 	)
 	return err
 }

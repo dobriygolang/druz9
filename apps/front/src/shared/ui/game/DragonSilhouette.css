@@ -1,0 +1,12 @@
+.gm-dragon {
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+.gm-dragon-flying {
+  animation: gm-dragon-float 8s ease-in-out infinite;
+}
+@keyframes gm-dragon-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}

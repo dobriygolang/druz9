@@ -11,12 +11,12 @@ import (
 // CodeReviewRequest holds everything needed for a post-solve code review.
 type CodeReviewRequest struct {
 	// Task context
-	TaskTitle             string
-	TaskStatement         string
-	TaskPattern           string // known pattern from task metadata (may be empty)
-	TaskOptimalTime       string // e.g. "O(n)"
-	TaskOptimalSpace      string // e.g. "O(1)"
-	TaskDifficulty        string // "easy", "medium", "hard"
+	TaskTitle        string
+	TaskStatement    string
+	TaskPattern      string // known pattern from task metadata (may be empty)
+	TaskOptimalTime  string // e.g. "O(n)"
+	TaskOptimalSpace string // e.g. "O(1)"
+	TaskDifficulty   string // "easy", "medium", "hard"
 
 	// Candidate submission
 	CandidateCode     string

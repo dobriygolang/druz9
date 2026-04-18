@@ -50,6 +50,14 @@ service CodeEditorService {
     };
   }
 
+  // UpdateRoom updates the room's task and/or privacy flag. Either field may be omitted.
+  rpc UpdateRoom(UpdateRoomRequest) returns (StatusResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/code-editor/rooms/{room_id}"
+      body: "*"
+    };
+  }
+
   rpc SubmitCode(SubmitCodeRequest) returns (SubmitCodeResponse) {
     option (google.api.http) = {
       post: "/api/v1/code-editor/rooms/{room_id}/submit"
@@ -61,12 +69,6 @@ service CodeEditorService {
     option (google.api.http) = {
       post: "/api/v1/code-editor/rooms/{room_id}/ready"
       body: "*"
-    };
-  }
-
-  rpc GetSubmissions(GetSubmissionsRequest) returns (GetSubmissionsResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/code-editor/rooms/{room_id}/submissions"
     };
   }
 
@@ -211,6 +213,12 @@ message CloseRoomRequest {
   string room_id = 1;
 }
 
+message UpdateRoomRequest {
+  string          room_id    = 1;
+  optional string task       = 2;
+  optional bool   is_private = 3;
+}
+
 message SubmitCodeRequest {
   string                        room_id   = 1;
   string                        code      = 2;
@@ -220,10 +228,6 @@ message SubmitCodeRequest {
 message SetReadyRequest {
   string room_id = 1;
   bool   ready   = 2;
-}
-
-message GetSubmissionsRequest {
-  string room_id = 1;
 }
 
 message ListTasksRequest {
@@ -310,10 +314,6 @@ message SubmitCodeResponse {
   string submission_id = 4;
 }
 
-message GetSubmissionsResponse {
-  repeated Submission submissions = 1;
-}
-
 message ListTasksResponse {
   repeated Task tasks = 1;
 }
@@ -361,20 +361,6 @@ message Participant {
   bool                      is_winner  = 5;
   google.protobuf.Timestamp joined_at  = 6;
   bool                      is_creator = 7;
-}
-
-message Submission {
-  string                    id           = 1;
-  string                    user_id      = 2;
-  string                    guest_name   = 3;
-  string                    code         = 4;
-  string                    output       = 5;
-  string                    error        = 6;
-  google.protobuf.Timestamp submitted_at = 7;
-  int64                     duration_ms  = 8;
-  bool                      is_correct   = 9;
-  int32                     passed_count = 10;
-  int32                     total_count  = 11;
 }
 
 message TaskTestCase {

@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"api/internal/realtime"
+	arenart "api/internal/realtime/arena"
+	codeeditorrt "api/internal/realtime/codeeditor"
 	server "api/internal/server"
 
 	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
@@ -18,12 +19,12 @@ const (
 )
 
 // Register mounts both WebSocket endpoints on the HTTP server.
-func Register(srv *kratoshttp.Server, codeEditorHub *realtime.CodeEditorHub, arenaHub *realtime.ArenaHub, auth server.Authorizer) {
+func Register(srv *kratoshttp.Server, codeEditorHub *codeeditorrt.Hub, arenaHub *arenart.Hub, auth server.Authorizer) {
 	srv.HandlePrefix(CodeEditorPrefix, codeEditorHandler(codeEditorHub, auth))
 	srv.HandlePrefix(ArenaPrefix, arenaHandler(arenaHub, auth))
 }
 
-func codeEditorHandler(hub *realtime.CodeEditorHub, auth server.Authorizer) http.Handler {
+func codeEditorHandler(hub *codeeditorrt.Hub, auth server.Authorizer) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc(CodeEditorPrefix, func(w http.ResponseWriter, r *http.Request) {
 		roomID := extractID(r.URL.Path, CodeEditorPrefix)
@@ -40,7 +41,7 @@ func codeEditorHandler(hub *realtime.CodeEditorHub, auth server.Authorizer) http
 	return mux
 }
 
-func arenaHandler(hub *realtime.ArenaHub, auth server.Authorizer) http.Handler {
+func arenaHandler(hub *arenart.Hub, auth server.Authorizer) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc(ArenaPrefix, func(w http.ResponseWriter, r *http.Request) {
 		matchID := extractID(r.URL.Path, ArenaPrefix)

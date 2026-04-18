@@ -1,9 +1,8 @@
-import { useState, useCallback } from 'react'
-import { Eye, Send, Star, Loader2 } from 'lucide-react'
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+
+import { Panel, RpgButton, Badge, PageHeader } from '@/shared/ui/pixel'
 import { apiClient } from '@/shared/api/base'
-import { Card } from '@/shared/ui/Card'
-import { Button } from '@/shared/ui/Button'
 import { PageMeta } from '@/shared/ui/PageMeta'
 
 interface BlindReviewTask {
@@ -19,6 +18,12 @@ interface BlindReviewResult {
   id: string
   aiScore: number
   aiFeedback: string
+}
+
+function scoreColor(score: number): string {
+  if (score >= 8) return 'var(--moss-1)'
+  if (score >= 5) return 'var(--ember-1)'
+  return 'var(--rpg-danger, #a23a2a)'
 }
 
 export function BlindReviewPage() {
@@ -65,109 +70,179 @@ export function BlindReviewPage() {
     }
   }, [task, review, t])
 
-  const scoreColor = (score: number) => {
-    if (score >= 8) return 'text-emerald-500'
-    if (score >= 5) return 'text-amber-500'
-    return 'text-red-500'
-  }
-
   return (
-    <div className="flex flex-col gap-4 px-4 pt-4 pb-6 md:px-6">
-      <PageMeta title={t('blindReview.meta.title', 'Blind Review')} description={t('blindReview.meta.desc', 'Review anonymous code and get AI feedback')} canonicalPath="/practice/blind-review" />
-
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-bold text-[#111111] dark:text-[#E2F0E8]">
-            {t('blindReview.title', 'Blind Code Review')}
-          </h1>
-          <p className="mt-1 text-xs text-[#7A9982] dark:text-[#7BA88A]">
-            {t('blindReview.subtitle', 'Review anonymous code. AI evaluates the quality of your review.')}
-          </p>
-        </div>
-        <Button variant="primary" size="sm" onClick={fetchTask} disabled={fetchingTask}>
-          {fetchingTask ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
-          {task ? t('blindReview.next', 'Next') : t('blindReview.start', 'Start')}
-        </Button>
-      </div>
+    <>
+      <PageMeta
+        title={t('blindReview.meta.title', 'Blind Review')}
+        description={t('blindReview.meta.desc', 'Review anonymous code and get AI feedback')}
+        canonicalPath="/practice/blind-review"
+      />
+      <PageHeader
+        eyebrow="Workshop · blind review"
+        title={t('blindReview.title', 'Blind Code Review')}
+        subtitle={t('blindReview.subtitle', 'Review anonymous code. AI evaluates the quality of your review.')}
+        right={
+          <RpgButton size="sm" variant="primary" onClick={() => void fetchTask()} disabled={fetchingTask}>
+            {fetchingTask ? 'Loading…' : task ? t('blindReview.next', 'Next →') : t('blindReview.start', '👁 Start')}
+          </RpgButton>
+        }
+      />
 
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
-          {error}
-        </div>
+        <Panel style={{ marginBottom: 18, borderColor: 'var(--rpg-danger, #a23a2a)' }}>
+          <div style={{ color: 'var(--rpg-danger, #a23a2a)', fontSize: 13 }}>{error}</div>
+        </Panel>
+      )}
+
+      {!task && !error && (
+        <Panel>
+          <div style={{ padding: 32, textAlign: 'center' }}>
+            <div style={{ fontSize: 40, marginBottom: 10 }}>👁</div>
+            <div
+              style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14, color: 'var(--ink-1)', marginBottom: 4 }}
+            >
+              {t('blindReview.empty', 'Click "Start" to get anonymous code for review')}
+            </div>
+            <div
+              className="font-silkscreen uppercase"
+              style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
+            >
+              {t('blindReview.emptyHint', 'AI will evaluate the quality of your code review')}
+            </div>
+          </div>
+        </Panel>
       )}
 
       {task && !result && (
-        <div className="grid gap-4 lg:grid-cols-2">
-          <Card padding="lg">
-            <h2 className="mb-2 text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 18 }}>
+          {/* Anonymous code */}
+          <Panel>
+            <h2 className="font-display" style={{ fontSize: 17, margin: '0 0 6px' }}>
               {task.taskTitle}
             </h2>
-            <p className="mb-3 text-xs text-[#7A9982] dark:text-[#7BA88A]">
-              {task.taskStatement.slice(0, 300)}{task.taskStatement.length > 300 ? '...' : ''}
-            </p>
-            <pre className="max-h-[400px] overflow-auto rounded-lg bg-[#1e1e1e] p-4 text-xs text-[#d4d4d4]">
+            <div style={{ fontSize: 12, color: 'var(--ink-2)', marginBottom: 10, lineHeight: 1.5 }}>
+              {task.taskStatement.slice(0, 300)}
+              {task.taskStatement.length > 300 && '…'}
+            </div>
+            <pre
+              style={{
+                maxHeight: 400,
+                overflow: 'auto',
+                padding: 12,
+                background: '#1e1e1e',
+                color: '#d4d4d4',
+                fontFamily: '"JetBrains Mono", monospace',
+                fontSize: 12,
+                lineHeight: 1.5,
+                border: '2px solid var(--ink-0)',
+                margin: 0,
+              }}
+            >
               <code>{task.code}</code>
             </pre>
-          </Card>
+          </Panel>
 
-          <Card padding="lg">
-            <h2 className="mb-2 text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">
+          {/* Your review */}
+          <Panel>
+            <h2 className="font-display" style={{ fontSize: 17, margin: '0 0 10px' }}>
               {t('blindReview.yourReview', 'Your Code Review')}
             </h2>
             <textarea
               value={review}
               onChange={(e) => setReview(e.target.value)}
-              placeholder={t('blindReview.placeholder', 'What issues do you see? What would you improve? Be specific...')}
-              className="h-[300px] w-full rounded-lg border border-[#C1CFC4] bg-white p-3 text-sm text-[#111111] placeholder:text-[#94a3b8] focus:border-[#059669] focus:outline-none dark:border-[#1E4035] dark:bg-[#132420] dark:text-[#E2F0E8]"
+              placeholder={t(
+                'blindReview.placeholder',
+                'What issues do you see? What would you improve? Be specific…',
+              )}
+              style={{
+                height: 300,
+                width: '100%',
+                padding: 12,
+                background: 'var(--parch-0)',
+                border: '3px solid var(--ink-0)',
+                fontFamily: 'Pixelify Sans, monospace',
+                fontSize: 13,
+                color: 'var(--ink-0)',
+                outline: 'none',
+                resize: 'vertical',
+                boxShadow: 'inset 2px 2px 0 var(--parch-3)',
+                boxSizing: 'border-box',
+              }}
             />
-            <div className="mt-3 flex items-center justify-between">
-              <span className="text-[11px] text-[#7A9982] dark:text-[#7BA88A]">
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: 12,
+              }}
+            >
+              <span
+                className="font-silkscreen uppercase"
+                style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
+              >
                 {review.length} {t('blindReview.chars', 'characters')}
               </span>
-              <Button variant="primary" size="sm" onClick={submitReview} disabled={loading || review.trim().length < 10}>
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                {t('blindReview.submit', 'Submit Review')}
-              </Button>
+              <RpgButton
+                size="sm"
+                variant="primary"
+                onClick={() => void submitReview()}
+                disabled={loading || review.trim().length < 10}
+              >
+                {loading ? 'Sending…' : t('blindReview.submit', 'Submit Review')}
+              </RpgButton>
             </div>
-          </Card>
+          </Panel>
         </div>
       )}
 
       {result && (
-        <Card padding="lg" className="section-enter">
-          <div className="flex items-center gap-3">
-            <Star className={`h-8 w-8 ${scoreColor(result.aiScore)}`} />
+        <Panel>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}>
+            <div style={{ fontSize: 36 }}>★</div>
             <div>
-              <p className={`font-mono text-3xl font-bold ${scoreColor(result.aiScore)}`}>
+              <div
+                style={{
+                  fontFamily: 'Pixelify Sans, monospace',
+                  fontSize: 32,
+                  color: scoreColor(result.aiScore),
+                  lineHeight: 1,
+                }}
+              >
                 {result.aiScore}/10
-              </p>
-              <p className="text-xs text-[#7A9982] dark:text-[#7BA88A]">
+              </div>
+              <div
+                className="font-silkscreen uppercase"
+                style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em', marginTop: 2 }}
+              >
                 {t('blindReview.reviewScore', 'Review Quality Score')}
-              </p>
+              </div>
             </div>
+            <div style={{ flex: 1 }} />
+            <Badge variant={result.aiScore >= 8 ? 'moss' : result.aiScore >= 5 ? 'ember' : 'dark'}>
+              {result.aiScore >= 8 ? 'excellent' : result.aiScore >= 5 ? 'solid' : 'needs work'}
+            </Badge>
           </div>
           {result.aiFeedback && (
-            <p className="mt-4 text-sm leading-relaxed text-[#4B6B52] dark:text-[#94a3b8]">
+            <div
+              style={{
+                fontSize: 13,
+                color: 'var(--ink-1)',
+                lineHeight: 1.6,
+                background: 'var(--parch-2)',
+                padding: 14,
+                border: '2px solid var(--ink-0)',
+                marginBottom: 14,
+              }}
+            >
               {result.aiFeedback}
-            </p>
+            </div>
           )}
-          <Button variant="secondary" size="sm" className="mt-4" onClick={fetchTask}>
+          <RpgButton variant="ghost" onClick={() => void fetchTask()}>
             {t('blindReview.tryAnother', 'Review another')}
-          </Button>
-        </Card>
+          </RpgButton>
+        </Panel>
       )}
-
-      {!task && !error && (
-        <Card padding="lg" className="flex flex-col items-center justify-center py-12 text-center">
-          <Eye className="mb-3 h-10 w-10 text-[#C1CFC4] dark:text-[#1E4035]" />
-          <p className="text-sm font-medium text-[#4B6B52] dark:text-[#94a3b8]">
-            {t('blindReview.empty', 'Click "Start" to get anonymous code for review')}
-          </p>
-          <p className="mt-1 text-xs text-[#7A9982] dark:text-[#7BA88A]">
-            {t('blindReview.emptyHint', 'AI will evaluate the quality of your code review')}
-          </p>
-        </Card>
-      )}
-    </div>
+    </>
   )
 }

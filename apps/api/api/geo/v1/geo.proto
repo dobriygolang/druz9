@@ -20,6 +20,14 @@ service GeoService {
       get: "/api/v1/geo/community"
     };
   }
+
+  // WorldPins aggregates locations of guild halls and upcoming events so
+  // the front-end world map can render a single query per view.
+  rpc WorldPins(WorldPinsRequest) returns (WorldPinsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/geo/world-pins"
+    };
+  }
 }
 
 message ResolveRequest {
@@ -58,5 +66,31 @@ message CommunityMapPoint {
   string last_name = 10;
   common.v1.UserActivityStatus activity_status = 11;
   string telegram_username = 12;
+}
+
+enum WorldPinKind {
+  WORLD_PIN_KIND_UNSPECIFIED = 0;
+  WORLD_PIN_KIND_GUILD       = 1;
+  WORLD_PIN_KIND_EVENT       = 2;
+  WORLD_PIN_KIND_PLAYER      = 3;  // reserved: current viewer's location
+}
+
+message WorldPin {
+  string       id         = 1;
+  WorldPinKind kind       = 2;
+  string       title      = 3;
+  string       subtitle   = 4;   // "23 members · mossveil" / "Oct 18 · lecture"
+  double       latitude   = 5;
+  double       longitude  = 6;
+  string       region     = 7;
+  string       icon_ref   = 8;   // sprite hint (banner/scroll/hero)
+  string       link_path  = 9;   // "/guild/<id>" or "/events/<id>"
+  bool         is_hot     = 10;  // upcoming within 24h / user is member
+}
+
+message WorldPinsRequest {}
+
+message WorldPinsResponse {
+  repeated WorldPin pins = 1;
 }
 

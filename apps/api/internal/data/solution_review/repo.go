@@ -23,12 +23,8 @@ func NewRepo(dataLayer *postgres.Store) *Repo {
 }
 
 // Create inserts a new solution review (Level 1 data, status=pending).
+// AI skill signals are populated later in UpdateAIReview, not here.
 func (r *Repo) Create(ctx context.Context, review *model.SolutionReview) error {
-	skillSignals, _ := json.Marshal(review.AISkillSignals)
-	if string(skillSignals) == "null" {
-		skillSignals = []byte("{}")
-	}
-
 	_, err := r.data.DB.Exec(ctx, `
 		INSERT INTO solution_reviews (
 			id, user_id, submission_id, source_type, task_id,

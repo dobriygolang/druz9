@@ -28,7 +28,6 @@ const OperationCodeEditorServiceGetDailyChallenge = "/code_editor.v1.CodeEditorS
 const OperationCodeEditorServiceGetLeaderboard = "/code_editor.v1.CodeEditorService/GetLeaderboard"
 const OperationCodeEditorServiceGetRoom = "/code_editor.v1.CodeEditorService/GetRoom"
 const OperationCodeEditorServiceGetSolutionReview = "/code_editor.v1.CodeEditorService/GetSolutionReview"
-const OperationCodeEditorServiceGetSubmissions = "/code_editor.v1.CodeEditorService/GetSubmissions"
 const OperationCodeEditorServiceJoinRoom = "/code_editor.v1.CodeEditorService/JoinRoom"
 const OperationCodeEditorServiceJoinRoomByInviteCode = "/code_editor.v1.CodeEditorService/JoinRoomByInviteCode"
 const OperationCodeEditorServiceLeaveRoom = "/code_editor.v1.CodeEditorService/LeaveRoom"
@@ -37,6 +36,7 @@ const OperationCodeEditorServiceListTasks = "/code_editor.v1.CodeEditorService/L
 const OperationCodeEditorServiceSetReady = "/code_editor.v1.CodeEditorService/SetReady"
 const OperationCodeEditorServiceStartRoom = "/code_editor.v1.CodeEditorService/StartRoom"
 const OperationCodeEditorServiceSubmitCode = "/code_editor.v1.CodeEditorService/SubmitCode"
+const OperationCodeEditorServiceUpdateRoom = "/code_editor.v1.CodeEditorService/UpdateRoom"
 const OperationCodeEditorServiceUpdateTask = "/code_editor.v1.CodeEditorService/UpdateTask"
 
 type CodeEditorServiceHTTPServer interface {
@@ -49,7 +49,6 @@ type CodeEditorServiceHTTPServer interface {
 	GetLeaderboard(context.Context, *GetLeaderboardRequest) (*GetLeaderboardResponse, error)
 	GetRoom(context.Context, *GetRoomRequest) (*GetRoomResponse, error)
 	GetSolutionReview(context.Context, *GetSolutionReviewRequest) (*SolutionReviewResponse, error)
-	GetSubmissions(context.Context, *GetSubmissionsRequest) (*GetSubmissionsResponse, error)
 	JoinRoom(context.Context, *JoinRoomRequest) (*JoinRoomResponse, error)
 	JoinRoomByInviteCode(context.Context, *JoinRoomByInviteCodeRequest) (*JoinRoomResponse, error)
 	LeaveRoom(context.Context, *LeaveRoomRequest) (*StatusResponse, error)
@@ -58,6 +57,8 @@ type CodeEditorServiceHTTPServer interface {
 	SetReady(context.Context, *SetReadyRequest) (*StatusResponse, error)
 	StartRoom(context.Context, *StartRoomRequest) (*StartRoomResponse, error)
 	SubmitCode(context.Context, *SubmitCodeRequest) (*SubmitCodeResponse, error)
+	// UpdateRoom UpdateRoom updates the room's task and/or privacy flag. Either field may be omitted.
+	UpdateRoom(context.Context, *UpdateRoomRequest) (*StatusResponse, error)
 	UpdateTask(context.Context, *UpdateTaskRequest) (*TaskResponse, error)
 }
 
@@ -69,9 +70,9 @@ func RegisterCodeEditorServiceHTTPServer(s *http.Server, srv CodeEditorServiceHT
 	r.POST("/api/v1/code-editor/join", _CodeEditorService_JoinRoomByInviteCode0_HTTP_Handler(srv))
 	r.POST("/api/v1/code-editor/rooms/{room_id}/leave", _CodeEditorService_LeaveRoom0_HTTP_Handler(srv))
 	r.POST("/api/v1/code-editor/rooms/{room_id}/close", _CodeEditorService_CloseRoom0_HTTP_Handler(srv))
+	r.PATCH("/api/v1/code-editor/rooms/{room_id}", _CodeEditorService_UpdateRoom0_HTTP_Handler(srv))
 	r.POST("/api/v1/code-editor/rooms/{room_id}/submit", _CodeEditorService_SubmitCode0_HTTP_Handler(srv))
 	r.POST("/api/v1/code-editor/rooms/{room_id}/ready", _CodeEditorService_SetReady0_HTTP_Handler(srv))
-	r.GET("/api/v1/code-editor/rooms/{room_id}/submissions", _CodeEditorService_GetSubmissions0_HTTP_Handler(srv))
 	r.GET("/api/v1/code-editor/tasks", _CodeEditorService_ListTasks0_HTTP_Handler(srv))
 	r.POST("/api/admin/code-editor/tasks", _CodeEditorService_CreateTask0_HTTP_Handler(srv))
 	r.PUT("/api/admin/code-editor/tasks/{task_id}", _CodeEditorService_UpdateTask0_HTTP_Handler(srv))
@@ -225,6 +226,31 @@ func _CodeEditorService_CloseRoom0_HTTP_Handler(srv CodeEditorServiceHTTPServer)
 	}
 }
 
+func _CodeEditorService_UpdateRoom0_HTTP_Handler(srv CodeEditorServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateRoomRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationCodeEditorServiceUpdateRoom)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateRoom(ctx, req.(*UpdateRoomRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*StatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _CodeEditorService_SubmitCode0_HTTP_Handler(srv CodeEditorServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in SubmitCodeRequest
@@ -271,28 +297,6 @@ func _CodeEditorService_SetReady0_HTTP_Handler(srv CodeEditorServiceHTTPServer) 
 			return err
 		}
 		reply := out.(*StatusResponse)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _CodeEditorService_GetSubmissions0_HTTP_Handler(srv CodeEditorServiceHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in GetSubmissionsRequest
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindVars(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationCodeEditorServiceGetSubmissions)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.GetSubmissions(ctx, req.(*GetSubmissionsRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*GetSubmissionsResponse)
 		return ctx.Result(200, reply)
 	}
 }
@@ -521,7 +525,6 @@ type CodeEditorServiceHTTPClient interface {
 	GetLeaderboard(ctx context.Context, req *GetLeaderboardRequest, opts ...http.CallOption) (rsp *GetLeaderboardResponse, err error)
 	GetRoom(ctx context.Context, req *GetRoomRequest, opts ...http.CallOption) (rsp *GetRoomResponse, err error)
 	GetSolutionReview(ctx context.Context, req *GetSolutionReviewRequest, opts ...http.CallOption) (rsp *SolutionReviewResponse, err error)
-	GetSubmissions(ctx context.Context, req *GetSubmissionsRequest, opts ...http.CallOption) (rsp *GetSubmissionsResponse, err error)
 	JoinRoom(ctx context.Context, req *JoinRoomRequest, opts ...http.CallOption) (rsp *JoinRoomResponse, err error)
 	JoinRoomByInviteCode(ctx context.Context, req *JoinRoomByInviteCodeRequest, opts ...http.CallOption) (rsp *JoinRoomResponse, err error)
 	LeaveRoom(ctx context.Context, req *LeaveRoomRequest, opts ...http.CallOption) (rsp *StatusResponse, err error)
@@ -530,6 +533,8 @@ type CodeEditorServiceHTTPClient interface {
 	SetReady(ctx context.Context, req *SetReadyRequest, opts ...http.CallOption) (rsp *StatusResponse, err error)
 	StartRoom(ctx context.Context, req *StartRoomRequest, opts ...http.CallOption) (rsp *StartRoomResponse, err error)
 	SubmitCode(ctx context.Context, req *SubmitCodeRequest, opts ...http.CallOption) (rsp *SubmitCodeResponse, err error)
+	// UpdateRoom UpdateRoom updates the room's task and/or privacy flag. Either field may be omitted.
+	UpdateRoom(ctx context.Context, req *UpdateRoomRequest, opts ...http.CallOption) (rsp *StatusResponse, err error)
 	UpdateTask(ctx context.Context, req *UpdateTaskRequest, opts ...http.CallOption) (rsp *TaskResponse, err error)
 }
 
@@ -658,19 +663,6 @@ func (c *CodeEditorServiceHTTPClientImpl) GetSolutionReview(ctx context.Context,
 	return &out, nil
 }
 
-func (c *CodeEditorServiceHTTPClientImpl) GetSubmissions(ctx context.Context, in *GetSubmissionsRequest, opts ...http.CallOption) (*GetSubmissionsResponse, error) {
-	var out GetSubmissionsResponse
-	pattern := "/api/v1/code-editor/rooms/{room_id}/submissions"
-	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationCodeEditorServiceGetSubmissions))
-	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, nil
-}
-
 func (c *CodeEditorServiceHTTPClientImpl) JoinRoom(ctx context.Context, in *JoinRoomRequest, opts ...http.CallOption) (*JoinRoomResponse, error) {
 	var out JoinRoomResponse
 	pattern := "/api/v1/code-editor/rooms/{room_id}/join"
@@ -769,6 +761,20 @@ func (c *CodeEditorServiceHTTPClientImpl) SubmitCode(ctx context.Context, in *Su
 	opts = append(opts, http.Operation(OperationCodeEditorServiceSubmitCode))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// UpdateRoom UpdateRoom updates the room's task and/or privacy flag. Either field may be omitted.
+func (c *CodeEditorServiceHTTPClientImpl) UpdateRoom(ctx context.Context, in *UpdateRoomRequest, opts ...http.CallOption) (*StatusResponse, error) {
+	var out StatusResponse
+	pattern := "/api/v1/code-editor/rooms/{room_id}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationCodeEditorServiceUpdateRoom))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PATCH", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

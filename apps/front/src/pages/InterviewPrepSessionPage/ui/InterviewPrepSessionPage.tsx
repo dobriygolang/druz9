@@ -10,7 +10,6 @@ import { useToast } from '@/shared/ui/Toast'
 import { useTranslation } from 'react-i18next'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import { registerFormatKeybinding } from '@/shared/lib/editorFormat'
-import { PREP_TYPE_LABELS } from '@/shared/lib/taskLabels'
 import { getLanguageLabel, getMonacoLanguage } from '@/shared/lib/codeEditorLanguage'
 import type * as Monaco from 'monaco-editor'
 
@@ -95,6 +94,7 @@ export function InterviewPrepSessionPage() {
   const question = session?.currentQuestion
   const isCodeTask = task?.isExecutable
   const supportedLanguages = resolveSupportedLanguages(task)
+  const prepTypeLabel = task?.prepType ? t(`interviewPrep.prepType.${task.prepType}`, { defaultValue: task.prepType }) : ''
 
   const handleEditorMount = useCallback((editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
     editorRef.current = editor
@@ -112,7 +112,7 @@ export function InterviewPrepSessionPage() {
         </button>
         <div>
           <p className="text-sm font-bold text-[#0B1210] dark:text-[#E2F0E8]">{task?.title ?? t('interviewPrep.session.titleFallback')}</p>
-          <p className="text-xs text-[#4B6B52] dark:text-[#7BA88A]">{task?.companyTag ?? t('interviewPrep.session.companyFallback')} · {PREP_TYPE_LABELS[task?.prepType] ?? task?.prepType ?? ''}</p>
+          <p className="text-xs text-[#4B6B52] dark:text-[#7BA88A]">{task?.companyTag ?? t('interviewPrep.session.companyFallback')} · {prepTypeLabel}</p>
         </div>
         <Badge variant="success" dot>{t('interviewPrep.session.inProgress')}</Badge>
       </div>
@@ -253,7 +253,7 @@ export function InterviewPrepSessionPage() {
             </button>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-bold text-[#0B1210] dark:text-[#E2F0E8]">{task?.title ?? t('interviewPrep.session.titleFallback')}</p>
-              <p className="mt-1 truncate text-xs text-[#4B6B52] dark:text-[#7BA88A]">{task?.companyTag ?? t('interviewPrep.session.companyFallback')} · {PREP_TYPE_LABELS[task?.prepType] ?? task?.prepType ?? ''}</p>
+              <p className="mt-1 truncate text-xs text-[#4B6B52] dark:text-[#7BA88A]">{task?.companyTag ?? t('interviewPrep.session.companyFallback')} · {prepTypeLabel}</p>
             </div>
             <Badge variant="success" dot>{t('interviewPrep.session.live')}</Badge>
           </div>
@@ -381,7 +381,7 @@ export function InterviewPrepSessionPage() {
           {!question && !review && (
             <div className="rounded-2xl border border-dashed border-[#C1CFC4] bg-white/50 px-6 py-8 text-center dark:bg-[#132420]/50 dark:border-[#163028]">
               <BookOpen className="w-10 h-10 mx-auto mb-3 text-[#C1CFC4] dark:text-[#4A7058]" />
-              <p className="text-sm text-[#94a3b8]">{t('interviewPrep.session.readAndWait', 'Read the task carefully. Questions will appear shortly.')}</p>
+              <p className="text-sm text-[#94a3b8]">{t('interviewPrep.session.readAndWait')}</p>
             </div>
           )}
         </div>

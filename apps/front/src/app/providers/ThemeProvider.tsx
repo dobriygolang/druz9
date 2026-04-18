@@ -30,12 +30,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement
-    if (theme === 'dark') {
-      root.classList.add('dark')
-    } else {
-      root.classList.remove('dark')
-    }
-    // Apply season class for seasonal CSS overrides
+    // pixel theme is always active — never apply .dark so Tailwind dark-mode
+    // doesn't override the parchment background tokens
+    root.classList.remove('dark')
     root.dataset.season = season
     localStorage.setItem('theme', theme)
   }, [theme, season])

@@ -10,11 +10,11 @@ func TestComputeLevel(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name          string
-		competency    *model.ProfileCompetency
-		wantLevel     string
-		wantMinProg   float64
-		wantMaxProg   float64
+		name        string
+		competency  *model.ProfileCompetency
+		wantLevel   string
+		wantMinProg float64
+		wantMaxProg float64
 	}{
 		{
 			name:       "nil competency",
@@ -31,9 +31,9 @@ func TestComputeLevel(t *testing.T) {
 			competency: &model.ProfileCompetency{
 				Score: 20, PracticeSessions: 2, StageCount: 0,
 			},
-			wantLevel:    LevelBeginner,
-			wantMinProg:  0.5,
-			wantMaxProg:  1.0,
+			wantLevel:   LevelBeginner,
+			wantMinProg: 0.5,
+			wantMaxProg: 1.0,
 		},
 		{
 			name: "score 30 with 3 sessions = confident",

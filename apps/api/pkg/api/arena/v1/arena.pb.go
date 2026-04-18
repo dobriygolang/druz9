@@ -76,59 +76,6 @@ func (ArenaMatchStatus) EnumDescriptor() ([]byte, []int) {
 	return file_arena_v1_arena_proto_rawDescGZIP(), []int{0}
 }
 
-// ArenaQueueStatus represents the current queue state for a player.
-type ArenaQueueStatus int32
-
-const (
-	ArenaQueueStatus_ARENA_QUEUE_STATUS_UNSPECIFIED ArenaQueueStatus = 0
-	ArenaQueueStatus_ARENA_QUEUE_STATUS_IDLE        ArenaQueueStatus = 1 // not in queue
-	ArenaQueueStatus_ARENA_QUEUE_STATUS_QUEUED      ArenaQueueStatus = 2 // waiting for an opponent
-	ArenaQueueStatus_ARENA_QUEUE_STATUS_MATCHED     ArenaQueueStatus = 3 // match found
-)
-
-// Enum value maps for ArenaQueueStatus.
-var (
-	ArenaQueueStatus_name = map[int32]string{
-		0: "ARENA_QUEUE_STATUS_UNSPECIFIED",
-		1: "ARENA_QUEUE_STATUS_IDLE",
-		2: "ARENA_QUEUE_STATUS_QUEUED",
-		3: "ARENA_QUEUE_STATUS_MATCHED",
-	}
-	ArenaQueueStatus_value = map[string]int32{
-		"ARENA_QUEUE_STATUS_UNSPECIFIED": 0,
-		"ARENA_QUEUE_STATUS_IDLE":        1,
-		"ARENA_QUEUE_STATUS_QUEUED":      2,
-		"ARENA_QUEUE_STATUS_MATCHED":     3,
-	}
-)
-
-func (x ArenaQueueStatus) Enum() *ArenaQueueStatus {
-	p := new(ArenaQueueStatus)
-	*p = x
-	return p
-}
-
-func (x ArenaQueueStatus) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ArenaQueueStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_arena_v1_arena_proto_enumTypes[1].Descriptor()
-}
-
-func (ArenaQueueStatus) Type() protoreflect.EnumType {
-	return &file_arena_v1_arena_proto_enumTypes[1]
-}
-
-func (x ArenaQueueStatus) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use ArenaQueueStatus.Descriptor instead.
-func (ArenaQueueStatus) EnumDescriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{1}
-}
-
 type ArenaLeague int32
 
 const (
@@ -177,11 +124,11 @@ func (x ArenaLeague) String() string {
 }
 
 func (ArenaLeague) Descriptor() protoreflect.EnumDescriptor {
-	return file_arena_v1_arena_proto_enumTypes[2].Descriptor()
+	return file_arena_v1_arena_proto_enumTypes[1].Descriptor()
 }
 
 func (ArenaLeague) Type() protoreflect.EnumType {
-	return &file_arena_v1_arena_proto_enumTypes[2]
+	return &file_arena_v1_arena_proto_enumTypes[1]
 }
 
 func (x ArenaLeague) Number() protoreflect.EnumNumber {
@@ -190,7 +137,7 @@ func (x ArenaLeague) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ArenaLeague.Descriptor instead.
 func (ArenaLeague) EnumDescriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{2}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{1}
 }
 
 type ArenaPlayerSide int32
@@ -226,11 +173,11 @@ func (x ArenaPlayerSide) String() string {
 }
 
 func (ArenaPlayerSide) Descriptor() protoreflect.EnumDescriptor {
-	return file_arena_v1_arena_proto_enumTypes[3].Descriptor()
+	return file_arena_v1_arena_proto_enumTypes[2].Descriptor()
 }
 
 func (ArenaPlayerSide) Type() protoreflect.EnumType {
-	return &file_arena_v1_arena_proto_enumTypes[3]
+	return &file_arena_v1_arena_proto_enumTypes[2]
 }
 
 func (x ArenaPlayerSide) Number() protoreflect.EnumNumber {
@@ -239,7 +186,7 @@ func (x ArenaPlayerSide) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ArenaPlayerSide.Descriptor instead.
 func (ArenaPlayerSide) EnumDescriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{3}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{2}
 }
 
 type WinnerReason int32
@@ -290,11 +237,11 @@ func (x WinnerReason) String() string {
 }
 
 func (WinnerReason) Descriptor() protoreflect.EnumDescriptor {
-	return file_arena_v1_arena_proto_enumTypes[4].Descriptor()
+	return file_arena_v1_arena_proto_enumTypes[3].Descriptor()
 }
 
 func (WinnerReason) Type() protoreflect.EnumType {
-	return &file_arena_v1_arena_proto_enumTypes[4]
+	return &file_arena_v1_arena_proto_enumTypes[3]
 }
 
 func (x WinnerReason) Number() protoreflect.EnumNumber {
@@ -303,7 +250,7 @@ func (x WinnerReason) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WinnerReason.Descriptor instead.
 func (WinnerReason) EnumDescriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{4}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{3}
 }
 
 // AntiCheatEventReason classifies the suspicious behaviour being reported.
@@ -346,11 +293,11 @@ func (x AntiCheatEventReason) String() string {
 }
 
 func (AntiCheatEventReason) Descriptor() protoreflect.EnumDescriptor {
-	return file_arena_v1_arena_proto_enumTypes[5].Descriptor()
+	return file_arena_v1_arena_proto_enumTypes[4].Descriptor()
 }
 
 func (AntiCheatEventReason) Type() protoreflect.EnumType {
-	return &file_arena_v1_arena_proto_enumTypes[5]
+	return &file_arena_v1_arena_proto_enumTypes[4]
 }
 
 func (x AntiCheatEventReason) Number() protoreflect.EnumNumber {
@@ -359,7 +306,7 @@ func (x AntiCheatEventReason) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use AntiCheatEventReason.Descriptor instead.
 func (AntiCheatEventReason) EnumDescriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{5}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{4}
 }
 
 type CreateMatchRequest struct {
@@ -650,29 +597,33 @@ func (x *GetLeaderboardRequest) GetLimit() int32 {
 	return 0
 }
 
-type JoinQueueRequest struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	Topic             string                 `protobuf:"bytes,1,opt,name=topic,proto3" json:"topic,omitempty"`
-	Difficulty        v1.Difficulty          `protobuf:"varint,2,opt,name=difficulty,proto3,enum=common.v1.Difficulty" json:"difficulty,omitempty"` // was: string
-	ObfuscateOpponent bool                   `protobuf:"varint,3,opt,name=obfuscate_opponent,json=obfuscateOpponent,proto3" json:"obfuscate_opponent,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+type GuildLeaderboardEntry struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	GuildId         string                 `protobuf:"bytes,1,opt,name=guild_id,json=guildId,proto3" json:"guild_id,omitempty"`
+	Name            string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	MemberCount     int32                  `protobuf:"varint,3,opt,name=member_count,json=memberCount,proto3" json:"member_count,omitempty"`
+	TotalWins       int32                  `protobuf:"varint,4,opt,name=total_wins,json=totalWins,proto3" json:"total_wins,omitempty"`
+	AggregatePoints int32                  `protobuf:"varint,5,opt,name=aggregate_points,json=aggregatePoints,proto3" json:"aggregate_points,omitempty"`
+	AvgRating       int32                  `protobuf:"varint,6,opt,name=avg_rating,json=avgRating,proto3" json:"avg_rating,omitempty"`
+	DeltaWeek       int32                  `protobuf:"varint,7,opt,name=delta_week,json=deltaWeek,proto3" json:"delta_week,omitempty"` // wins this week — signed
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
-func (x *JoinQueueRequest) Reset() {
-	*x = JoinQueueRequest{}
+func (x *GuildLeaderboardEntry) Reset() {
+	*x = GuildLeaderboardEntry{}
 	mi := &file_arena_v1_arena_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *JoinQueueRequest) String() string {
+func (x *GuildLeaderboardEntry) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*JoinQueueRequest) ProtoMessage() {}
+func (*GuildLeaderboardEntry) ProtoMessage() {}
 
-func (x *JoinQueueRequest) ProtoReflect() protoreflect.Message {
+func (x *GuildLeaderboardEntry) ProtoReflect() protoreflect.Message {
 	mi := &file_arena_v1_arena_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -684,52 +635,81 @@ func (x *JoinQueueRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use JoinQueueRequest.ProtoReflect.Descriptor instead.
-func (*JoinQueueRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GuildLeaderboardEntry.ProtoReflect.Descriptor instead.
+func (*GuildLeaderboardEntry) Descriptor() ([]byte, []int) {
 	return file_arena_v1_arena_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *JoinQueueRequest) GetTopic() string {
+func (x *GuildLeaderboardEntry) GetGuildId() string {
 	if x != nil {
-		return x.Topic
+		return x.GuildId
 	}
 	return ""
 }
 
-func (x *JoinQueueRequest) GetDifficulty() v1.Difficulty {
+func (x *GuildLeaderboardEntry) GetName() string {
 	if x != nil {
-		return x.Difficulty
+		return x.Name
 	}
-	return v1.Difficulty(0)
+	return ""
 }
 
-func (x *JoinQueueRequest) GetObfuscateOpponent() bool {
+func (x *GuildLeaderboardEntry) GetMemberCount() int32 {
 	if x != nil {
-		return x.ObfuscateOpponent
+		return x.MemberCount
 	}
-	return false
+	return 0
 }
 
-type LeaveQueueRequest struct {
+func (x *GuildLeaderboardEntry) GetTotalWins() int32 {
+	if x != nil {
+		return x.TotalWins
+	}
+	return 0
+}
+
+func (x *GuildLeaderboardEntry) GetAggregatePoints() int32 {
+	if x != nil {
+		return x.AggregatePoints
+	}
+	return 0
+}
+
+func (x *GuildLeaderboardEntry) GetAvgRating() int32 {
+	if x != nil {
+		return x.AvgRating
+	}
+	return 0
+}
+
+func (x *GuildLeaderboardEntry) GetDeltaWeek() int32 {
+	if x != nil {
+		return x.DeltaWeek
+	}
+	return 0
+}
+
+type GuildsLeaderboardRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *LeaveQueueRequest) Reset() {
-	*x = LeaveQueueRequest{}
+func (x *GuildsLeaderboardRequest) Reset() {
+	*x = GuildsLeaderboardRequest{}
 	mi := &file_arena_v1_arena_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *LeaveQueueRequest) String() string {
+func (x *GuildsLeaderboardRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*LeaveQueueRequest) ProtoMessage() {}
+func (*GuildsLeaderboardRequest) ProtoMessage() {}
 
-func (x *LeaveQueueRequest) ProtoReflect() protoreflect.Message {
+func (x *GuildsLeaderboardRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_arena_v1_arena_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -741,31 +721,39 @@ func (x *LeaveQueueRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use LeaveQueueRequest.ProtoReflect.Descriptor instead.
-func (*LeaveQueueRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GuildsLeaderboardRequest.ProtoReflect.Descriptor instead.
+func (*GuildsLeaderboardRequest) Descriptor() ([]byte, []int) {
 	return file_arena_v1_arena_proto_rawDescGZIP(), []int{7}
 }
 
-type GetQueueStatusRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+func (x *GuildsLeaderboardRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+type GuildsLeaderboardResponse struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Entries       []*GuildLeaderboardEntry `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetQueueStatusRequest) Reset() {
-	*x = GetQueueStatusRequest{}
+func (x *GuildsLeaderboardResponse) Reset() {
+	*x = GuildsLeaderboardResponse{}
 	mi := &file_arena_v1_arena_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetQueueStatusRequest) String() string {
+func (x *GuildsLeaderboardResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetQueueStatusRequest) ProtoMessage() {}
+func (*GuildsLeaderboardResponse) ProtoMessage() {}
 
-func (x *GetQueueStatusRequest) ProtoReflect() protoreflect.Message {
+func (x *GuildsLeaderboardResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_arena_v1_arena_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -777,9 +765,212 @@ func (x *GetQueueStatusRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetQueueStatusRequest.ProtoReflect.Descriptor instead.
-func (*GetQueueStatusRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GuildsLeaderboardResponse.ProtoReflect.Descriptor instead.
+func (*GuildsLeaderboardResponse) Descriptor() ([]byte, []int) {
 	return file_arena_v1_arena_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GuildsLeaderboardResponse) GetEntries() []*GuildLeaderboardEntry {
+	if x != nil {
+		return x.Entries
+	}
+	return nil
+}
+
+type SeasonXPEntry struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	DisplayName   string                 `protobuf:"bytes,3,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	AvatarUrl     string                 `protobuf:"bytes,4,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
+	GuildName     string                 `protobuf:"bytes,5,opt,name=guild_name,json=guildName,proto3" json:"guild_name,omitempty"`
+	Xp            int32                  `protobuf:"varint,6,opt,name=xp,proto3" json:"xp,omitempty"`
+	CurrentTier   int32                  `protobuf:"varint,7,opt,name=current_tier,json=currentTier,proto3" json:"current_tier,omitempty"`
+	Trophies      int32                  `protobuf:"varint,8,opt,name=trophies,proto3" json:"trophies,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SeasonXPEntry) Reset() {
+	*x = SeasonXPEntry{}
+	mi := &file_arena_v1_arena_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SeasonXPEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SeasonXPEntry) ProtoMessage() {}
+
+func (x *SeasonXPEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SeasonXPEntry.ProtoReflect.Descriptor instead.
+func (*SeasonXPEntry) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *SeasonXPEntry) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *SeasonXPEntry) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *SeasonXPEntry) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *SeasonXPEntry) GetAvatarUrl() string {
+	if x != nil {
+		return x.AvatarUrl
+	}
+	return ""
+}
+
+func (x *SeasonXPEntry) GetGuildName() string {
+	if x != nil {
+		return x.GuildName
+	}
+	return ""
+}
+
+func (x *SeasonXPEntry) GetXp() int32 {
+	if x != nil {
+		return x.Xp
+	}
+	return 0
+}
+
+func (x *SeasonXPEntry) GetCurrentTier() int32 {
+	if x != nil {
+		return x.CurrentTier
+	}
+	return 0
+}
+
+func (x *SeasonXPEntry) GetTrophies() int32 {
+	if x != nil {
+		return x.Trophies
+	}
+	return 0
+}
+
+type SeasonXPLeaderboardRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SeasonXPLeaderboardRequest) Reset() {
+	*x = SeasonXPLeaderboardRequest{}
+	mi := &file_arena_v1_arena_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SeasonXPLeaderboardRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SeasonXPLeaderboardRequest) ProtoMessage() {}
+
+func (x *SeasonXPLeaderboardRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SeasonXPLeaderboardRequest.ProtoReflect.Descriptor instead.
+func (*SeasonXPLeaderboardRequest) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *SeasonXPLeaderboardRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+type SeasonXPLeaderboardResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Entries       []*SeasonXPEntry       `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
+	SeasonNumber  int32                  `protobuf:"varint,2,opt,name=season_number,json=seasonNumber,proto3" json:"season_number,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SeasonXPLeaderboardResponse) Reset() {
+	*x = SeasonXPLeaderboardResponse{}
+	mi := &file_arena_v1_arena_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SeasonXPLeaderboardResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SeasonXPLeaderboardResponse) ProtoMessage() {}
+
+func (x *SeasonXPLeaderboardResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SeasonXPLeaderboardResponse.ProtoReflect.Descriptor instead.
+func (*SeasonXPLeaderboardResponse) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *SeasonXPLeaderboardResponse) GetEntries() []*SeasonXPEntry {
+	if x != nil {
+		return x.Entries
+	}
+	return nil
+}
+
+func (x *SeasonXPLeaderboardResponse) GetSeasonNumber() int32 {
+	if x != nil {
+		return x.SeasonNumber
+	}
+	return 0
 }
 
 type GetPlayerStatsRequest struct {
@@ -791,7 +982,7 @@ type GetPlayerStatsRequest struct {
 
 func (x *GetPlayerStatsRequest) Reset() {
 	*x = GetPlayerStatsRequest{}
-	mi := &file_arena_v1_arena_proto_msgTypes[9]
+	mi := &file_arena_v1_arena_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -803,7 +994,7 @@ func (x *GetPlayerStatsRequest) String() string {
 func (*GetPlayerStatsRequest) ProtoMessage() {}
 
 func (x *GetPlayerStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[9]
+	mi := &file_arena_v1_arena_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -816,7 +1007,7 @@ func (x *GetPlayerStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPlayerStatsRequest.ProtoReflect.Descriptor instead.
 func (*GetPlayerStatsRequest) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{9}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GetPlayerStatsRequest) GetUserId() string {
@@ -824,50 +1015,6 @@ func (x *GetPlayerStatsRequest) GetUserId() string {
 		return x.UserId
 	}
 	return ""
-}
-
-type GetPlayerStatsBatchRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserIds       []string               `protobuf:"bytes,1,rep,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetPlayerStatsBatchRequest) Reset() {
-	*x = GetPlayerStatsBatchRequest{}
-	mi := &file_arena_v1_arena_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetPlayerStatsBatchRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetPlayerStatsBatchRequest) ProtoMessage() {}
-
-func (x *GetPlayerStatsBatchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetPlayerStatsBatchRequest.ProtoReflect.Descriptor instead.
-func (*GetPlayerStatsBatchRequest) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *GetPlayerStatsBatchRequest) GetUserIds() []string {
-	if x != nil {
-		return x.UserIds
-	}
-	return nil
 }
 
 type ReportAntiCheatEventRequest struct {
@@ -880,7 +1027,7 @@ type ReportAntiCheatEventRequest struct {
 
 func (x *ReportAntiCheatEventRequest) Reset() {
 	*x = ReportAntiCheatEventRequest{}
-	mi := &file_arena_v1_arena_proto_msgTypes[11]
+	mi := &file_arena_v1_arena_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -892,7 +1039,7 @@ func (x *ReportAntiCheatEventRequest) String() string {
 func (*ReportAntiCheatEventRequest) ProtoMessage() {}
 
 func (x *ReportAntiCheatEventRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[11]
+	mi := &file_arena_v1_arena_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -905,7 +1052,7 @@ func (x *ReportAntiCheatEventRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportAntiCheatEventRequest.ProtoReflect.Descriptor instead.
 func (*ReportAntiCheatEventRequest) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{11}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *ReportAntiCheatEventRequest) GetMatchId() string {
@@ -922,246 +1069,6 @@ func (x *ReportAntiCheatEventRequest) GetReason() AntiCheatEventReason {
 	return AntiCheatEventReason_ANTI_CHEAT_EVENT_REASON_UNSPECIFIED
 }
 
-type ListOpenMatchesRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListOpenMatchesRequest) Reset() {
-	*x = ListOpenMatchesRequest{}
-	mi := &file_arena_v1_arena_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListOpenMatchesRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListOpenMatchesRequest) ProtoMessage() {}
-
-func (x *ListOpenMatchesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListOpenMatchesRequest.ProtoReflect.Descriptor instead.
-func (*ListOpenMatchesRequest) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{12}
-}
-
-func (x *ListOpenMatchesRequest) GetLimit() int32 {
-	if x != nil {
-		return x.Limit
-	}
-	return 0
-}
-
-type GetSeasonHistoryRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Limit         int32                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetSeasonHistoryRequest) Reset() {
-	*x = GetSeasonHistoryRequest{}
-	mi := &file_arena_v1_arena_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetSeasonHistoryRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetSeasonHistoryRequest) ProtoMessage() {}
-
-func (x *GetSeasonHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetSeasonHistoryRequest.ProtoReflect.Descriptor instead.
-func (*GetSeasonHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{13}
-}
-
-func (x *GetSeasonHistoryRequest) GetUserId() string {
-	if x != nil {
-		return x.UserId
-	}
-	return ""
-}
-
-func (x *GetSeasonHistoryRequest) GetLimit() int32 {
-	if x != nil {
-		return x.Limit
-	}
-	return 0
-}
-
-type ArenaSeasonResultEntry struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SeasonNumber  int32                  `protobuf:"varint,1,opt,name=season_number,json=seasonNumber,proto3" json:"season_number,omitempty"`
-	FinalRating   int32                  `protobuf:"varint,2,opt,name=final_rating,json=finalRating,proto3" json:"final_rating,omitempty"`
-	FinalLeague   string                 `protobuf:"bytes,3,opt,name=final_league,json=finalLeague,proto3" json:"final_league,omitempty"`
-	LeagueRank    int32                  `protobuf:"varint,4,opt,name=league_rank,json=leagueRank,proto3" json:"league_rank,omitempty"`
-	PeakRating    int32                  `protobuf:"varint,5,opt,name=peak_rating,json=peakRating,proto3" json:"peak_rating,omitempty"`
-	Wins          int32                  `protobuf:"varint,6,opt,name=wins,proto3" json:"wins,omitempty"`
-	Losses        int32                  `protobuf:"varint,7,opt,name=losses,proto3" json:"losses,omitempty"`
-	Matches       int32                  `protobuf:"varint,8,opt,name=matches,proto3" json:"matches,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ArenaSeasonResultEntry) Reset() {
-	*x = ArenaSeasonResultEntry{}
-	mi := &file_arena_v1_arena_proto_msgTypes[14]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ArenaSeasonResultEntry) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ArenaSeasonResultEntry) ProtoMessage() {}
-
-func (x *ArenaSeasonResultEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[14]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ArenaSeasonResultEntry.ProtoReflect.Descriptor instead.
-func (*ArenaSeasonResultEntry) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{14}
-}
-
-func (x *ArenaSeasonResultEntry) GetSeasonNumber() int32 {
-	if x != nil {
-		return x.SeasonNumber
-	}
-	return 0
-}
-
-func (x *ArenaSeasonResultEntry) GetFinalRating() int32 {
-	if x != nil {
-		return x.FinalRating
-	}
-	return 0
-}
-
-func (x *ArenaSeasonResultEntry) GetFinalLeague() string {
-	if x != nil {
-		return x.FinalLeague
-	}
-	return ""
-}
-
-func (x *ArenaSeasonResultEntry) GetLeagueRank() int32 {
-	if x != nil {
-		return x.LeagueRank
-	}
-	return 0
-}
-
-func (x *ArenaSeasonResultEntry) GetPeakRating() int32 {
-	if x != nil {
-		return x.PeakRating
-	}
-	return 0
-}
-
-func (x *ArenaSeasonResultEntry) GetWins() int32 {
-	if x != nil {
-		return x.Wins
-	}
-	return 0
-}
-
-func (x *ArenaSeasonResultEntry) GetLosses() int32 {
-	if x != nil {
-		return x.Losses
-	}
-	return 0
-}
-
-func (x *ArenaSeasonResultEntry) GetMatches() int32 {
-	if x != nil {
-		return x.Matches
-	}
-	return 0
-}
-
-type GetSeasonHistoryResponse struct {
-	state         protoimpl.MessageState    `protogen:"open.v1"`
-	Seasons       []*ArenaSeasonResultEntry `protobuf:"bytes,1,rep,name=seasons,proto3" json:"seasons,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetSeasonHistoryResponse) Reset() {
-	*x = GetSeasonHistoryResponse{}
-	mi := &file_arena_v1_arena_proto_msgTypes[15]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetSeasonHistoryResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetSeasonHistoryResponse) ProtoMessage() {}
-
-func (x *GetSeasonHistoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[15]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetSeasonHistoryResponse.ProtoReflect.Descriptor instead.
-func (*GetSeasonHistoryResponse) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{15}
-}
-
-func (x *GetSeasonHistoryResponse) GetSeasons() []*ArenaSeasonResultEntry {
-	if x != nil {
-		return x.Seasons
-	}
-	return nil
-}
-
 type ArenaMatchResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Match         *ArenaMatch            `protobuf:"bytes,1,opt,name=match,proto3" json:"match,omitempty"`
@@ -1171,7 +1078,7 @@ type ArenaMatchResponse struct {
 
 func (x *ArenaMatchResponse) Reset() {
 	*x = ArenaMatchResponse{}
-	mi := &file_arena_v1_arena_proto_msgTypes[16]
+	mi := &file_arena_v1_arena_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1183,7 +1090,7 @@ func (x *ArenaMatchResponse) String() string {
 func (*ArenaMatchResponse) ProtoMessage() {}
 
 func (x *ArenaMatchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[16]
+	mi := &file_arena_v1_arena_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1196,7 +1103,7 @@ func (x *ArenaMatchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArenaMatchResponse.ProtoReflect.Descriptor instead.
 func (*ArenaMatchResponse) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{16}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *ArenaMatchResponse) GetMatch() *ArenaMatch {
@@ -1225,7 +1132,7 @@ type SubmitCodeResponse struct {
 
 func (x *SubmitCodeResponse) Reset() {
 	*x = SubmitCodeResponse{}
-	mi := &file_arena_v1_arena_proto_msgTypes[17]
+	mi := &file_arena_v1_arena_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1237,7 +1144,7 @@ func (x *SubmitCodeResponse) String() string {
 func (*SubmitCodeResponse) ProtoMessage() {}
 
 func (x *SubmitCodeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[17]
+	mi := &file_arena_v1_arena_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1250,7 +1157,7 @@ func (x *SubmitCodeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitCodeResponse.ProtoReflect.Descriptor instead.
 func (*SubmitCodeResponse) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{17}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *SubmitCodeResponse) GetOutput() string {
@@ -1340,7 +1247,7 @@ type GetLeaderboardResponse struct {
 
 func (x *GetLeaderboardResponse) Reset() {
 	*x = GetLeaderboardResponse{}
-	mi := &file_arena_v1_arena_proto_msgTypes[18]
+	mi := &file_arena_v1_arena_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1352,7 +1259,7 @@ func (x *GetLeaderboardResponse) String() string {
 func (*GetLeaderboardResponse) ProtoMessage() {}
 
 func (x *GetLeaderboardResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[18]
+	mi := &file_arena_v1_arena_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1365,7 +1272,7 @@ func (x *GetLeaderboardResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLeaderboardResponse.ProtoReflect.Descriptor instead.
 func (*GetLeaderboardResponse) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{18}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *GetLeaderboardResponse) GetEntries() []*ArenaLeaderboardEntry {
@@ -1393,7 +1300,7 @@ type ArenaSeasonInfo struct {
 
 func (x *ArenaSeasonInfo) Reset() {
 	*x = ArenaSeasonInfo{}
-	mi := &file_arena_v1_arena_proto_msgTypes[19]
+	mi := &file_arena_v1_arena_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1405,7 +1312,7 @@ func (x *ArenaSeasonInfo) String() string {
 func (*ArenaSeasonInfo) ProtoMessage() {}
 
 func (x *ArenaSeasonInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[19]
+	mi := &file_arena_v1_arena_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1418,7 +1325,7 @@ func (x *ArenaSeasonInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArenaSeasonInfo.ProtoReflect.Descriptor instead.
 func (*ArenaSeasonInfo) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{19}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *ArenaSeasonInfo) GetSeasonNumber() int32 {
@@ -1442,90 +1349,6 @@ func (x *ArenaSeasonInfo) GetEndsAt() *timestamppb.Timestamp {
 	return nil
 }
 
-type ArenaQueueStateResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        ArenaQueueStatus       `protobuf:"varint,1,opt,name=status,proto3,enum=arena.v1.ArenaQueueStatus" json:"status,omitempty"` // was: string
-	Topic         string                 `protobuf:"bytes,2,opt,name=topic,proto3" json:"topic,omitempty"`
-	Difficulty    v1.Difficulty          `protobuf:"varint,3,opt,name=difficulty,proto3,enum=common.v1.Difficulty" json:"difficulty,omitempty"` // was: string
-	QueueSize     int32                  `protobuf:"varint,4,opt,name=queue_size,json=queueSize,proto3" json:"queue_size,omitempty"`
-	QueuedAt      *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=queued_at,json=queuedAt,proto3" json:"queued_at,omitempty"` // was: string
-	Match         *ArenaMatch            `protobuf:"bytes,6,opt,name=match,proto3" json:"match,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ArenaQueueStateResponse) Reset() {
-	*x = ArenaQueueStateResponse{}
-	mi := &file_arena_v1_arena_proto_msgTypes[20]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ArenaQueueStateResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ArenaQueueStateResponse) ProtoMessage() {}
-
-func (x *ArenaQueueStateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[20]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ArenaQueueStateResponse.ProtoReflect.Descriptor instead.
-func (*ArenaQueueStateResponse) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{20}
-}
-
-func (x *ArenaQueueStateResponse) GetStatus() ArenaQueueStatus {
-	if x != nil {
-		return x.Status
-	}
-	return ArenaQueueStatus_ARENA_QUEUE_STATUS_UNSPECIFIED
-}
-
-func (x *ArenaQueueStateResponse) GetTopic() string {
-	if x != nil {
-		return x.Topic
-	}
-	return ""
-}
-
-func (x *ArenaQueueStateResponse) GetDifficulty() v1.Difficulty {
-	if x != nil {
-		return x.Difficulty
-	}
-	return v1.Difficulty(0)
-}
-
-func (x *ArenaQueueStateResponse) GetQueueSize() int32 {
-	if x != nil {
-		return x.QueueSize
-	}
-	return 0
-}
-
-func (x *ArenaQueueStateResponse) GetQueuedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.QueuedAt
-	}
-	return nil
-}
-
-func (x *ArenaQueueStateResponse) GetMatch() *ArenaMatch {
-	if x != nil {
-		return x.Match
-	}
-	return nil
-}
-
 type ArenaPlayerStatsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Stats         *ArenaPlayerStats      `protobuf:"bytes,1,opt,name=stats,proto3" json:"stats,omitempty"`
@@ -1535,7 +1358,7 @@ type ArenaPlayerStatsResponse struct {
 
 func (x *ArenaPlayerStatsResponse) Reset() {
 	*x = ArenaPlayerStatsResponse{}
-	mi := &file_arena_v1_arena_proto_msgTypes[21]
+	mi := &file_arena_v1_arena_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1547,7 +1370,7 @@ func (x *ArenaPlayerStatsResponse) String() string {
 func (*ArenaPlayerStatsResponse) ProtoMessage() {}
 
 func (x *ArenaPlayerStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[21]
+	mi := &file_arena_v1_arena_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1560,54 +1383,10 @@ func (x *ArenaPlayerStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArenaPlayerStatsResponse.ProtoReflect.Descriptor instead.
 func (*ArenaPlayerStatsResponse) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{21}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ArenaPlayerStatsResponse) GetStats() *ArenaPlayerStats {
-	if x != nil {
-		return x.Stats
-	}
-	return nil
-}
-
-type ArenaPlayerStatsBatchResponse struct {
-	state         protoimpl.MessageState       `protogen:"open.v1"`
-	Stats         map[string]*ArenaPlayerStats `protobuf:"bytes,1,rep,name=stats,proto3" json:"stats,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ArenaPlayerStatsBatchResponse) Reset() {
-	*x = ArenaPlayerStatsBatchResponse{}
-	mi := &file_arena_v1_arena_proto_msgTypes[22]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ArenaPlayerStatsBatchResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ArenaPlayerStatsBatchResponse) ProtoMessage() {}
-
-func (x *ArenaPlayerStatsBatchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[22]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ArenaPlayerStatsBatchResponse.ProtoReflect.Descriptor instead.
-func (*ArenaPlayerStatsBatchResponse) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{22}
-}
-
-func (x *ArenaPlayerStatsBatchResponse) GetStats() map[string]*ArenaPlayerStats {
 	if x != nil {
 		return x.Stats
 	}
@@ -1623,7 +1402,7 @@ type ArenaStatusResponse struct {
 
 func (x *ArenaStatusResponse) Reset() {
 	*x = ArenaStatusResponse{}
-	mi := &file_arena_v1_arena_proto_msgTypes[23]
+	mi := &file_arena_v1_arena_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1635,7 +1414,7 @@ func (x *ArenaStatusResponse) String() string {
 func (*ArenaStatusResponse) ProtoMessage() {}
 
 func (x *ArenaStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[23]
+	mi := &file_arena_v1_arena_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1648,7 +1427,7 @@ func (x *ArenaStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArenaStatusResponse.ProtoReflect.Descriptor instead.
 func (*ArenaStatusResponse) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{23}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ArenaStatusResponse) GetStatus() v1.OperationStatus {
@@ -1656,50 +1435,6 @@ func (x *ArenaStatusResponse) GetStatus() v1.OperationStatus {
 		return x.Status
 	}
 	return v1.OperationStatus(0)
-}
-
-type ListOpenMatchesResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Matches       []*ArenaMatch          `protobuf:"bytes,1,rep,name=matches,proto3" json:"matches,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListOpenMatchesResponse) Reset() {
-	*x = ListOpenMatchesResponse{}
-	mi := &file_arena_v1_arena_proto_msgTypes[24]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListOpenMatchesResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListOpenMatchesResponse) ProtoMessage() {}
-
-func (x *ListOpenMatchesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[24]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListOpenMatchesResponse.ProtoReflect.Descriptor instead.
-func (*ListOpenMatchesResponse) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{24}
-}
-
-func (x *ListOpenMatchesResponse) GetMatches() []*ArenaMatch {
-	if x != nil {
-		return x.Matches
-	}
-	return nil
 }
 
 type ArenaMatch struct {
@@ -1729,7 +1464,7 @@ type ArenaMatch struct {
 
 func (x *ArenaMatch) Reset() {
 	*x = ArenaMatch{}
-	mi := &file_arena_v1_arena_proto_msgTypes[25]
+	mi := &file_arena_v1_arena_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1741,7 +1476,7 @@ func (x *ArenaMatch) String() string {
 func (*ArenaMatch) ProtoMessage() {}
 
 func (x *ArenaMatch) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[25]
+	mi := &file_arena_v1_arena_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1754,7 +1489,7 @@ func (x *ArenaMatch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArenaMatch.ProtoReflect.Descriptor instead.
 func (*ArenaMatch) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{25}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ArenaMatch) GetId() string {
@@ -1910,7 +1645,7 @@ type ArenaPlayer struct {
 
 func (x *ArenaPlayer) Reset() {
 	*x = ArenaPlayer{}
-	mi := &file_arena_v1_arena_proto_msgTypes[26]
+	mi := &file_arena_v1_arena_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1922,7 +1657,7 @@ func (x *ArenaPlayer) String() string {
 func (*ArenaPlayer) ProtoMessage() {}
 
 func (x *ArenaPlayer) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[26]
+	mi := &file_arena_v1_arena_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1935,7 +1670,7 @@ func (x *ArenaPlayer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArenaPlayer.ProtoReflect.Descriptor instead.
 func (*ArenaPlayer) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{26}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *ArenaPlayer) GetUserId() string {
@@ -2045,7 +1780,7 @@ type ArenaPlayerStats struct {
 
 func (x *ArenaPlayerStats) Reset() {
 	*x = ArenaPlayerStats{}
-	mi := &file_arena_v1_arena_proto_msgTypes[27]
+	mi := &file_arena_v1_arena_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2057,7 +1792,7 @@ func (x *ArenaPlayerStats) String() string {
 func (*ArenaPlayerStats) ProtoMessage() {}
 
 func (x *ArenaPlayerStats) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[27]
+	mi := &file_arena_v1_arena_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2070,7 +1805,7 @@ func (x *ArenaPlayerStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArenaPlayerStats.ProtoReflect.Descriptor instead.
 func (*ArenaPlayerStats) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{27}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ArenaPlayerStats) GetUserId() string {
@@ -2196,7 +1931,7 @@ type ArenaLeaderboardEntry struct {
 
 func (x *ArenaLeaderboardEntry) Reset() {
 	*x = ArenaLeaderboardEntry{}
-	mi := &file_arena_v1_arena_proto_msgTypes[28]
+	mi := &file_arena_v1_arena_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2208,7 +1943,7 @@ func (x *ArenaLeaderboardEntry) String() string {
 func (*ArenaLeaderboardEntry) ProtoMessage() {}
 
 func (x *ArenaLeaderboardEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[28]
+	mi := &file_arena_v1_arena_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2221,7 +1956,7 @@ func (x *ArenaLeaderboardEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArenaLeaderboardEntry.ProtoReflect.Descriptor instead.
 func (*ArenaLeaderboardEntry) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{28}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *ArenaLeaderboardEntry) GetUserId() string {
@@ -2315,40 +2050,43 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\bmatch_id\x18\x01 \x01(\tR\amatchId\x12\x12\n" +
 	"\x04code\x18\x02 \x01(\tR\x04code\"-\n" +
 	"\x15GetLeaderboardRequest\x12\x14\n" +
-	"\x05limit\x18\x01 \x01(\x05R\x05limit\"\x8e\x01\n" +
-	"\x10JoinQueueRequest\x12\x14\n" +
-	"\x05topic\x18\x01 \x01(\tR\x05topic\x125\n" +
+	"\x05limit\x18\x01 \x01(\x05R\x05limit\"\xf1\x01\n" +
+	"\x15GuildLeaderboardEntry\x12\x19\n" +
+	"\bguild_id\x18\x01 \x01(\tR\aguildId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12!\n" +
+	"\fmember_count\x18\x03 \x01(\x05R\vmemberCount\x12\x1d\n" +
 	"\n" +
-	"difficulty\x18\x02 \x01(\x0e2\x15.common.v1.DifficultyR\n" +
-	"difficulty\x12-\n" +
-	"\x12obfuscate_opponent\x18\x03 \x01(\bR\x11obfuscateOpponent\"\x13\n" +
-	"\x11LeaveQueueRequest\"\x17\n" +
-	"\x15GetQueueStatusRequest\"0\n" +
+	"total_wins\x18\x04 \x01(\x05R\ttotalWins\x12)\n" +
+	"\x10aggregate_points\x18\x05 \x01(\x05R\x0faggregatePoints\x12\x1d\n" +
+	"\n" +
+	"avg_rating\x18\x06 \x01(\x05R\tavgRating\x12\x1d\n" +
+	"\n" +
+	"delta_week\x18\a \x01(\x05R\tdeltaWeek\"0\n" +
+	"\x18GuildsLeaderboardRequest\x12\x14\n" +
+	"\x05limit\x18\x01 \x01(\x05R\x05limit\"V\n" +
+	"\x19GuildsLeaderboardResponse\x129\n" +
+	"\aentries\x18\x01 \x03(\v2\x1f.arena.v1.GuildLeaderboardEntryR\aentries\"\xf4\x01\n" +
+	"\rSeasonXPEntry\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12!\n" +
+	"\fdisplay_name\x18\x03 \x01(\tR\vdisplayName\x12\x1d\n" +
+	"\n" +
+	"avatar_url\x18\x04 \x01(\tR\tavatarUrl\x12\x1d\n" +
+	"\n" +
+	"guild_name\x18\x05 \x01(\tR\tguildName\x12\x0e\n" +
+	"\x02xp\x18\x06 \x01(\x05R\x02xp\x12!\n" +
+	"\fcurrent_tier\x18\a \x01(\x05R\vcurrentTier\x12\x1a\n" +
+	"\btrophies\x18\b \x01(\x05R\btrophies\"2\n" +
+	"\x1aSeasonXPLeaderboardRequest\x12\x14\n" +
+	"\x05limit\x18\x01 \x01(\x05R\x05limit\"u\n" +
+	"\x1bSeasonXPLeaderboardResponse\x121\n" +
+	"\aentries\x18\x01 \x03(\v2\x17.arena.v1.SeasonXPEntryR\aentries\x12#\n" +
+	"\rseason_number\x18\x02 \x01(\x05R\fseasonNumber\"0\n" +
 	"\x15GetPlayerStatsRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\"7\n" +
-	"\x1aGetPlayerStatsBatchRequest\x12\x19\n" +
-	"\buser_ids\x18\x01 \x03(\tR\auserIds\"p\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"p\n" +
 	"\x1bReportAntiCheatEventRequest\x12\x19\n" +
 	"\bmatch_id\x18\x01 \x01(\tR\amatchId\x126\n" +
-	"\x06reason\x18\x02 \x01(\x0e2\x1e.arena.v1.AntiCheatEventReasonR\x06reason\".\n" +
-	"\x16ListOpenMatchesRequest\x12\x14\n" +
-	"\x05limit\x18\x01 \x01(\x05R\x05limit\"H\n" +
-	"\x17GetSeasonHistoryRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
-	"\x05limit\x18\x02 \x01(\x05R\x05limit\"\x8b\x02\n" +
-	"\x16ArenaSeasonResultEntry\x12#\n" +
-	"\rseason_number\x18\x01 \x01(\x05R\fseasonNumber\x12!\n" +
-	"\ffinal_rating\x18\x02 \x01(\x05R\vfinalRating\x12!\n" +
-	"\ffinal_league\x18\x03 \x01(\tR\vfinalLeague\x12\x1f\n" +
-	"\vleague_rank\x18\x04 \x01(\x05R\n" +
-	"leagueRank\x12\x1f\n" +
-	"\vpeak_rating\x18\x05 \x01(\x05R\n" +
-	"peakRating\x12\x12\n" +
-	"\x04wins\x18\x06 \x01(\x05R\x04wins\x12\x16\n" +
-	"\x06losses\x18\a \x01(\x05R\x06losses\x12\x18\n" +
-	"\amatches\x18\b \x01(\x05R\amatches\"V\n" +
-	"\x18GetSeasonHistoryResponse\x12:\n" +
-	"\aseasons\x18\x01 \x03(\v2 .arena.v1.ArenaSeasonResultEntryR\aseasons\"@\n" +
+	"\x06reason\x18\x02 \x01(\x0e2\x1e.arena.v1.AntiCheatEventReasonR\x06reason\"@\n" +
 	"\x12ArenaMatchResponse\x12*\n" +
 	"\x05match\x18\x01 \x01(\v2\x14.arena.v1.ArenaMatchR\x05match\"\xc1\x03\n" +
 	"\x12SubmitCodeResponse\x12\x16\n" +
@@ -2373,29 +2111,11 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\x0fArenaSeasonInfo\x12#\n" +
 	"\rseason_number\x18\x01 \x01(\x05R\fseasonNumber\x127\n" +
 	"\tstarts_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\bstartsAt\x123\n" +
-	"\aends_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x06endsAt\"\x9e\x02\n" +
-	"\x17ArenaQueueStateResponse\x122\n" +
-	"\x06status\x18\x01 \x01(\x0e2\x1a.arena.v1.ArenaQueueStatusR\x06status\x12\x14\n" +
-	"\x05topic\x18\x02 \x01(\tR\x05topic\x125\n" +
-	"\n" +
-	"difficulty\x18\x03 \x01(\x0e2\x15.common.v1.DifficultyR\n" +
-	"difficulty\x12\x1d\n" +
-	"\n" +
-	"queue_size\x18\x04 \x01(\x05R\tqueueSize\x127\n" +
-	"\tqueued_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\bqueuedAt\x12*\n" +
-	"\x05match\x18\x06 \x01(\v2\x14.arena.v1.ArenaMatchR\x05match\"L\n" +
+	"\aends_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x06endsAt\"L\n" +
 	"\x18ArenaPlayerStatsResponse\x120\n" +
-	"\x05stats\x18\x01 \x01(\v2\x1a.arena.v1.ArenaPlayerStatsR\x05stats\"\xbf\x01\n" +
-	"\x1dArenaPlayerStatsBatchResponse\x12H\n" +
-	"\x05stats\x18\x01 \x03(\v22.arena.v1.ArenaPlayerStatsBatchResponse.StatsEntryR\x05stats\x1aT\n" +
-	"\n" +
-	"StatsEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x120\n" +
-	"\x05value\x18\x02 \x01(\v2\x1a.arena.v1.ArenaPlayerStatsR\x05value:\x028\x01\"I\n" +
+	"\x05stats\x18\x01 \x01(\v2\x1a.arena.v1.ArenaPlayerStatsR\x05stats\"I\n" +
 	"\x13ArenaStatusResponse\x122\n" +
-	"\x06status\x18\x01 \x01(\x0e2\x1a.common.v1.OperationStatusR\x06status\"I\n" +
-	"\x17ListOpenMatchesResponse\x12.\n" +
-	"\amatches\x18\x01 \x03(\v2\x14.arena.v1.ArenaMatchR\amatches\"\xb0\x06\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x1a.common.v1.OperationStatusR\x06status\"\xb0\x06\n" +
 	"\n" +
 	"ArenaMatch\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
@@ -2476,12 +2196,7 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\x1eARENA_MATCH_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aARENA_MATCH_STATUS_WAITING\x10\x01\x12\x1d\n" +
 	"\x19ARENA_MATCH_STATUS_ACTIVE\x10\x02\x12\x1f\n" +
-	"\x1bARENA_MATCH_STATUS_FINISHED\x10\x03*\x92\x01\n" +
-	"\x10ArenaQueueStatus\x12\"\n" +
-	"\x1eARENA_QUEUE_STATUS_UNSPECIFIED\x10\x00\x12\x1b\n" +
-	"\x17ARENA_QUEUE_STATUS_IDLE\x10\x01\x12\x1d\n" +
-	"\x19ARENA_QUEUE_STATUS_QUEUED\x10\x02\x12\x1e\n" +
-	"\x1aARENA_QUEUE_STATUS_MATCHED\x10\x03*\xdb\x01\n" +
+	"\x1bARENA_MATCH_STATUS_FINISHED\x10\x03*\xdb\x01\n" +
 	"\vArenaLeague\x12\x1c\n" +
 	"\x18ARENA_LEAGUE_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13ARENA_LEAGUE_BRONZE\x10\x01\x12\x17\n" +
@@ -2509,25 +2224,20 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\"ANTI_CHEAT_EVENT_REASON_TAB_SWITCH\x10\x01\x12&\n" +
 	"\"ANTI_CHEAT_EVENT_REASON_COPY_PASTE\x10\x02\x12)\n" +
 	"%ANTI_CHEAT_EVENT_REASON_EXTERNAL_CODE\x10\x03\x12!\n" +
-	"\x1dANTI_CHEAT_EVENT_REASON_OTHER\x10\x042\xc9\r\n" +
+	"\x1dANTI_CHEAT_EVENT_REASON_OTHER\x10\x042\xf7\t\n" +
 	"\fArenaService\x12k\n" +
 	"\vCreateMatch\x12\x1c.arena.v1.CreateMatchRequest\x1a\x1c.arena.v1.ArenaMatchResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/arena/matches\x12m\n" +
 	"\bGetMatch\x12\x19.arena.v1.GetMatchRequest\x1a\x1c.arena.v1.ArenaMatchResponse\"(\x82\xd3\xe4\x93\x02\"\x12 /api/v1/arena/matches/{match_id}\x12w\n" +
 	"\tJoinMatch\x12\x1a.arena.v1.JoinMatchRequest\x1a\x1c.arena.v1.ArenaMatchResponse\"0\x82\xd3\xe4\x93\x02*:\x01*\"%/api/v1/arena/matches/{match_id}/join\x12{\n" +
 	"\n" +
 	"SubmitCode\x12\x1b.arena.v1.SubmitCodeRequest\x1a\x1c.arena.v1.SubmitCodeResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/api/v1/arena/matches/{match_id}/submit\x12v\n" +
-	"\x0eGetLeaderboard\x12\x1f.arena.v1.GetLeaderboardRequest\x1a .arena.v1.GetLeaderboardResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/arena/leaderboard\x12z\n" +
+	"\x0eGetLeaderboard\x12\x1f.arena.v1.GetLeaderboardRequest\x1a .arena.v1.GetLeaderboardResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/arena/leaderboard\x12\x86\x01\n" +
+	"\x11GuildsLeaderboard\x12\".arena.v1.GuildsLeaderboardRequest\x1a#.arena.v1.GuildsLeaderboardResponse\"(\x82\xd3\xe4\x93\x02\"\x12 /api/v1/arena/leaderboard/guilds\x12\x8f\x01\n" +
+	"\x13SeasonXPLeaderboard\x12$.arena.v1.SeasonXPLeaderboardRequest\x1a%.arena.v1.SeasonXPLeaderboardResponse\"+\x82\xd3\xe4\x93\x02%\x12#/api/v1/arena/leaderboard/season-xp\x12z\n" +
 	"\n" +
-	"LeaveMatch\x12\x1b.arena.v1.LeaveMatchRequest\x1a\x1c.arena.v1.ArenaMatchResponse\"1\x82\xd3\xe4\x93\x02+:\x01*\"&/api/v1/arena/matches/{match_id}/leave\x12o\n" +
-	"\tJoinQueue\x12\x1a.arena.v1.JoinQueueRequest\x1a!.arena.v1.ArenaQueueStateResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/v1/arena/queue/join\x12r\n" +
-	"\n" +
-	"LeaveQueue\x12\x1b.arena.v1.LeaveQueueRequest\x1a!.arena.v1.ArenaQueueStateResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/arena/queue/leave\x12x\n" +
-	"\x0eGetQueueStatus\x12\x1f.arena.v1.GetQueueStatusRequest\x1a!.arena.v1.ArenaQueueStateResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/arena/queue/status\x12|\n" +
-	"\x0eGetPlayerStats\x12\x1f.arena.v1.GetPlayerStatsRequest\x1a\".arena.v1.ArenaPlayerStatsResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/arena/stats/{user_id}\x12\x8a\x01\n" +
-	"\x13GetPlayerStatsBatch\x12$.arena.v1.GetPlayerStatsBatchRequest\x1a'.arena.v1.ArenaPlayerStatsBatchResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/arena/stats/batch\x12\x87\x01\n" +
-	"\x14ReportAntiCheatEvent\x12%.arena.v1.ReportAntiCheatEventRequest\x1a\x1d.arena.v1.ArenaStatusResponse\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/api/v1/arena/anti-cheat/event\x12z\n" +
-	"\x0fListOpenMatches\x12 .arena.v1.ListOpenMatchesRequest\x1a!.arena.v1.ListOpenMatchesResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/arena/open-matches\x12\x82\x01\n" +
-	"\x10GetSeasonHistory\x12!.arena.v1.GetSeasonHistoryRequest\x1a\".arena.v1.GetSeasonHistoryResponse\"'\x82\xd3\xe4\x93\x02!\x12\x1f/api/v1/arena/seasons/{user_id}B\x19Z\x17api/pkg/api/arena/v1;v1b\x06proto3"
+	"LeaveMatch\x12\x1b.arena.v1.LeaveMatchRequest\x1a\x1c.arena.v1.ArenaMatchResponse\"1\x82\xd3\xe4\x93\x02+:\x01*\"&/api/v1/arena/matches/{match_id}/leave\x12|\n" +
+	"\x0eGetPlayerStats\x12\x1f.arena.v1.GetPlayerStatsRequest\x1a\".arena.v1.ArenaPlayerStatsResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/arena/stats/{user_id}\x12\x87\x01\n" +
+	"\x14ReportAntiCheatEvent\x12%.arena.v1.ReportAntiCheatEventRequest\x1a\x1d.arena.v1.ArenaStatusResponse\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/api/v1/arena/anti-cheat/eventB\x19Z\x17api/pkg/api/arena/v1;v1b\x06proto3"
 
 var (
 	file_arena_v1_arena_proto_rawDescOnce sync.Once
@@ -2541,118 +2251,96 @@ func file_arena_v1_arena_proto_rawDescGZIP() []byte {
 	return file_arena_v1_arena_proto_rawDescData
 }
 
-var file_arena_v1_arena_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_arena_v1_arena_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_arena_v1_arena_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
+var file_arena_v1_arena_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_arena_v1_arena_proto_goTypes = []any{
-	(ArenaMatchStatus)(0),                 // 0: arena.v1.ArenaMatchStatus
-	(ArenaQueueStatus)(0),                 // 1: arena.v1.ArenaQueueStatus
-	(ArenaLeague)(0),                      // 2: arena.v1.ArenaLeague
-	(ArenaPlayerSide)(0),                  // 3: arena.v1.ArenaPlayerSide
-	(WinnerReason)(0),                     // 4: arena.v1.WinnerReason
-	(AntiCheatEventReason)(0),             // 5: arena.v1.AntiCheatEventReason
-	(*CreateMatchRequest)(nil),            // 6: arena.v1.CreateMatchRequest
-	(*GetMatchRequest)(nil),               // 7: arena.v1.GetMatchRequest
-	(*JoinMatchRequest)(nil),              // 8: arena.v1.JoinMatchRequest
-	(*LeaveMatchRequest)(nil),             // 9: arena.v1.LeaveMatchRequest
-	(*SubmitCodeRequest)(nil),             // 10: arena.v1.SubmitCodeRequest
-	(*GetLeaderboardRequest)(nil),         // 11: arena.v1.GetLeaderboardRequest
-	(*JoinQueueRequest)(nil),              // 12: arena.v1.JoinQueueRequest
-	(*LeaveQueueRequest)(nil),             // 13: arena.v1.LeaveQueueRequest
-	(*GetQueueStatusRequest)(nil),         // 14: arena.v1.GetQueueStatusRequest
-	(*GetPlayerStatsRequest)(nil),         // 15: arena.v1.GetPlayerStatsRequest
-	(*GetPlayerStatsBatchRequest)(nil),    // 16: arena.v1.GetPlayerStatsBatchRequest
-	(*ReportAntiCheatEventRequest)(nil),   // 17: arena.v1.ReportAntiCheatEventRequest
-	(*ListOpenMatchesRequest)(nil),        // 18: arena.v1.ListOpenMatchesRequest
-	(*GetSeasonHistoryRequest)(nil),       // 19: arena.v1.GetSeasonHistoryRequest
-	(*ArenaSeasonResultEntry)(nil),        // 20: arena.v1.ArenaSeasonResultEntry
-	(*GetSeasonHistoryResponse)(nil),      // 21: arena.v1.GetSeasonHistoryResponse
-	(*ArenaMatchResponse)(nil),            // 22: arena.v1.ArenaMatchResponse
-	(*SubmitCodeResponse)(nil),            // 23: arena.v1.SubmitCodeResponse
-	(*GetLeaderboardResponse)(nil),        // 24: arena.v1.GetLeaderboardResponse
-	(*ArenaSeasonInfo)(nil),               // 25: arena.v1.ArenaSeasonInfo
-	(*ArenaQueueStateResponse)(nil),       // 26: arena.v1.ArenaQueueStateResponse
-	(*ArenaPlayerStatsResponse)(nil),      // 27: arena.v1.ArenaPlayerStatsResponse
-	(*ArenaPlayerStatsBatchResponse)(nil), // 28: arena.v1.ArenaPlayerStatsBatchResponse
-	(*ArenaStatusResponse)(nil),           // 29: arena.v1.ArenaStatusResponse
-	(*ListOpenMatchesResponse)(nil),       // 30: arena.v1.ListOpenMatchesResponse
-	(*ArenaMatch)(nil),                    // 31: arena.v1.ArenaMatch
-	(*ArenaPlayer)(nil),                   // 32: arena.v1.ArenaPlayer
-	(*ArenaPlayerStats)(nil),              // 33: arena.v1.ArenaPlayerStats
-	(*ArenaLeaderboardEntry)(nil),         // 34: arena.v1.ArenaLeaderboardEntry
-	nil,                                   // 35: arena.v1.ArenaPlayerStatsBatchResponse.StatsEntry
-	(v1.Difficulty)(0),                    // 36: common.v1.Difficulty
-	(*timestamppb.Timestamp)(nil),         // 37: google.protobuf.Timestamp
-	(v1.SubmitFailureKind)(0),             // 38: common.v1.SubmitFailureKind
-	(v1.OperationStatus)(0),               // 39: common.v1.OperationStatus
+	(ArenaMatchStatus)(0),               // 0: arena.v1.ArenaMatchStatus
+	(ArenaLeague)(0),                    // 1: arena.v1.ArenaLeague
+	(ArenaPlayerSide)(0),                // 2: arena.v1.ArenaPlayerSide
+	(WinnerReason)(0),                   // 3: arena.v1.WinnerReason
+	(AntiCheatEventReason)(0),           // 4: arena.v1.AntiCheatEventReason
+	(*CreateMatchRequest)(nil),          // 5: arena.v1.CreateMatchRequest
+	(*GetMatchRequest)(nil),             // 6: arena.v1.GetMatchRequest
+	(*JoinMatchRequest)(nil),            // 7: arena.v1.JoinMatchRequest
+	(*LeaveMatchRequest)(nil),           // 8: arena.v1.LeaveMatchRequest
+	(*SubmitCodeRequest)(nil),           // 9: arena.v1.SubmitCodeRequest
+	(*GetLeaderboardRequest)(nil),       // 10: arena.v1.GetLeaderboardRequest
+	(*GuildLeaderboardEntry)(nil),       // 11: arena.v1.GuildLeaderboardEntry
+	(*GuildsLeaderboardRequest)(nil),    // 12: arena.v1.GuildsLeaderboardRequest
+	(*GuildsLeaderboardResponse)(nil),   // 13: arena.v1.GuildsLeaderboardResponse
+	(*SeasonXPEntry)(nil),               // 14: arena.v1.SeasonXPEntry
+	(*SeasonXPLeaderboardRequest)(nil),  // 15: arena.v1.SeasonXPLeaderboardRequest
+	(*SeasonXPLeaderboardResponse)(nil), // 16: arena.v1.SeasonXPLeaderboardResponse
+	(*GetPlayerStatsRequest)(nil),       // 17: arena.v1.GetPlayerStatsRequest
+	(*ReportAntiCheatEventRequest)(nil), // 18: arena.v1.ReportAntiCheatEventRequest
+	(*ArenaMatchResponse)(nil),          // 19: arena.v1.ArenaMatchResponse
+	(*SubmitCodeResponse)(nil),          // 20: arena.v1.SubmitCodeResponse
+	(*GetLeaderboardResponse)(nil),      // 21: arena.v1.GetLeaderboardResponse
+	(*ArenaSeasonInfo)(nil),             // 22: arena.v1.ArenaSeasonInfo
+	(*ArenaPlayerStatsResponse)(nil),    // 23: arena.v1.ArenaPlayerStatsResponse
+	(*ArenaStatusResponse)(nil),         // 24: arena.v1.ArenaStatusResponse
+	(*ArenaMatch)(nil),                  // 25: arena.v1.ArenaMatch
+	(*ArenaPlayer)(nil),                 // 26: arena.v1.ArenaPlayer
+	(*ArenaPlayerStats)(nil),            // 27: arena.v1.ArenaPlayerStats
+	(*ArenaLeaderboardEntry)(nil),       // 28: arena.v1.ArenaLeaderboardEntry
+	(v1.Difficulty)(0),                  // 29: common.v1.Difficulty
+	(*timestamppb.Timestamp)(nil),       // 30: google.protobuf.Timestamp
+	(v1.SubmitFailureKind)(0),           // 31: common.v1.SubmitFailureKind
+	(v1.OperationStatus)(0),             // 32: common.v1.OperationStatus
 }
 var file_arena_v1_arena_proto_depIdxs = []int32{
-	36, // 0: arena.v1.CreateMatchRequest.difficulty:type_name -> common.v1.Difficulty
-	36, // 1: arena.v1.JoinQueueRequest.difficulty:type_name -> common.v1.Difficulty
-	5,  // 2: arena.v1.ReportAntiCheatEventRequest.reason:type_name -> arena.v1.AntiCheatEventReason
-	20, // 3: arena.v1.GetSeasonHistoryResponse.seasons:type_name -> arena.v1.ArenaSeasonResultEntry
-	31, // 4: arena.v1.ArenaMatchResponse.match:type_name -> arena.v1.ArenaMatch
-	37, // 5: arena.v1.SubmitCodeResponse.freeze_until:type_name -> google.protobuf.Timestamp
-	31, // 6: arena.v1.SubmitCodeResponse.match:type_name -> arena.v1.ArenaMatch
-	38, // 7: arena.v1.SubmitCodeResponse.failure_kind:type_name -> common.v1.SubmitFailureKind
-	34, // 8: arena.v1.GetLeaderboardResponse.entries:type_name -> arena.v1.ArenaLeaderboardEntry
-	25, // 9: arena.v1.GetLeaderboardResponse.season:type_name -> arena.v1.ArenaSeasonInfo
-	37, // 10: arena.v1.ArenaSeasonInfo.starts_at:type_name -> google.protobuf.Timestamp
-	37, // 11: arena.v1.ArenaSeasonInfo.ends_at:type_name -> google.protobuf.Timestamp
-	1,  // 12: arena.v1.ArenaQueueStateResponse.status:type_name -> arena.v1.ArenaQueueStatus
-	36, // 13: arena.v1.ArenaQueueStateResponse.difficulty:type_name -> common.v1.Difficulty
-	37, // 14: arena.v1.ArenaQueueStateResponse.queued_at:type_name -> google.protobuf.Timestamp
-	31, // 15: arena.v1.ArenaQueueStateResponse.match:type_name -> arena.v1.ArenaMatch
-	33, // 16: arena.v1.ArenaPlayerStatsResponse.stats:type_name -> arena.v1.ArenaPlayerStats
-	35, // 17: arena.v1.ArenaPlayerStatsBatchResponse.stats:type_name -> arena.v1.ArenaPlayerStatsBatchResponse.StatsEntry
-	39, // 18: arena.v1.ArenaStatusResponse.status:type_name -> common.v1.OperationStatus
-	31, // 19: arena.v1.ListOpenMatchesResponse.matches:type_name -> arena.v1.ArenaMatch
-	36, // 20: arena.v1.ArenaMatch.difficulty:type_name -> common.v1.Difficulty
-	0,  // 21: arena.v1.ArenaMatch.status:type_name -> arena.v1.ArenaMatchStatus
-	4,  // 22: arena.v1.ArenaMatch.winner_reason:type_name -> arena.v1.WinnerReason
-	37, // 23: arena.v1.ArenaMatch.started_at:type_name -> google.protobuf.Timestamp
-	37, // 24: arena.v1.ArenaMatch.finished_at:type_name -> google.protobuf.Timestamp
-	37, // 25: arena.v1.ArenaMatch.created_at:type_name -> google.protobuf.Timestamp
-	32, // 26: arena.v1.ArenaMatch.players:type_name -> arena.v1.ArenaPlayer
-	3,  // 27: arena.v1.ArenaPlayer.side:type_name -> arena.v1.ArenaPlayerSide
-	37, // 28: arena.v1.ArenaPlayer.freeze_until:type_name -> google.protobuf.Timestamp
-	37, // 29: arena.v1.ArenaPlayer.accepted_at:type_name -> google.protobuf.Timestamp
-	37, // 30: arena.v1.ArenaPlayer.joined_at:type_name -> google.protobuf.Timestamp
-	2,  // 31: arena.v1.ArenaPlayerStats.league:type_name -> arena.v1.ArenaLeague
-	2,  // 32: arena.v1.ArenaLeaderboardEntry.league:type_name -> arena.v1.ArenaLeague
-	33, // 33: arena.v1.ArenaPlayerStatsBatchResponse.StatsEntry.value:type_name -> arena.v1.ArenaPlayerStats
-	6,  // 34: arena.v1.ArenaService.CreateMatch:input_type -> arena.v1.CreateMatchRequest
-	7,  // 35: arena.v1.ArenaService.GetMatch:input_type -> arena.v1.GetMatchRequest
-	8,  // 36: arena.v1.ArenaService.JoinMatch:input_type -> arena.v1.JoinMatchRequest
-	10, // 37: arena.v1.ArenaService.SubmitCode:input_type -> arena.v1.SubmitCodeRequest
-	11, // 38: arena.v1.ArenaService.GetLeaderboard:input_type -> arena.v1.GetLeaderboardRequest
-	9,  // 39: arena.v1.ArenaService.LeaveMatch:input_type -> arena.v1.LeaveMatchRequest
-	12, // 40: arena.v1.ArenaService.JoinQueue:input_type -> arena.v1.JoinQueueRequest
-	13, // 41: arena.v1.ArenaService.LeaveQueue:input_type -> arena.v1.LeaveQueueRequest
-	14, // 42: arena.v1.ArenaService.GetQueueStatus:input_type -> arena.v1.GetQueueStatusRequest
-	15, // 43: arena.v1.ArenaService.GetPlayerStats:input_type -> arena.v1.GetPlayerStatsRequest
-	16, // 44: arena.v1.ArenaService.GetPlayerStatsBatch:input_type -> arena.v1.GetPlayerStatsBatchRequest
-	17, // 45: arena.v1.ArenaService.ReportAntiCheatEvent:input_type -> arena.v1.ReportAntiCheatEventRequest
-	18, // 46: arena.v1.ArenaService.ListOpenMatches:input_type -> arena.v1.ListOpenMatchesRequest
-	19, // 47: arena.v1.ArenaService.GetSeasonHistory:input_type -> arena.v1.GetSeasonHistoryRequest
-	22, // 48: arena.v1.ArenaService.CreateMatch:output_type -> arena.v1.ArenaMatchResponse
-	22, // 49: arena.v1.ArenaService.GetMatch:output_type -> arena.v1.ArenaMatchResponse
-	22, // 50: arena.v1.ArenaService.JoinMatch:output_type -> arena.v1.ArenaMatchResponse
-	23, // 51: arena.v1.ArenaService.SubmitCode:output_type -> arena.v1.SubmitCodeResponse
-	24, // 52: arena.v1.ArenaService.GetLeaderboard:output_type -> arena.v1.GetLeaderboardResponse
-	22, // 53: arena.v1.ArenaService.LeaveMatch:output_type -> arena.v1.ArenaMatchResponse
-	26, // 54: arena.v1.ArenaService.JoinQueue:output_type -> arena.v1.ArenaQueueStateResponse
-	26, // 55: arena.v1.ArenaService.LeaveQueue:output_type -> arena.v1.ArenaQueueStateResponse
-	26, // 56: arena.v1.ArenaService.GetQueueStatus:output_type -> arena.v1.ArenaQueueStateResponse
-	27, // 57: arena.v1.ArenaService.GetPlayerStats:output_type -> arena.v1.ArenaPlayerStatsResponse
-	28, // 58: arena.v1.ArenaService.GetPlayerStatsBatch:output_type -> arena.v1.ArenaPlayerStatsBatchResponse
-	29, // 59: arena.v1.ArenaService.ReportAntiCheatEvent:output_type -> arena.v1.ArenaStatusResponse
-	30, // 60: arena.v1.ArenaService.ListOpenMatches:output_type -> arena.v1.ListOpenMatchesResponse
-	21, // 61: arena.v1.ArenaService.GetSeasonHistory:output_type -> arena.v1.GetSeasonHistoryResponse
-	48, // [48:62] is the sub-list for method output_type
-	34, // [34:48] is the sub-list for method input_type
-	34, // [34:34] is the sub-list for extension type_name
-	34, // [34:34] is the sub-list for extension extendee
-	0,  // [0:34] is the sub-list for field type_name
+	29, // 0: arena.v1.CreateMatchRequest.difficulty:type_name -> common.v1.Difficulty
+	11, // 1: arena.v1.GuildsLeaderboardResponse.entries:type_name -> arena.v1.GuildLeaderboardEntry
+	14, // 2: arena.v1.SeasonXPLeaderboardResponse.entries:type_name -> arena.v1.SeasonXPEntry
+	4,  // 3: arena.v1.ReportAntiCheatEventRequest.reason:type_name -> arena.v1.AntiCheatEventReason
+	25, // 4: arena.v1.ArenaMatchResponse.match:type_name -> arena.v1.ArenaMatch
+	30, // 5: arena.v1.SubmitCodeResponse.freeze_until:type_name -> google.protobuf.Timestamp
+	25, // 6: arena.v1.SubmitCodeResponse.match:type_name -> arena.v1.ArenaMatch
+	31, // 7: arena.v1.SubmitCodeResponse.failure_kind:type_name -> common.v1.SubmitFailureKind
+	28, // 8: arena.v1.GetLeaderboardResponse.entries:type_name -> arena.v1.ArenaLeaderboardEntry
+	22, // 9: arena.v1.GetLeaderboardResponse.season:type_name -> arena.v1.ArenaSeasonInfo
+	30, // 10: arena.v1.ArenaSeasonInfo.starts_at:type_name -> google.protobuf.Timestamp
+	30, // 11: arena.v1.ArenaSeasonInfo.ends_at:type_name -> google.protobuf.Timestamp
+	27, // 12: arena.v1.ArenaPlayerStatsResponse.stats:type_name -> arena.v1.ArenaPlayerStats
+	32, // 13: arena.v1.ArenaStatusResponse.status:type_name -> common.v1.OperationStatus
+	29, // 14: arena.v1.ArenaMatch.difficulty:type_name -> common.v1.Difficulty
+	0,  // 15: arena.v1.ArenaMatch.status:type_name -> arena.v1.ArenaMatchStatus
+	3,  // 16: arena.v1.ArenaMatch.winner_reason:type_name -> arena.v1.WinnerReason
+	30, // 17: arena.v1.ArenaMatch.started_at:type_name -> google.protobuf.Timestamp
+	30, // 18: arena.v1.ArenaMatch.finished_at:type_name -> google.protobuf.Timestamp
+	30, // 19: arena.v1.ArenaMatch.created_at:type_name -> google.protobuf.Timestamp
+	26, // 20: arena.v1.ArenaMatch.players:type_name -> arena.v1.ArenaPlayer
+	2,  // 21: arena.v1.ArenaPlayer.side:type_name -> arena.v1.ArenaPlayerSide
+	30, // 22: arena.v1.ArenaPlayer.freeze_until:type_name -> google.protobuf.Timestamp
+	30, // 23: arena.v1.ArenaPlayer.accepted_at:type_name -> google.protobuf.Timestamp
+	30, // 24: arena.v1.ArenaPlayer.joined_at:type_name -> google.protobuf.Timestamp
+	1,  // 25: arena.v1.ArenaPlayerStats.league:type_name -> arena.v1.ArenaLeague
+	1,  // 26: arena.v1.ArenaLeaderboardEntry.league:type_name -> arena.v1.ArenaLeague
+	5,  // 27: arena.v1.ArenaService.CreateMatch:input_type -> arena.v1.CreateMatchRequest
+	6,  // 28: arena.v1.ArenaService.GetMatch:input_type -> arena.v1.GetMatchRequest
+	7,  // 29: arena.v1.ArenaService.JoinMatch:input_type -> arena.v1.JoinMatchRequest
+	9,  // 30: arena.v1.ArenaService.SubmitCode:input_type -> arena.v1.SubmitCodeRequest
+	10, // 31: arena.v1.ArenaService.GetLeaderboard:input_type -> arena.v1.GetLeaderboardRequest
+	12, // 32: arena.v1.ArenaService.GuildsLeaderboard:input_type -> arena.v1.GuildsLeaderboardRequest
+	15, // 33: arena.v1.ArenaService.SeasonXPLeaderboard:input_type -> arena.v1.SeasonXPLeaderboardRequest
+	8,  // 34: arena.v1.ArenaService.LeaveMatch:input_type -> arena.v1.LeaveMatchRequest
+	17, // 35: arena.v1.ArenaService.GetPlayerStats:input_type -> arena.v1.GetPlayerStatsRequest
+	18, // 36: arena.v1.ArenaService.ReportAntiCheatEvent:input_type -> arena.v1.ReportAntiCheatEventRequest
+	19, // 37: arena.v1.ArenaService.CreateMatch:output_type -> arena.v1.ArenaMatchResponse
+	19, // 38: arena.v1.ArenaService.GetMatch:output_type -> arena.v1.ArenaMatchResponse
+	19, // 39: arena.v1.ArenaService.JoinMatch:output_type -> arena.v1.ArenaMatchResponse
+	20, // 40: arena.v1.ArenaService.SubmitCode:output_type -> arena.v1.SubmitCodeResponse
+	21, // 41: arena.v1.ArenaService.GetLeaderboard:output_type -> arena.v1.GetLeaderboardResponse
+	13, // 42: arena.v1.ArenaService.GuildsLeaderboard:output_type -> arena.v1.GuildsLeaderboardResponse
+	16, // 43: arena.v1.ArenaService.SeasonXPLeaderboard:output_type -> arena.v1.SeasonXPLeaderboardResponse
+	19, // 44: arena.v1.ArenaService.LeaveMatch:output_type -> arena.v1.ArenaMatchResponse
+	23, // 45: arena.v1.ArenaService.GetPlayerStats:output_type -> arena.v1.ArenaPlayerStatsResponse
+	24, // 46: arena.v1.ArenaService.ReportAntiCheatEvent:output_type -> arena.v1.ArenaStatusResponse
+	37, // [37:47] is the sub-list for method output_type
+	27, // [27:37] is the sub-list for method input_type
+	27, // [27:27] is the sub-list for extension type_name
+	27, // [27:27] is the sub-list for extension extendee
+	0,  // [0:27] is the sub-list for field type_name
 }
 
 func init() { file_arena_v1_arena_proto_init() }
@@ -2665,8 +2353,8 @@ func file_arena_v1_arena_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_arena_v1_arena_proto_rawDesc), len(file_arena_v1_arena_proto_rawDesc)),
-			NumEnums:      6,
-			NumMessages:   30,
+			NumEnums:      5,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

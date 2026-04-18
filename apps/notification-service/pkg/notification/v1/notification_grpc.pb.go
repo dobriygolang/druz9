@@ -25,7 +25,7 @@ const (
 	NotificationService_LinkTelegram_FullMethodName         = "/notification.v1.NotificationService/LinkTelegram"
 	NotificationService_UpdateSettings_FullMethodName       = "/notification.v1.NotificationService/UpdateSettings"
 	NotificationService_GetSettings_FullMethodName          = "/notification.v1.NotificationService/GetSettings"
-	NotificationService_UpdateCircleSettings_FullMethodName = "/notification.v1.NotificationService/UpdateCircleSettings"
+	NotificationService_UpdateGuildSettings_FullMethodName = "/notification.v1.NotificationService/UpdateGuildSettings"
 )
 
 // NotificationServiceClient is the client API for NotificationService service.
@@ -37,7 +37,7 @@ const (
 type NotificationServiceClient interface {
 	// Send enqueues a single notification for delivery.
 	Send(ctx context.Context, in *SendRequest, opts ...grpc.CallOption) (*SendResponse, error)
-	// SendBatch enqueues notifications for multiple users (e.g. circle fan-out).
+	// SendBatch enqueues notifications for multiple users (e.g. guild fan-out).
 	SendBatch(ctx context.Context, in *SendBatchRequest, opts ...grpc.CallOption) (*SendBatchResponse, error)
 	// RegisterChat links a Telegram chat ID to a user (by user UUID).
 	RegisterChat(ctx context.Context, in *RegisterChatRequest, opts ...grpc.CallOption) (*RegisterChatResponse, error)
@@ -47,8 +47,8 @@ type NotificationServiceClient interface {
 	UpdateSettings(ctx context.Context, in *UpdateSettingsRequest, opts ...grpc.CallOption) (*UpdateSettingsResponse, error)
 	// GetSettings returns a user's notification preferences.
 	GetSettings(ctx context.Context, in *GetSettingsRequest, opts ...grpc.CallOption) (*GetSettingsResponse, error)
-	// UpdateCircleSettings updates per-circle notification preferences.
-	UpdateCircleSettings(ctx context.Context, in *UpdateCircleSettingsRequest, opts ...grpc.CallOption) (*UpdateCircleSettingsResponse, error)
+	// UpdateGuildSettings updates per-guild notification preferences.
+	UpdateGuildSettings(ctx context.Context, in *UpdateGuildSettingsRequest, opts ...grpc.CallOption) (*UpdateGuildSettingsResponse, error)
 }
 
 type notificationServiceClient struct {
@@ -119,10 +119,10 @@ func (c *notificationServiceClient) GetSettings(ctx context.Context, in *GetSett
 	return out, nil
 }
 
-func (c *notificationServiceClient) UpdateCircleSettings(ctx context.Context, in *UpdateCircleSettingsRequest, opts ...grpc.CallOption) (*UpdateCircleSettingsResponse, error) {
+func (c *notificationServiceClient) UpdateGuildSettings(ctx context.Context, in *UpdateGuildSettingsRequest, opts ...grpc.CallOption) (*UpdateGuildSettingsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateCircleSettingsResponse)
-	err := c.cc.Invoke(ctx, NotificationService_UpdateCircleSettings_FullMethodName, in, out, cOpts...)
+	out := new(UpdateGuildSettingsResponse)
+	err := c.cc.Invoke(ctx, NotificationService_UpdateGuildSettings_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func (c *notificationServiceClient) UpdateCircleSettings(ctx context.Context, in
 type NotificationServiceServer interface {
 	// Send enqueues a single notification for delivery.
 	Send(context.Context, *SendRequest) (*SendResponse, error)
-	// SendBatch enqueues notifications for multiple users (e.g. circle fan-out).
+	// SendBatch enqueues notifications for multiple users (e.g. guild fan-out).
 	SendBatch(context.Context, *SendBatchRequest) (*SendBatchResponse, error)
 	// RegisterChat links a Telegram chat ID to a user (by user UUID).
 	RegisterChat(context.Context, *RegisterChatRequest) (*RegisterChatResponse, error)
@@ -148,8 +148,8 @@ type NotificationServiceServer interface {
 	UpdateSettings(context.Context, *UpdateSettingsRequest) (*UpdateSettingsResponse, error)
 	// GetSettings returns a user's notification preferences.
 	GetSettings(context.Context, *GetSettingsRequest) (*GetSettingsResponse, error)
-	// UpdateCircleSettings updates per-circle notification preferences.
-	UpdateCircleSettings(context.Context, *UpdateCircleSettingsRequest) (*UpdateCircleSettingsResponse, error)
+	// UpdateGuildSettings updates per-guild notification preferences.
+	UpdateGuildSettings(context.Context, *UpdateGuildSettingsRequest) (*UpdateGuildSettingsResponse, error)
 	mustEmbedUnimplementedNotificationServiceServer()
 }
 
@@ -178,8 +178,8 @@ func (UnimplementedNotificationServiceServer) UpdateSettings(context.Context, *U
 func (UnimplementedNotificationServiceServer) GetSettings(context.Context, *GetSettingsRequest) (*GetSettingsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetSettings not implemented")
 }
-func (UnimplementedNotificationServiceServer) UpdateCircleSettings(context.Context, *UpdateCircleSettingsRequest) (*UpdateCircleSettingsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpdateCircleSettings not implemented")
+func (UnimplementedNotificationServiceServer) UpdateGuildSettings(context.Context, *UpdateGuildSettingsRequest) (*UpdateGuildSettingsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateGuildSettings not implemented")
 }
 func (UnimplementedNotificationServiceServer) mustEmbedUnimplementedNotificationServiceServer() {}
 func (UnimplementedNotificationServiceServer) testEmbeddedByValue()                             {}
@@ -310,20 +310,20 @@ func _NotificationService_GetSettings_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _NotificationService_UpdateCircleSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateCircleSettingsRequest)
+func _NotificationService_UpdateGuildSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateGuildSettingsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NotificationServiceServer).UpdateCircleSettings(ctx, in)
+		return srv.(NotificationServiceServer).UpdateGuildSettings(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: NotificationService_UpdateCircleSettings_FullMethodName,
+		FullMethod: NotificationService_UpdateGuildSettings_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NotificationServiceServer).UpdateCircleSettings(ctx, req.(*UpdateCircleSettingsRequest))
+		return srv.(NotificationServiceServer).UpdateGuildSettings(ctx, req.(*UpdateGuildSettingsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -360,8 +360,8 @@ var NotificationService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _NotificationService_GetSettings_Handler,
 		},
 		{
-			MethodName: "UpdateCircleSettings",
-			Handler:    _NotificationService_UpdateCircleSettings_Handler,
+			MethodName: "UpdateGuildSettings",
+			Handler:    _NotificationService_UpdateGuildSettings_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

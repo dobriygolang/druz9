@@ -24,7 +24,7 @@ func (i *Implementation) GetSettings(ctx context.Context, req *v1.GetSettingsReq
 	return &v1.GetSettingsResponse{
 		DuelsEnabled:          settings.DuelsEnabled,
 		ProgressEnabled:       settings.ProgressEnabled,
-		CirclesEnabled:        settings.CirclesEnabled,
+		GuildsEnabled:        settings.GuildsEnabled,
 		DailyChallengeEnabled: settings.DailyChallengeEnabled,
 		QuietHoursStart:       int32(settings.QuietHoursStart),
 		QuietHoursEnd:         int32(settings.QuietHoursEnd),

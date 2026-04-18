@@ -49,9 +49,10 @@ func (s *Service) handleUpdate(ctx context.Context, update telegramUpdate) {
 
 	s.sendMessage(ctx, update.Message.Chat.ID, fmt.Sprintf("Код входа: %s\n\nВернись на сайт и введи его в форму авторизации.", code))
 
-	// TODO(sprint-2): Register Telegram chat ID in notification service.
-	// Requires resolving app user UUID from Telegram ID, which happens after login completes.
-	// Will be wired in the profile login endpoint (consumeConfirmedTelegramAuthChallenge).
+	// Chat-ID ↔ user binding happens later, in profile.TelegramAuth, once
+	// the user enters the login code on the web and we have their
+	// resolved app-user UUID. Notification-service's LinkTelegram call is
+	// issued there (see internal/api/profile/telegram_login.go).
 }
 
 func parseStartCommand(text string) (string, string) {

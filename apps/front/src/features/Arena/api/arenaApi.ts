@@ -66,4 +66,43 @@ export const arenaApi = {
   invalidateStats: (userId: string) => {
     statsCache.delete(userId)
   },
+
+  // Guild leaderboard — ranks guilds by aggregate wins + avg rating.
+  getGuildsLeaderboard: async (limit = 20): Promise<GuildLeaderboardEntry[]> => {
+    const r = await apiClient.get('/api/v1/arena/leaderboard/guilds', { params: { limit } })
+    return r.data?.entries ?? []
+  },
+
+  // Season XP leaderboard — ranks users by season-pass XP.
+  getSeasonXPLeaderboard: async (limit = 50): Promise<{
+    entries: SeasonXPEntry[]
+    seasonNumber: number
+  }> => {
+    const r = await apiClient.get('/api/v1/arena/leaderboard/season-xp', { params: { limit } })
+    return {
+      entries: r.data?.entries ?? [],
+      seasonNumber: r.data?.seasonNumber ?? 0,
+    }
+  },
+}
+
+export interface GuildLeaderboardEntry {
+  guildId: string
+  name: string
+  memberCount: number
+  totalWins: number
+  aggregatePoints: number
+  avgRating: number
+  deltaWeek: number
+}
+
+export interface SeasonXPEntry {
+  userId: string
+  username: string
+  displayName: string
+  avatarUrl: string
+  guildName: string
+  xp: number
+  currentTier: number
+  trophies: number
 }

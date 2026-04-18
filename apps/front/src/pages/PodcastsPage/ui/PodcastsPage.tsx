@@ -1,440 +1,427 @@
-import { useEffect, useState, useCallback } from 'react'
-import { Mic, Play, Pause, Search, Upload, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Panel, RpgButton, Bar, Badge, PageHeader } from '@/shared/ui/pixel'
+import { Fireplace, Fireflies } from '@/shared/ui/sprites'
 import { podcastApi } from '@/features/Podcast/api/podcastApi'
 import type { Podcast } from '@/entities/Podcast/model/types'
-import { Card } from '@/shared/ui/Card'
-import { Badge } from '@/shared/ui/Badge'
-import { ErrorState } from '@/shared/ui/ErrorState'
-import { useAuth } from '@/app/providers/AuthProvider'
-import { apiClient } from '@/shared/api/base'
-import { useAudioPlayer } from '@/features/Podcast/providers/AudioPlayerProvider'
-import { useTranslation } from 'react-i18next'
 
+type Tab = 'featured' | 'series' | 'history' | 'saved'
 
-function formatDuration(seconds: number) {
-  const m = Math.floor(seconds / 60)
-  const s = seconds % 60
-  return `${m}:${s.toString().padStart(2, '0')}`
+interface Episode {
+  id: string
+  t: string
+  h: string
+  d: string
+  c: string
+  tags: string[]
+  heard: boolean
+  ep: number
 }
 
-function formatTimeAgo(iso: string, t: (key: string, options?: Record<string, unknown>) => string) {
-  try {
-    const diff = Date.now() - new Date(iso).getTime()
-    const days = Math.floor(diff / 86400000)
-    if (days === 0) return t('podcasts.time.today')
-    if (days === 1) return t('podcasts.time.yesterday')
-    if (days < 7) return t('podcasts.time.daysAgo', { count: days })
-    if (days < 30) return t('podcasts.time.weeksAgo', { count: Math.floor(days / 7) })
-    return t('podcasts.time.monthsAgo', { count: Math.floor(days / 30) })
-  } catch { return '' }
+// Deterministic-per-title accent color; cycles through our pixel palette.
+const PALETTE = ['#3d6149', '#b8692a', '#a23a2a', '#3b6a8f', '#7a4a8f', '#4a2a5a']
+function pickColor(title: string, i: number): string {
+  let h = i
+  for (const c of title) h = (h * 31 + c.charCodeAt(0)) | 0
+  return PALETTE[Math.abs(h) % PALETTE.length]
 }
 
-const GRADIENT_COLORS = [
-  ['#059669', '#0D9488'],
-  ['#22c55e', '#16a34a'],
-  ['#f59e0b', '#059669'],
-  ['#ec4899', '#be185d'],
-  ['#3b82f6', '#1d4ed8'],
-  ['#14b8a6', '#0d9488'],
+function toEpisode(p: Podcast, i: number): Episode {
+  const mins = Math.max(1, Math.round(p.durationSeconds / 60))
+  return {
+    id: p.id,
+    t: p.title,
+    h: p.authorName || 'druz9 mentor',
+    d: `${mins} min`,
+    c: pickColor(p.title, i),
+    tags: [],
+    heard: false,
+    ep: p.listensCount || i + 1,
+  }
+}
+
+const SERIES: Array<[string, number, string]> = [
+  ["Algorithmist's Codex", 24, '#3d6149'],
+  ['Systems Scrolls', 18, '#b8692a'],
+  ['Guild Chronicles', 12, '#a23a2a'],
+  ['Career Trail', 30, '#3b6a8f'],
+]
+
+const QUEUE: Array<[string, string, string]> = [
+  ['up next', 'Rituals of the Mock Interview', '38m'],
+  ['queued', 'Why the Ember Bearers fell', '61m'],
+  ['queued', 'Dungeons & Databases', '44m'],
+  ['queued', 'Scrolls of Concurrency', '28m'],
 ]
 
 export function PodcastsPage() {
-  const { user } = useAuth()
-  const player = useAudioPlayer()
-  const { t } = useTranslation()
-  const [podcasts, setPodcasts] = useState<Podcast[]>([])
-  const [search, setSearch] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [showUpload, setShowUpload] = useState(false)
-  const [uploadTitle, setUploadTitle] = useState('')
-  const [uploadAuthor, setUploadAuthor] = useState('')
-  const [uploadDesc, setUploadDesc] = useState('')
-  const [uploadFile, setUploadFile] = useState<File | null>(null)
-  const [uploading, setUploading] = useState(false)
+  const [tab, setTab] = useState<Tab>('featured')
+  const [episodes, setEpisodes] = useState<Episode[]>([])
+  const [totalCatalog, setTotalCatalog] = useState(0)
+  const [playing, setPlaying] = useState<{ title: string; host: string; ep: string; pos: number } | null>(null)
 
-  const fetchPodcasts = useCallback(() => {
-    setError(null)
-    podcastApi.list({ limit: 50 })
-      .then(r => setPodcasts(r.podcasts))
-      .catch(() => setError(t('common.loadFailed')))
-  }, [t])
-
-  useEffect(() => { fetchPodcasts() }, [fetchPodcasts])
-
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const pct = ((e.clientX - rect.left) / rect.width) * 100
-    player.seek(Math.max(0, Math.min(100, pct)))
-  }
-
-  const SPEEDS = [0.75, 1, 1.25, 1.5, 2]
-  const cycleSpeed = () => {
-    const idx = SPEEDS.indexOf(player.speed)
-    player.setSpeed(SPEEDS[(idx + 1) % SPEEDS.length])
-  }
-
-  const filtered = podcasts.filter(p => {
-    if (search && !p.title.toLowerCase().includes(search.toLowerCase()) && !p.authorName.toLowerCase().includes(search.toLowerCase())) return false
-    return true
-  })
-
-  const [uploadError, setUploadError] = useState<string | null>(null)
-
-  // Warn user if they try to leave while uploading
   useEffect(() => {
-    if (!uploading) return
-    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = '' }
-    window.addEventListener('beforeunload', handler)
-    return () => window.removeEventListener('beforeunload', handler)
-  }, [uploading])
-
-  const handleUpload = async () => {
-    if (!uploadTitle || !uploadFile) return
-    setUploadError(null)
-    setUploading(true)
-    try {
-      // Step 1: Create podcast record
-      const createRes = await apiClient.post<{ podcast: { id: string } }>('/api/admin/podcasts', {
-        title: uploadTitle,
-        author: uploadAuthor || undefined,
-        description: uploadDesc || undefined,
+    let cancelled = false
+    podcastApi
+      .list({ limit: 40, offset: 0 })
+      .then((r) => {
+        if (cancelled) return
+        const eps = r.podcasts.map(toEpisode)
+        setEpisodes(eps)
+        setTotalCatalog(r.total)
+        if (eps[0] && !playing) {
+          setPlaying({ title: eps[0].t, host: eps[0].h, ep: `Ep. ${eps[0].ep} · ${eps[0].d}`, pos: 0 })
+        }
       })
-      const podcastId = createRes.data.podcast.id
-
-      // Determine content type enum from MIME type
-      const mimeType = uploadFile.type
-      let contentType = 'MEDIA_CONTENT_TYPE_AUDIO_MPEG'
-      if (mimeType === 'audio/wav') contentType = 'MEDIA_CONTENT_TYPE_AUDIO_WAV'
-      else if (mimeType === 'audio/ogg') contentType = 'MEDIA_CONTENT_TYPE_AUDIO_OGG'
-      else if (mimeType === 'audio/mp4' || mimeType === 'audio/x-m4a') contentType = 'MEDIA_CONTENT_TYPE_AUDIO_MP4'
-
-      // Get duration from audio metadata
-      let durationSeconds = 0
-      try {
-        const blobUrl = URL.createObjectURL(uploadFile)
-        durationSeconds = await new Promise<number>((resolve) => {
-          const audio = new Audio(blobUrl)
-          audio.addEventListener('loadedmetadata', () => { URL.revokeObjectURL(blobUrl); resolve(Math.round(audio.duration) || 0) })
-          audio.addEventListener('error', () => { URL.revokeObjectURL(blobUrl); resolve(0) })
-        })
-      } catch { durationSeconds = 0 }
-
-      // Step 2: Prepare upload — get S3 pre-signed URL
-      const prepareRes = await apiClient.post<{ uploadUrl: string; objectKey: string }>(
-        `/api/admin/podcasts/${podcastId}/upload/prepare`,
-        { fileName: uploadFile.name, contentType, durationSeconds },
-      )
-      const { uploadUrl, objectKey } = prepareRes.data
-
-      // Step 3: Upload file directly to S3/MinIO
-      await fetch(uploadUrl, {
-        method: 'PUT',
-        body: uploadFile,
-        headers: { 'Content-Type': uploadFile.type || 'audio/mpeg' },
-      })
-
-      // Step 4: Mark upload as complete
-      await apiClient.post(`/api/admin/podcasts/${podcastId}/upload/complete`, {
-        fileName: uploadFile.name,
-        contentType,
-        durationSeconds,
-        objectKey,
-      })
-
-      setShowUpload(false)
-      setUploadTitle(''); setUploadAuthor(''); setUploadDesc(''); setUploadFile(null)
-      fetchPodcasts()
-    } catch {
-      setUploadError(t('podcasts.upload.failed'))
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchPodcasts() }} />
+      .catch(() => {})
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
-    <div className="flex min-h-full flex-col gap-4 px-4 pb-6 pt-4 md:gap-6 md:p-8">
-      <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-        <div>
-          <h1 className="font-mono text-2xl font-bold text-[#111111]">{t('podcasts.title')}</h1>
-          <p className="text-sm text-[#4B6B52] font-geist mt-1">{t('podcasts.subtitle')}</p>
-        </div>
-        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center xl:w-auto">
-          {user?.isAdmin && (
-            <button
-              onClick={() => setShowUpload(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#059669] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#047857]"
+    <>
+      <PageHeader
+        eyebrow="Tavern · hearthside tales"
+        title="Tales by the Hearth"
+        subtitle="Podcasts, guest lectures and live stories from the druz9 world."
+        right={
+          <span
+            className="font-silkscreen uppercase"
+            style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em' }}
+          >
+            {totalCatalog} in catalog
+          </span>
+        }
+      />
+
+      {/* Player bar */}
+      <Panel variant="dark" style={{ padding: 0, overflow: 'hidden', marginBottom: 14 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '160px 1fr 200px',
+            alignItems: 'center',
+            gap: 16,
+            padding: '14px 20px',
+          }}
+        >
+          <div
+            style={{
+              height: 120,
+              background: 'linear-gradient(135deg, #3d6149 0%, #2a1f15 100%)',
+              border: '3px solid var(--ink-0)',
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Fireplace scale={3} />
+            <Fireflies count={4} />
+          </div>
+          <div>
+            <div
+              className="font-silkscreen uppercase"
+              style={{ color: 'var(--ember-3)', fontSize: 10, letterSpacing: '0.1em' }}
             >
-              <Upload className="w-4 h-4" /> {t('podcasts.upload.button')}
-            </button>
-          )}
-          <div className="relative w-full sm:flex-1 xl:w-[280px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder={t('podcasts.searchPlaceholder')}
-              className="w-full rounded-xl border border-[#C1CFC4] bg-white py-2.5 pl-10 pr-4 text-sm transition-shadow focus:outline-none focus:ring-2 focus:ring-[#059669]/20"
-            />
+              NOW PLAYING · {playing?.ep ?? '—'}
+            </div>
+            <div
+              style={{
+                fontFamily: 'Pixelify Sans, monospace',
+                fontSize: 22,
+                color: 'var(--parch-0)',
+                marginTop: 2,
+              }}
+            >
+              {playing?.title ?? 'Pick an episode'}
+            </div>
+            <div
+              className="font-silkscreen uppercase"
+              style={{
+                color: 'var(--parch-2)',
+                fontSize: 10,
+                letterSpacing: '0.08em',
+                marginTop: 2,
+              }}
+            >
+              {playing ? `with ${playing.host}` : 'tavern is quiet'}
+            </div>
+            <div style={{ marginTop: 10 }}>
+              <Bar value={(playing?.pos ?? 0) * 100} />
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: 8,
+              }}
+            >
+              <span
+                className="font-silkscreen uppercase"
+                style={{ color: 'var(--parch-2)', fontSize: 9, letterSpacing: '0.08em' }}
+              >
+                17:42 / 52:14
+              </span>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <span
+                  className="rpg-tweak-chip"
+                  style={{
+                    background: '#2a1f15',
+                    color: 'var(--parch-2)',
+                    borderColor: '#4a3028',
+                  }}
+                >
+                  1.0×
+                </span>
+                <span
+                  className="rpg-tweak-chip"
+                  style={{
+                    background: '#2a1f15',
+                    color: 'var(--parch-2)',
+                    borderColor: '#4a3028',
+                  }}
+                >
+                  sleep timer
+                </span>
+              </div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
+            <RpgButton size="sm" style={{ padding: '12px 14px', fontSize: 18 }}>
+              ⏮
+            </RpgButton>
+            <RpgButton size="sm" variant="primary" style={{ padding: '14px 18px', fontSize: 20 }}>
+              ▶
+            </RpgButton>
+            <RpgButton size="sm" style={{ padding: '12px 14px', fontSize: 18 }}>
+              ⏭
+            </RpgButton>
           </div>
         </div>
+      </Panel>
+
+      <div className="rpg-tabs">
+        {(
+          [
+            ['featured', 'Featured'],
+            ['series', 'Series'],
+            ['history', 'History'],
+            ['saved', 'Saved (12)'],
+          ] as const
+        ).map(([id, t]) => (
+          <div
+            key={id}
+            className={`rpg-tab ${tab === id ? 'rpg-tab--active' : ''}`}
+            onClick={() => setTab(id as Tab)}
+          >
+            {t}
+          </div>
+        ))}
       </div>
 
-      <div className="flex flex-1 min-h-0 flex-col gap-6 xl:flex-row">
-        {/* Left column */}
-        <div className="flex-1 flex flex-col gap-5 min-w-0">
-          {/* Now Playing */}
-          {player.playing && (
-            <div className="animate-fade-in flex flex-col gap-4 rounded-2xl bg-[#0B1210] p-5 sm:flex-row sm:items-center sm:gap-5 sm:p-6">
-              <div
-                className="w-[120px] h-[120px] rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: `linear-gradient(135deg, #059669, #f59e0b)` }}
+      <div className="rpg-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 18 }}>
+        <div>
+          <h3 className="font-display" style={{ fontSize: 17, marginBottom: 12 }}>
+            New from the hearth
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {episodes.map((p) => (
+              <Panel
+                key={p.ep}
+                variant="tight"
+                style={{ padding: 12, cursor: 'pointer' }}
+                onClick={() =>
+                  setPlaying({
+                    title: p.t,
+                    host: p.h,
+                    ep: `Ep. ${p.ep} · ${p.d}`,
+                    pos: 0,
+                  })
+                }
               >
-                <Mic className="w-12 h-12 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[11px] text-[#059669] font-medium tracking-wider font-geist uppercase">{t('podcasts.nowPlaying')}</p>
-                <h3 className="font-mono text-lg font-bold text-white mt-1 truncate">{player.playing.title}</h3>
-                <p className="text-sm text-[#94a3b8] font-geist mt-0.5">
-                  {player.playing.authorName} · {formatDuration(player.duration)}
-                </p>
-                <div className="flex items-center gap-3 mt-3">
-                  <button
-                    onClick={player.isPlaying ? player.pause : player.resume}
-                    className="w-10 h-10 rounded-full bg-[#059669] flex items-center justify-center hover:bg-[#047857] transition-colors"
+                <div style={{ display: 'flex', gap: 12, alignItems: 'stretch' }}>
+                  <div
+                    style={{
+                      width: 72,
+                      height: 72,
+                      background: p.c,
+                      border: '3px solid var(--ink-0)',
+                      flexShrink: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
                   >
-                    {player.isPlaying ? <Pause className="w-[18px] h-[18px] text-white" /> : <Play className="w-[18px] h-[18px] text-white ml-0.5" />}
-                  </button>
-                  {/* Speed */}
-                  <button
-                    onClick={cycleSpeed}
-                    className="px-2 py-1 text-[11px] font-bold text-[#7A9982] hover:text-white bg-[#1e293b] hover:bg-[#263148] rounded-md transition-colors min-w-[40px] text-center"
-                  >
-                    {player.speed === 1 ? '1×' : `${player.speed}×`}
-                  </button>
-                  <div className="flex-1 flex items-center gap-2">
-                    {/* Seekable progress bar */}
-                    <div
-                      className="flex-1 h-2 bg-[#1e293b] rounded-full overflow-hidden cursor-pointer group relative"
-                      onClick={handleSeek}
+                    <span
+                      style={{
+                        fontFamily: 'Silkscreen, monospace',
+                        fontSize: 20,
+                        color: 'var(--parch-0)',
+                        letterSpacing: '0.04em',
+                      }}
                     >
-                      <div
-                        className="h-full bg-[#059669] rounded-full relative transition-all duration-300"
-                        style={{ width: `${player.progress}%` }}
-                      >
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                    </div>
-                    <span className="text-[11px] font-mono text-[#4B6B52] w-[90px] text-right flex-shrink-0">
-                      {formatDuration(player.currentTime)} / {formatDuration(player.duration)}
+                      EP{p.ep}
                     </span>
                   </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Episode list header */}
-          <h2 className="font-mono text-base font-semibold text-[#111111]">
-            {player.playing ? t('podcasts.latestEpisodes') : t('podcasts.all')}
-          </h2>
-
-          {/* Episode list */}
-          <div className="flex flex-col gap-2">
-            {filtered.length === 0 && podcasts.length === 0 ? (
-              // Skeleton
-              Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 bg-white rounded-xl border border-[#C1CFC4] animate-pulse">
-                  <div className="w-14 h-14 rounded-xl bg-[#E4EBE5]" />
-                  <div className="flex-1">
-                    <div className="h-4 bg-[#E4EBE5] rounded w-48 mb-2" />
-                    <div className="h-3 bg-[#E4EBE5] rounded w-32" />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div
+                      style={{
+                        fontFamily: 'Pixelify Sans, monospace',
+                        fontSize: 14,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {p.t}
+                    </div>
+                    <div
+                      className="font-silkscreen uppercase"
+                      style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
+                    >
+                      {p.h} · {p.d}
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: 4,
+                        marginTop: 8,
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      {p.tags.map((t) => (
+                        <Badge key={t} style={{ fontSize: 9 }}>
+                          {t}
+                        </Badge>
+                      ))}
+                      {p.heard && (
+                        <Badge variant="moss" style={{ fontSize: 9 }}>
+                          ✓ heard
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
-              ))
-            ) : filtered.length === 0 ? (
-              <div className="text-center py-12">
-                <Mic className="w-10 h-10 mx-auto mb-3 text-[#C1CFC4]" />
-                <p className="text-sm text-[#94a3b8]">{t('podcasts.empty')}</p>
+              </Panel>
+            ))}
+          </div>
+
+          <h3 className="font-display" style={{ fontSize: 17, marginTop: 16, marginBottom: 12 }}>
+            Series
+          </h3>
+          <div className="rpg-podcasts-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+            {SERIES.map(([n, c, col]) => (
+              <div
+                key={String(n)}
+                style={{
+                  padding: 10,
+                  border: '3px solid var(--ink-0)',
+                  background: 'var(--parch-0)',
+                  boxShadow: '3px 3px 0 var(--ink-0)',
+                }}
+              >
+                <div
+                  style={{
+                    height: 60,
+                    background: col,
+                    border: '2px solid var(--ink-0)',
+                    marginBottom: 6,
+                  }}
+                />
+                <div
+                  style={{
+                    fontFamily: 'Pixelify Sans, monospace',
+                    fontSize: 12,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {n}
+                </div>
+                <div
+                  className="font-silkscreen uppercase"
+                  style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
+                >
+                  {c} episodes
+                </div>
               </div>
-            ) : (
-              filtered.map((podcast, i) => {
-                const colors = GRADIENT_COLORS[i % GRADIENT_COLORS.length]
-                const isCurrentlyPlaying = player.playing?.id === podcast.id
-                return (
-                  <button
-                    key={podcast.id}
-                    onClick={() => player.play(podcast)}
-                    className={`stagger-item flex flex-col items-start gap-4 rounded-xl border p-4 text-left transition-all duration-200 sm:flex-row sm:items-center ${
-                      isCurrentlyPlaying
-                        ? 'bg-[#fff7ed] border-[#059669]/30'
-                        : 'bg-white border-[#C1CFC4] hover:border-[#94a3b8] hover:shadow-sm'
-                    }`}
-                  >
-                    <div
-                      className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ background: `linear-gradient(135deg, ${colors[0]}, ${colors[1]})` }}
-                    >
-                      {isCurrentlyPlaying && player.isPlaying ? (
-                        <Pause className="w-6 h-6 text-white" />
-                      ) : (
-                        <Play className="w-6 h-6 text-white ml-0.5" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0 self-stretch">
-                      <p className="text-sm font-semibold text-[#111111] font-geist truncate">{podcast.title}</p>
-                      <div className="mt-0.5 flex flex-wrap items-center gap-2">
-                        <span className="text-xs text-[#4B6B52] font-geist">{podcast.authorName}</span>
-                        <span className="w-1 h-1 rounded-full bg-[#C1CFC4]" />
-                        <span className="text-xs text-[#4B6B52] font-geist">{formatDuration(podcast.durationSeconds)}</span>
-                        <span className="w-1 h-1 rounded-full bg-[#C1CFC4]" />
-                        <span className="text-xs text-[#4B6B52] font-geist">{formatTimeAgo(podcast.createdAt, t)}</span>
-                      </div>
-                    </div>
-                    <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-start">
-                      {podcast.listensCount > 0 && (
-                        <span className="text-xs text-[#94a3b8]">{t('podcasts.listens', { count: podcast.listensCount })}</span>
-                      )}
-                      <div className="w-9 h-9 rounded-full bg-[#F0F5F1] flex items-center justify-center">
-                        {isCurrentlyPlaying && player.isPlaying ? (
-                          <Pause className="w-4 h-4 text-[#111111]" />
-                        ) : (
-                          <Play className="w-4 h-4 text-[#111111] ml-0.5" />
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                )
-              })
-            )}
+            ))}
           </div>
         </div>
 
-        {/* Right column */}
-        <div className="flex w-full flex-shrink-0 flex-col gap-4 xl:w-[320px]">
-          {/* Popular shows */}
-          <Card padding="lg" className="flex flex-col gap-4">
-            <h3 className="font-mono text-sm font-semibold text-[#111111]">{t('podcasts.popularShows')}</h3>
-            {(podcasts.length > 0
-              ? [...new Map(podcasts.map(p => [p.authorName, p])).values()].slice(0, 3)
-              : []
-            ).map((show, i) => {
-              const colors = GRADIENT_COLORS[i % GRADIENT_COLORS.length]
-              return (
-                <div key={show.authorName} className="flex items-center gap-3">
-                  <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: `linear-gradient(135deg, ${colors[0]}, ${colors[1]})` }}
-                  >
-                    <Mic className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#111111] font-geist truncate">{show.authorName}</p>
-                    <p className="text-xs text-[#4B6B52] font-geist">
-                      {t('podcasts.episodes', { count: podcasts.filter(p => p.authorName === show.authorName).length })}
-                    </p>
-                  </div>
+        <div>
+          <Panel variant="recessed" style={{ padding: 14, marginBottom: 12 }}>
+            <h3 className="font-display" style={{ fontSize: 17, marginBottom: 10 }}>
+              Queue · 5
+            </h3>
+            {QUEUE.map(([s, t, d], i) => (
+              <div
+                key={i}
+                style={{
+                  padding: '8px 0',
+                  borderBottom: i < QUEUE.length - 1 ? '1px dashed var(--ink-3)' : 'none',
+                }}
+              >
+                <div
+                  className="font-silkscreen uppercase"
+                  style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
+                >
+                  {s}
                 </div>
-              )
-            })}
-            {podcasts.length === 0 && (
-              <div className="flex flex-col gap-3">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="flex items-center gap-3 animate-pulse">
-                    <div className="w-11 h-11 rounded-xl bg-[#E4EBE5]" />
-                    <div className="flex-1">
-                      <div className="h-3.5 bg-[#E4EBE5] rounded w-28 mb-1.5" />
-                      <div className="h-3 bg-[#E4EBE5] rounded w-20" />
-                    </div>
-                  </div>
-                ))}
+                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 12 }}>{t}</div>
+                <div
+                  className="font-silkscreen uppercase"
+                  style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
+                >
+                  {d}
+                </div>
               </div>
-            )}
-          </Card>
+            ))}
+          </Panel>
 
-          {/* Stats card */}
-          <Card padding="lg" dark>
-            <h3 className="font-mono text-sm font-semibold text-[#C1CFC4] mb-4">{t('podcasts.stats')}</h3>
-            <div className="flex gap-4 mb-4">
-              <div className="flex-1 text-center">
-                <p className="font-mono text-[28px] font-bold text-[#059669] leading-none">{podcasts.length || '—'}</p>
-                <p className="text-[11px] text-[#94a3b8] mt-1 font-geist">{t('podcasts.statsEpisodes')}</p>
-              </div>
-              <div className="flex-1 text-center">
-                <p className="font-mono text-[28px] font-bold text-[#059669] leading-none">
-                  {podcasts.reduce((sum, p) => sum + p.listensCount, 0) || '—'}
-                </p>
-                <p className="text-[11px] text-[#94a3b8] mt-1 font-geist">{t('podcasts.statsListeners')}</p>
-              </div>
+          <Panel>
+            <h3 className="font-display" style={{ fontSize: 17 }}>
+              Listening pact
+            </h3>
+            <div
+              className="font-silkscreen uppercase"
+              style={{
+                fontSize: 9,
+                color: 'var(--ink-2)',
+                letterSpacing: '0.08em',
+                marginBottom: 8,
+              }}
+            >
+              this month
             </div>
-            <div className="h-px bg-[#1e293b] mb-4" />
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-[#4B6B52] font-geist">{t('podcasts.newEpisodeEveryFriday')}</p>
-              <Badge variant="orange">{t('podcasts.follow')}</Badge>
+            <div
+              style={{
+                fontFamily: 'Pixelify Sans, monospace',
+                fontSize: 32,
+                color: 'var(--ember-1)',
+              }}
+            >
+              14h 20m
             </div>
-          </Card>
+            <div style={{ marginTop: 8 }}>
+              <Bar value={71} />
+            </div>
+            <div
+              className="font-silkscreen uppercase"
+              style={{
+                fontSize: 9,
+                color: 'var(--ink-2)',
+                letterSpacing: '0.08em',
+                marginTop: 6,
+              }}
+            >
+              71% of 20h goal · +200 ✦ on complete
+            </div>
+          </Panel>
         </div>
       </div>
-
-      {/* Upload modal */}
-      {showUpload && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
-          <div className="bg-white rounded-2xl shadow-xl border border-[#C1CFC4] w-full max-w-sm p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-bold text-[#111111]">{t('podcasts.upload.title')}</h2>
-              <button onClick={() => { if (!uploading) setShowUpload(false) }} disabled={uploading} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F0F5F1] text-[#4B6B52] disabled:opacity-30 disabled:cursor-not-allowed">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="flex flex-col gap-3">
-              <div>
-                <label className="text-xs font-medium text-[#4B6B52] mb-1 block">{t('podcasts.upload.titleLabel')}</label>
-                <input value={uploadTitle} onChange={e => setUploadTitle(e.target.value)}
-                  placeholder={t('podcasts.upload.titlePlaceholder')}
-                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0B1210] text-[#111111] dark:text-[#E2F0E8] border border-[#C1CFC4] dark:border-[#1E4035] rounded-lg focus:outline-none focus:border-[#059669] dark:focus:border-[#059669] placeholder:text-[#94a3b8]" />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-[#4B6B52] mb-1 block">{t('podcasts.upload.authorLabel')}</label>
-                <input value={uploadAuthor} onChange={e => setUploadAuthor(e.target.value)}
-                  placeholder={t('podcasts.upload.authorPlaceholder')}
-                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0B1210] text-[#111111] dark:text-[#E2F0E8] border border-[#C1CFC4] dark:border-[#1E4035] rounded-lg focus:outline-none focus:border-[#059669] dark:focus:border-[#059669] placeholder:text-[#94a3b8]" />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-[#4B6B52] mb-1 block">{t('podcasts.upload.descriptionLabel')}</label>
-                <textarea value={uploadDesc} onChange={e => setUploadDesc(e.target.value)}
-                  placeholder={t('podcasts.upload.descriptionPlaceholder')}
-                  rows={2}
-                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0B1210] text-[#111111] dark:text-[#E2F0E8] border border-[#C1CFC4] dark:border-[#1E4035] rounded-lg focus:outline-none focus:border-[#059669] dark:focus:border-[#059669] placeholder:text-[#94a3b8] resize-none" />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-[#4B6B52] mb-1 block">{t('podcasts.upload.fileLabel')}</label>
-                <input type="file" accept="audio/*"
-                  onChange={e => setUploadFile(e.target.files?.[0] ?? null)}
-                  className="w-full text-sm text-[#4B6B52] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-[#ecfdf5] file:text-[#059669] hover:file:bg-[#d1fae5]" />
-              </div>
-            </div>
-            {uploading && (
-              <p className="mt-3 text-xs text-[#f59e0b] font-medium text-center">
-                {t('podcasts.upload.progress')}
-              </p>
-            )}
-            {uploadError && (
-              <p className="mt-2 text-xs text-[#dc2626] text-center">{uploadError}</p>
-            )}
-            <div className="flex gap-2 mt-4">
-              <button onClick={() => { if (!uploading) setShowUpload(false) }} disabled={uploading}
-                className="flex-1 py-2 text-sm font-medium text-[#4B6B52] bg-[#F0F5F1] rounded-xl hover:bg-[#E4EBE5] transition-colors">
-                {t('common.cancel')}
-              </button>
-              <button onClick={handleUpload} disabled={uploading || !uploadTitle || !uploadFile}
-                className="flex-1 py-2 text-sm font-medium text-white bg-[#059669] rounded-xl hover:bg-[#047857] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                {uploading ? t('podcasts.upload.uploading') : t('podcasts.upload.submit')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   )
 }

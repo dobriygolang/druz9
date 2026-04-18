@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-// MissionDef defines a mission template in the static pool.
-type MissionDef struct {
+// Def defines a mission template in the static pool.
+type Def struct {
 	Key         string
 	Title       string
 	Description string
@@ -20,7 +20,7 @@ type MissionDef struct {
 }
 
 // dailyPool is the static pool of daily mission definitions.
-var dailyPool = []MissionDef{
+var dailyPool = []Def{
 	{
 		Key: "solve_practice_1", Title: "Solve a practice task",
 		Description: "Solve 1 practice task", TargetValue: 1, XPReward: 15,
@@ -122,7 +122,7 @@ const MissionsPerDay = 3
 
 // SelectDailyMissions deterministically picks 3 non-overlapping missions
 // for a given user on a given date using a hash-based selection.
-func SelectDailyMissions(userID string, date time.Time) []MissionDef {
+func SelectDailyMissions(userID string, date time.Time) []Def {
 	dateKey := date.UTC().Format("2006-01-02")
 	seed := hashSeed(userID + ":" + dateKey)
 
@@ -131,13 +131,13 @@ func SelectDailyMissions(userID string, date time.Time) []MissionDef {
 		return nil
 	}
 
-	selected := make([]MissionDef, 0, MissionsPerDay)
+	selected := make([]Def, 0, MissionsPerDay)
 	used := make(map[int]bool, MissionsPerDay)
 
 	for i := 0; i < MissionsPerDay; i++ {
 		// Derive a sub-seed for each slot to avoid collisions.
-		slotSeed := seed + uint64(i)*7919
-		idx := int(slotSeed % uint64(poolSize))
+		slotSeed := seed + uint64(i)*7919       //nolint:gosec // i is bounded by small constant MissionsPerDay
+		idx := int(slotSeed % uint64(poolSize)) //nolint:gosec // modulo result fits in int by construction
 
 		// Linear probe to find an unused slot.
 		for attempts := 0; attempts < poolSize; attempts++ {
@@ -155,7 +155,7 @@ func SelectDailyMissions(userID string, date time.Time) []MissionDef {
 
 // categorySaturated returns true if the category already has 2+ missions selected
 // (soft limit to avoid all 3 missions from the same feature).
-func categorySaturated(selected []MissionDef, category string) bool {
+func categorySaturated(selected []Def, category string) bool {
 	count := 0
 	for _, s := range selected {
 		if s.Category == category {
@@ -204,7 +204,7 @@ func BuildDailyMissions(userID string, date time.Time, counts *ActivityCounts, c
 		})
 	}
 
-	allComplete := completedCount == int32(len(missions))
+	allComplete := completedCount == int32(len(missions)) //nolint:gosec // missions len is bounded by MissionsPerDay constant
 	bonusXP := int32(0)
 	if allComplete {
 		bonusXP = AllCompleteBonusXP

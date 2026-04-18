@@ -16,7 +16,6 @@ func protoRoomModeToModel(mode v1.RoomMode) model.RoomMode {
 	}
 }
 
-
 func protoTaskTypeToModel(taskType v1.TaskType) model.TaskType {
 	switch taskType {
 	case v1.TaskType_TASK_TYPE_ALGORITHM:

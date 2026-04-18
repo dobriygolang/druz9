@@ -39,7 +39,7 @@ func TestListEvents(t *testing.T) {
 
 		mockService := mocks.NewService(t)
 		mockService.On("ListEvents", mock.Anything, user.ID, expectedOpts).Return(expectedResp, nil).Once()
-impl := New(mockService)
+		impl := New(mockService)
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
 
 		resp, err := impl.ListEvents(ctx, req)

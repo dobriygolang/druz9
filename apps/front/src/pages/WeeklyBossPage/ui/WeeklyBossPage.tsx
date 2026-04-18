@@ -1,10 +1,9 @@
-import { useEffect, useState, useCallback } from 'react'
-import { Crown, Clock, Star, ChevronRight, Loader2 } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+
+import { Panel, Badge, PageHeader } from '@/shared/ui/pixel'
 import { apiClient } from '@/shared/api/base'
-import { Card } from '@/shared/ui/Card'
-import { Avatar } from '@/shared/ui/Avatar'
 import { PageMeta } from '@/shared/ui/PageMeta'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 
@@ -42,7 +41,7 @@ function formatTime(ms: number): string {
 
 function timeRemaining(endsAt: string): string {
   const diff = new Date(endsAt).getTime() - Date.now()
-  if (diff <= 0) return 'Ended'
+  if (diff <= 0) return 'ended'
   const days = Math.floor(diff / 86_400_000)
   const hours = Math.floor((diff % 86_400_000) / 3_600_000)
   if (days > 0) return `${days}d ${hours}h left`
@@ -62,13 +61,15 @@ export function WeeklyBossPage() {
       const { data: d } = await apiClient.get('/api/v1/challenges/weekly')
       setData(d)
     } catch {
-      // ignore
+      // swallow — endpoint may not be live yet.
     } finally {
       setLoading(false)
     }
   }, [])
 
-  useEffect(() => { fetchData() }, [fetchData])
+  useEffect(() => {
+    void fetchData()
+  }, [fetchData])
 
   const handleStartChallenge = useCallback(async () => {
     const task = data?.weeklyTask
@@ -92,139 +93,252 @@ export function WeeklyBossPage() {
   const weeklyTask = data?.weeklyTask
 
   return (
-    <div className="flex flex-col gap-4 px-4 pt-4 pb-6 md:px-6">
-      <PageMeta title={t('weeklyBoss.meta.title', 'Weekly Boss')} description={t('weeklyBoss.meta.desc', 'Weekly hard challenge with community leaderboard')} canonicalPath="/practice/weekly-boss" />
-
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-bold text-[#111111] dark:text-[#E2F0E8]">
-            <Crown className="mr-2 inline h-5 w-5 text-[#f59e0b]" />
-            {t('weeklyBoss.title', 'Weekly Boss')}
-          </h1>
-          <p className="mt-1 text-xs text-[#7A9982] dark:text-[#7BA88A]">
-            {t('weeklyBoss.subtitle', 'One Hard challenge per week. Compete on the leaderboard by AI score and speed.')}
-          </p>
-        </div>
-        {data?.endsAt && (
-          <div className="flex items-center gap-1.5 rounded-full border border-[#f59e0b]/20 bg-[#ecfdf5] px-3 py-1.5 text-xs font-semibold text-[#92400e] dark:border-[#f59e0b]/15 dark:bg-[#2a200a] dark:text-[#fbbf24]">
-            <Clock className="h-3.5 w-3.5" />
-            {timeRemaining(data.endsAt)}
-          </div>
+    <>
+      <PageMeta
+        title={t('weeklyBoss.meta.title', 'Weekly Boss')}
+        description={t('weeklyBoss.meta.desc', 'Weekly hard challenge with community leaderboard')}
+        canonicalPath="/practice/weekly-boss"
+      />
+      <PageHeader
+        eyebrow="Arena · weekly boss"
+        title={t('weeklyBoss.title', 'Weekly Boss')}
+        subtitle={t(
+          'weeklyBoss.subtitle',
+          'One Hard challenge per week. Compete by AI score and speed.',
         )}
-      </div>
+        right={
+          data?.endsAt ? (
+            <Badge variant="ember" style={{ fontFamily: 'Pixelify Sans, monospace' }}>
+              ⏱ {timeRemaining(data.endsAt)}
+            </Badge>
+          ) : null
+        }
+      />
 
-      {/* My status */}
+      {/* My status / Start CTA */}
       {myEntry ? (
-        <Card padding="md" className="border-[#059669]/20 bg-[#ecfdf5] dark:border-[#059669]/15 dark:bg-[#0d2a1f]">
-          <div className="flex items-center justify-between">
+        <Panel style={{ marginBottom: 18 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <p className="text-xs font-medium text-[#059669]">{t('weeklyBoss.yourBest', 'Your Best')}</p>
-              <p className="mt-1 font-mono text-2xl font-bold text-[#059669]">{myEntry.aiScore}/10</p>
+              <div
+                className="font-silkscreen uppercase"
+                style={{ fontSize: 9, color: 'var(--moss-1)', letterSpacing: '0.1em' }}
+              >
+                {t('weeklyBoss.yourBest', 'Your Best')}
+              </div>
+              <div
+                style={{
+                  fontFamily: 'Pixelify Sans, monospace',
+                  fontSize: 32,
+                  color: 'var(--moss-1)',
+                  lineHeight: 1.1,
+                }}
+              >
+                {myEntry.aiScore}/10
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-xs text-[#7A9982] dark:text-[#7BA88A]">{t('weeklyBoss.solveTime', 'Solve time')}</p>
-              <p className="mt-1 font-mono text-lg font-bold text-[#4B6B52] dark:text-[#94a3b8]">{formatTime(myEntry.solveTimeMs)}</p>
+            <div style={{ textAlign: 'right' }}>
+              <div
+                className="font-silkscreen uppercase"
+                style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
+              >
+                {t('weeklyBoss.solveTime', 'Solve time')}
+              </div>
+              <div
+                style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 20, color: 'var(--ink-1)' }}
+              >
+                {formatTime(myEntry.solveTimeMs)}
+              </div>
             </div>
           </div>
-        </Card>
+        </Panel>
       ) : weeklyTask ? (
-        <button
+        <Panel
           onClick={handleStartChallenge}
-          disabled={starting}
-          className="flex w-full items-center justify-between rounded-xl border border-[#f59e0b]/30 bg-[#ecfdf5] px-4 py-3 text-left transition-colors hover:border-[#f59e0b] disabled:opacity-60 dark:border-[#f59e0b]/15 dark:bg-[#2a200a] dark:hover:border-[#f59e0b]/40"
+          style={{
+            marginBottom: 18,
+            cursor: starting ? 'default' : 'pointer',
+            opacity: starting ? 0.6 : 1,
+            borderLeftWidth: 6,
+            borderLeftColor: 'var(--ember-1)',
+          }}
         >
-          <div className="flex items-center gap-3">
-            {starting ? (
-              <Loader2 className="h-6 w-6 animate-spin text-[#f59e0b]" />
-            ) : (
-              <Crown className="h-6 w-6 text-[#f59e0b]" />
-            )}
-            <div>
-              <p className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">
-                {weeklyTask.taskTitle}
-              </p>
-              <p className="text-xs text-[#7A9982] dark:text-[#7BA88A]">
-                {t('weeklyBoss.startDesc')}
-              </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                background: 'var(--ember-2)',
+                border: '3px solid var(--ink-0)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 22,
+                flexShrink: 0,
+              }}
+            >
+              👑
             </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 15 }}>
+                {weeklyTask.taskTitle}
+              </div>
+              <div
+                className="font-silkscreen uppercase"
+                style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em', marginTop: 2 }}
+              >
+                {t('weeklyBoss.startDesc', 'Claim this week’s boss task')}
+              </div>
+            </div>
+            <span style={{ color: 'var(--ember-1)', fontSize: 20 }}>▸</span>
           </div>
-          <ChevronRight className="h-5 w-5 text-[#f59e0b]" />
-        </button>
+        </Panel>
       ) : (
-        <Card padding="md" className="text-center text-sm text-[#7A9982] dark:text-[#7BA88A]">
-          {t('weeklyBoss.noTask')}
-        </Card>
+        <Panel style={{ marginBottom: 18 }}>
+          <div style={{ padding: 16, textAlign: 'center', color: 'var(--ink-2)', fontSize: 13 }}>
+            {t('weeklyBoss.noTask', 'No active boss task this week.')}
+          </div>
+        </Panel>
       )}
 
       {/* Leaderboard */}
-      <div>
-        <h2 className="mb-3 text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">
+      <Panel style={{ marginBottom: 18 }}>
+        <h2 className="font-display" style={{ fontSize: 17, margin: '0 0 12px' }}>
           {t('weeklyBoss.leaderboard', 'Leaderboard')}
         </h2>
 
         {loading ? (
-          <div className="flex flex-col gap-2">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-14 animate-pulse rounded-xl bg-[#F0F5F1] dark:bg-[#162E24]" />
-            ))}
-          </div>
+          <div style={{ padding: 20, textAlign: 'center', color: 'var(--ink-2)' }}>{t('common.loading')}</div>
         ) : leaderboard.length === 0 ? (
-          <Card padding="lg" className="text-center">
-            <Crown className="mx-auto mb-2 h-8 w-8 text-[#C1CFC4] dark:text-[#1E4035]" />
-            <p className="text-sm text-[#7A9982] dark:text-[#7BA88A]">
-              {t('weeklyBoss.noEntries', 'No one has attempted the Weekly Boss yet. Be the first!')}
-            </p>
-          </Card>
+          <div style={{ padding: 32, textAlign: 'center' }}>
+            <div style={{ fontSize: 36, marginBottom: 8 }}>👑</div>
+            <div style={{ fontSize: 13, color: 'var(--ink-2)' }}>
+              {t(
+                'weeklyBoss.noEntries',
+                'No one has attempted the Weekly Boss yet. Be the first!',
+              )}
+            </div>
+          </div>
         ) : (
-          <div className="flex flex-col gap-1.5">
-            {leaderboard.map((entry, i) => (
+          leaderboard.map((entry, i) => {
+            const rankColor = i === 0 ? 'var(--ember-1)' : i < 3 ? 'var(--r-legendary)' : 'var(--ink-1)'
+            return (
               <div
                 key={entry.userId}
-                className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 ${
-                  i === 0
-                    ? 'border-[#f59e0b]/30 bg-[#ecfdf5] dark:border-[#f59e0b]/15 dark:bg-[#2a200a]'
-                    : 'border-[#C1CFC4] bg-white dark:border-[#1E4035] dark:bg-[#132420]'
-                }`}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '32px 32px 1fr auto',
+                  gap: 10,
+                  alignItems: 'center',
+                  padding: '8px 4px',
+                  borderBottom: i < leaderboard.length - 1 ? '1px dashed var(--ink-3)' : 'none',
+                  background: i === 0 ? 'rgba(184,105,42,0.08)' : 'transparent',
+                }}
               >
-                <span className={`w-6 text-center font-mono text-sm font-bold ${
-                  i === 0 ? 'text-[#f59e0b]' : i < 3 ? 'text-[#059669]' : 'text-[#7A9982] dark:text-[#7BA88A]'
-                }`}>
-                  {i + 1}
+                <span
+                  style={{
+                    fontFamily: 'Pixelify Sans, monospace',
+                    fontSize: 16,
+                    color: rankColor,
+                    textAlign: 'center',
+                  }}
+                >
+                  #{i + 1}
                 </span>
-                <Avatar name={entry.displayName} src={entry.avatarUrl || undefined} size="sm" />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-[#111111] dark:text-[#E2F0E8]">
-                    {entry.displayName}
-                  </p>
+                <div
+                  style={{
+                    width: 28,
+                    height: 28,
+                    background: 'var(--ink-0)',
+                    color: 'var(--parch-0)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontFamily: 'Pixelify Sans, monospace',
+                    fontSize: 13,
+                  }}
+                >
+                  {entry.displayName.slice(0, 2).toUpperCase()}
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1">
-                    <Star className="h-3.5 w-3.5 text-[#f59e0b]" />
-                    <span className="font-mono text-sm font-bold text-[#111111] dark:text-[#E2F0E8]">{entry.aiScore}</span>
-                  </div>
-                  <span className="font-mono text-xs text-[#7A9982] dark:text-[#7BA88A]">
+                <span
+                  style={{
+                    fontFamily: 'Pixelify Sans, monospace',
+                    fontSize: 13,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {entry.displayName}
+                </span>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <span
+                    style={{
+                      fontFamily: 'Pixelify Sans, monospace',
+                      fontSize: 14,
+                      color: 'var(--ember-1)',
+                    }}
+                  >
+                    ★ {entry.aiScore}
+                  </span>
+                  <span
+                    className="font-silkscreen uppercase"
+                    style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.06em' }}
+                  >
                     {formatTime(entry.solveTimeMs)}
                   </span>
                 </div>
               </div>
-            ))}
-          </div>
+            )
+          })
         )}
-      </div>
+      </Panel>
 
-      {/* Rewards info */}
-      <Card padding="md">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#7A9982] dark:text-[#7BA88A]">
+      {/* Rewards */}
+      <Panel variant="recessed">
+        <div
+          className="font-silkscreen uppercase"
+          style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.1em', marginBottom: 8 }}
+        >
           {t('weeklyBoss.rewards', 'Weekly Rewards')}
-        </h3>
-        <div className="flex flex-col gap-1 text-xs text-[#4B6B52] dark:text-[#94a3b8]">
-          <p>🥇 1st — +100 XP</p>
-          <p>🥈 2nd — +50 XP</p>
-          <p>🥉 3rd — +25 XP</p>
-          <p>7+ score — +25 XP ({t('weeklyBoss.missionReward', 'mission reward')})</p>
         </div>
-      </Card>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8 }}>
+          <RewardTile emoji="🥇" label="1st place" value="+100 XP" />
+          <RewardTile emoji="🥈" label="2nd place" value="+50 XP" />
+          <RewardTile emoji="🥉" label="3rd place" value="+25 XP" />
+          <RewardTile emoji="★" label="7+ score" value={`+25 XP · ${t('weeklyBoss.missionReward', 'mission')}`} />
+        </div>
+      </Panel>
+
+      {starting && (
+        <div style={{ marginTop: 12, fontSize: 11, color: 'var(--ink-2)' }}>Starting room…</div>
+      )}
+    </>
+  )
+}
+
+function RewardTile({ emoji, label, value }: { emoji: string; label: string; value: string }) {
+  return (
+    <div
+      style={{
+        padding: 10,
+        background: 'var(--parch-0)',
+        border: '2px solid var(--ink-0)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+      }}
+    >
+      <span style={{ fontSize: 20 }}>{emoji}</span>
+      <div>
+        <div
+          className="font-silkscreen uppercase"
+          style={{ fontSize: 8, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
+        >
+          {label}
+        </div>
+        <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 12 }}>{value}</div>
+      </div>
     </div>
   )
 }

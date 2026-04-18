@@ -100,9 +100,9 @@ func (r *Repo) buildListEventsQueries(opts model.ListEventsOptions) (string, str
 		args = append(args, *opts.CreatorID)
 		argNum++
 	}
-	if opts.CircleID != nil {
-		conditions = append(conditions, fmt.Sprintf("e.circle_id = $%d", argNum))
-		args = append(args, *opts.CircleID)
+	if opts.GuildID != nil {
+		conditions = append(conditions, fmt.Sprintf("e.guild_id = $%d", argNum))
+		args = append(args, *opts.GuildID)
 		argNum++
 	}
 
@@ -139,7 +139,7 @@ SELECT
   e.created_at,
   e.creator_id::text,
   COALESCE(NULLIF(TRIM(CONCAT_WS(' ', cu.first_name, cu.last_name)), ''), NULLIF(cu.username, ''), ''),
-  e.circle_id,
+  e.guild_id,
   COALESCE(e.repeat_rule, 'none'),
   e.is_public,
   COALESCE(e.status, 'approved')
@@ -238,7 +238,7 @@ func (r *Repo) fetchEvents(
 			&createdAt,
 			&event.CreatorID,
 			&event.CreatorName,
-			&event.CircleID,
+			&event.GuildID,
 			&event.Repeat,
 			&event.IsPublic,
 			&event.Status,

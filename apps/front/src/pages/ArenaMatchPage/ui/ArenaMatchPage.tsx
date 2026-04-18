@@ -15,6 +15,7 @@ import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { ReviewCard } from '@/features/SolutionReview/ui/ReviewCard'
 import { useSolutionReview } from '@/features/SolutionReview/hooks/useSolutionReview'
 import { useTranslation } from 'react-i18next'
+import { getLanguageLabel } from '@/shared/lib/codeEditorLanguage'
 import type * as Monaco from 'monaco-editor'
 
 function formatDuration(seconds: number) {
@@ -33,9 +34,9 @@ function parseFreezeSeconds(freezeUntil?: string) {
 }
 
 function difficultyLabel(difficulty?: number | string) {
-  if (difficulty === 1 || difficulty === 'ARENA_DIFFICULTY_EASY' || difficulty === 'easy') return 'Easy'
-  if (difficulty === 2 || difficulty === 'ARENA_DIFFICULTY_MEDIUM' || difficulty === 'medium') return 'Medium'
-  return 'Hard'
+  if (difficulty === 1 || difficulty === 'ARENA_DIFFICULTY_EASY' || difficulty === 'easy') return 'easy'
+  if (difficulty === 2 || difficulty === 'ARENA_DIFFICULTY_MEDIUM' || difficulty === 'medium') return 'medium'
+  return 'hard'
 }
 
 export function ArenaMatchPage() {
@@ -166,9 +167,9 @@ export function ArenaMatchPage() {
   const isSpectator = !!user?.id && ws.players.length > 0 && !ws.players.some(player => player.userId === user.id)
   const matchFinished = ws.matchState?.status === 'MATCH_STATUS_FINISHED'
   const waitingForOpponent = ws.matchState?.status === 'MATCH_STATUS_WAITING' || (!matchFinished && ws.players.length < 2)
-  const taskTitle = ws.matchState?.taskTitle ?? 'Task'
+  const taskTitle = ws.matchState?.taskTitle ?? t('arena.match.task')
   const taskStatement = ws.matchState?.taskStatement ?? ''
-  const levelLabel = difficultyLabel(ws.matchState?.difficulty)
+  const levelLabel = t(`arena.diff.${difficultyLabel(ws.matchState?.difficulty)}`)
   const editingLocked = freezeSeconds > 0 || waitingForOpponent || matchFinished || isSpectator
 
   useEffect(() => {
@@ -316,7 +317,7 @@ export function ArenaMatchPage() {
               <div className="flex items-center gap-3 border-b border-[#e2e8f0] px-4 py-3">
                 <Avatar name={myPlayer?.displayName ?? t('arena.match.you')} size="xs" />
                 <span className="text-sm font-semibold text-[#111111]">{myPlayer?.displayName ?? t('arena.match.you')}</span>
-                <span className="ml-auto rounded-full bg-[#F0F5F1] px-2 py-0.5 text-[11px] text-[#7A9982]">Python 3</span>
+                <span className="ml-auto rounded-full bg-[#F0F5F1] px-2 py-0.5 text-[11px] text-[#7A9982]">{getLanguageLabel('python')}</span>
               </div>
               {waitingForOpponent ? (
                 <div className="flex min-h-[320px] items-center justify-center px-6 py-10 text-center text-[#4B6B52]">
@@ -533,7 +534,7 @@ export function ArenaMatchPage() {
           <div className="h-10 bg-[#F0F5F1] border-b border-[#C1CFC4] flex items-center px-4 gap-3">
             <Avatar name={myPlayer?.displayName ?? t('arena.match.you')} size="xs" />
             <span className="text-xs font-medium text-[#0B1210]">{myPlayer?.displayName ?? t('arena.match.you')}</span>
-            <span className="ml-auto text-xs text-[#94a3b8] px-2 py-0.5 bg-[#F0F5F1] rounded-full">Python 3</span>
+            <span className="ml-auto text-xs text-[#94a3b8] px-2 py-0.5 bg-[#F0F5F1] rounded-full">{getLanguageLabel('python')}</span>
           </div>
           <div className="flex-1">
             {waitingForOpponent ? (

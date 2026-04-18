@@ -50,6 +50,38 @@ func (r *Repo) ListTasks(ctx context.Context, filter codeeditordomain.TaskFilter
 	return tasks, nil
 }
 
+func (r *Repo) ListSolvedTasks(ctx context.Context, userID uuid.UUID) ([]*codeeditordomain.Task, error) {
+	query := `
+		SELECT DISTINCT ON (ct.id) ` + codetasks.SelectColumns + `
+		FROM code_submissions cs
+		INNER JOIN code_rooms cr ON cr.id = cs.room_id
+		INNER JOIN code_tasks ct ON ct.id = cr.task_id
+		WHERE cs.user_id = $1
+		  AND cs.is_correct = TRUE
+		  AND ct.is_active = TRUE
+		ORDER BY ct.id, cs.submitted_at DESC
+	`
+	rows, err := r.data.DB.Query(ctx, query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("list solved tasks: %w", err)
+	}
+	defer rows.Close()
+
+	var tasks []*codeeditordomain.Task
+	for rows.Next() {
+		var task codeeditordomain.Task
+		if err := codetasks.ScanTask(rows, &task); err != nil {
+			return nil, fmt.Errorf("scan solved task: %w", err)
+		}
+		tasks = append(tasks, &task)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate solved tasks: %w", err)
+	}
+
+	return tasks, nil
+}
+
 func (r *Repo) CreateTask(ctx context.Context, task *codeeditordomain.Task) (*codeeditordomain.Task, error) {
 	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {

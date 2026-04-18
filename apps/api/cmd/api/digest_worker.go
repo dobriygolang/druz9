@@ -10,8 +10,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// startCircleDigestWorker sends weekly circle digests every Monday at ~10:00.
-func startCircleDigestWorker(notif notification.Sender, db *pgxpool.Pool) func() error {
+// startGuildDigestWorker sends weekly guild digests every Monday at ~10:00.
+func startGuildDigestWorker(notif notification.Sender, db *pgxpool.Pool) func() error {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	go func() {
@@ -27,7 +27,7 @@ func startCircleDigestWorker(notif notification.Sender, db *pgxpool.Pool) func()
 			case <-ctx.Done():
 				return
 			case <-time.After(waitDuration):
-				sendCircleDigests(ctx, notif, db)
+				sendGuildDigests(ctx, notif, db)
 			}
 		}
 	}()
@@ -46,56 +46,56 @@ func nextMonday(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day()+daysUntilMonday, 0, 0, 0, 0, t.Location())
 }
 
-func sendCircleDigests(ctx context.Context, notif notification.Sender, db *pgxpool.Pool) {
-	// Single query: get circles with their members in one pass.
+func sendGuildDigests(ctx context.Context, notif notification.Sender, db *pgxpool.Pool) {
+	// Single query: get guilds with their members in one pass.
 	rows, err := db.Query(ctx, `
 		SELECT c.id, c.name, c.member_count, cm.user_id::text
-		FROM circles c
-		JOIN circle_members cm ON cm.circle_id = c.id
+		FROM guilds c
+		JOIN guild_members cm ON cm.guild_id = c.id
 		WHERE c.member_count >= 2
 		ORDER BY c.id
 		LIMIT 5000
 	`)
 	if err != nil {
-		klog.Errorf("circle digest query: %v", err)
+		klog.Errorf("guild digest query: %v", err)
 		return
 	}
 	defer rows.Close()
 
-	type circleDigest struct {
+	type guildDigest struct {
 		name      string
 		count     int
 		memberIDs []string
 	}
 
-	circles := make(map[string]*circleDigest)
+	guilds := make(map[string]*guildDigest)
 	var order []string
 
 	for rows.Next() {
-		var circleID, name, memberID string
+		var guildID, name, memberID string
 		var memberCount int
-		if err := rows.Scan(&circleID, &name, &memberCount, &memberID); err != nil {
+		if err := rows.Scan(&guildID, &name, &memberCount, &memberID); err != nil {
 			continue
 		}
-		cd, ok := circles[circleID]
+		cd, ok := guilds[guildID]
 		if !ok {
-			cd = &circleDigest{name: name, count: memberCount}
-			circles[circleID] = cd
-			order = append(order, circleID)
+			cd = &guildDigest{name: name, count: memberCount}
+			guilds[guildID] = cd
+			order = append(order, guildID)
 		}
 		cd.memberIDs = append(cd.memberIDs, memberID)
 	}
 
-	for _, circleID := range order {
-		cd := circles[circleID]
+	for _, guildID := range order {
+		cd := guilds[guildID]
 		if len(cd.memberIDs) == 0 {
 			continue
 		}
-		notif.SendBatch(ctx, cd.memberIDs, "circle_weekly_digest",
-			notiftext.CircleDigestTitle(),
-			notiftext.CircleDigestBody(cd.name, cd.count),
-			map[string]any{"circle_id": circleID, "circle_name": cd.name})
+		notif.SendBatch(ctx, cd.memberIDs, "guild_weekly_digest",
+			notiftext.GuildDigestTitle(),
+			notiftext.GuildDigestBody(cd.name, cd.count),
+			map[string]any{"guild_id": guildID, "guild_name": cd.name})
 	}
 
-	klog.Infof("circle digests sent for %d circles", len(circles))
+	klog.Infof("guild digests sent for %d guilds", len(guilds))
 }

@@ -18,6 +18,7 @@ import (
 type Service interface {
 	CreateRoom(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string, task string, isPrivate bool) (*codeeditordomain.Room, error)
 	SetRoomTask(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, task string) error
+	SetRoomPrivacy(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, isPrivate bool) error
 	CloseRoom(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID) error
 	GetRoom(ctx context.Context, roomID uuid.UUID) (*codeeditordomain.Room, error)
 	JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, name string, isGuest bool) (*codeeditordomain.Room, error)

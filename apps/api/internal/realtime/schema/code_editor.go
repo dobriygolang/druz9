@@ -21,20 +21,20 @@ const (
 )
 
 type CodeEditorMessage struct {
-	Type              string                     `json:"type"`
-	ClientID          string                     `json:"clientId,omitempty"`
-	AwarenessID       uint64                     `json:"awarenessId,omitempty"`
-	AwarenessIDs      []uint64                   `json:"awarenessIds,omitempty"`
-	ActiveClientCount int                        `json:"activeClientCount,omitempty"`
-	UserID            string                     `json:"userId,omitempty"`
-	GuestName         string                     `json:"guestName,omitempty"`
-	Data              string                     `json:"data,omitempty"`
-	PlainText         string                     `json:"plainText,omitempty"`
-	Language          string                     `json:"language,omitempty"`
+	Type              string   `json:"type"`
+	ClientID          string   `json:"clientId,omitempty"`
+	AwarenessID       uint64   `json:"awarenessId,omitempty"`
+	AwarenessIDs      []uint64 `json:"awarenessIds,omitempty"`
+	ActiveClientCount int      `json:"activeClientCount,omitempty"`
+	UserID            string   `json:"userId,omitempty"`
+	GuestName         string   `json:"guestName,omitempty"`
+	Data              string   `json:"data,omitempty"`
+	PlainText         string   `json:"plainText,omitempty"`
+	Language          string   `json:"language,omitempty"`
 	// CodeLen is used in duel_progress messages to convey the opponent's code
 	// character count without revealing the actual content.
-	CodeLen  int                        `json:"codeLen,omitempty"`
-	Room     *CodeEditorRoom            `json:"room,omitempty"`
+	CodeLen    int                        `json:"codeLen,omitempty"`
+	Room       *CodeEditorRoom            `json:"room,omitempty"`
 	Submission *CodeEditorSubmissionEvent `json:"submission,omitempty"`
 	Review     *CodeEditorReviewEvent     `json:"review,omitempty"`
 }

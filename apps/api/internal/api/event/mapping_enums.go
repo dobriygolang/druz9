@@ -43,6 +43,22 @@ func unmapEventRepeat(repeat v1.EventRepeat) string {
 	}
 }
 
+// mapEventStatus converts a model.Event.Status string to the proto enum.
+// Unknown values fall through to UNSPECIFIED so old rows in the DB never
+// crash marshaling.
+func mapEventStatus(status string) v1.EventStatus {
+	switch status {
+	case model.EventStatusPending:
+		return v1.EventStatus_EVENT_STATUS_PENDING
+	case model.EventStatusApproved:
+		return v1.EventStatus_EVENT_STATUS_APPROVED
+	case model.EventStatusRejected:
+		return v1.EventStatus_EVENT_STATUS_REJECTED
+	default:
+		return v1.EventStatus_EVENT_STATUS_UNSPECIFIED
+	}
+}
+
 // unmapDeleteEventScope converts the proto enum to the string used by the domain context.
 func unmapDeleteEventScope(scope v1.DeleteEventScope) string {
 	switch scope {

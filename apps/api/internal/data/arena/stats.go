@@ -59,43 +59,6 @@ func (r *Repo) GetPlayerStats(ctx context.Context, userID uuid.UUID) (*domain.Pl
 	return &item, nil
 }
 
-func (r *Repo) GetPlayerStatsBatch(ctx context.Context, userIDs []uuid.UUID) (map[uuid.UUID]*domain.PlayerStats, error) {
-	if len(userIDs) == 0 {
-		return make(map[uuid.UUID]*domain.PlayerStats), nil
-	}
-
-	userIDStrings := make([]string, 0, len(userIDs))
-	for _, id := range userIDs {
-		userIDStrings = append(userIDStrings, id.String())
-	}
-
-	rows, err := r.data.DB.Query(ctx, leaderboardSelect+`
-		WHERE aps.user_id = ANY($1)
-	`, userIDStrings)
-	if err != nil {
-		return nil, fmt.Errorf("get arena player stats batch: %w", err)
-	}
-	defer rows.Close()
-
-	result := make(map[uuid.UUID]*domain.PlayerStats, len(userIDs))
-	for rows.Next() {
-		var item domain.PlayerStats
-		if err := scanPlayerStats(rows, &item); err != nil {
-			return nil, fmt.Errorf("scan arena player stats batch: %w", err)
-		}
-		item.League = arenaLeague(item.Rating)
-		parsedUserID, err := uuid.Parse(item.UserID)
-		if err != nil {
-			return nil, fmt.Errorf("parse arena player stats user id %q: %w", item.UserID, err)
-		}
-		result[parsedUserID] = &item
-	}
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iterate arena player stats rows: %w", err)
-	}
-	return result, nil
-}
-
 func arenaLeague(rating int32) model.ArenaLeague {
 	return model.ArenaLeagueFromString(arenarating.LeagueName(rating))
 }

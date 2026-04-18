@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { authApi } from '@/features/Auth/api/authApi'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { geoApi, type GeoSuggestion } from '@/features/Geo/api/geoApi'
-import { Button } from '@/shared/ui/Button'
-import { cn } from '@/shared/lib/cn'
+import { Panel, RpgButton } from '@/shared/ui/pixel'
+import { Banner, Fireflies } from '@/shared/ui/sprites'
 
 export function CompleteRegistrationPage() {
   const { t } = useTranslation()
@@ -21,7 +21,6 @@ export function CompleteRegistrationPage() {
   const debounceRef = useRef<ReturnType<typeof setTimeout>>()
   const wrapperRef = useRef<HTMLDivElement>(null)
 
-  // Debounced search
   useEffect(() => {
     if (selected) return
     if (query.trim().length < 2) {
@@ -42,7 +41,6 @@ export function CompleteRegistrationPage() {
     return () => clearTimeout(debounceRef.current)
   }, [query, selected])
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
@@ -82,7 +80,7 @@ export function CompleteRegistrationPage() {
         longitude: selected.longitude,
       })
       await refresh()
-      navigate('/home', { replace: true })
+      navigate('/hub', { replace: true })
     } catch {
       setError(t('complete.error.saveFailed'))
     } finally {
@@ -91,69 +89,150 @@ export function CompleteRegistrationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F0F5F1] flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-[460px]">
-        <div className="overflow-hidden rounded-[28px] border border-[#d8d9d6] bg-white shadow-[0_16px_34px_rgba(15,23,42,0.06)]">
-          <div className="h-1.5 bg-gradient-to-r from-[#059669] via-[#0D9488] to-[#5EEAD4]" />
-          <div className="p-6 sm:p-8">
-            <div className="mb-6 text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#059669]">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M4 20L12 4L20 20" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M7 14H17" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
-                </svg>
-              </div>
-              <h2 className="text-xl font-bold text-[#111111]">{t('complete.title')}</h2>
-              <p className="mt-1 text-sm text-[#4B6B52]">{t('complete.subtitle')}</p>
-            </div>
-            {error && (
-              <div className="mb-4 rounded-lg border border-[#fca5a5] bg-[#fef2f2] p-3 text-sm text-[#dc2626]">{error}</div>
-            )}
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <div ref={wrapperRef} className="relative flex flex-col gap-1.5">
-                <label htmlFor="city-input" className="text-xs font-500 text-[#4B6B52]">
-                  {t('complete.city')}
-                </label>
-                <input
-                  id="city-input"
-                  type="text"
-                  value={query}
-                  onChange={e => handleInputChange(e.target.value)}
-                  onFocus={() => { if (suggestions.length > 0 && !selected) setShowDropdown(true) }}
-                  placeholder={t('complete.cityPlaceholder')}
-                  autoComplete="off"
-                  className={cn(
-                    'w-full px-3 py-3 text-sm rounded-xl transition-colors',
-                    'bg-[#E2F0E8] border border-[#e2e8f0] text-[#0B1210] placeholder-[#94a3b8]',
-                    'focus:outline-none focus:ring-2 focus:ring-[#059669]/20 focus:border-[#059669]',
-                  )}
-                />
-                {showDropdown && (
-                  <ul className="absolute top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto rounded-xl border border-[#e2e8f0] bg-white shadow-lg z-50">
-                    {suggestions.map((s, i) => (
-                      <li
-                        key={i}
-                        onClick={() => handleSelect(s)}
-                        className="cursor-pointer px-3 py-2 text-sm text-[#0B1210] hover:bg-[#f1f5f9] first:rounded-t-xl last:rounded-b-xl"
-                      >
-                        {s.placeLabel}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {selected && (
-                  <p className="text-xs text-[#059669]">
-                    {[selected.city, selected.region, selected.country].filter(Boolean).join(', ')}
-                  </p>
-                )}
-              </div>
-              <Button type="submit" variant="orange" loading={loading} className="mt-2 w-full justify-center rounded-2xl">
-                {t('complete.continue')}
-              </Button>
-            </form>
-          </div>
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '32px 16px',
+        position: 'relative',
+      }}
+    >
+      <Fireflies count={10} />
+      <Panel
+        style={{
+          maxWidth: 460,
+          width: '100%',
+          animation: 'rpg-pop-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+          <Banner crest="D9" color="#b8692a" scale={3} />
         </div>
-      </div>
+        <h1
+          className="font-display"
+          style={{ textAlign: 'center', fontSize: 22, margin: '0 0 4px' }}
+        >
+          {t('complete.title')}
+        </h1>
+        <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--ink-2)', marginBottom: 18 }}>
+          {t('complete.subtitle')}
+        </p>
+
+        {error && (
+          <div
+            style={{
+              marginBottom: 14,
+              padding: '10px 12px',
+              border: '3px solid var(--rpg-danger, #a23a2a)',
+              background: 'rgba(162, 58, 42, 0.12)',
+              color: 'var(--rpg-danger, #a23a2a)',
+              fontSize: 13,
+            }}
+          >
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div ref={wrapperRef} style={{ position: 'relative' }}>
+            <label
+              htmlFor="city-input"
+              className="font-silkscreen uppercase"
+              style={{
+                display: 'block',
+                fontSize: 10,
+                color: 'var(--ink-2)',
+                letterSpacing: '0.1em',
+                marginBottom: 6,
+              }}
+            >
+              {t('complete.city')}
+            </label>
+            <input
+              id="city-input"
+              type="text"
+              value={query}
+              onChange={(e) => handleInputChange(e.target.value)}
+              onFocus={() => {
+                if (suggestions.length > 0 && !selected) setShowDropdown(true)
+              }}
+              placeholder={t('complete.cityPlaceholder')}
+              autoComplete="off"
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                fontFamily: 'IBM Plex Sans, system-ui',
+                fontSize: 14,
+                background: 'var(--parch-2)',
+                border: '3px solid var(--ink-0)',
+                boxShadow: 'inset 2px 2px 0 var(--parch-3), inset -2px -2px 0 var(--parch-0)',
+                color: 'var(--ink-0)',
+                outline: 'none',
+              }}
+            />
+            {showDropdown && (
+              <ul
+                style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 4px)',
+                  left: 0,
+                  right: 0,
+                  maxHeight: 192,
+                  overflowY: 'auto',
+                  background: 'var(--parch-0)',
+                  border: '3px solid var(--ink-0)',
+                  boxShadow: '4px 4px 0 var(--ink-0)',
+                  zIndex: 50,
+                  listStyle: 'none',
+                  margin: 0,
+                  padding: 0,
+                }}
+              >
+                {suggestions.map((s, i) => (
+                  <li
+                    key={i}
+                    onClick={() => handleSelect(s)}
+                    style={{
+                      cursor: 'pointer',
+                      padding: '10px 12px',
+                      fontSize: 13,
+                      color: 'var(--ink-0)',
+                      borderBottom:
+                        i === suggestions.length - 1 ? 'none' : '1px dashed var(--ink-3)',
+                    }}
+                    onMouseEnter={(e) => {
+                      ;(e.target as HTMLLIElement).style.background = 'var(--parch-2)'
+                    }}
+                    onMouseLeave={(e) => {
+                      ;(e.target as HTMLLIElement).style.background = 'transparent'
+                    }}
+                  >
+                    {s.placeLabel}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {selected && (
+              <p
+                className="font-silkscreen uppercase"
+                style={{
+                  fontSize: 10,
+                  color: 'var(--moss-1)',
+                  letterSpacing: '0.08em',
+                  marginTop: 6,
+                }}
+              >
+                {[selected.city, selected.region, selected.country].filter(Boolean).join(' · ')}
+              </p>
+            )}
+          </div>
+          <RpgButton variant="primary" type="submit" disabled={loading}>
+            {loading ? 'Sealing...' : t('complete.continue')}
+          </RpgButton>
+        </form>
+      </Panel>
     </div>
   )
 }

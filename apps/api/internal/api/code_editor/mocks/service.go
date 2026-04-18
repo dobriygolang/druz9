@@ -762,6 +762,55 @@ func (_c *Service_SetReady_Call) RunAndReturn(run func(context.Context, uuid.UUI
 	return _c
 }
 
+// SetRoomPrivacy provides a mock function with given fields: ctx, roomID, callerID, isPrivate
+func (_m *Service) SetRoomPrivacy(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, isPrivate bool) error {
+	ret := _m.Called(ctx, roomID, callerID, isPrivate)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetRoomPrivacy")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *uuid.UUID, bool) error); ok {
+		r0 = rf(ctx, roomID, callerID, isPrivate)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Service_SetRoomPrivacy_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetRoomPrivacy'
+type Service_SetRoomPrivacy_Call struct {
+	*mock.Call
+}
+
+// SetRoomPrivacy is a helper method to define mock.On call
+//   - ctx context.Context
+//   - roomID uuid.UUID
+//   - callerID *uuid.UUID
+//   - isPrivate bool
+func (_e *Service_Expecter) SetRoomPrivacy(ctx interface{}, roomID interface{}, callerID interface{}, isPrivate interface{}) *Service_SetRoomPrivacy_Call {
+	return &Service_SetRoomPrivacy_Call{Call: _e.mock.On("SetRoomPrivacy", ctx, roomID, callerID, isPrivate)}
+}
+
+func (_c *Service_SetRoomPrivacy_Call) Run(run func(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, isPrivate bool)) *Service_SetRoomPrivacy_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*uuid.UUID), args[3].(bool))
+	})
+	return _c
+}
+
+func (_c *Service_SetRoomPrivacy_Call) Return(_a0 error) *Service_SetRoomPrivacy_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Service_SetRoomPrivacy_Call) RunAndReturn(run func(context.Context, uuid.UUID, *uuid.UUID, bool) error) *Service_SetRoomPrivacy_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SetRoomTask provides a mock function with given fields: ctx, roomID, callerID, task
 func (_m *Service) SetRoomTask(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, task string) error {
 	ret := _m.Called(ctx, roomID, callerID, task)

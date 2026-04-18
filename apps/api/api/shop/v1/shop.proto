@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package shop.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "api/pkg/api/shop/v1;v1";
+
+// ShopService is the Tavern: a catalog of cosmetics/decor/pets plus a
+// per-user inventory of what's been purchased. Prices are paid in gold or
+// gems; both balances live on the profile (not yet debited from this
+// service — Debit* is a follow-up when the profile wallet API is ready).
+service ShopService {
+  // ListCategories returns the tabs shown on the tavern page along with the
+  // item count per tab.
+  rpc ListCategories(ListCategoriesRequest) returns (ListCategoriesResponse) {
+    option (google.api.http) = { get: "/api/v1/shop/categories" };
+  }
+
+  // ListItems returns catalog entries filtered by category and/or rarity.
+  rpc ListItems(ListItemsRequest) returns (ListItemsResponse) {
+    option (google.api.http) = { get: "/api/v1/shop/items" };
+  }
+
+  // GetItem returns a single item's full detail (art, lore, price).
+  rpc GetItem(GetItemRequest) returns (GetItemResponse) {
+    option (google.api.http) = { get: "/api/v1/shop/items/{item_id}" };
+  }
+
+  // GetInventory returns items the authenticated user owns.
+  rpc GetInventory(GetInventoryRequest) returns (GetInventoryResponse) {
+    option (google.api.http) = { get: "/api/v1/shop/inventory" };
+  }
+
+  // Purchase buys an item with the user's gold/gems. Idempotent on a
+  // per-item basis (re-purchasing an owned item returns AlreadyOwned).
+  rpc Purchase(PurchaseRequest) returns (PurchaseResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/shop/purchase"
+      body: "*"
+    };
+  }
+}
+
+// ItemCategory tracks the high-level tab the item belongs to. Admin can
+// add more later; the client treats unknown values as "misc".
+enum ItemCategory {
+  ITEM_CATEGORY_UNSPECIFIED = 0;
+  ITEM_CATEGORY_DECOR       = 1;  // room furniture
+  ITEM_CATEGORY_COSMETICS   = 2;  // hero titles, frames, auras
+  ITEM_CATEGORY_AMBIENT     = 3;  // fireflies, snow, rain
+  ITEM_CATEGORY_PETS        = 4;  // companions
+  ITEM_CATEGORY_GUILD       = 5;  // guild hall banners
+  ITEM_CATEGORY_SEASONAL    = 6;  // event-drops
+}
+
+// Rarity drives the border and price curve.
+enum ItemRarity {
+  ITEM_RARITY_UNSPECIFIED = 0;
+  ITEM_RARITY_COMMON      = 1;
+  ITEM_RARITY_UNCOMMON    = 2;
+  ITEM_RARITY_RARE        = 3;
+  ITEM_RARITY_EPIC        = 4;
+  ITEM_RARITY_LEGENDARY   = 5;
+}
+
+// Currency the item is priced in.
+enum ItemCurrency {
+  ITEM_CURRENCY_UNSPECIFIED = 0;
+  ITEM_CURRENCY_GOLD        = 1;
+  ITEM_CURRENCY_GEMS        = 2;
+  ITEM_CURRENCY_SHARDS      = 3;  // seasonal-event currency
+}
+
+message ShopItem {
+  string       id               = 1;
+  string       slug             = 2;
+  string       name             = 3;
+  string       description      = 4;
+  ItemCategory category         = 5;
+  ItemRarity   rarity           = 6;
+  ItemCurrency currency         = 7;
+  int32        price            = 8;    // 0 means not-for-sale (event drop)
+  string       icon_ref         = 9;    // sprite name used by the client
+  string       accent_color     = 10;   // hex color — client tinting
+  bool         is_active        = 11;   // sold right now?
+  bool         is_seasonal      = 12;
+  google.protobuf.Timestamp rotates_at = 13; // when the item cycles out
+}
+
+message CategoryInfo {
+  ItemCategory category    = 1;
+  string       name        = 2;
+  int32        item_count  = 3;
+}
+
+message ListCategoriesRequest {}
+message ListCategoriesResponse {
+  repeated CategoryInfo categories = 1;
+}
+
+message ListItemsRequest {
+  ItemCategory category = 1;  // UNSPECIFIED → all
+  ItemRarity   rarity   = 2;  // UNSPECIFIED → all
+  int32        limit    = 3;  // default 50, max 200
+  int32        offset   = 4;
+}
+message ListItemsResponse {
+  repeated ShopItem items = 1;
+  int32             total = 2;
+}
+
+message GetItemRequest {
+  string item_id = 1;
+}
+message GetItemResponse {
+  ShopItem item  = 1;
+  bool     owned = 2;
+}
+
+message GetInventoryRequest {}
+message GetInventoryResponse {
+  repeated OwnedItem items = 1;
+}
+message OwnedItem {
+  ShopItem                  item        = 1;
+  google.protobuf.Timestamp acquired_at = 2;
+  bool                      equipped    = 3;
+}
+
+message PurchaseRequest {
+  string item_id = 1;
+}
+message PurchaseResponse {
+  OwnedItem item               = 1;
+  int32     remaining_gold     = 2;
+  int32     remaining_gems     = 3;
+}

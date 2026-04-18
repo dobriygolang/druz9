@@ -18,7 +18,7 @@ import (
 
 const (
 	yandexAuthorizeURL = "https://oauth.yandex.ru/authorize"
-	yandexTokenURL     = "https://oauth.yandex.ru/token"
+	yandexTokenURL     = "https://oauth.yandex.ru/token" //nolint:gosec // OAuth endpoint URL, not a credential
 	yandexUserInfoURL  = "https://login.yandex.ru/info"
 )
 

@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	GeoService_Resolve_FullMethodName      = "/geo.v1.GeoService/Resolve"
 	GeoService_CommunityMap_FullMethodName = "/geo.v1.GeoService/CommunityMap"
+	GeoService_WorldPins_FullMethodName    = "/geo.v1.GeoService/WorldPins"
 )
 
 // GeoServiceClient is the client API for GeoService service.
@@ -29,6 +30,9 @@ const (
 type GeoServiceClient interface {
 	Resolve(ctx context.Context, in *ResolveRequest, opts ...grpc.CallOption) (*ResolveResponse, error)
 	CommunityMap(ctx context.Context, in *CommunityMapRequest, opts ...grpc.CallOption) (*CommunityMapResponse, error)
+	// WorldPins aggregates locations of guild halls and upcoming events so
+	// the front-end world map can render a single query per view.
+	WorldPins(ctx context.Context, in *WorldPinsRequest, opts ...grpc.CallOption) (*WorldPinsResponse, error)
 }
 
 type geoServiceClient struct {
@@ -59,12 +63,25 @@ func (c *geoServiceClient) CommunityMap(ctx context.Context, in *CommunityMapReq
 	return out, nil
 }
 
+func (c *geoServiceClient) WorldPins(ctx context.Context, in *WorldPinsRequest, opts ...grpc.CallOption) (*WorldPinsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorldPinsResponse)
+	err := c.cc.Invoke(ctx, GeoService_WorldPins_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GeoServiceServer is the server API for GeoService service.
 // All implementations must embed UnimplementedGeoServiceServer
 // for forward compatibility.
 type GeoServiceServer interface {
 	Resolve(context.Context, *ResolveRequest) (*ResolveResponse, error)
 	CommunityMap(context.Context, *CommunityMapRequest) (*CommunityMapResponse, error)
+	// WorldPins aggregates locations of guild halls and upcoming events so
+	// the front-end world map can render a single query per view.
+	WorldPins(context.Context, *WorldPinsRequest) (*WorldPinsResponse, error)
 	mustEmbedUnimplementedGeoServiceServer()
 }
 
@@ -80,6 +97,9 @@ func (UnimplementedGeoServiceServer) Resolve(context.Context, *ResolveRequest) (
 }
 func (UnimplementedGeoServiceServer) CommunityMap(context.Context, *CommunityMapRequest) (*CommunityMapResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CommunityMap not implemented")
+}
+func (UnimplementedGeoServiceServer) WorldPins(context.Context, *WorldPinsRequest) (*WorldPinsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method WorldPins not implemented")
 }
 func (UnimplementedGeoServiceServer) mustEmbedUnimplementedGeoServiceServer() {}
 func (UnimplementedGeoServiceServer) testEmbeddedByValue()                    {}
@@ -138,6 +158,24 @@ func _GeoService_CommunityMap_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GeoService_WorldPins_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WorldPinsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GeoServiceServer).WorldPins(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GeoService_WorldPins_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GeoServiceServer).WorldPins(ctx, req.(*WorldPinsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // GeoService_ServiceDesc is the grpc.ServiceDesc for GeoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -152,6 +190,10 @@ var GeoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CommunityMap",
 			Handler:    _GeoService_CommunityMap_Handler,
+		},
+		{
+			MethodName: "WorldPins",
+			Handler:    _GeoService_WorldPins_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

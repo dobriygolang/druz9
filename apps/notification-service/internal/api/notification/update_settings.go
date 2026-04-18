@@ -24,8 +24,8 @@ func (i *Implementation) UpdateSettings(ctx context.Context, req *v1.UpdateSetti
 		if req.ProgressEnabled != nil {
 			us.ProgressEnabled = *req.ProgressEnabled
 		}
-		if req.CirclesEnabled != nil {
-			us.CirclesEnabled = *req.CirclesEnabled
+		if req.GuildsEnabled != nil {
+			us.GuildsEnabled = *req.GuildsEnabled
 		}
 		if req.DailyChallengeEnabled != nil {
 			us.DailyChallengeEnabled = *req.DailyChallengeEnabled

@@ -79,3 +79,18 @@ func (r *Repo) FindUserByProviderIdentity(ctx context.Context, provider model.Au
 func (r *Repo) FindUserByID(ctx context.Context, id uuid.UUID) (*model.User, error) {
 	return scanUser(r.data.DB.QueryRow(ctx, buildUserSelectQuery("u.id = $1"), id))
 }
+
+// FindUserByUsername looks up a user by their case-insensitive username.
+// Returns nil, nil when no user matches so callers can translate to their
+// own domain's "not found" error cleanly.
+func (r *Repo) FindUserByUsername(ctx context.Context, username string) (*model.User, error) {
+	user, err := scanUser(r.data.DB.QueryRow(ctx, buildUserSelectQuery("LOWER(u.username) = LOWER($1)"), username))
+	if err != nil {
+		// scanUser wraps pgx.ErrNoRows as profileerrors.ErrUserNotFound.
+		if err == profileerrors.ErrUserNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return user, nil
+}

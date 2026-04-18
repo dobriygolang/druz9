@@ -24,6 +24,9 @@ type Resolver interface {
 		ctx context.Context,
 		currentUserID string,
 	) ([]*model.CommunityMapPoint, error)
+	// ListWorldPins aggregates guild halls + upcoming events into a single
+	// list of map markers for the world-map page.
+	ListWorldPins(ctx context.Context) ([]*model.WorldPin, error)
 }
 
 // Service implements geo domain logic.
@@ -50,4 +53,10 @@ func (s *Service) EnrichCommunityMapWithAvatarURLs(ctx context.Context, response
 	_ = ctx
 	_ = response
 	return nil
+}
+
+// WorldPins proxies to the resolver. Kept as a domain method so callers
+// depend on geodomain.Service (not directly on the data layer).
+func (s *Service) WorldPins(ctx context.Context) ([]*model.WorldPin, error) {
+	return s.resolver.ListWorldPins(ctx)
 }

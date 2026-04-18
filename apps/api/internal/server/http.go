@@ -36,6 +36,9 @@ func NewHTTPServer(
 			newHTTPOptionalAuthMiddleware(authorizer, cookies),
 			newHTTPAuthMiddleware(authorizer, cookies, shouldRequireAuth),
 			newHTTPAdminMiddleware(),
+			// Per-user+per-operation caps on mutate endpoints. Sits AFTER
+			// auth so userID bucketing has the enriched ctx.
+			NewHTTPMutateRateLimiter(),
 		),
 	}
 

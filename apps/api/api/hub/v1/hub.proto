@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package hub.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "api/pkg/api/hub/v1;v1";
+
+service HubService {
+  rpc GetOverview(GetOverviewRequest) returns (GetOverviewResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/hub/overview"
+    };
+  }
+}
+
+message GetOverviewRequest {}
+
+message GetOverviewResponse {
+  HubPlayer player = 1;
+  repeated HubDailyMission daily_missions = 2;
+  HubQuest quest = 3;
+  HubArena arena = 4;
+  repeated HubEvent events = 5;
+  HubGuild guild = 6;
+  repeated HubMerchantPick merchant_picks = 7;
+}
+
+message HubPlayer {
+  string id = 1;
+  string display_name = 2;
+  string title = 3;
+  string level_label = 4;
+  int32 streak_days = 5;
+  HubAchievements achievements = 6;
+}
+
+message HubAchievements {
+  int32 unlocked = 1;
+  int32 total = 2;
+}
+
+message HubDailyMission {
+  string key = 1;
+  string title = 2;
+  string progress_label = 3;
+  int32 current = 4;
+  int32 target = 5;
+  bool completed = 6;
+  string reward_label = 7;
+  string action_url = 8;
+  string icon = 9;
+}
+
+message HubQuest {
+  string title = 1;
+  string description = 2;
+  int32 progress_pct = 3;
+  string action_url = 4;
+  string action_label = 5;
+}
+
+message HubArena {
+  repeated HubArenaItem items = 1;
+}
+
+message HubArenaItem {
+  string label = 1;
+  string meta = 2;
+  string action_url = 3;
+}
+
+message HubEvent {
+  string id = 1;
+  string title = 2;
+  string starts_at = 3;
+  string meta = 4;
+  string action_url = 5;
+}
+
+message HubGuild {
+  string id = 1;
+  string name = 2;
+  repeated string member_preview = 3;
+  string action_url = 4;
+}
+
+message HubMerchantPick {
+  string id = 1;
+  string name = 2;
+  string rarity = 3;
+  string price_label = 4;
+  string action_url = 5;
+}

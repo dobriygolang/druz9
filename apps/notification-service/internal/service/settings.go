@@ -29,11 +29,11 @@ func (s *Service) UpdateSettings(ctx context.Context, userID uuid.UUID, apply fu
 	return s.repo.UpsertUserSettings(ctx, settings)
 }
 
-func (s *Service) UpdateCircleSettings(ctx context.Context, userID, circleID uuid.UUID, apply func(s *data.CircleSettings)) error {
-	settings, err := s.repo.GetCircleSettings(ctx, userID, circleID)
+func (s *Service) UpdateGuildSettings(ctx context.Context, userID, guildID uuid.UUID, apply func(s *data.GuildSettings)) error {
+	settings, err := s.repo.GetGuildSettings(ctx, userID, guildID)
 	if err != nil {
 		return err
 	}
 	apply(settings)
-	return s.repo.UpsertCircleSettings(ctx, settings)
+	return s.repo.UpsertGuildSettings(ctx, settings)
 }

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { BarChart2, Code2, Layers, CheckCircle, RefreshCw } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { adminApi } from '@/features/Admin/api/adminApi'
 import { getCategoryFromTopics, CATEGORY_LABELS } from '@/features/Admin/model/taskCategories'
+import { PageMeta } from '@/shared/ui/PageMeta'
 
 function StatCard({ label, value, icon }: { label: string; value: string | number; icon: React.ReactNode }) {
   return (
@@ -56,6 +58,7 @@ const LANG_COLORS: Record<string, string> = {
 }
 
 export function AdminAnalyticsPage() {
+  const { t } = useTranslation()
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -97,17 +100,18 @@ export function AdminAnalyticsPage() {
 
   return (
     <div className="p-6">
+      <PageMeta title={t('admin.analytics.meta.title')} description={t('admin.analytics.meta.description')} />
       <div className="mb-5">
-        <h1 className="text-xl font-bold text-[#0B1210]">Analytics</h1>
-        <p className="text-sm text-[#4B6B52] mt-0.5">Platform task statistics</p>
+        <h1 className="text-xl font-bold text-[#0B1210]">{t('admin.analytics.title')}</h1>
+        <p className="text-sm text-[#4B6B52] mt-0.5">{t('admin.analytics.subtitle')}</p>
       </div>
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Total tasks" value={s.total} icon={<Code2 className="w-5 h-5 text-[#059669]" />} />
-        <StatCard label="Active" value={s.active} icon={<CheckCircle className="w-5 h-5 text-[#22c55e]" />} />
-        <StatCard label="Mock Interview" value={s.mock} icon={<Layers className="w-5 h-5 text-[#34D399]" />} />
-        <StatCard label="Solo Practice" value={s.solo} icon={<Layers className="w-5 h-5 text-[#f59e0b]" />} />
+        <StatCard label={t('admin.analytics.stats.total')} value={s.total} icon={<Code2 className="w-5 h-5 text-[#059669]" />} />
+        <StatCard label={t('admin.analytics.stats.active')} value={s.active} icon={<CheckCircle className="w-5 h-5 text-[#22c55e]" />} />
+        <StatCard label={t('admin.analytics.stats.mock')} value={s.mock} icon={<Layers className="w-5 h-5 text-[#34D399]" />} />
+        <StatCard label={t('admin.analytics.stats.solo')} value={s.solo} icon={<Layers className="w-5 h-5 text-[#f59e0b]" />} />
       </div>
 
       {/* Charts */}
@@ -115,31 +119,31 @@ export function AdminAnalyticsPage() {
         {/* Difficulty Distribution */}
         <div className="bg-white dark:bg-[#132420] rounded-xl border border-[#C1CFC4] dark:border-[#1E4035] p-5">
           <h3 className="text-sm font-semibold text-[#0B1210] mb-4 flex items-center gap-2">
-            <BarChart2 className="w-4 h-4 text-[#059669]" /> Difficulty
+            <BarChart2 className="w-4 h-4 text-[#059669]" /> {t('admin.analytics.difficulty')}
           </h3>
           <div className="flex flex-col gap-3">
-            <ProgressBar label="Easy" value={s.easy} total={s.total} color="#22c55e" />
-            <ProgressBar label="Medium" value={s.medium} total={s.total} color="#f59e0b" />
-            <ProgressBar label="Hard" value={s.hard} total={s.total} color="#ef4444" />
+            <ProgressBar label={t('admin.analytics.level.easy')} value={s.easy} total={s.total} color="#22c55e" />
+            <ProgressBar label={t('admin.analytics.level.medium')} value={s.medium} total={s.total} color="#f59e0b" />
+            <ProgressBar label={t('admin.analytics.level.hard')} value={s.hard} total={s.total} color="#ef4444" />
           </div>
         </div>
 
         {/* Category Distribution */}
         <div className="bg-white dark:bg-[#132420] rounded-xl border border-[#C1CFC4] dark:border-[#1E4035] p-5">
           <h3 className="text-sm font-semibold text-[#0B1210] mb-4 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-[#059669]" /> Categories
+            <Layers className="w-4 h-4 text-[#059669]" /> {t('admin.analytics.categories')}
           </h3>
           <div className="flex flex-col gap-3">
-            <ProgressBar label={CATEGORY_LABELS.mock ?? 'Mock'} value={s.mock} total={s.total} color="#059669" />
-            <ProgressBar label={CATEGORY_LABELS.solo_practice ?? 'Solo'} value={s.solo} total={s.total} color="#f59e0b" />
-            <ProgressBar label="No category" value={s.uncategorized} total={s.total} color="#94a3b8" />
+            <ProgressBar label={CATEGORY_LABELS.mock ?? t('admin.analytics.stats.mock')} value={s.mock} total={s.total} color="#059669" />
+            <ProgressBar label={CATEGORY_LABELS.solo_practice ?? t('admin.analytics.stats.solo')} value={s.solo} total={s.total} color="#f59e0b" />
+            <ProgressBar label={t('admin.analytics.noCategory')} value={s.uncategorized} total={s.total} color="#94a3b8" />
           </div>
         </div>
 
         {/* Languages Distribution */}
         <div className="bg-white dark:bg-[#132420] rounded-xl border border-[#C1CFC4] dark:border-[#1E4035] p-5">
           <h3 className="text-sm font-semibold text-[#0B1210] mb-4 flex items-center gap-2">
-            <Code2 className="w-4 h-4 text-[#059669]" /> Languages
+            <Code2 className="w-4 h-4 text-[#059669]" /> {t('admin.analytics.languages')}
           </h3>
           <div className="flex flex-col gap-3">
             {Object.entries(s.languages)
@@ -154,7 +158,7 @@ export function AdminAnalyticsPage() {
                 />
               ))}
             {Object.keys(s.languages).length === 0 && (
-              <p className="text-xs text-[#94a3b8] italic">No data</p>
+              <p className="text-xs text-[#94a3b8] italic">{t('admin.analytics.noData')}</p>
             )}
           </div>
         </div>
