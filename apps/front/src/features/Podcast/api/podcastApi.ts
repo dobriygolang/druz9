@@ -20,4 +20,49 @@ export const podcastApi = {
     const r = await apiClient.get<{ podcast: Podcast; streamUrl: string }>(`/api/v1/podcasts/${id}/play`)
     return { podcast: r.data.podcast, streamUrl: r.data.streamUrl }
   },
+
+  // ── Admin / creator upload flow ────────────────────────────────────
+  // 3-step contract mirroring the backend: create shell → ask for a
+  // presigned URL → client uploads bytes directly → mark complete.
+
+  create: async (title: string): Promise<Podcast> => {
+    const r = await apiClient.post<{ podcast: Podcast }>('/api/admin/podcasts', { title })
+    return r.data.podcast
+  },
+
+  prepareUpload: async (payload: {
+    podcastId: string
+    fileName: string
+    contentType: string
+    durationSeconds: number
+  }): Promise<{ uploadUrl: string; objectKey: string; podcast: Podcast }> => {
+    const r = await apiClient.post<{ uploadUrl: string; objectKey: string; podcast: Podcast }>(
+      `/api/admin/podcasts/${payload.podcastId}/upload/prepare`,
+      {
+        fileName: payload.fileName,
+        contentType: payload.contentType,
+        durationSeconds: payload.durationSeconds,
+      },
+    )
+    return r.data
+  },
+
+  completeUpload: async (payload: {
+    podcastId: string
+    fileName: string
+    contentType: string
+    durationSeconds: number
+    objectKey: string
+  }): Promise<Podcast> => {
+    const r = await apiClient.post<{ podcast: Podcast }>(
+      `/api/admin/podcasts/${payload.podcastId}/upload/complete`,
+      {
+        fileName: payload.fileName,
+        contentType: payload.contentType,
+        durationSeconds: payload.durationSeconds,
+        objectKey: payload.objectKey,
+      },
+    )
+    return r.data.podcast
+  },
 }

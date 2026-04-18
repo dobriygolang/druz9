@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Panel, RpgButton, Bar, Badge, PageHeader } from '@/shared/ui/pixel'
 import { Fireplace, Fireflies } from '@/shared/ui/sprites'
 import { podcastApi } from '@/features/Podcast/api/podcastApi'
 import type { Podcast } from '@/entities/Podcast/model/types'
+import { useAuth } from '@/app/providers/AuthProvider'
+import { addToast } from '@/shared/lib/toasts'
 
 type Tab = 'featured' | 'series' | 'history' | 'saved'
 
@@ -51,6 +53,8 @@ const SERIES: Array<[string, number, string]> = [
 type QueueItem = { episodeId: string; title: string; mins: number; slot: string }
 
 export function PodcastsPage() {
+  const { user } = useAuth()
+  const [uploadOpen, setUploadOpen] = useState(false)
   const [tab, setTab] = useState<Tab>('featured')
   const [episodes, setEpisodes] = useState<Episode[]>([])
   const [totalCatalog, setTotalCatalog] = useState(0)
@@ -89,14 +93,31 @@ export function PodcastsPage() {
         title="Tales by the Hearth"
         subtitle="Podcasts, guest lectures and live stories from the druz9 world."
         right={
-          <span
-            className="font-silkscreen uppercase"
-            style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em' }}
-          >
-            {totalCatalog} in catalog
-          </span>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <span
+              className="font-silkscreen uppercase"
+              style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em' }}
+            >
+              {totalCatalog} in catalog
+            </span>
+            {user?.isAdmin && (
+              <RpgButton size="sm" variant="primary" onClick={() => setUploadOpen(true)}>
+                + Add podcast
+              </RpgButton>
+            )}
+          </div>
         }
       />
+      {uploadOpen && (
+        <UploadPodcastModal
+          onClose={() => setUploadOpen(false)}
+          onUploaded={(p) => {
+            setUploadOpen(false)
+            setEpisodes((prev) => [toEpisode(p, 0), ...prev])
+            setTotalCatalog((t) => t + 1)
+          }}
+        />
+      )}
 
       {/* Player bar — only visible once the user actually picks an
           episode; the previous "NOW PLAYING · —" skeleton made the
@@ -427,4 +448,198 @@ export function PodcastsPage() {
       </div>
     </>
   )
+}
+
+// Admin-only upload modal. Drives the 3-step flow:
+//   1. POST /api/admin/podcasts with a title → get podcastId.
+//   2. POST /api/admin/podcasts/:id/upload/prepare → get presigned PUT URL.
+//   3. PUT the file bytes directly to that URL.
+//   4. POST /api/admin/podcasts/:id/upload/complete to finalize.
+function UploadPodcastModal({
+  onClose,
+  onUploaded,
+}: {
+  onClose: () => void
+  onUploaded: (p: Podcast) => void
+}) {
+  const [title, setTitle] = useState('')
+  const [file, setFile] = useState<File | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [error, setError] = useState('')
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+
+  const submit = async () => {
+    if (title.trim().length < 3) {
+      setError('Title must be at least 3 characters')
+      return
+    }
+    if (!file) {
+      setError('Pick an audio file (mp3, m4a, ogg)')
+      return
+    }
+    if (file.size > 200 * 1024 * 1024) {
+      setError('File is too large (max 200 MB)')
+      return
+    }
+    setError('')
+    setBusy(true)
+    setProgress(5)
+    try {
+      // 1) shell
+      const shell = await podcastApi.create(title.trim())
+      setProgress(15)
+
+      // 2) get presigned URL
+      const contentType = file.type || 'audio/mpeg'
+      const durationSec = await probeAudioDuration(file).catch(() => 0)
+      const prep = await podcastApi.prepareUpload({
+        podcastId: shell.id,
+        fileName: file.name,
+        contentType,
+        durationSeconds: Math.floor(durationSec),
+      })
+      setProgress(25)
+
+      // 3) PUT bytes with progress
+      await uploadWithProgress(prep.uploadUrl, file, contentType, (p) => {
+        setProgress(25 + Math.floor(p * 70))
+      })
+      setProgress(95)
+
+      // 4) finalize
+      const finalized = await podcastApi.completeUpload({
+        podcastId: shell.id,
+        fileName: file.name,
+        contentType,
+        durationSeconds: Math.floor(durationSec),
+        objectKey: prep.objectKey,
+      })
+      setProgress(100)
+
+      addToast({
+        kind: 'LOOT',
+        title: 'Podcast uploaded',
+        body: finalized.title,
+        icon: '◈',
+        color: 'var(--moss-1)',
+      })
+      onUploaded(finalized)
+    } catch (e: any) {
+      setError(e?.response?.data?.message ?? e?.message ?? 'Upload failed')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="rpg-modal-backdrop" onClick={onClose}>
+      <div
+        className="rpg-panel rpg-panel--nailed"
+        style={{ padding: 24, maxWidth: 480, width: '92%', maxHeight: '90vh', overflow: 'auto' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="font-display" style={{ fontSize: 20, marginBottom: 12 }}>Upload podcast</h3>
+        <div style={{ color: 'var(--ink-2)', fontSize: 13, marginBottom: 16 }}>
+          Audio only (mp3 / m4a / ogg). Duration is probed automatically.
+        </div>
+
+        <div style={{ marginBottom: 12 }}>
+          <div className="font-silkscreen uppercase" style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em', marginBottom: 4 }}>
+            title
+          </div>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={120}
+            placeholder="Episode title"
+            style={{
+              width: '100%',
+              padding: '8px 10px',
+              border: '3px solid var(--ink-0)',
+              background: 'var(--parch-2)',
+              fontFamily: 'IBM Plex Sans, system-ui',
+              fontSize: 14,
+              color: 'var(--ink-0)',
+              outline: 'none',
+            }}
+          />
+        </div>
+
+        <div style={{ marginBottom: 12 }}>
+          <div className="font-silkscreen uppercase" style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em', marginBottom: 4 }}>
+            file
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="audio/mpeg,audio/mp4,audio/ogg,audio/*"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            style={{ fontFamily: 'IBM Plex Sans, system-ui', fontSize: 12 }}
+          />
+          {file && (
+            <div style={{ fontSize: 11, color: 'var(--ink-2)', marginTop: 4 }}>
+              {file.name} · {(file.size / 1024 / 1024).toFixed(1)} MB
+            </div>
+          )}
+        </div>
+
+        {busy && (
+          <div style={{ marginBottom: 12 }}>
+            <Bar value={progress} />
+            <div className="font-silkscreen uppercase" style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em', marginTop: 4 }}>
+              uploading… {progress}%
+            </div>
+          </div>
+        )}
+
+        {error && <div style={{ color: 'var(--rpg-danger)', fontSize: 12, marginBottom: 10 }}>{error}</div>}
+
+        <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+          <RpgButton variant="primary" disabled={busy || !file || title.trim().length < 3} onClick={submit}>
+            {busy ? 'Uploading…' : 'Upload'}
+          </RpgButton>
+          <RpgButton disabled={busy} onClick={onClose}>
+            Cancel
+          </RpgButton>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function probeAudioDuration(file: File): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file)
+    const audio = new Audio()
+    audio.preload = 'metadata'
+    audio.src = url
+    const cleanup = () => URL.revokeObjectURL(url)
+    audio.onloadedmetadata = () => {
+      const d = audio.duration
+      cleanup()
+      resolve(Number.isFinite(d) ? d : 0)
+    }
+    audio.onerror = () => {
+      cleanup()
+      reject(new Error('Failed to read audio metadata'))
+    }
+  })
+}
+
+function uploadWithProgress(url: string, file: File, contentType: string, onProgress: (pct: number) => void): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('PUT', url)
+    xhr.setRequestHeader('Content-Type', contentType)
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onProgress(e.loaded / e.total)
+    }
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) resolve()
+      else reject(new Error(`Upload failed (${xhr.status})`))
+    }
+    xhr.onerror = () => reject(new Error('Network error during upload'))
+    xhr.send(file)
+  })
 }
