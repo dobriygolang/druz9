@@ -1,25 +1,13 @@
--- Season I "The Ember Pact": the default/active pass used by the UI.
--- (File name kept as *_s3.sql for historical reasons — see migration
---  00010 which also renumbered an already-deployed Season III row to I.)
--- Idempotent: guarded by unique(season_number).
+-- +goose Up
+-- +goose StatementBegin
 
-INSERT INTO season_passes (
-    id, season_number, title, subtitle, starts_at, ends_at,
-    max_tier, xp_per_tier, premium_price_gems
-)
-VALUES (
-    '00000000-0000-0000-0000-00000000ce03'::UUID,  -- stable id: reused across seed + migration
-    1, 'The Ember Pact', 'Chapter I · the founding season',
-    NOW(),
-    NOW() + INTERVAL '60 days',
-    40, 500, 400
-)
-ON CONFLICT (season_number) DO NOTHING;
+-- Ensure the active season pass has a 40-tier ladder. Idempotent: only
+-- inserts when the tier table is empty for the active pass. This used to
+-- live only in scripts/seeds/003_season_pass_s3.sql, which isn't applied
+-- automatically on prod deploys — resulting in an empty /seasonpass
+-- page. Putting it in a migration guarantees fresh environments always
+-- have a playable pass.
 
--- Tier ladder. Every 5 tiers we hand out a big cosmetic; other tiers give
--- gold/gems/xp. Premium track mirrors the structure with larger rewards.
--- Reward kind constants:
---   1 GOLD, 2 GEMS, 3 XP, 4 FRAME, 5 PET, 6 EMOTE, 7 BANNER, 8 AURA, 9 COSMETIC
 DO $$
 DECLARE
     pass_id UUID;
@@ -27,18 +15,23 @@ DECLARE
     free_kind SMALLINT; free_amt INT; free_lbl TEXT;
     prem_kind SMALLINT; prem_amt INT; prem_lbl TEXT;
 BEGIN
-    SELECT id INTO pass_id FROM season_passes WHERE season_number = 1;
+    -- Pick the first active pass (there's only ever one at a time).
+    SELECT id INTO pass_id
+      FROM season_passes
+     WHERE starts_at <= NOW() AND ends_at > NOW()
+     ORDER BY starts_at DESC
+     LIMIT 1;
+
     IF pass_id IS NULL THEN
         RETURN;
     END IF;
 
-    -- Skip if tiers already seeded.
+    -- Skip if this pass already has tiers.
     IF EXISTS (SELECT 1 FROM season_pass_tiers WHERE season_pass_id = pass_id) THEN
         RETURN;
     END IF;
 
     FOR t IN 1..40 LOOP
-        -- Big-reward tiers every 5.
         IF t % 10 = 0 THEN
             free_kind := 9; free_amt := 1; free_lbl := 'Rare cosmetic';
             prem_kind := 7; prem_amt := 1; prem_lbl := 'Ember banner';
@@ -46,7 +39,6 @@ BEGIN
             free_kind := 4; free_amt := 1; free_lbl := 'Bronze frame';
             prem_kind := 5; prem_amt := 1; prem_lbl := 'Pet companion';
         ELSE
-            -- Alternate gold / xp / gems across the fills.
             CASE t % 3
                 WHEN 0 THEN free_kind := 1; free_amt := 80;  free_lbl := '+80 gold';
                 WHEN 1 THEN free_kind := 3; free_amt := 120; free_lbl := '+120 xp';
@@ -55,7 +47,6 @@ BEGIN
             prem_kind := 1; prem_amt := 200; prem_lbl := '+200 gold';
         END IF;
 
-        -- Final tier gets the legendary frame.
         IF t = 40 THEN
             free_kind := 4; free_amt := 1; free_lbl := 'Season I frame';
             prem_kind := 8; prem_amt := 1; prem_lbl := 'Ember Sovereign aura';
@@ -72,3 +63,11 @@ BEGIN
         );
     END LOOP;
 END $$;
+
+-- +goose StatementEnd
+
+-- +goose Down
+-- +goose StatementBegin
+-- No-op: we don't tear down seed data on rollback.
+SELECT 1;
+-- +goose StatementEnd
