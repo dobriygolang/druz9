@@ -63,6 +63,32 @@ service PeerMockService {
   rpc GetMyReliability(GetMyReliabilityRequest) returns (GetMyReliabilityResponse) {
     option (google.api.http) = { get: "/api/v1/peer-mocks/reliability" };
   }
+
+  // GetCoachReport returns the post-mock AI coach report for a
+  // completed booking. On first call the report is lazily generated
+  // from the interviewer review notes (Whisper → Claude pipeline is a
+  // drop-in for the current heuristic). Subsequent calls return the
+  // cached row.
+  rpc GetCoachReport(GetCoachReportRequest) returns (GetCoachReportResponse) {
+    option (google.api.http) = { get: "/api/v1/peer-mocks/bookings/{booking_id}/coach" };
+  }
+}
+
+message GetCoachReportRequest {
+  string booking_id = 1;
+}
+
+message CoachReport {
+  string booking_id                 = 1;
+  string strengths                  = 2;
+  string areas_to_revisit           = 3;
+  repeated string recommended_focus = 4;
+  int32  filler_word_hits           = 5;
+  int32  overall_score              = 6;  // 0..100
+  google.protobuf.Timestamp generated_at = 7;
+}
+message GetCoachReportResponse {
+  CoachReport report = 1;
 }
 
 // ── Types ──────────────────────────────────────────────────────────────

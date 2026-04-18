@@ -23,6 +23,7 @@ const OperationPeerMockServiceBookSlot = "/peer_mock.v1.PeerMockService/BookSlot
 const OperationPeerMockServiceCancelBooking = "/peer_mock.v1.PeerMockService/CancelBooking"
 const OperationPeerMockServiceCancelSlot = "/peer_mock.v1.PeerMockService/CancelSlot"
 const OperationPeerMockServiceCreateSlot = "/peer_mock.v1.PeerMockService/CreateSlot"
+const OperationPeerMockServiceGetCoachReport = "/peer_mock.v1.PeerMockService/GetCoachReport"
 const OperationPeerMockServiceGetMyReliability = "/peer_mock.v1.PeerMockService/GetMyReliability"
 const OperationPeerMockServiceListMyBookings = "/peer_mock.v1.PeerMockService/ListMyBookings"
 const OperationPeerMockServiceListMySlots = "/peer_mock.v1.PeerMockService/ListMySlots"
@@ -34,6 +35,12 @@ type PeerMockServiceHTTPServer interface {
 	CancelBooking(context.Context, *CancelBookingRequest) (*CancelBookingResponse, error)
 	CancelSlot(context.Context, *CancelSlotRequest) (*CancelSlotResponse, error)
 	CreateSlot(context.Context, *CreateSlotRequest) (*CreateSlotResponse, error)
+	// GetCoachReport GetCoachReport returns the post-mock AI coach report for a
+	// completed booking. On first call the report is lazily generated
+	// from the interviewer review notes (Whisper → Claude pipeline is a
+	// drop-in for the current heuristic). Subsequent calls return the
+	// cached row.
+	GetCoachReport(context.Context, *GetCoachReportRequest) (*GetCoachReportResponse, error)
 	GetMyReliability(context.Context, *GetMyReliabilityRequest) (*GetMyReliabilityResponse, error)
 	ListMyBookings(context.Context, *ListMyBookingsRequest) (*ListMyBookingsResponse, error)
 	ListMySlots(context.Context, *ListMySlotsRequest) (*ListMySlotsResponse, error)
@@ -52,6 +59,7 @@ func RegisterPeerMockServiceHTTPServer(s *http.Server, srv PeerMockServiceHTTPSe
 	r.POST("/api/v1/peer-mocks/bookings/{booking_id}/cancel", _PeerMockService_CancelBooking0_HTTP_Handler(srv))
 	r.POST("/api/v1/peer-mocks/bookings/{booking_id}/review", _PeerMockService_SubmitReview0_HTTP_Handler(srv))
 	r.GET("/api/v1/peer-mocks/reliability", _PeerMockService_GetMyReliability0_HTTP_Handler(srv))
+	r.GET("/api/v1/peer-mocks/bookings/{booking_id}/coach", _PeerMockService_GetCoachReport0_HTTP_Handler(srv))
 }
 
 func _PeerMockService_CreateSlot0_HTTP_Handler(srv PeerMockServiceHTTPServer) func(ctx http.Context) error {
@@ -252,11 +260,39 @@ func _PeerMockService_GetMyReliability0_HTTP_Handler(srv PeerMockServiceHTTPServ
 	}
 }
 
+func _PeerMockService_GetCoachReport0_HTTP_Handler(srv PeerMockServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetCoachReportRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPeerMockServiceGetCoachReport)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetCoachReport(ctx, req.(*GetCoachReportRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetCoachReportResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type PeerMockServiceHTTPClient interface {
 	BookSlot(ctx context.Context, req *BookSlotRequest, opts ...http.CallOption) (rsp *BookSlotResponse, err error)
 	CancelBooking(ctx context.Context, req *CancelBookingRequest, opts ...http.CallOption) (rsp *CancelBookingResponse, err error)
 	CancelSlot(ctx context.Context, req *CancelSlotRequest, opts ...http.CallOption) (rsp *CancelSlotResponse, err error)
 	CreateSlot(ctx context.Context, req *CreateSlotRequest, opts ...http.CallOption) (rsp *CreateSlotResponse, err error)
+	// GetCoachReport GetCoachReport returns the post-mock AI coach report for a
+	// completed booking. On first call the report is lazily generated
+	// from the interviewer review notes (Whisper → Claude pipeline is a
+	// drop-in for the current heuristic). Subsequent calls return the
+	// cached row.
+	GetCoachReport(ctx context.Context, req *GetCoachReportRequest, opts ...http.CallOption) (rsp *GetCoachReportResponse, err error)
 	GetMyReliability(ctx context.Context, req *GetMyReliabilityRequest, opts ...http.CallOption) (rsp *GetMyReliabilityResponse, err error)
 	ListMyBookings(ctx context.Context, req *ListMyBookingsRequest, opts ...http.CallOption) (rsp *ListMyBookingsResponse, err error)
 	ListMySlots(ctx context.Context, req *ListMySlotsRequest, opts ...http.CallOption) (rsp *ListMySlotsResponse, err error)
@@ -318,6 +354,24 @@ func (c *PeerMockServiceHTTPClientImpl) CreateSlot(ctx context.Context, in *Crea
 	opts = append(opts, http.Operation(OperationPeerMockServiceCreateSlot))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// GetCoachReport GetCoachReport returns the post-mock AI coach report for a
+// completed booking. On first call the report is lazily generated
+// from the interviewer review notes (Whisper → Claude pipeline is a
+// drop-in for the current heuristic). Subsequent calls return the
+// cached row.
+func (c *PeerMockServiceHTTPClientImpl) GetCoachReport(ctx context.Context, in *GetCoachReportRequest, opts ...http.CallOption) (*GetCoachReportResponse, error) {
+	var out GetCoachReportResponse
+	pattern := "/api/v1/peer-mocks/bookings/{booking_id}/coach"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationPeerMockServiceGetCoachReport))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

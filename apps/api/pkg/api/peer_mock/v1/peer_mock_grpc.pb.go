@@ -28,6 +28,7 @@ const (
 	PeerMockService_CancelBooking_FullMethodName    = "/peer_mock.v1.PeerMockService/CancelBooking"
 	PeerMockService_SubmitReview_FullMethodName     = "/peer_mock.v1.PeerMockService/SubmitReview"
 	PeerMockService_GetMyReliability_FullMethodName = "/peer_mock.v1.PeerMockService/GetMyReliability"
+	PeerMockService_GetCoachReport_FullMethodName   = "/peer_mock.v1.PeerMockService/GetCoachReport"
 )
 
 // PeerMockServiceClient is the client API for PeerMockService service.
@@ -49,6 +50,12 @@ type PeerMockServiceClient interface {
 	CancelBooking(ctx context.Context, in *CancelBookingRequest, opts ...grpc.CallOption) (*CancelBookingResponse, error)
 	SubmitReview(ctx context.Context, in *SubmitReviewRequest, opts ...grpc.CallOption) (*SubmitReviewResponse, error)
 	GetMyReliability(ctx context.Context, in *GetMyReliabilityRequest, opts ...grpc.CallOption) (*GetMyReliabilityResponse, error)
+	// GetCoachReport returns the post-mock AI coach report for a
+	// completed booking. On first call the report is lazily generated
+	// from the interviewer review notes (Whisper → Claude pipeline is a
+	// drop-in for the current heuristic). Subsequent calls return the
+	// cached row.
+	GetCoachReport(ctx context.Context, in *GetCoachReportRequest, opts ...grpc.CallOption) (*GetCoachReportResponse, error)
 }
 
 type peerMockServiceClient struct {
@@ -149,6 +156,16 @@ func (c *peerMockServiceClient) GetMyReliability(ctx context.Context, in *GetMyR
 	return out, nil
 }
 
+func (c *peerMockServiceClient) GetCoachReport(ctx context.Context, in *GetCoachReportRequest, opts ...grpc.CallOption) (*GetCoachReportResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCoachReportResponse)
+	err := c.cc.Invoke(ctx, PeerMockService_GetCoachReport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PeerMockServiceServer is the server API for PeerMockService service.
 // All implementations must embed UnimplementedPeerMockServiceServer
 // for forward compatibility.
@@ -168,6 +185,12 @@ type PeerMockServiceServer interface {
 	CancelBooking(context.Context, *CancelBookingRequest) (*CancelBookingResponse, error)
 	SubmitReview(context.Context, *SubmitReviewRequest) (*SubmitReviewResponse, error)
 	GetMyReliability(context.Context, *GetMyReliabilityRequest) (*GetMyReliabilityResponse, error)
+	// GetCoachReport returns the post-mock AI coach report for a
+	// completed booking. On first call the report is lazily generated
+	// from the interviewer review notes (Whisper → Claude pipeline is a
+	// drop-in for the current heuristic). Subsequent calls return the
+	// cached row.
+	GetCoachReport(context.Context, *GetCoachReportRequest) (*GetCoachReportResponse, error)
 	mustEmbedUnimplementedPeerMockServiceServer()
 }
 
@@ -204,6 +227,9 @@ func (UnimplementedPeerMockServiceServer) SubmitReview(context.Context, *SubmitR
 }
 func (UnimplementedPeerMockServiceServer) GetMyReliability(context.Context, *GetMyReliabilityRequest) (*GetMyReliabilityResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetMyReliability not implemented")
+}
+func (UnimplementedPeerMockServiceServer) GetCoachReport(context.Context, *GetCoachReportRequest) (*GetCoachReportResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetCoachReport not implemented")
 }
 func (UnimplementedPeerMockServiceServer) mustEmbedUnimplementedPeerMockServiceServer() {}
 func (UnimplementedPeerMockServiceServer) testEmbeddedByValue()                         {}
@@ -388,6 +414,24 @@ func _PeerMockService_GetMyReliability_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PeerMockService_GetCoachReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCoachReportRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PeerMockServiceServer).GetCoachReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PeerMockService_GetCoachReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PeerMockServiceServer).GetCoachReport(ctx, req.(*GetCoachReportRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PeerMockService_ServiceDesc is the grpc.ServiceDesc for PeerMockService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -430,6 +474,10 @@ var PeerMockService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetMyReliability",
 			Handler:    _PeerMockService_GetMyReliability_Handler,
+		},
+		{
+			MethodName: "GetCoachReport",
+			Handler:    _PeerMockService_GetCoachReport_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

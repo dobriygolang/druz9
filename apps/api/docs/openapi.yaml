@@ -2631,6 +2631,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/peer_mock.v1.CancelBookingResponse'
+    /api/v1/peer-mocks/bookings/{bookingId}/coach:
+        get:
+            tags:
+                - PeerMockService
+            description: |-
+                GetCoachReport returns the post-mock AI coach report for a
+                 completed booking. On first call the report is lazily generated
+                 from the interviewer review notes (Whisper → Claude pipeline is a
+                 drop-in for the current heuristic). Subsequent calls return the
+                 cached row.
+            operationId: PeerMockService_GetCoachReport
+            parameters:
+                - name: bookingId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/peer_mock.v1.GetCoachReportResponse'
     /api/v1/peer-mocks/bookings/{bookingId}/review:
         post:
             tags:
@@ -6939,6 +6963,28 @@ components:
             properties:
                 slot:
                     $ref: '#/components/schemas/peer_mock.v1.Slot'
+        peer_mock.v1.CoachReport:
+            type: object
+            properties:
+                bookingId:
+                    type: string
+                strengths:
+                    type: string
+                areasToRevisit:
+                    type: string
+                recommendedFocus:
+                    type: array
+                    items:
+                        type: string
+                fillerWordHits:
+                    type: integer
+                    format: int32
+                overallScore:
+                    type: integer
+                    format: int32
+                generatedAt:
+                    type: string
+                    format: date-time
         peer_mock.v1.CreateSlotRequest:
             type: object
             properties:
@@ -6964,6 +7010,11 @@ components:
             properties:
                 slot:
                     $ref: '#/components/schemas/peer_mock.v1.Slot'
+        peer_mock.v1.GetCoachReportResponse:
+            type: object
+            properties:
+                report:
+                    $ref: '#/components/schemas/peer_mock.v1.CoachReport'
         peer_mock.v1.GetMyReliabilityResponse:
             type: object
             properties:

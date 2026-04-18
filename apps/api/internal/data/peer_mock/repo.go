@@ -364,6 +364,68 @@ func (r *Repo) SubmitReview(ctx context.Context, bookingID, reviewerID, targetID
 	return nil
 }
 
+// GetReviewForBooking returns the interviewer → interviewee review rating
+// and notes (if present). Used by the coach-report generator as its only
+// input until the Whisper/Claude pipeline lands.
+func (r *Repo) GetReviewForBooking(ctx context.Context, bookingID, interviewerID uuid.UUID) (rating int16, notes string, err error) {
+	err = r.data.DB.QueryRow(ctx, `
+        SELECT rating, notes FROM mock_reviews
+        WHERE booking_id = $1 AND reviewer_id = $2
+        LIMIT 1
+    `, bookingID, interviewerID).Scan(&rating, &notes)
+	if err != nil {
+		// Caller handles pgx.ErrNoRows as "no review yet".
+		return 0, "", err
+	}
+	return rating, notes, nil
+}
+
+// ── Coach reports (killer feature #3) ─────────────────────────────────
+
+type CoachReportRow struct {
+	BookingID        uuid.UUID
+	Strengths        string
+	AreasToRevisit   string
+	RecommendedFocus []string
+	FillerWordHits   int32
+	OverallScore     int32
+	GeneratedAt      time.Time
+}
+
+func (r *Repo) GetCoachReport(ctx context.Context, bookingID uuid.UUID) (*CoachReportRow, error) {
+	var row CoachReportRow
+	row.BookingID = bookingID
+	err := r.data.DB.QueryRow(ctx, `
+        SELECT strengths, areas_to_revisit, recommended_focus, filler_word_hits, overall_score, generated_at
+        FROM mock_coach_reports WHERE booking_id = $1
+    `, bookingID).Scan(&row.Strengths, &row.AreasToRevisit, &row.RecommendedFocus,
+		&row.FillerWordHits, &row.OverallScore, &row.GeneratedAt)
+	if err != nil {
+		return nil, err
+	}
+	return &row, nil
+}
+
+func (r *Repo) UpsertCoachReport(ctx context.Context, row *CoachReportRow) error {
+	_, err := r.data.DB.Exec(ctx, `
+        INSERT INTO mock_coach_reports
+            (booking_id, strengths, areas_to_revisit, recommended_focus, filler_word_hits, overall_score)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        ON CONFLICT (booking_id) DO UPDATE SET
+            strengths         = EXCLUDED.strengths,
+            areas_to_revisit  = EXCLUDED.areas_to_revisit,
+            recommended_focus = EXCLUDED.recommended_focus,
+            filler_word_hits  = EXCLUDED.filler_word_hits,
+            overall_score     = EXCLUDED.overall_score,
+            generated_at      = NOW()
+    `, row.BookingID, row.Strengths, row.AreasToRevisit, row.RecommendedFocus,
+		row.FillerWordHits, row.OverallScore)
+	if err != nil {
+		return fmt.Errorf("upsert coach report: %w", err)
+	}
+	return nil
+}
+
 // ── Reliability ───────────────────────────────────────────────────────
 
 func (r *Repo) GetReliability(ctx context.Context, userID uuid.UUID) (*model.UserReliability, error) {

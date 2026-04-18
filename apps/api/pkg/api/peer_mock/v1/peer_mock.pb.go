@@ -249,6 +249,186 @@ func (BookingStatus) EnumDescriptor() ([]byte, []int) {
 	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{3}
 }
 
+type GetCoachReportRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	BookingId     string                 `protobuf:"bytes,1,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCoachReportRequest) Reset() {
+	*x = GetCoachReportRequest{}
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCoachReportRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCoachReportRequest) ProtoMessage() {}
+
+func (x *GetCoachReportRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCoachReportRequest.ProtoReflect.Descriptor instead.
+func (*GetCoachReportRequest) Descriptor() ([]byte, []int) {
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *GetCoachReportRequest) GetBookingId() string {
+	if x != nil {
+		return x.BookingId
+	}
+	return ""
+}
+
+type CoachReport struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	BookingId        string                 `protobuf:"bytes,1,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
+	Strengths        string                 `protobuf:"bytes,2,opt,name=strengths,proto3" json:"strengths,omitempty"`
+	AreasToRevisit   string                 `protobuf:"bytes,3,opt,name=areas_to_revisit,json=areasToRevisit,proto3" json:"areas_to_revisit,omitempty"`
+	RecommendedFocus []string               `protobuf:"bytes,4,rep,name=recommended_focus,json=recommendedFocus,proto3" json:"recommended_focus,omitempty"`
+	FillerWordHits   int32                  `protobuf:"varint,5,opt,name=filler_word_hits,json=fillerWordHits,proto3" json:"filler_word_hits,omitempty"`
+	OverallScore     int32                  `protobuf:"varint,6,opt,name=overall_score,json=overallScore,proto3" json:"overall_score,omitempty"` // 0..100
+	GeneratedAt      *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=generated_at,json=generatedAt,proto3" json:"generated_at,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *CoachReport) Reset() {
+	*x = CoachReport{}
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CoachReport) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CoachReport) ProtoMessage() {}
+
+func (x *CoachReport) ProtoReflect() protoreflect.Message {
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CoachReport.ProtoReflect.Descriptor instead.
+func (*CoachReport) Descriptor() ([]byte, []int) {
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *CoachReport) GetBookingId() string {
+	if x != nil {
+		return x.BookingId
+	}
+	return ""
+}
+
+func (x *CoachReport) GetStrengths() string {
+	if x != nil {
+		return x.Strengths
+	}
+	return ""
+}
+
+func (x *CoachReport) GetAreasToRevisit() string {
+	if x != nil {
+		return x.AreasToRevisit
+	}
+	return ""
+}
+
+func (x *CoachReport) GetRecommendedFocus() []string {
+	if x != nil {
+		return x.RecommendedFocus
+	}
+	return nil
+}
+
+func (x *CoachReport) GetFillerWordHits() int32 {
+	if x != nil {
+		return x.FillerWordHits
+	}
+	return 0
+}
+
+func (x *CoachReport) GetOverallScore() int32 {
+	if x != nil {
+		return x.OverallScore
+	}
+	return 0
+}
+
+func (x *CoachReport) GetGeneratedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.GeneratedAt
+	}
+	return nil
+}
+
+type GetCoachReportResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Report        *CoachReport           `protobuf:"bytes,1,opt,name=report,proto3" json:"report,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCoachReportResponse) Reset() {
+	*x = GetCoachReportResponse{}
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCoachReportResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCoachReportResponse) ProtoMessage() {}
+
+func (x *GetCoachReportResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCoachReportResponse.ProtoReflect.Descriptor instead.
+func (*GetCoachReportResponse) Descriptor() ([]byte, []int) {
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetCoachReportResponse) GetReport() *CoachReport {
+	if x != nil {
+		return x.Report
+	}
+	return nil
+}
+
 type Slot struct {
 	state                  protoimpl.MessageState `protogen:"open.v1"`
 	Id                     string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -268,7 +448,7 @@ type Slot struct {
 
 func (x *Slot) Reset() {
 	*x = Slot{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[0]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -280,7 +460,7 @@ func (x *Slot) String() string {
 func (*Slot) ProtoMessage() {}
 
 func (x *Slot) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[0]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -293,7 +473,7 @@ func (x *Slot) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Slot.ProtoReflect.Descriptor instead.
 func (*Slot) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{0}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Slot) GetId() string {
@@ -393,7 +573,7 @@ type Booking struct {
 
 func (x *Booking) Reset() {
 	*x = Booking{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[1]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -405,7 +585,7 @@ func (x *Booking) String() string {
 func (*Booking) ProtoMessage() {}
 
 func (x *Booking) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[1]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -418,7 +598,7 @@ func (x *Booking) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Booking.ProtoReflect.Descriptor instead.
 func (*Booking) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{1}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Booking) GetId() string {
@@ -519,7 +699,7 @@ type CreateSlotRequest struct {
 
 func (x *CreateSlotRequest) Reset() {
 	*x = CreateSlotRequest{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[2]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -531,7 +711,7 @@ func (x *CreateSlotRequest) String() string {
 func (*CreateSlotRequest) ProtoMessage() {}
 
 func (x *CreateSlotRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[2]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -544,7 +724,7 @@ func (x *CreateSlotRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSlotRequest.ProtoReflect.Descriptor instead.
 func (*CreateSlotRequest) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{2}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CreateSlotRequest) GetStartsAt() *timestamppb.Timestamp {
@@ -598,7 +778,7 @@ type CreateSlotResponse struct {
 
 func (x *CreateSlotResponse) Reset() {
 	*x = CreateSlotResponse{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[3]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -610,7 +790,7 @@ func (x *CreateSlotResponse) String() string {
 func (*CreateSlotResponse) ProtoMessage() {}
 
 func (x *CreateSlotResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[3]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -623,7 +803,7 @@ func (x *CreateSlotResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSlotResponse.ProtoReflect.Descriptor instead.
 func (*CreateSlotResponse) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{3}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *CreateSlotResponse) GetSlot() *Slot {
@@ -645,7 +825,7 @@ type ListOpenSlotsRequest struct {
 
 func (x *ListOpenSlotsRequest) Reset() {
 	*x = ListOpenSlotsRequest{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[4]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -657,7 +837,7 @@ func (x *ListOpenSlotsRequest) String() string {
 func (*ListOpenSlotsRequest) ProtoMessage() {}
 
 func (x *ListOpenSlotsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[4]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -670,7 +850,7 @@ func (x *ListOpenSlotsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListOpenSlotsRequest.ProtoReflect.Descriptor instead.
 func (*ListOpenSlotsRequest) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{4}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ListOpenSlotsRequest) GetType() SlotType {
@@ -710,7 +890,7 @@ type ListOpenSlotsResponse struct {
 
 func (x *ListOpenSlotsResponse) Reset() {
 	*x = ListOpenSlotsResponse{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[5]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -722,7 +902,7 @@ func (x *ListOpenSlotsResponse) String() string {
 func (*ListOpenSlotsResponse) ProtoMessage() {}
 
 func (x *ListOpenSlotsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[5]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -735,7 +915,7 @@ func (x *ListOpenSlotsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListOpenSlotsResponse.ProtoReflect.Descriptor instead.
 func (*ListOpenSlotsResponse) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{5}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListOpenSlotsResponse) GetSlots() []*Slot {
@@ -755,7 +935,7 @@ type ListMySlotsRequest struct {
 
 func (x *ListMySlotsRequest) Reset() {
 	*x = ListMySlotsRequest{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[6]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -767,7 +947,7 @@ func (x *ListMySlotsRequest) String() string {
 func (*ListMySlotsRequest) ProtoMessage() {}
 
 func (x *ListMySlotsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[6]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -780,7 +960,7 @@ func (x *ListMySlotsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMySlotsRequest.ProtoReflect.Descriptor instead.
 func (*ListMySlotsRequest) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{6}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ListMySlotsRequest) GetLimit() int32 {
@@ -806,7 +986,7 @@ type ListMySlotsResponse struct {
 
 func (x *ListMySlotsResponse) Reset() {
 	*x = ListMySlotsResponse{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[7]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -818,7 +998,7 @@ func (x *ListMySlotsResponse) String() string {
 func (*ListMySlotsResponse) ProtoMessage() {}
 
 func (x *ListMySlotsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[7]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -831,7 +1011,7 @@ func (x *ListMySlotsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMySlotsResponse.ProtoReflect.Descriptor instead.
 func (*ListMySlotsResponse) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{7}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ListMySlotsResponse) GetSlots() []*Slot {
@@ -850,7 +1030,7 @@ type CancelSlotRequest struct {
 
 func (x *CancelSlotRequest) Reset() {
 	*x = CancelSlotRequest{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[8]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -862,7 +1042,7 @@ func (x *CancelSlotRequest) String() string {
 func (*CancelSlotRequest) ProtoMessage() {}
 
 func (x *CancelSlotRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[8]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -875,7 +1055,7 @@ func (x *CancelSlotRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelSlotRequest.ProtoReflect.Descriptor instead.
 func (*CancelSlotRequest) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{8}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *CancelSlotRequest) GetSlotId() string {
@@ -894,7 +1074,7 @@ type CancelSlotResponse struct {
 
 func (x *CancelSlotResponse) Reset() {
 	*x = CancelSlotResponse{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[9]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -906,7 +1086,7 @@ func (x *CancelSlotResponse) String() string {
 func (*CancelSlotResponse) ProtoMessage() {}
 
 func (x *CancelSlotResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[9]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -919,7 +1099,7 @@ func (x *CancelSlotResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelSlotResponse.ProtoReflect.Descriptor instead.
 func (*CancelSlotResponse) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{9}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *CancelSlotResponse) GetSlot() *Slot {
@@ -938,7 +1118,7 @@ type BookSlotRequest struct {
 
 func (x *BookSlotRequest) Reset() {
 	*x = BookSlotRequest{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[10]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -950,7 +1130,7 @@ func (x *BookSlotRequest) String() string {
 func (*BookSlotRequest) ProtoMessage() {}
 
 func (x *BookSlotRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[10]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -963,7 +1143,7 @@ func (x *BookSlotRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BookSlotRequest.ProtoReflect.Descriptor instead.
 func (*BookSlotRequest) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{10}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *BookSlotRequest) GetSlotId() string {
@@ -982,7 +1162,7 @@ type BookSlotResponse struct {
 
 func (x *BookSlotResponse) Reset() {
 	*x = BookSlotResponse{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[11]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -994,7 +1174,7 @@ func (x *BookSlotResponse) String() string {
 func (*BookSlotResponse) ProtoMessage() {}
 
 func (x *BookSlotResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[11]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1007,7 +1187,7 @@ func (x *BookSlotResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BookSlotResponse.ProtoReflect.Descriptor instead.
 func (*BookSlotResponse) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{11}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *BookSlotResponse) GetBooking() *Booking {
@@ -1027,7 +1207,7 @@ type ListMyBookingsRequest struct {
 
 func (x *ListMyBookingsRequest) Reset() {
 	*x = ListMyBookingsRequest{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[12]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1039,7 +1219,7 @@ func (x *ListMyBookingsRequest) String() string {
 func (*ListMyBookingsRequest) ProtoMessage() {}
 
 func (x *ListMyBookingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[12]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1052,7 +1232,7 @@ func (x *ListMyBookingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMyBookingsRequest.ProtoReflect.Descriptor instead.
 func (*ListMyBookingsRequest) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{12}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *ListMyBookingsRequest) GetLimit() int32 {
@@ -1079,7 +1259,7 @@ type ListMyBookingsResponse struct {
 
 func (x *ListMyBookingsResponse) Reset() {
 	*x = ListMyBookingsResponse{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[13]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1091,7 +1271,7 @@ func (x *ListMyBookingsResponse) String() string {
 func (*ListMyBookingsResponse) ProtoMessage() {}
 
 func (x *ListMyBookingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[13]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1104,7 +1284,7 @@ func (x *ListMyBookingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMyBookingsResponse.ProtoReflect.Descriptor instead.
 func (*ListMyBookingsResponse) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{13}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ListMyBookingsResponse) GetAsInterviewer() []*Booking {
@@ -1130,7 +1310,7 @@ type CancelBookingRequest struct {
 
 func (x *CancelBookingRequest) Reset() {
 	*x = CancelBookingRequest{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[14]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1142,7 +1322,7 @@ func (x *CancelBookingRequest) String() string {
 func (*CancelBookingRequest) ProtoMessage() {}
 
 func (x *CancelBookingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[14]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1155,7 +1335,7 @@ func (x *CancelBookingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelBookingRequest.ProtoReflect.Descriptor instead.
 func (*CancelBookingRequest) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{14}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *CancelBookingRequest) GetBookingId() string {
@@ -1177,7 +1357,7 @@ type CancelBookingResponse struct {
 
 func (x *CancelBookingResponse) Reset() {
 	*x = CancelBookingResponse{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[15]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1189,7 +1369,7 @@ func (x *CancelBookingResponse) String() string {
 func (*CancelBookingResponse) ProtoMessage() {}
 
 func (x *CancelBookingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[15]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1202,7 +1382,7 @@ func (x *CancelBookingResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelBookingResponse.ProtoReflect.Descriptor instead.
 func (*CancelBookingResponse) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{15}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *CancelBookingResponse) GetBooking() *Booking {
@@ -1237,7 +1417,7 @@ type SubmitReviewRequest struct {
 
 func (x *SubmitReviewRequest) Reset() {
 	*x = SubmitReviewRequest{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[16]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1249,7 +1429,7 @@ func (x *SubmitReviewRequest) String() string {
 func (*SubmitReviewRequest) ProtoMessage() {}
 
 func (x *SubmitReviewRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[16]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1262,7 +1442,7 @@ func (x *SubmitReviewRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitReviewRequest.ProtoReflect.Descriptor instead.
 func (*SubmitReviewRequest) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{16}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *SubmitReviewRequest) GetBookingId() string {
@@ -1295,7 +1475,7 @@ type SubmitReviewResponse struct {
 
 func (x *SubmitReviewResponse) Reset() {
 	*x = SubmitReviewResponse{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[17]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1307,7 +1487,7 @@ func (x *SubmitReviewResponse) String() string {
 func (*SubmitReviewResponse) ProtoMessage() {}
 
 func (x *SubmitReviewResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[17]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1320,7 +1500,7 @@ func (x *SubmitReviewResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitReviewResponse.ProtoReflect.Descriptor instead.
 func (*SubmitReviewResponse) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{17}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *SubmitReviewResponse) GetBooking() *Booking {
@@ -1338,7 +1518,7 @@ type GetMyReliabilityRequest struct {
 
 func (x *GetMyReliabilityRequest) Reset() {
 	*x = GetMyReliabilityRequest{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[18]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1350,7 +1530,7 @@ func (x *GetMyReliabilityRequest) String() string {
 func (*GetMyReliabilityRequest) ProtoMessage() {}
 
 func (x *GetMyReliabilityRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[18]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1363,7 +1543,7 @@ func (x *GetMyReliabilityRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMyReliabilityRequest.ProtoReflect.Descriptor instead.
 func (*GetMyReliabilityRequest) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{18}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{21}
 }
 
 type GetMyReliabilityResponse struct {
@@ -1379,7 +1559,7 @@ type GetMyReliabilityResponse struct {
 
 func (x *GetMyReliabilityResponse) Reset() {
 	*x = GetMyReliabilityResponse{}
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[19]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1391,7 +1571,7 @@ func (x *GetMyReliabilityResponse) String() string {
 func (*GetMyReliabilityResponse) ProtoMessage() {}
 
 func (x *GetMyReliabilityResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[19]
+	mi := &file_learning_peer_mock_v1_peer_mock_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1404,7 +1584,7 @@ func (x *GetMyReliabilityResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMyReliabilityResponse.ProtoReflect.Descriptor instead.
 func (*GetMyReliabilityResponse) Descriptor() ([]byte, []int) {
-	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{19}
+	return file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *GetMyReliabilityResponse) GetScore() int32 {
@@ -1446,7 +1626,21 @@ var File_learning_peer_mock_v1_peer_mock_proto protoreflect.FileDescriptor
 
 const file_learning_peer_mock_v1_peer_mock_proto_rawDesc = "" +
 	"\n" +
-	"%learning/peer_mock/v1/peer_mock.proto\x12\fpeer_mock.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xcf\x03\n" +
+	"%learning/peer_mock/v1/peer_mock.proto\x12\fpeer_mock.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"6\n" +
+	"\x15GetCoachReportRequest\x12\x1d\n" +
+	"\n" +
+	"booking_id\x18\x01 \x01(\tR\tbookingId\"\xaf\x02\n" +
+	"\vCoachReport\x12\x1d\n" +
+	"\n" +
+	"booking_id\x18\x01 \x01(\tR\tbookingId\x12\x1c\n" +
+	"\tstrengths\x18\x02 \x01(\tR\tstrengths\x12(\n" +
+	"\x10areas_to_revisit\x18\x03 \x01(\tR\x0eareasToRevisit\x12+\n" +
+	"\x11recommended_focus\x18\x04 \x03(\tR\x10recommendedFocus\x12(\n" +
+	"\x10filler_word_hits\x18\x05 \x01(\x05R\x0efillerWordHits\x12#\n" +
+	"\roverall_score\x18\x06 \x01(\x05R\foverallScore\x12=\n" +
+	"\fgenerated_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\vgeneratedAt\"K\n" +
+	"\x16GetCoachReportResponse\x121\n" +
+	"\x06report\x18\x01 \x01(\v2\x19.peer_mock.v1.CoachReportR\x06report\"\xcf\x03\n" +
 	"\x04Slot\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12%\n" +
 	"\x0einterviewer_id\x18\x02 \x01(\tR\rinterviewerId\x12)\n" +
@@ -1559,7 +1753,8 @@ const file_learning_peer_mock_v1_peer_mock_proto_rawDesc = "" +
 	"\"BOOKING_STATUS_CANCELLED_BY_BOOKER\x10\x04\x12'\n" +
 	"#BOOKING_STATUS_CANCELLED_BY_OFFERER\x10\x05\x12!\n" +
 	"\x1dBOOKING_STATUS_NO_SHOW_BOOKER\x10\x06\x12\"\n" +
-	"\x1eBOOKING_STATUS_NO_SHOW_OFFERER\x10\a2\xbf\t\n" +
+	"\x1eBOOKING_STATUS_NO_SHOW_OFFERER\x10\a2\xd5\n" +
+	"\n" +
 	"\x0fPeerMockService\x12t\n" +
 	"\n" +
 	"CreateSlot\x12\x1f.peer_mock.v1.CreateSlotRequest\x1a .peer_mock.v1.CreateSlotResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/v1/peer-mocks/slots\x12z\n" +
@@ -1571,7 +1766,8 @@ const file_learning_peer_mock_v1_peer_mock_proto_rawDesc = "" +
 	"\x0eListMyBookings\x12#.peer_mock.v1.ListMyBookingsRequest\x1a$.peer_mock.v1.ListMyBookingsResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/api/v1/peer-mocks/bookings\x12\x94\x01\n" +
 	"\rCancelBooking\x12\".peer_mock.v1.CancelBookingRequest\x1a#.peer_mock.v1.CancelBookingResponse\":\x82\xd3\xe4\x93\x024:\x01*\"//api/v1/peer-mocks/bookings/{booking_id}/cancel\x12\x91\x01\n" +
 	"\fSubmitReview\x12!.peer_mock.v1.SubmitReviewRequest\x1a\".peer_mock.v1.SubmitReviewResponse\":\x82\xd3\xe4\x93\x024:\x01*\"//api/v1/peer-mocks/bookings/{booking_id}/review\x12\x89\x01\n" +
-	"\x10GetMyReliability\x12%.peer_mock.v1.GetMyReliabilityRequest\x1a&.peer_mock.v1.GetMyReliabilityResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/api/v1/peer-mocks/reliabilityB\x1dZ\x1bapi/pkg/api/peer_mock/v1;v1b\x06proto3"
+	"\x10GetMyReliability\x12%.peer_mock.v1.GetMyReliabilityRequest\x1a&.peer_mock.v1.GetMyReliabilityResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/api/v1/peer-mocks/reliability\x12\x93\x01\n" +
+	"\x0eGetCoachReport\x12#.peer_mock.v1.GetCoachReportRequest\x1a$.peer_mock.v1.GetCoachReportResponse\"6\x82\xd3\xe4\x93\x020\x12./api/v1/peer-mocks/bookings/{booking_id}/coachB\x1dZ\x1bapi/pkg/api/peer_mock/v1;v1b\x06proto3"
 
 var (
 	file_learning_peer_mock_v1_peer_mock_proto_rawDescOnce sync.Once
@@ -1586,83 +1782,90 @@ func file_learning_peer_mock_v1_peer_mock_proto_rawDescGZIP() []byte {
 }
 
 var file_learning_peer_mock_v1_peer_mock_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_learning_peer_mock_v1_peer_mock_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_learning_peer_mock_v1_peer_mock_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_learning_peer_mock_v1_peer_mock_proto_goTypes = []any{
 	(SlotType)(0),                    // 0: peer_mock.v1.SlotType
 	(SlotLevel)(0),                   // 1: peer_mock.v1.SlotLevel
 	(SlotStatus)(0),                  // 2: peer_mock.v1.SlotStatus
 	(BookingStatus)(0),               // 3: peer_mock.v1.BookingStatus
-	(*Slot)(nil),                     // 4: peer_mock.v1.Slot
-	(*Booking)(nil),                  // 5: peer_mock.v1.Booking
-	(*CreateSlotRequest)(nil),        // 6: peer_mock.v1.CreateSlotRequest
-	(*CreateSlotResponse)(nil),       // 7: peer_mock.v1.CreateSlotResponse
-	(*ListOpenSlotsRequest)(nil),     // 8: peer_mock.v1.ListOpenSlotsRequest
-	(*ListOpenSlotsResponse)(nil),    // 9: peer_mock.v1.ListOpenSlotsResponse
-	(*ListMySlotsRequest)(nil),       // 10: peer_mock.v1.ListMySlotsRequest
-	(*ListMySlotsResponse)(nil),      // 11: peer_mock.v1.ListMySlotsResponse
-	(*CancelSlotRequest)(nil),        // 12: peer_mock.v1.CancelSlotRequest
-	(*CancelSlotResponse)(nil),       // 13: peer_mock.v1.CancelSlotResponse
-	(*BookSlotRequest)(nil),          // 14: peer_mock.v1.BookSlotRequest
-	(*BookSlotResponse)(nil),         // 15: peer_mock.v1.BookSlotResponse
-	(*ListMyBookingsRequest)(nil),    // 16: peer_mock.v1.ListMyBookingsRequest
-	(*ListMyBookingsResponse)(nil),   // 17: peer_mock.v1.ListMyBookingsResponse
-	(*CancelBookingRequest)(nil),     // 18: peer_mock.v1.CancelBookingRequest
-	(*CancelBookingResponse)(nil),    // 19: peer_mock.v1.CancelBookingResponse
-	(*SubmitReviewRequest)(nil),      // 20: peer_mock.v1.SubmitReviewRequest
-	(*SubmitReviewResponse)(nil),     // 21: peer_mock.v1.SubmitReviewResponse
-	(*GetMyReliabilityRequest)(nil),  // 22: peer_mock.v1.GetMyReliabilityRequest
-	(*GetMyReliabilityResponse)(nil), // 23: peer_mock.v1.GetMyReliabilityResponse
-	(*timestamppb.Timestamp)(nil),    // 24: google.protobuf.Timestamp
+	(*GetCoachReportRequest)(nil),    // 4: peer_mock.v1.GetCoachReportRequest
+	(*CoachReport)(nil),              // 5: peer_mock.v1.CoachReport
+	(*GetCoachReportResponse)(nil),   // 6: peer_mock.v1.GetCoachReportResponse
+	(*Slot)(nil),                     // 7: peer_mock.v1.Slot
+	(*Booking)(nil),                  // 8: peer_mock.v1.Booking
+	(*CreateSlotRequest)(nil),        // 9: peer_mock.v1.CreateSlotRequest
+	(*CreateSlotResponse)(nil),       // 10: peer_mock.v1.CreateSlotResponse
+	(*ListOpenSlotsRequest)(nil),     // 11: peer_mock.v1.ListOpenSlotsRequest
+	(*ListOpenSlotsResponse)(nil),    // 12: peer_mock.v1.ListOpenSlotsResponse
+	(*ListMySlotsRequest)(nil),       // 13: peer_mock.v1.ListMySlotsRequest
+	(*ListMySlotsResponse)(nil),      // 14: peer_mock.v1.ListMySlotsResponse
+	(*CancelSlotRequest)(nil),        // 15: peer_mock.v1.CancelSlotRequest
+	(*CancelSlotResponse)(nil),       // 16: peer_mock.v1.CancelSlotResponse
+	(*BookSlotRequest)(nil),          // 17: peer_mock.v1.BookSlotRequest
+	(*BookSlotResponse)(nil),         // 18: peer_mock.v1.BookSlotResponse
+	(*ListMyBookingsRequest)(nil),    // 19: peer_mock.v1.ListMyBookingsRequest
+	(*ListMyBookingsResponse)(nil),   // 20: peer_mock.v1.ListMyBookingsResponse
+	(*CancelBookingRequest)(nil),     // 21: peer_mock.v1.CancelBookingRequest
+	(*CancelBookingResponse)(nil),    // 22: peer_mock.v1.CancelBookingResponse
+	(*SubmitReviewRequest)(nil),      // 23: peer_mock.v1.SubmitReviewRequest
+	(*SubmitReviewResponse)(nil),     // 24: peer_mock.v1.SubmitReviewResponse
+	(*GetMyReliabilityRequest)(nil),  // 25: peer_mock.v1.GetMyReliabilityRequest
+	(*GetMyReliabilityResponse)(nil), // 26: peer_mock.v1.GetMyReliabilityResponse
+	(*timestamppb.Timestamp)(nil),    // 27: google.protobuf.Timestamp
 }
 var file_learning_peer_mock_v1_peer_mock_proto_depIdxs = []int32{
-	24, // 0: peer_mock.v1.Slot.starts_at:type_name -> google.protobuf.Timestamp
-	24, // 1: peer_mock.v1.Slot.ends_at:type_name -> google.protobuf.Timestamp
-	0,  // 2: peer_mock.v1.Slot.type:type_name -> peer_mock.v1.SlotType
-	1,  // 3: peer_mock.v1.Slot.level:type_name -> peer_mock.v1.SlotLevel
-	2,  // 4: peer_mock.v1.Slot.status:type_name -> peer_mock.v1.SlotStatus
-	24, // 5: peer_mock.v1.Booking.starts_at:type_name -> google.protobuf.Timestamp
-	24, // 6: peer_mock.v1.Booking.ends_at:type_name -> google.protobuf.Timestamp
-	3,  // 7: peer_mock.v1.Booking.status:type_name -> peer_mock.v1.BookingStatus
-	24, // 8: peer_mock.v1.CreateSlotRequest.starts_at:type_name -> google.protobuf.Timestamp
-	24, // 9: peer_mock.v1.CreateSlotRequest.ends_at:type_name -> google.protobuf.Timestamp
-	0,  // 10: peer_mock.v1.CreateSlotRequest.type:type_name -> peer_mock.v1.SlotType
-	1,  // 11: peer_mock.v1.CreateSlotRequest.level:type_name -> peer_mock.v1.SlotLevel
-	4,  // 12: peer_mock.v1.CreateSlotResponse.slot:type_name -> peer_mock.v1.Slot
-	0,  // 13: peer_mock.v1.ListOpenSlotsRequest.type:type_name -> peer_mock.v1.SlotType
-	1,  // 14: peer_mock.v1.ListOpenSlotsRequest.level:type_name -> peer_mock.v1.SlotLevel
-	4,  // 15: peer_mock.v1.ListOpenSlotsResponse.slots:type_name -> peer_mock.v1.Slot
-	4,  // 16: peer_mock.v1.ListMySlotsResponse.slots:type_name -> peer_mock.v1.Slot
-	4,  // 17: peer_mock.v1.CancelSlotResponse.slot:type_name -> peer_mock.v1.Slot
-	5,  // 18: peer_mock.v1.BookSlotResponse.booking:type_name -> peer_mock.v1.Booking
-	5,  // 19: peer_mock.v1.ListMyBookingsResponse.as_interviewer:type_name -> peer_mock.v1.Booking
-	5,  // 20: peer_mock.v1.ListMyBookingsResponse.as_interviewee:type_name -> peer_mock.v1.Booking
-	5,  // 21: peer_mock.v1.CancelBookingResponse.booking:type_name -> peer_mock.v1.Booking
-	5,  // 22: peer_mock.v1.SubmitReviewResponse.booking:type_name -> peer_mock.v1.Booking
-	24, // 23: peer_mock.v1.GetMyReliabilityResponse.last_penalty_at:type_name -> google.protobuf.Timestamp
-	24, // 24: peer_mock.v1.GetMyReliabilityResponse.ban_until:type_name -> google.protobuf.Timestamp
-	6,  // 25: peer_mock.v1.PeerMockService.CreateSlot:input_type -> peer_mock.v1.CreateSlotRequest
-	8,  // 26: peer_mock.v1.PeerMockService.ListOpenSlots:input_type -> peer_mock.v1.ListOpenSlotsRequest
-	10, // 27: peer_mock.v1.PeerMockService.ListMySlots:input_type -> peer_mock.v1.ListMySlotsRequest
-	12, // 28: peer_mock.v1.PeerMockService.CancelSlot:input_type -> peer_mock.v1.CancelSlotRequest
-	14, // 29: peer_mock.v1.PeerMockService.BookSlot:input_type -> peer_mock.v1.BookSlotRequest
-	16, // 30: peer_mock.v1.PeerMockService.ListMyBookings:input_type -> peer_mock.v1.ListMyBookingsRequest
-	18, // 31: peer_mock.v1.PeerMockService.CancelBooking:input_type -> peer_mock.v1.CancelBookingRequest
-	20, // 32: peer_mock.v1.PeerMockService.SubmitReview:input_type -> peer_mock.v1.SubmitReviewRequest
-	22, // 33: peer_mock.v1.PeerMockService.GetMyReliability:input_type -> peer_mock.v1.GetMyReliabilityRequest
-	7,  // 34: peer_mock.v1.PeerMockService.CreateSlot:output_type -> peer_mock.v1.CreateSlotResponse
-	9,  // 35: peer_mock.v1.PeerMockService.ListOpenSlots:output_type -> peer_mock.v1.ListOpenSlotsResponse
-	11, // 36: peer_mock.v1.PeerMockService.ListMySlots:output_type -> peer_mock.v1.ListMySlotsResponse
-	13, // 37: peer_mock.v1.PeerMockService.CancelSlot:output_type -> peer_mock.v1.CancelSlotResponse
-	15, // 38: peer_mock.v1.PeerMockService.BookSlot:output_type -> peer_mock.v1.BookSlotResponse
-	17, // 39: peer_mock.v1.PeerMockService.ListMyBookings:output_type -> peer_mock.v1.ListMyBookingsResponse
-	19, // 40: peer_mock.v1.PeerMockService.CancelBooking:output_type -> peer_mock.v1.CancelBookingResponse
-	21, // 41: peer_mock.v1.PeerMockService.SubmitReview:output_type -> peer_mock.v1.SubmitReviewResponse
-	23, // 42: peer_mock.v1.PeerMockService.GetMyReliability:output_type -> peer_mock.v1.GetMyReliabilityResponse
-	34, // [34:43] is the sub-list for method output_type
-	25, // [25:34] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	27, // 0: peer_mock.v1.CoachReport.generated_at:type_name -> google.protobuf.Timestamp
+	5,  // 1: peer_mock.v1.GetCoachReportResponse.report:type_name -> peer_mock.v1.CoachReport
+	27, // 2: peer_mock.v1.Slot.starts_at:type_name -> google.protobuf.Timestamp
+	27, // 3: peer_mock.v1.Slot.ends_at:type_name -> google.protobuf.Timestamp
+	0,  // 4: peer_mock.v1.Slot.type:type_name -> peer_mock.v1.SlotType
+	1,  // 5: peer_mock.v1.Slot.level:type_name -> peer_mock.v1.SlotLevel
+	2,  // 6: peer_mock.v1.Slot.status:type_name -> peer_mock.v1.SlotStatus
+	27, // 7: peer_mock.v1.Booking.starts_at:type_name -> google.protobuf.Timestamp
+	27, // 8: peer_mock.v1.Booking.ends_at:type_name -> google.protobuf.Timestamp
+	3,  // 9: peer_mock.v1.Booking.status:type_name -> peer_mock.v1.BookingStatus
+	27, // 10: peer_mock.v1.CreateSlotRequest.starts_at:type_name -> google.protobuf.Timestamp
+	27, // 11: peer_mock.v1.CreateSlotRequest.ends_at:type_name -> google.protobuf.Timestamp
+	0,  // 12: peer_mock.v1.CreateSlotRequest.type:type_name -> peer_mock.v1.SlotType
+	1,  // 13: peer_mock.v1.CreateSlotRequest.level:type_name -> peer_mock.v1.SlotLevel
+	7,  // 14: peer_mock.v1.CreateSlotResponse.slot:type_name -> peer_mock.v1.Slot
+	0,  // 15: peer_mock.v1.ListOpenSlotsRequest.type:type_name -> peer_mock.v1.SlotType
+	1,  // 16: peer_mock.v1.ListOpenSlotsRequest.level:type_name -> peer_mock.v1.SlotLevel
+	7,  // 17: peer_mock.v1.ListOpenSlotsResponse.slots:type_name -> peer_mock.v1.Slot
+	7,  // 18: peer_mock.v1.ListMySlotsResponse.slots:type_name -> peer_mock.v1.Slot
+	7,  // 19: peer_mock.v1.CancelSlotResponse.slot:type_name -> peer_mock.v1.Slot
+	8,  // 20: peer_mock.v1.BookSlotResponse.booking:type_name -> peer_mock.v1.Booking
+	8,  // 21: peer_mock.v1.ListMyBookingsResponse.as_interviewer:type_name -> peer_mock.v1.Booking
+	8,  // 22: peer_mock.v1.ListMyBookingsResponse.as_interviewee:type_name -> peer_mock.v1.Booking
+	8,  // 23: peer_mock.v1.CancelBookingResponse.booking:type_name -> peer_mock.v1.Booking
+	8,  // 24: peer_mock.v1.SubmitReviewResponse.booking:type_name -> peer_mock.v1.Booking
+	27, // 25: peer_mock.v1.GetMyReliabilityResponse.last_penalty_at:type_name -> google.protobuf.Timestamp
+	27, // 26: peer_mock.v1.GetMyReliabilityResponse.ban_until:type_name -> google.protobuf.Timestamp
+	9,  // 27: peer_mock.v1.PeerMockService.CreateSlot:input_type -> peer_mock.v1.CreateSlotRequest
+	11, // 28: peer_mock.v1.PeerMockService.ListOpenSlots:input_type -> peer_mock.v1.ListOpenSlotsRequest
+	13, // 29: peer_mock.v1.PeerMockService.ListMySlots:input_type -> peer_mock.v1.ListMySlotsRequest
+	15, // 30: peer_mock.v1.PeerMockService.CancelSlot:input_type -> peer_mock.v1.CancelSlotRequest
+	17, // 31: peer_mock.v1.PeerMockService.BookSlot:input_type -> peer_mock.v1.BookSlotRequest
+	19, // 32: peer_mock.v1.PeerMockService.ListMyBookings:input_type -> peer_mock.v1.ListMyBookingsRequest
+	21, // 33: peer_mock.v1.PeerMockService.CancelBooking:input_type -> peer_mock.v1.CancelBookingRequest
+	23, // 34: peer_mock.v1.PeerMockService.SubmitReview:input_type -> peer_mock.v1.SubmitReviewRequest
+	25, // 35: peer_mock.v1.PeerMockService.GetMyReliability:input_type -> peer_mock.v1.GetMyReliabilityRequest
+	4,  // 36: peer_mock.v1.PeerMockService.GetCoachReport:input_type -> peer_mock.v1.GetCoachReportRequest
+	10, // 37: peer_mock.v1.PeerMockService.CreateSlot:output_type -> peer_mock.v1.CreateSlotResponse
+	12, // 38: peer_mock.v1.PeerMockService.ListOpenSlots:output_type -> peer_mock.v1.ListOpenSlotsResponse
+	14, // 39: peer_mock.v1.PeerMockService.ListMySlots:output_type -> peer_mock.v1.ListMySlotsResponse
+	16, // 40: peer_mock.v1.PeerMockService.CancelSlot:output_type -> peer_mock.v1.CancelSlotResponse
+	18, // 41: peer_mock.v1.PeerMockService.BookSlot:output_type -> peer_mock.v1.BookSlotResponse
+	20, // 42: peer_mock.v1.PeerMockService.ListMyBookings:output_type -> peer_mock.v1.ListMyBookingsResponse
+	22, // 43: peer_mock.v1.PeerMockService.CancelBooking:output_type -> peer_mock.v1.CancelBookingResponse
+	24, // 44: peer_mock.v1.PeerMockService.SubmitReview:output_type -> peer_mock.v1.SubmitReviewResponse
+	26, // 45: peer_mock.v1.PeerMockService.GetMyReliability:output_type -> peer_mock.v1.GetMyReliabilityResponse
+	6,  // 46: peer_mock.v1.PeerMockService.GetCoachReport:output_type -> peer_mock.v1.GetCoachReportResponse
+	37, // [37:47] is the sub-list for method output_type
+	27, // [27:37] is the sub-list for method input_type
+	27, // [27:27] is the sub-list for extension type_name
+	27, // [27:27] is the sub-list for extension extendee
+	0,  // [0:27] is the sub-list for field type_name
 }
 
 func init() { file_learning_peer_mock_v1_peer_mock_proto_init() }
@@ -1676,7 +1879,7 @@ func file_learning_peer_mock_v1_peer_mock_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_learning_peer_mock_v1_peer_mock_proto_rawDesc), len(file_learning_peer_mock_v1_peer_mock_proto_rawDesc)),
 			NumEnums:      4,
-			NumMessages:   20,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

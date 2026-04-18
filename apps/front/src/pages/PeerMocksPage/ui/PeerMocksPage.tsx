@@ -372,6 +372,8 @@ function BookingRow({
 }) {
   const otherName = viewerRole === 'interviewer' ? booking.intervieweeName : booking.interviewerName
   const active = booking.status === BookingStatus.SCHEDULED
+  const completed = booking.status === BookingStatus.COMPLETED
+  const [coachOpen, setCoachOpen] = useState(false)
   return (
     <div
       style={{
@@ -396,6 +398,69 @@ function BookingRow({
           Cancel
         </RpgButton>
       )}
+      {completed && (
+        <RpgButton size="sm" variant="primary" onClick={() => setCoachOpen(true)}>AI Coach</RpgButton>
+      )}
+      {coachOpen && <CoachReportModal bookingId={booking.id} onClose={() => setCoachOpen(false)} />}
+    </div>
+  )
+}
+
+function CoachReportModal({ bookingId, onClose }: { bookingId: string; onClose: () => void }) {
+  const [loading, setLoading] = useState(true)
+  const [err, setErr] = useState<string | null>(null)
+  const [rep, setRep] = useState<import('@/features/PeerMock/api/peerMockApi').CoachReport | null>(null)
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    peerMockApi.getCoachReport(bookingId).then((r) => {
+      if (!cancelled) { setRep(r); setLoading(false) }
+    }).catch((e) => {
+      if (!cancelled) { setErr(e instanceof Error ? e.message : 'failed to load'); setLoading(false) }
+    })
+    return () => { cancelled = true }
+  }, [bookingId])
+  return (
+    <div className="rpg-modal-backdrop" onClick={onClose}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'grid', placeItems: 'center', zIndex: 1000 }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ maxWidth: 520, width: '92%' }}>
+        <Panel style={{ padding: 18 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
+            <h2 className="font-display" style={{ fontSize: 18 }}>AI Coach Report</h2>
+            <RpgButton size="sm" variant="ghost" onClick={onClose}>Close</RpgButton>
+          </div>
+          {loading && <div>Generating…</div>}
+          {err && <div style={{ color: '#c85050' }}>{err}</div>}
+          {rep && !loading && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13 }}>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <Badge variant="default">Score {rep.overallScore}/100</Badge>
+                <Badge variant="dark">Filler words: {rep.fillerWordHits}</Badge>
+              </div>
+              {rep.strengths && (
+                <div>
+                  <div className="font-silkscreen uppercase" style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em' }}>Strengths</div>
+                  <div>{rep.strengths}</div>
+                </div>
+              )}
+              {rep.areasToRevisit && (
+                <div>
+                  <div className="font-silkscreen uppercase" style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em' }}>Areas to revisit</div>
+                  <div>{rep.areasToRevisit}</div>
+                </div>
+              )}
+              {rep.recommendedFocus.length > 0 && (
+                <div>
+                  <div className="font-silkscreen uppercase" style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em' }}>Recommended focus</div>
+                  <ul style={{ margin: 0, paddingLeft: 16 }}>
+                    {rep.recommendedFocus.map((t) => <li key={t}>{t}</li>)}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+        </Panel>
+      </div>
     </div>
   )
 }

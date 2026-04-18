@@ -230,4 +230,33 @@ export const peerMockApi = {
       tier: r.data.tier ?? 'unranked',
     }
   },
+
+  // Killer feature #3 — AI post-mock coach. Returns a generated
+  // coaching report for a completed booking (lazy-generated on
+  // the server on first call).
+  getCoachReport: async (bookingId: string): Promise<CoachReport> => {
+    const r = await apiClient.get<{ report?: CoachReport }>(
+      `/api/v1/peer-mocks/bookings/${bookingId}/coach`,
+    )
+    const rep = r.data.report ?? ({} as CoachReport)
+    return {
+      bookingId: rep.bookingId ?? bookingId,
+      strengths: rep.strengths ?? '',
+      areasToRevisit: rep.areasToRevisit ?? '',
+      recommendedFocus: rep.recommendedFocus ?? [],
+      fillerWordHits: rep.fillerWordHits ?? 0,
+      overallScore: rep.overallScore ?? 0,
+      generatedAt: rep.generatedAt,
+    }
+  },
+}
+
+export interface CoachReport {
+  bookingId: string
+  strengths: string
+  areasToRevisit: string
+  recommendedFocus: string[]
+  fillerWordHits: number
+  overallScore: number
+  generatedAt?: string
 }
