@@ -101,6 +101,7 @@ func registerBackgroundWorkers(bootstrap *bootstrapContext, storage *storageCont
 	}
 	closer.AddSync(startStreakWarningWorker(services.notificationSender, storage.store.DB))
 	closer.AddSync(startGuildDigestWorker(services.notificationSender, storage.store.DB))
+	closer.AddSync(startGuildWarCronWorker(storage.guildRepo))
 }
 
 func registerManualHTTPRoutes(
