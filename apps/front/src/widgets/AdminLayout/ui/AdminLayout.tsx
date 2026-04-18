@@ -1,56 +1,130 @@
-import { Outlet, Link, useLocation } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AdminSidebar } from '@/widgets/AdminSidebar/ui/AdminSidebar'
 import { useAuth } from '@/app/providers/AuthProvider'
-import { Avatar } from '@/shared/ui/Avatar'
-import { Badge } from '@/shared/ui/Badge'
-import { cn } from '@/shared/lib/cn'
-import { ADMIN_NAV } from '@/widgets/AdminSidebar/ui/AdminSidebar'
-import { useTranslation } from 'react-i18next'
+import { RpgButton } from '@/shared/ui/pixel'
 
 export function AdminLayout() {
-  const location = useLocation()
-  const { user } = useAuth()
+  const { user, isLoading } = useAuth()
   const { t } = useTranslation()
-  const displayName = user ? `${user.firstName} ${user.lastName}`.trim() || user.username : 'Admin'
+  const navigate = useNavigate()
+
+  // Belt-and-suspenders gate — the Router also gates /admin/* behind
+  // user.isAdmin, but if someone hot-swaps routes we still show the
+  // "forbidden" shell rather than the admin surface.
+  if (!isLoading && (!user || !user.isAdmin)) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          gap: 14,
+          background: 'var(--parch-0)',
+        }}
+      >
+        <div className="font-display" style={{ fontSize: 26 }}>
+          {t('admin.forbidden', { defaultValue: 'Admin only' })}
+        </div>
+        <div style={{ color: 'var(--ink-2)', maxWidth: 380, textAlign: 'center', fontSize: 14 }}>
+          {t('admin.forbiddenBody', { defaultValue: 'Your account does not have admin permissions for this panel.' })}
+        </div>
+        <RpgButton variant="primary" onClick={() => navigate('/hub')}>
+          {t('admin.backToHub', { defaultValue: 'Back to hub' })}
+        </RpgButton>
+      </div>
+    )
+  }
+
+  const displayName =
+    [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim() ||
+    user?.username || user?.telegramUsername || 'Admin'
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F0F5F1]">
-      {/* Top bar */}
-      <header className="h-[52px] bg-white border-b border-[#C1CFC4] flex items-center justify-between px-6 flex-shrink-0 z-10">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-[#059669] rounded-lg flex items-center justify-center">
-              <span className="text-xs font-bold text-white">D</span>
-            </div>
-            <span className="text-sm font-semibold text-[#0B1210]">{t('admin.title')}</span>
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'var(--parch-0)',
+      }}
+    >
+      {/* Top bar — styled to match the main app HeroStrip visually without
+          cloning its gradient/sprite load. A clean banded header with the
+          "ADMIN" badge makes the mode-switch obvious. */}
+      <header
+        style={{
+          height: 52,
+          borderBottom: '3px solid var(--ink-0)',
+          background: 'linear-gradient(180deg, var(--ink-0) 0%, #1a140e 100%)',
+          color: 'var(--parch-0)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 20px',
+          flexShrink: 0,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              background: 'var(--ember-1)',
+              border: '2px solid var(--parch-0)',
+              boxShadow: 'inset -2px -2px 0 var(--ember-0), inset 2px 2px 0 var(--ember-3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: 'Pixelify Sans, monospace',
+              fontSize: 16,
+              color: 'var(--parch-0)',
+            }}
+          >
+            D9
           </div>
-          <nav className="flex items-center gap-1">
-            {ADMIN_NAV.map((tab) => (
-              <Link
-                key={tab.href}
-                to={tab.href}
-                className={cn(
-                  'px-3 py-1.5 text-xs font-medium rounded-lg transition-colors',
-                  location.pathname === tab.href
-                    ? 'bg-[#059669] text-[#0B1210]'
-                    : 'text-[#4B6B52] hover:bg-[#F0F5F1]',
-                )}
-              >
-                {t(tab.labelKey)}
-              </Link>
-            ))}
-          </nav>
+          <div>
+            <div
+              className="font-silkscreen uppercase"
+              style={{ fontSize: 9, letterSpacing: '0.12em', color: 'var(--ember-3)' }}
+            >
+              ADMIN CONTROL
+            </div>
+            <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>druz9 · manage</div>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="warning" className="text-[11px] font-semibold bg-[#1a1a0e] text-[#fbbf24]">{t('admin.badge')}</Badge>
-          <Avatar name={displayName} size="xs" className="w-7 h-7 text-xs" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span
+            className="font-silkscreen uppercase"
+            style={{
+              padding: '4px 8px',
+              background: 'var(--ember-1)',
+              color: 'var(--ink-0)',
+              border: '2px solid var(--parch-0)',
+              fontSize: 10,
+              letterSpacing: '0.1em',
+            }}
+          >
+            ADMIN
+          </span>
+          <span
+            className="font-silkscreen uppercase"
+            style={{ fontSize: 10, letterSpacing: '0.08em', color: 'var(--parch-2)' }}
+          >
+            {displayName}
+          </span>
+          <RpgButton size="sm" onClick={() => navigate('/hub')}>
+            {t('admin.exit', { defaultValue: '← exit' })}
+          </RpgButton>
         </div>
       </header>
 
       {/* Body */}
-      <div className="flex flex-1 min-h-0">
+      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
         <AdminSidebar />
-        <main className="flex-1 overflow-y-auto">
+        <main style={{ flex: 1, overflow: 'auto', padding: '28px 32px 56px' }}>
           <Outlet />
         </main>
       </div>

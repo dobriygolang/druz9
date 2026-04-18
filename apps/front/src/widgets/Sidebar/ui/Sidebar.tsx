@@ -6,6 +6,7 @@ import { NAV_GROUPS, type NavItem } from '../model/nav'
 import { useSidebarBadges } from '../model/badges'
 import { useApi } from '@/shared/hooks/useApi'
 import { hubApi } from '@/features/Hub/api/hubApi'
+import { useAuth } from '@/app/providers/AuthProvider'
 
 interface SidebarProps {
   open?: boolean
@@ -16,6 +17,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const { pathname } = useLocation()
   const { t } = useTranslation()
   const badges = useSidebarBadges()
+  const { user } = useAuth()
+  const isAdmin = Boolean(user?.isAdmin)
   const { data: overview } = useApi(() => hubApi.getOverview(), [])
   // Today's pact = first incomplete daily mission, or the final one once
   // all are done so the card still says something cheerful.
@@ -47,20 +50,24 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           zIndex: 40,
         }}
       >
-        {NAV_GROUPS.map((group) => (
-          <div key={group.labelKey}>
-            <div className="rpg-sidenav__section rpg-sidenav__label">{t(group.labelKey)}</div>
-            {group.items.map((item) => (
-              <NavRow
-                key={item.id}
-                item={item}
-                currentPath={pathname}
-                onNavigate={onClose}
-                liveBadge={item.badgeKey ? badges[item.badgeKey] : undefined}
-              />
-            ))}
-          </div>
-        ))}
+        {NAV_GROUPS.map((group) => {
+          const visible = group.items.filter((item) => !item.adminOnly || isAdmin)
+          if (visible.length === 0) return null
+          return (
+            <div key={group.labelKey}>
+              <div className="rpg-sidenav__section rpg-sidenav__label">{t(group.labelKey)}</div>
+              {visible.map((item) => (
+                <NavRow
+                  key={item.id}
+                  item={item}
+                  currentPath={pathname}
+                  onNavigate={onClose}
+                  liveBadge={item.badgeKey ? badges[item.badgeKey] : undefined}
+                />
+              ))}
+            </div>
+          )
+        })}
 
         {todaysPact && (
           <div

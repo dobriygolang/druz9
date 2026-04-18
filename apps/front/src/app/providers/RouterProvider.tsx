@@ -161,6 +161,11 @@ const AdminCodeGamePage = lazy(() =>
     default: m.AdminCodeGamePage,
   })),
 )
+const AdminDashboardPage = lazy(() =>
+  import('@/pages/AdminDashboardPage/ui/AdminDashboardPage').then((m) => ({
+    default: m.AdminDashboardPage,
+  })),
+)
 
 const Fallback: React.FC = () => (
   <div
@@ -222,7 +227,7 @@ class ErrorBoundary extends React.Component<
 }
 
 export const RouterProvider: React.FC = () => {
-  const { isLoading, isAuthenticated, needsProfileComplete, user } = useAuth()
+  const { isLoading, isAuthenticated, needsProfileComplete } = useAuth()
   const { isLoading: rcLoading, appRequireAuth, arenaRequireAuth } = useRuntimeConfig()
 
   if (isLoading || rcLoading) return null
@@ -375,38 +380,24 @@ export const RouterProvider: React.FC = () => {
           {/* Full-screen code room (no sidebar/header — matches code-interview layout) */}
           <Route path="/code-rooms/:roomId" element={<CodeRoomPage />} />
 
-          {/* Admin (legacy, not restyled — deliberately) */}
+          {/* Admin — restyled to match the pixel theme. All /admin/*
+               routes are gated by AdminLayout (isAdmin check) — no need
+               to repeat the guard on each inner route. */}
           <Route element={<AdminLayout />}>
-            <Route
-              path="/admin/code-tasks"
-              element={
-                !isAuthenticated || !user?.isAdmin ? <Navigate to="/login" replace /> : <CodeTasksAdminPage />
-              }
-            />
-            <Route
-              path="/admin/config"
-              element={
-                !isAuthenticated || !user?.isAdmin ? <Navigate to="/login" replace /> : <RTConfigAdminPage />
-              }
-            />
-            <Route
-              path="/admin/interview-prep"
-              element={
-                !isAuthenticated || !user?.isAdmin ? <Navigate to="/login" replace /> : <InterviewPrepAdminPage />
-              }
-            />
-            <Route
-              path="/admin/analytics"
-              element={
-                !isAuthenticated || !user?.isAdmin ? <Navigate to="/login" replace /> : <AdminAnalyticsPage />
-              }
-            />
-            <Route
-              path="/admin/code-game"
-              element={
-                !isAuthenticated || !user?.isAdmin ? <Navigate to="/login" replace /> : <AdminCodeGamePage />
-              }
-            />
+            <Route path="/admin" element={<AdminDashboardPage />} />
+            <Route path="/admin/code-tasks" element={<CodeTasksAdminPage />} />
+            <Route path="/admin/config" element={<RTConfigAdminPage />} />
+            <Route path="/admin/interview-prep" element={<InterviewPrepAdminPage />} />
+            <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
+            <Route path="/admin/code-game" element={<AdminCodeGamePage />} />
+            {/* Stubs for the Wave E sections that don't have UI yet — the
+                dashboard links land here; each will get a real page as
+                the corresponding admin RPCs ship. */}
+            <Route path="/admin/podcasts"     element={<AdminStub title="Podcasts admin" />} />
+            <Route path="/admin/shop"         element={<AdminStub title="Shop admin" />} />
+            <Route path="/admin/seasonpass"   element={<AdminStub title="Season pass admin" />} />
+            <Route path="/admin/ai-bots"      element={<AdminStub title="AI mentors admin" />} />
+            <Route path="/admin/notifications" element={<AdminStub title="Notifications admin" />} />
           </Route>
 
           {/* Catch-all */}
@@ -427,5 +418,19 @@ export const RouterProvider: React.FC = () => {
         </Routes>
       </ErrorBoundary>
     </Suspense>
+  )
+}
+
+// Placeholder for admin sections whose UI is still being built. Keeps
+// dashboard links navigable and tells the admin what's coming.
+function AdminStub({ title }: { title: string }) {
+  return (
+    <div style={{ padding: 24 }}>
+      <h1 className="font-display" style={{ fontSize: 26, marginBottom: 8 }}>{title}</h1>
+      <div style={{ color: 'var(--ink-2)', fontSize: 14, maxWidth: 520 }}>
+        Content editor for this section is being built — the RPCs are already on the backend.
+        Reach out in #admin if you need a manual insert in the meantime.
+      </div>
+    </div>
   )
 }

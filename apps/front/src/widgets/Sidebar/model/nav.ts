@@ -10,6 +10,9 @@ export interface NavItem {
   // `badgeKey` — the sidebar shell resolves them against an API store.
   badge?: { kind: 'ember' | 'dark'; textKey: string }
   badgeKey?: 'inboxUnread' | 'incomingChallenges' | 'arenaOpen'
+  // Hidden unless the viewer has `user.isAdmin`. Sidebar filters these
+  // out for regular users so no shimmering admin links leak through.
+  adminOnly?: boolean
 }
 
 export interface NavGroup {
@@ -83,6 +86,17 @@ export const NAV_GROUPS: NavGroup[] = [
     labelKey: 'sidebar.group.system',
     items: [
       { id: 'settings', labelKey: 'sidebar.nav.settings', hintKey: 'sidebar.hint.settings', icon: 'settings', path: '/settings' },
+      // Admin entry — only rendered for admins. The Sidebar filters by
+      // user.isAdmin so other roles don't even see the link.
+      {
+        id: 'admin',
+        labelKey: 'sidebar.nav.admin',
+        hintKey: 'sidebar.hint.admin',
+        icon: 'settings',
+        path: '/admin',
+        adminOnly: true,
+        badge: { kind: 'ember', textKey: 'sidebar.badge.admin' },
+      },
     ],
   },
 ]

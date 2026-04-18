@@ -1,49 +1,88 @@
-import { Link, useLocation } from 'react-router-dom'
-import { Code2, BookOpen, Settings, BarChart3 } from 'lucide-react'
-import { cn } from '@/shared/lib/cn'
+import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 interface AdminNavItem {
   labelKey: string
-  icon: React.ReactNode
+  icon: string // pixel glyph
   href: string
-  count?: number
 }
 
+// Order matches conceptual importance in the admin flow: content
+// management first (tasks / questions / podcasts), then economy
+// (shop / seasonpass), then observability and config.
 export const ADMIN_NAV: AdminNavItem[] = [
-  { labelKey: 'admin.nav.codeTasks', icon: <Code2 className="w-3.5 h-3.5" />, href: '/admin/code-tasks' },
-  { labelKey: 'admin.nav.interviewPrep', icon: <BookOpen className="w-3.5 h-3.5" />, href: '/admin/interview-prep' },
-  { labelKey: 'admin.nav.analytics', icon: <BarChart3 className="w-3.5 h-3.5" />, href: '/admin/analytics' },
-  { labelKey: 'admin.nav.config', icon: <Settings className="w-3.5 h-3.5" />, href: '/admin/config' },
+  { labelKey: 'admin.nav.dashboard',    icon: '▦', href: '/admin' },
+  { labelKey: 'admin.nav.codeTasks',    icon: '⟨⟩', href: '/admin/code-tasks' },
+  { labelKey: 'admin.nav.interviewPrep', icon: '☰', href: '/admin/interview-prep' },
+  { labelKey: 'admin.nav.podcasts',     icon: '♪', href: '/admin/podcasts' },
+  { labelKey: 'admin.nav.shop',         icon: '$', href: '/admin/shop' },
+  { labelKey: 'admin.nav.seasonpass',   icon: '★', href: '/admin/seasonpass' },
+  { labelKey: 'admin.nav.aiBots',       icon: '◉', href: '/admin/ai-bots' },
+  { labelKey: 'admin.nav.notifications', icon: '✉', href: '/admin/notifications' },
+  { labelKey: 'admin.nav.analytics',    icon: '▨', href: '/admin/analytics' },
+  { labelKey: 'admin.nav.config',       icon: '⚙', href: '/admin/config' },
 ]
 
 export function AdminSidebar() {
-  const location = useLocation()
   const { t } = useTranslation()
 
   return (
-    <aside className="w-[220px] min-h-screen bg-white border-r border-[#C1CFC4] flex flex-col flex-shrink-0">
-      <nav className="flex-1 p-2.5 pt-4">
-        <p className="px-3 mb-2 text-[10px] font-bold text-[#4B6B52] uppercase tracking-widest">{t('admin.manage')}</p>
-        {ADMIN_NAV.map((item) => {
-          const active = location.pathname === item.href
-          return (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={cn(
-                'flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium mb-0.5 transition-colors',
-                active
-                  ? 'bg-[#eff6ff] text-[#065F46]'
-                  : 'text-[#4B6B52] hover:bg-[#F0F5F1]',
-              )}
-            >
-              <span className={cn(active && 'text-[#059669]')}>{item.icon}</span>
-              {t(item.labelKey)}
-            </Link>
-          )
-        })}
-      </nav>
-    </aside>
+    <nav
+      style={{
+        width: 220,
+        minHeight: 'calc(100vh - 52px)',
+        background: 'var(--parch-1)',
+        borderRight: '3px dashed var(--ink-3)',
+        padding: '14px 10px',
+        flexShrink: 0,
+      }}
+    >
+      <div
+        className="font-silkscreen uppercase"
+        style={{
+          padding: '0 10px 8px',
+          fontSize: 10,
+          letterSpacing: '0.1em',
+          color: 'var(--ink-2)',
+        }}
+      >
+        {t('admin.manage')}
+      </div>
+      {ADMIN_NAV.map((item) => (
+        <NavLink
+          key={item.href}
+          to={item.href}
+          end={item.href === '/admin'}
+          style={({ isActive }) => ({
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: '9px 12px',
+            marginBottom: 4,
+            border: isActive ? '2px solid var(--ember-1)' : '2px solid transparent',
+            background: isActive ? 'var(--parch-2)' : 'transparent',
+            boxShadow: isActive ? '2px 2px 0 var(--ember-1)' : 'none',
+            fontFamily: 'Pixelify Sans, monospace',
+            fontSize: 13,
+            color: 'var(--ink-0)',
+            textDecoration: 'none',
+            cursor: 'pointer',
+          })}
+        >
+          <span
+            style={{
+              fontFamily: 'Silkscreen, monospace',
+              fontSize: 14,
+              color: 'var(--ember-1)',
+              width: 18,
+              textAlign: 'center',
+            }}
+          >
+            {item.icon}
+          </span>
+          {t(item.labelKey)}
+        </NavLink>
+      ))}
+    </nav>
   )
 }
