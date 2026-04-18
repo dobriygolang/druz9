@@ -288,7 +288,7 @@ export const RouterProvider: React.FC = () => {
                  screens, not the map. */}
             <Route
               path="/atlas"
-              element={gate ? <Navigate to="/login" replace /> : <SkillsPage />}
+              element={gate ? <Navigate to="/login" replace /> : <TrainingPage />}
             />
             <Route path="/skills" element={<Navigate to="/atlas" replace />} />
             <Route path="/training" element={<Navigate to="/atlas" replace />} />

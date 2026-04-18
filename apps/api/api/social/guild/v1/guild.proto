@@ -81,6 +81,14 @@ service GuildService {
       body: "*"
     };
   }
+
+  // GetGuildWar returns the user's current guild-war snapshot: opponent,
+  // score, fronts, MVPs, recent feed. When no war is active it returns a
+  // nil war field so the client can render a "no active war" state rather
+  // than 404.
+  rpc GetGuildWar(GetGuildWarRequest) returns (GetGuildWarResponse) {
+    option (google.api.http) = { get: "/api/v1/guilds/war" };
+  }
 }
 
 enum GuildMemberRole {
@@ -294,4 +302,55 @@ message CreateGuildChallengeRequest {
 
 message CreateGuildChallengeResponse {
   GuildChallengeData challenge = 1;
+}
+
+// ── Guild War ─────────────────────────────────────────────────────────────
+
+message GetGuildWarRequest {}
+
+message GetGuildWarResponse {
+  GuildWarSnapshot war = 1;
+}
+
+message GuildWarSnapshot {
+  string                    id               = 1;
+  string                    our_guild_name   = 2;
+  string                    their_guild_name = 3;
+  int32                     our_score        = 4;
+  int32                     their_score      = 5;
+  int32                     day_number       = 6;
+  int32                     total_days       = 7;
+  int32                     our_deployed     = 8;
+  int32                     our_roster       = 9;
+  google.protobuf.Timestamp ends_at          = 10;
+
+  repeated GuildWarFront front = 11;
+  repeated GuildWarMvp   mvps  = 12;
+  repeated GuildWarFeed  feed  = 13;
+}
+
+message GuildWarFront {
+  string name          = 1;
+  int32  our_rounds    = 2;
+  int32  their_rounds  = 3;
+  string duration_label = 4;
+  // status enum-as-string so the proto stays stable if we add more later:
+  // "contested" | "leading" | "losing" | "won" | "lost" | "upcoming".
+  string status        = 5;
+  bool   is_hot        = 6;
+  bool   is_danger     = 7;
+}
+
+message GuildWarMvp {
+  string username   = 1;
+  string guild_name = 2;
+  int32  wins       = 3;
+  int32  losses     = 4;
+  // "ours" | "theirs".
+  string side       = 5;
+}
+
+message GuildWarFeed {
+  google.protobuf.Timestamp at   = 1;
+  string                    text = 2;
 }

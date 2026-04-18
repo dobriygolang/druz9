@@ -1678,6 +1678,23 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/guild.v1.GuildResponse'
+    /api/v1/guilds/war:
+        get:
+            tags:
+                - GuildService
+            description: |-
+                GetGuildWar returns the user's current guild-war snapshot: opponent,
+                 score, fronts, MVPs, recent feed. When no war is active it returns a
+                 nil war field so the client can render a "no active war" state rather
+                 than 404.
+            operationId: GuildService_GetGuildWar
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.GetGuildWarResponse'
     /api/v1/guilds/{guildId}:
         delete:
             tags:
@@ -4926,6 +4943,11 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/guild.v1.GuildMemberAction'
+        guild.v1.GetGuildWarResponse:
+            type: object
+            properties:
+                war:
+                    $ref: '#/components/schemas/guild.v1.GuildWarSnapshot'
         guild.v1.Guild:
             type: object
             properties:
@@ -5064,6 +5086,94 @@ components:
             properties:
                 guild:
                     $ref: '#/components/schemas/guild.v1.Guild'
+        guild.v1.GuildWarFeed:
+            type: object
+            properties:
+                at:
+                    type: string
+                    format: date-time
+                text:
+                    type: string
+        guild.v1.GuildWarFront:
+            type: object
+            properties:
+                name:
+                    type: string
+                ourRounds:
+                    type: integer
+                    format: int32
+                theirRounds:
+                    type: integer
+                    format: int32
+                durationLabel:
+                    type: string
+                status:
+                    type: string
+                    description: |-
+                        status enum-as-string so the proto stays stable if we add more later:
+                         "contested" | "leading" | "losing" | "won" | "lost" | "upcoming".
+                isHot:
+                    type: boolean
+                isDanger:
+                    type: boolean
+        guild.v1.GuildWarMvp:
+            type: object
+            properties:
+                username:
+                    type: string
+                guildName:
+                    type: string
+                wins:
+                    type: integer
+                    format: int32
+                losses:
+                    type: integer
+                    format: int32
+                side:
+                    type: string
+                    description: '"ours" | "theirs".'
+        guild.v1.GuildWarSnapshot:
+            type: object
+            properties:
+                id:
+                    type: string
+                ourGuildName:
+                    type: string
+                theirGuildName:
+                    type: string
+                ourScore:
+                    type: integer
+                    format: int32
+                theirScore:
+                    type: integer
+                    format: int32
+                dayNumber:
+                    type: integer
+                    format: int32
+                totalDays:
+                    type: integer
+                    format: int32
+                ourDeployed:
+                    type: integer
+                    format: int32
+                ourRoster:
+                    type: integer
+                    format: int32
+                endsAt:
+                    type: string
+                    format: date-time
+                front:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/guild.v1.GuildWarFront'
+                mvps:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/guild.v1.GuildWarMvp'
+                feed:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/guild.v1.GuildWarFeed'
         guild.v1.InviteToGuildRequest:
             type: object
             properties:

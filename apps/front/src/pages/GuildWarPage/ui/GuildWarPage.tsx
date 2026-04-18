@@ -1,48 +1,82 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Panel, RpgButton, Badge, PageHeader } from '@/shared/ui/pixel'
 import { Banner } from '@/shared/ui/sprites'
+import { guildApi, type GuildWar } from '@/features/Guild/api/guildApi'
 
-interface Front {
-  n: string
-  us: number
-  them: number
-  dur: string
-  status: string
-  hot?: boolean
-  danger?: boolean
+function relTime(iso: string): string {
+  if (!iso) return ''
+  const t = new Date(iso).getTime()
+  if (Number.isNaN(t)) return ''
+  const diff = Math.max(0, Date.now() - t)
+  const m = Math.floor(diff / 60_000)
+  if (m < 1) return 'now'
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  const d = Math.floor(h / 24)
+  return `${d}d ago`
 }
 
-const FRONTS: Front[] = [
-  { n: 'Graphs Bastion', us: 4, them: 3, dur: '14m left', status: 'contested', hot: true },
-  { n: 'Systems Tower', us: 3, them: 1, dur: '32m left', status: 'mossveil-leading' },
-  { n: 'DP Canyon', us: 1, them: 4, dur: '9m left', status: 'ravens-leading', danger: true },
-  { n: 'String Bridge', us: 2, them: 2, dur: '1h left', status: 'contested' },
-  { n: 'Algo Plaza', us: 2, them: 0, dur: 'next round', status: 'mossveil-leading' },
-]
-
-const MVPS: Array<[string, string, number, number, 'moss' | 'danger']> = [
-  ['thornmoss', 'mossveil', 4, 0, 'moss'],
-  ['kyrie.dev', 'ravens', 3, 1, 'danger'],
-  ['lunarfox', 'mossveil', 3, 0, 'moss'],
-  ['petrogryph', 'ravens', 2, 1, 'danger'],
-]
-
-const FEED: Array<[string, string]> = [
-  ['2m ago', 'thornmoss captured Graphs Bastion round 3'],
-  ['8m ago', 'ravens took DP Canyon +2'],
-  ['14m ago', 'Mossveil reinforced Systems Tower'],
-  ['20m ago', 'glowbeacon duel won +60 ELO'],
-  ['27m ago', 'Algo Plaza established'],
-]
+function endsInLabel(iso: string): string {
+  if (!iso) return ''
+  const t = new Date(iso).getTime()
+  if (Number.isNaN(t)) return ''
+  const diff = t - Date.now()
+  if (diff <= 0) return 'ended'
+  const h = Math.floor(diff / 3_600_000)
+  const m = Math.floor((diff % 3_600_000) / 60_000)
+  return `ends in ${h}h ${m}m`
+}
 
 export function GuildWarPage() {
   const navigate = useNavigate()
+  const [war, setWar] = useState<GuildWar | null>(null)
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    guildApi
+      .getGuildWar()
+      .then((w) => { if (!cancelled) setWar(w) })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setLoaded(true) })
+    return () => { cancelled = true }
+  }, [])
+
+  if (loaded && !war) {
+    return (
+      <>
+        <PageHeader
+          eyebrow="Guild War"
+          title="No active war"
+          subtitle="Your guild isn't in a war right now. Join one or wait for the next cycle — the Herald will announce it."
+          right={
+            <RpgButton size="sm" onClick={() => navigate('/guild')}>
+              Back to guild hall
+            </RpgButton>
+          }
+        />
+      </>
+    )
+  }
+
+  if (!war) {
+    return (
+      <Panel>
+        <div style={{ padding: 16, textAlign: 'center', color: 'var(--ink-2)' }}>
+          Loading war…
+        </div>
+      </Panel>
+    )
+  }
+
   return (
     <>
       <PageHeader
         eyebrow="Guild War · live"
-        title="Mossveil vs Red Ravens"
-        subtitle="Second day of a long guild war. Fronts colour in when one side wins a round."
+        title={`${war.ourGuildName} vs ${war.theirGuildName}`}
+        subtitle={`Day ${war.dayNumber} of ${war.totalDays}. Fronts colour in when one side wins a round.`}
         right={
           <div style={{ display: 'flex', gap: 8 }}>
             <RpgButton size="sm" onClick={() => navigate('/guild')}>
@@ -69,30 +103,17 @@ export function GuildWarPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <Banner scale={4} color="var(--moss-1)" crest="✦" />
             <div>
-              <div
-                style={{
-                  fontFamily: 'Pixelify Sans, monospace',
-                  fontSize: 26,
-                  color: 'var(--parch-0)',
-                }}
-              >
-                Mossveil
+              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 26, color: 'var(--parch-0)' }}>
+                {war.ourGuildName}
               </div>
               <div
                 className="font-silkscreen uppercase"
                 style={{ color: 'var(--moss-2)', fontSize: 10, letterSpacing: '0.08em' }}
               >
-                24 members · 18 deployed
+                {war.ourRoster} members · {war.ourDeployed} deployed
               </div>
-              <div
-                style={{
-                  fontFamily: 'Pixelify Sans, monospace',
-                  fontSize: 56,
-                  color: 'var(--moss-2)',
-                  lineHeight: 1,
-                }}
-              >
-                12
+              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 56, color: 'var(--moss-2)', lineHeight: 1 }}>
+                {war.ourScore}
               </div>
             </div>
           </div>
@@ -101,27 +122,16 @@ export function GuildWarPage() {
               className="font-silkscreen uppercase"
               style={{ color: 'var(--parch-2)', opacity: 0.6, fontSize: 9, letterSpacing: '0.1em' }}
             >
-              day 2 / 3
+              day {war.dayNumber} / {war.totalDays}
             </div>
-            <div
-              style={{
-                fontFamily: 'Pixelify Sans, monospace',
-                fontSize: 40,
-                color: 'var(--ember-3)',
-              }}
-            >
+            <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 40, color: 'var(--ember-3)' }}>
               vs
             </div>
             <div
               className="font-silkscreen uppercase"
-              style={{
-                color: 'var(--parch-2)',
-                opacity: 0.8,
-                fontSize: 10,
-                letterSpacing: '0.08em',
-              }}
+              style={{ color: 'var(--parch-2)', opacity: 0.8, fontSize: 10, letterSpacing: '0.08em' }}
             >
-              ends in 08h 42m
+              {endsInLabel(war.endsAt)}
             </div>
           </div>
           <div
@@ -135,24 +145,14 @@ export function GuildWarPage() {
           >
             <Banner scale={4} color="var(--rpg-danger, #a23a2a)" crest="▲" />
             <div>
-              <div
-                style={{
-                  fontFamily: 'Pixelify Sans, monospace',
-                  fontSize: 26,
-                  color: 'var(--parch-0)',
-                }}
-              >
-                Red Ravens
+              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 26, color: 'var(--parch-0)' }}>
+                {war.theirGuildName}
               </div>
               <div
                 className="font-silkscreen uppercase"
-                style={{
-                  color: 'var(--rpg-danger, #a23a2a)',
-                  fontSize: 10,
-                  letterSpacing: '0.08em',
-                }}
+                style={{ color: 'var(--rpg-danger, #a23a2a)', fontSize: 10, letterSpacing: '0.08em' }}
               >
-                31 members · 24 deployed
+                opponent guild
               </div>
               <div
                 style={{
@@ -162,7 +162,7 @@ export function GuildWarPage() {
                   lineHeight: 1,
                 }}
               >
-                9
+                {war.theirScore}
               </div>
             </div>
           </div>
@@ -173,18 +173,18 @@ export function GuildWarPage() {
         {/* Fronts */}
         <Panel>
           <h3 className="font-display" style={{ fontSize: 17, marginBottom: 12 }}>
-            Active fronts · 5
+            Active fronts · {war.front.length}
           </h3>
-          {FRONTS.map((f) => (
+          {war.front.map((f) => (
             <div
-              key={f.n}
+              key={f.name}
               style={{
                 padding: 12,
                 marginBottom: 8,
                 border: '3px solid var(--ink-0)',
-                background: f.danger
+                background: f.isDanger
                   ? 'rgba(184,41,42,0.08)'
-                  : f.hot
+                  : f.isHot
                     ? 'rgba(233,184,102,0.15)'
                     : 'var(--parch-0)',
                 boxShadow: '3px 3px 0 var(--ink-0)',
@@ -199,17 +199,17 @@ export function GuildWarPage() {
                 }}
               >
                 <div>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 16 }}>{f.n}</div>
+                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 16 }}>{f.name}</div>
                   <div
                     className="font-silkscreen uppercase"
                     style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
                   >
-                    {f.dur}
+                    {f.durationLabel}
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  {f.hot && <Badge variant="ember">hot</Badge>}
-                  {f.danger && (
+                  {f.isHot && <Badge variant="ember">hot</Badge>}
+                  {f.isDanger && (
                     <span
                       className="rpg-badge"
                       style={{
@@ -226,14 +226,9 @@ export function GuildWarPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span
                   className="font-silkscreen uppercase"
-                  style={{
-                    fontSize: 11,
-                    color: 'var(--moss-1)',
-                    width: 40,
-                    letterSpacing: '0.08em',
-                  }}
+                  style={{ fontSize: 11, color: 'var(--moss-1)', width: 40, letterSpacing: '0.08em' }}
                 >
-                  {f.us}
+                  {f.ourRounds}
                 </span>
                 <div
                   style={{
@@ -245,8 +240,8 @@ export function GuildWarPage() {
                     overflow: 'hidden',
                   }}
                 >
-                  <div style={{ flex: f.us, background: 'var(--moss-1)' }} />
-                  <div style={{ flex: f.them, background: 'var(--rpg-danger, #a23a2a)' }} />
+                  <div style={{ flex: Math.max(f.ourRounds, 0.0001), background: 'var(--moss-1)' }} />
+                  <div style={{ flex: Math.max(f.theirRounds, 0.0001), background: 'var(--rpg-danger, #a23a2a)' }} />
                 </div>
                 <span
                   className="font-silkscreen uppercase"
@@ -258,48 +253,47 @@ export function GuildWarPage() {
                     letterSpacing: '0.08em',
                   }}
                 >
-                  {f.them}
+                  {f.theirRounds}
                 </span>
               </div>
             </div>
           ))}
         </Panel>
 
-        {/* Right side */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <Panel variant="tight">
             <h3 className="font-display" style={{ fontSize: 17, marginBottom: 8 }}>
               MVPs today
             </h3>
-            {MVPS.map(([n, g, w, l, c], i) => (
+            {war.mvps.map((m, i) => (
               <div
-                key={String(n)}
+                key={`${m.username}-${i}`}
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '6px 0',
-                  borderBottom: i < MVPS.length - 1 ? '1px dashed var(--ink-3)' : 'none',
+                  borderBottom: i < war.mvps.length - 1 ? '1px dashed var(--ink-3)' : 'none',
                 }}
               >
                 <div>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13 }}>{n}</div>
+                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13 }}>{m.username}</div>
                   <div
                     className="font-silkscreen uppercase"
                     style={{
                       fontSize: 9,
-                      color: c === 'moss' ? 'var(--moss-1)' : 'var(--rpg-danger, #a23a2a)',
+                      color: m.side === 'ours' ? 'var(--moss-1)' : 'var(--rpg-danger, #a23a2a)',
                       letterSpacing: '0.08em',
                     }}
                   >
-                    {g}
+                    {m.guildName}
                   </div>
                 </div>
                 <span
                   className="font-silkscreen uppercase"
                   style={{ fontSize: 11, color: 'var(--ember-1)', letterSpacing: '0.08em' }}
                 >
-                  {w}w · {l}l
+                  {m.wins}w · {m.losses}l
                 </span>
               </div>
             ))}
@@ -310,15 +304,15 @@ export function GuildWarPage() {
               War feed
             </h3>
             <div style={{ fontSize: 11, lineHeight: 1.6, color: 'var(--parch-2)', marginTop: 6 }}>
-              {FEED.map(([t, msg]) => (
-                <div key={t}>
+              {war.feed.map((entry, i) => (
+                <div key={i}>
                   <span
                     className="font-silkscreen uppercase"
                     style={{ color: 'var(--ember-1)', letterSpacing: '0.08em' }}
                   >
-                    {t} ·
+                    {relTime(entry.at)} ·
                   </span>{' '}
-                  {msg}
+                  {entry.text}
                 </div>
               ))}
             </div>
@@ -327,12 +321,7 @@ export function GuildWarPage() {
           <Panel variant="recessed">
             <div
               className="font-silkscreen uppercase"
-              style={{
-                fontSize: 9,
-                color: 'var(--ink-2)',
-                marginBottom: 8,
-                letterSpacing: '0.1em',
-              }}
+              style={{ fontSize: 9, color: 'var(--ink-2)', marginBottom: 8, letterSpacing: '0.1em' }}
             >
               war reward · on victory
             </div>

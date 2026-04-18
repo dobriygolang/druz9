@@ -32,6 +32,7 @@ const (
 	GuildService_GetGuildMemberStats_FullMethodName     = "/guild.v1.GuildService/GetGuildMemberStats"
 	GuildService_GetActiveGuildChallenge_FullMethodName = "/guild.v1.GuildService/GetActiveGuildChallenge"
 	GuildService_CreateGuildChallenge_FullMethodName    = "/guild.v1.GuildService/CreateGuildChallenge"
+	GuildService_GetGuildWar_FullMethodName             = "/guild.v1.GuildService/GetGuildWar"
 )
 
 // GuildServiceClient is the client API for GuildService service.
@@ -51,6 +52,11 @@ type GuildServiceClient interface {
 	GetGuildMemberStats(ctx context.Context, in *GetGuildMemberStatsRequest, opts ...grpc.CallOption) (*GetGuildMemberStatsResponse, error)
 	GetActiveGuildChallenge(ctx context.Context, in *GetActiveGuildChallengeRequest, opts ...grpc.CallOption) (*GetActiveGuildChallengeResponse, error)
 	CreateGuildChallenge(ctx context.Context, in *CreateGuildChallengeRequest, opts ...grpc.CallOption) (*CreateGuildChallengeResponse, error)
+	// GetGuildWar returns the user's current guild-war snapshot: opponent,
+	// score, fronts, MVPs, recent feed. When no war is active it returns a
+	// nil war field so the client can render a "no active war" state rather
+	// than 404.
+	GetGuildWar(ctx context.Context, in *GetGuildWarRequest, opts ...grpc.CallOption) (*GetGuildWarResponse, error)
 }
 
 type guildServiceClient struct {
@@ -191,6 +197,16 @@ func (c *guildServiceClient) CreateGuildChallenge(ctx context.Context, in *Creat
 	return out, nil
 }
 
+func (c *guildServiceClient) GetGuildWar(ctx context.Context, in *GetGuildWarRequest, opts ...grpc.CallOption) (*GetGuildWarResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetGuildWarResponse)
+	err := c.cc.Invoke(ctx, GuildService_GetGuildWar_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GuildServiceServer is the server API for GuildService service.
 // All implementations must embed UnimplementedGuildServiceServer
 // for forward compatibility.
@@ -208,6 +224,11 @@ type GuildServiceServer interface {
 	GetGuildMemberStats(context.Context, *GetGuildMemberStatsRequest) (*GetGuildMemberStatsResponse, error)
 	GetActiveGuildChallenge(context.Context, *GetActiveGuildChallengeRequest) (*GetActiveGuildChallengeResponse, error)
 	CreateGuildChallenge(context.Context, *CreateGuildChallengeRequest) (*CreateGuildChallengeResponse, error)
+	// GetGuildWar returns the user's current guild-war snapshot: opponent,
+	// score, fronts, MVPs, recent feed. When no war is active it returns a
+	// nil war field so the client can render a "no active war" state rather
+	// than 404.
+	GetGuildWar(context.Context, *GetGuildWarRequest) (*GetGuildWarResponse, error)
 	mustEmbedUnimplementedGuildServiceServer()
 }
 
@@ -256,6 +277,9 @@ func (UnimplementedGuildServiceServer) GetActiveGuildChallenge(context.Context, 
 }
 func (UnimplementedGuildServiceServer) CreateGuildChallenge(context.Context, *CreateGuildChallengeRequest) (*CreateGuildChallengeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateGuildChallenge not implemented")
+}
+func (UnimplementedGuildServiceServer) GetGuildWar(context.Context, *GetGuildWarRequest) (*GetGuildWarResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetGuildWar not implemented")
 }
 func (UnimplementedGuildServiceServer) mustEmbedUnimplementedGuildServiceServer() {}
 func (UnimplementedGuildServiceServer) testEmbeddedByValue()                      {}
@@ -512,6 +536,24 @@ func _GuildService_CreateGuildChallenge_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GuildService_GetGuildWar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetGuildWarRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GuildServiceServer).GetGuildWar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GuildService_GetGuildWar_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GuildServiceServer).GetGuildWar(ctx, req.(*GetGuildWarRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // GuildService_ServiceDesc is the grpc.ServiceDesc for GuildService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -570,6 +612,10 @@ var GuildService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateGuildChallenge",
 			Handler:    _GuildService_CreateGuildChallenge_Handler,
+		},
+		{
+			MethodName: "GetGuildWar",
+			Handler:    _GuildService_GetGuildWar_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

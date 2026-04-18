@@ -26,6 +26,7 @@ const OperationGuildServiceDeleteGuild = "/guild.v1.GuildService/DeleteGuild"
 const OperationGuildServiceGetActiveGuildChallenge = "/guild.v1.GuildService/GetActiveGuildChallenge"
 const OperationGuildServiceGetGuildMemberStats = "/guild.v1.GuildService/GetGuildMemberStats"
 const OperationGuildServiceGetGuildPulse = "/guild.v1.GuildService/GetGuildPulse"
+const OperationGuildServiceGetGuildWar = "/guild.v1.GuildService/GetGuildWar"
 const OperationGuildServiceInviteToGuild = "/guild.v1.GuildService/InviteToGuild"
 const OperationGuildServiceJoinGuild = "/guild.v1.GuildService/JoinGuild"
 const OperationGuildServiceLeaveGuild = "/guild.v1.GuildService/LeaveGuild"
@@ -41,6 +42,11 @@ type GuildServiceHTTPServer interface {
 	GetActiveGuildChallenge(context.Context, *GetActiveGuildChallengeRequest) (*GetActiveGuildChallengeResponse, error)
 	GetGuildMemberStats(context.Context, *GetGuildMemberStatsRequest) (*GetGuildMemberStatsResponse, error)
 	GetGuildPulse(context.Context, *GetGuildPulseRequest) (*GetGuildPulseResponse, error)
+	// GetGuildWar GetGuildWar returns the user's current guild-war snapshot: opponent,
+	// score, fronts, MVPs, recent feed. When no war is active it returns a
+	// nil war field so the client can render a "no active war" state rather
+	// than 404.
+	GetGuildWar(context.Context, *GetGuildWarRequest) (*GetGuildWarResponse, error)
 	InviteToGuild(context.Context, *InviteToGuildRequest) (*InviteToGuildResponse, error)
 	JoinGuild(context.Context, *JoinGuildRequest) (*JoinGuildResponse, error)
 	LeaveGuild(context.Context, *LeaveGuildRequest) (*LeaveGuildResponse, error)
@@ -64,6 +70,7 @@ func RegisterGuildServiceHTTPServer(s *http.Server, srv GuildServiceHTTPServer) 
 	r.GET("/api/v1/guilds/{guild_id}/member-stats", _GuildService_GetGuildMemberStats0_HTTP_Handler(srv))
 	r.GET("/api/v1/guilds/{guild_id}/challenge", _GuildService_GetActiveGuildChallenge0_HTTP_Handler(srv))
 	r.POST("/api/v1/guilds/{guild_id}/challenge", _GuildService_CreateGuildChallenge0_HTTP_Handler(srv))
+	r.GET("/api/v1/guilds/war", _GuildService_GetGuildWar0_HTTP_Handler(srv))
 }
 
 func _GuildService_ListGuilds0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
@@ -364,6 +371,25 @@ func _GuildService_CreateGuildChallenge0_HTTP_Handler(srv GuildServiceHTTPServer
 	}
 }
 
+func _GuildService_GetGuildWar0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetGuildWarRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGuildServiceGetGuildWar)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetGuildWar(ctx, req.(*GetGuildWarRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetGuildWarResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type GuildServiceHTTPClient interface {
 	CreateGuild(ctx context.Context, req *CreateGuildRequest, opts ...http.CallOption) (rsp *GuildResponse, err error)
 	CreateGuildChallenge(ctx context.Context, req *CreateGuildChallengeRequest, opts ...http.CallOption) (rsp *CreateGuildChallengeResponse, err error)
@@ -372,6 +398,11 @@ type GuildServiceHTTPClient interface {
 	GetActiveGuildChallenge(ctx context.Context, req *GetActiveGuildChallengeRequest, opts ...http.CallOption) (rsp *GetActiveGuildChallengeResponse, err error)
 	GetGuildMemberStats(ctx context.Context, req *GetGuildMemberStatsRequest, opts ...http.CallOption) (rsp *GetGuildMemberStatsResponse, err error)
 	GetGuildPulse(ctx context.Context, req *GetGuildPulseRequest, opts ...http.CallOption) (rsp *GetGuildPulseResponse, err error)
+	// GetGuildWar GetGuildWar returns the user's current guild-war snapshot: opponent,
+	// score, fronts, MVPs, recent feed. When no war is active it returns a
+	// nil war field so the client can render a "no active war" state rather
+	// than 404.
+	GetGuildWar(ctx context.Context, req *GetGuildWarRequest, opts ...http.CallOption) (rsp *GetGuildWarResponse, err error)
 	InviteToGuild(ctx context.Context, req *InviteToGuildRequest, opts ...http.CallOption) (rsp *InviteToGuildResponse, err error)
 	JoinGuild(ctx context.Context, req *JoinGuildRequest, opts ...http.CallOption) (rsp *JoinGuildResponse, err error)
 	LeaveGuild(ctx context.Context, req *LeaveGuildRequest, opts ...http.CallOption) (rsp *LeaveGuildResponse, err error)
@@ -471,6 +502,23 @@ func (c *GuildServiceHTTPClientImpl) GetGuildPulse(ctx context.Context, in *GetG
 	pattern := "/api/v1/guilds/{guild_id}/pulse"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationGuildServiceGetGuildPulse))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// GetGuildWar GetGuildWar returns the user's current guild-war snapshot: opponent,
+// score, fronts, MVPs, recent feed. When no war is active it returns a
+// nil war field so the client can render a "no active war" state rather
+// than 404.
+func (c *GuildServiceHTTPClientImpl) GetGuildWar(ctx context.Context, in *GetGuildWarRequest, opts ...http.CallOption) (*GetGuildWarResponse, error) {
+	var out GetGuildWarResponse
+	pattern := "/api/v1/guilds/war"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationGuildServiceGetGuildWar))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

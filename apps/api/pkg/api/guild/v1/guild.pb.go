@@ -2074,6 +2074,449 @@ func (x *CreateGuildChallengeResponse) GetChallenge() *GuildChallengeData {
 	return nil
 }
 
+type GetGuildWarRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetGuildWarRequest) Reset() {
+	*x = GetGuildWarRequest{}
+	mi := &file_social_guild_v1_guild_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetGuildWarRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetGuildWarRequest) ProtoMessage() {}
+
+func (x *GetGuildWarRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_social_guild_v1_guild_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetGuildWarRequest.ProtoReflect.Descriptor instead.
+func (*GetGuildWarRequest) Descriptor() ([]byte, []int) {
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{33}
+}
+
+type GetGuildWarResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	War           *GuildWarSnapshot      `protobuf:"bytes,1,opt,name=war,proto3" json:"war,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetGuildWarResponse) Reset() {
+	*x = GetGuildWarResponse{}
+	mi := &file_social_guild_v1_guild_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetGuildWarResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetGuildWarResponse) ProtoMessage() {}
+
+func (x *GetGuildWarResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_social_guild_v1_guild_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetGuildWarResponse.ProtoReflect.Descriptor instead.
+func (*GetGuildWarResponse) Descriptor() ([]byte, []int) {
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *GetGuildWarResponse) GetWar() *GuildWarSnapshot {
+	if x != nil {
+		return x.War
+	}
+	return nil
+}
+
+type GuildWarSnapshot struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	OurGuildName   string                 `protobuf:"bytes,2,opt,name=our_guild_name,json=ourGuildName,proto3" json:"our_guild_name,omitempty"`
+	TheirGuildName string                 `protobuf:"bytes,3,opt,name=their_guild_name,json=theirGuildName,proto3" json:"their_guild_name,omitempty"`
+	OurScore       int32                  `protobuf:"varint,4,opt,name=our_score,json=ourScore,proto3" json:"our_score,omitempty"`
+	TheirScore     int32                  `protobuf:"varint,5,opt,name=their_score,json=theirScore,proto3" json:"their_score,omitempty"`
+	DayNumber      int32                  `protobuf:"varint,6,opt,name=day_number,json=dayNumber,proto3" json:"day_number,omitempty"`
+	TotalDays      int32                  `protobuf:"varint,7,opt,name=total_days,json=totalDays,proto3" json:"total_days,omitempty"`
+	OurDeployed    int32                  `protobuf:"varint,8,opt,name=our_deployed,json=ourDeployed,proto3" json:"our_deployed,omitempty"`
+	OurRoster      int32                  `protobuf:"varint,9,opt,name=our_roster,json=ourRoster,proto3" json:"our_roster,omitempty"`
+	EndsAt         *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=ends_at,json=endsAt,proto3" json:"ends_at,omitempty"`
+	Front          []*GuildWarFront       `protobuf:"bytes,11,rep,name=front,proto3" json:"front,omitempty"`
+	Mvps           []*GuildWarMvp         `protobuf:"bytes,12,rep,name=mvps,proto3" json:"mvps,omitempty"`
+	Feed           []*GuildWarFeed        `protobuf:"bytes,13,rep,name=feed,proto3" json:"feed,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *GuildWarSnapshot) Reset() {
+	*x = GuildWarSnapshot{}
+	mi := &file_social_guild_v1_guild_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GuildWarSnapshot) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GuildWarSnapshot) ProtoMessage() {}
+
+func (x *GuildWarSnapshot) ProtoReflect() protoreflect.Message {
+	mi := &file_social_guild_v1_guild_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GuildWarSnapshot.ProtoReflect.Descriptor instead.
+func (*GuildWarSnapshot) Descriptor() ([]byte, []int) {
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *GuildWarSnapshot) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *GuildWarSnapshot) GetOurGuildName() string {
+	if x != nil {
+		return x.OurGuildName
+	}
+	return ""
+}
+
+func (x *GuildWarSnapshot) GetTheirGuildName() string {
+	if x != nil {
+		return x.TheirGuildName
+	}
+	return ""
+}
+
+func (x *GuildWarSnapshot) GetOurScore() int32 {
+	if x != nil {
+		return x.OurScore
+	}
+	return 0
+}
+
+func (x *GuildWarSnapshot) GetTheirScore() int32 {
+	if x != nil {
+		return x.TheirScore
+	}
+	return 0
+}
+
+func (x *GuildWarSnapshot) GetDayNumber() int32 {
+	if x != nil {
+		return x.DayNumber
+	}
+	return 0
+}
+
+func (x *GuildWarSnapshot) GetTotalDays() int32 {
+	if x != nil {
+		return x.TotalDays
+	}
+	return 0
+}
+
+func (x *GuildWarSnapshot) GetOurDeployed() int32 {
+	if x != nil {
+		return x.OurDeployed
+	}
+	return 0
+}
+
+func (x *GuildWarSnapshot) GetOurRoster() int32 {
+	if x != nil {
+		return x.OurRoster
+	}
+	return 0
+}
+
+func (x *GuildWarSnapshot) GetEndsAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndsAt
+	}
+	return nil
+}
+
+func (x *GuildWarSnapshot) GetFront() []*GuildWarFront {
+	if x != nil {
+		return x.Front
+	}
+	return nil
+}
+
+func (x *GuildWarSnapshot) GetMvps() []*GuildWarMvp {
+	if x != nil {
+		return x.Mvps
+	}
+	return nil
+}
+
+func (x *GuildWarSnapshot) GetFeed() []*GuildWarFeed {
+	if x != nil {
+		return x.Feed
+	}
+	return nil
+}
+
+type GuildWarFront struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	OurRounds     int32                  `protobuf:"varint,2,opt,name=our_rounds,json=ourRounds,proto3" json:"our_rounds,omitempty"`
+	TheirRounds   int32                  `protobuf:"varint,3,opt,name=their_rounds,json=theirRounds,proto3" json:"their_rounds,omitempty"`
+	DurationLabel string                 `protobuf:"bytes,4,opt,name=duration_label,json=durationLabel,proto3" json:"duration_label,omitempty"`
+	// status enum-as-string so the proto stays stable if we add more later:
+	// "contested" | "leading" | "losing" | "won" | "lost" | "upcoming".
+	Status        string `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
+	IsHot         bool   `protobuf:"varint,6,opt,name=is_hot,json=isHot,proto3" json:"is_hot,omitempty"`
+	IsDanger      bool   `protobuf:"varint,7,opt,name=is_danger,json=isDanger,proto3" json:"is_danger,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GuildWarFront) Reset() {
+	*x = GuildWarFront{}
+	mi := &file_social_guild_v1_guild_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GuildWarFront) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GuildWarFront) ProtoMessage() {}
+
+func (x *GuildWarFront) ProtoReflect() protoreflect.Message {
+	mi := &file_social_guild_v1_guild_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GuildWarFront.ProtoReflect.Descriptor instead.
+func (*GuildWarFront) Descriptor() ([]byte, []int) {
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *GuildWarFront) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *GuildWarFront) GetOurRounds() int32 {
+	if x != nil {
+		return x.OurRounds
+	}
+	return 0
+}
+
+func (x *GuildWarFront) GetTheirRounds() int32 {
+	if x != nil {
+		return x.TheirRounds
+	}
+	return 0
+}
+
+func (x *GuildWarFront) GetDurationLabel() string {
+	if x != nil {
+		return x.DurationLabel
+	}
+	return ""
+}
+
+func (x *GuildWarFront) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *GuildWarFront) GetIsHot() bool {
+	if x != nil {
+		return x.IsHot
+	}
+	return false
+}
+
+func (x *GuildWarFront) GetIsDanger() bool {
+	if x != nil {
+		return x.IsDanger
+	}
+	return false
+}
+
+type GuildWarMvp struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Username  string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	GuildName string                 `protobuf:"bytes,2,opt,name=guild_name,json=guildName,proto3" json:"guild_name,omitempty"`
+	Wins      int32                  `protobuf:"varint,3,opt,name=wins,proto3" json:"wins,omitempty"`
+	Losses    int32                  `protobuf:"varint,4,opt,name=losses,proto3" json:"losses,omitempty"`
+	// "ours" | "theirs".
+	Side          string `protobuf:"bytes,5,opt,name=side,proto3" json:"side,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GuildWarMvp) Reset() {
+	*x = GuildWarMvp{}
+	mi := &file_social_guild_v1_guild_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GuildWarMvp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GuildWarMvp) ProtoMessage() {}
+
+func (x *GuildWarMvp) ProtoReflect() protoreflect.Message {
+	mi := &file_social_guild_v1_guild_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GuildWarMvp.ProtoReflect.Descriptor instead.
+func (*GuildWarMvp) Descriptor() ([]byte, []int) {
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *GuildWarMvp) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *GuildWarMvp) GetGuildName() string {
+	if x != nil {
+		return x.GuildName
+	}
+	return ""
+}
+
+func (x *GuildWarMvp) GetWins() int32 {
+	if x != nil {
+		return x.Wins
+	}
+	return 0
+}
+
+func (x *GuildWarMvp) GetLosses() int32 {
+	if x != nil {
+		return x.Losses
+	}
+	return 0
+}
+
+func (x *GuildWarMvp) GetSide() string {
+	if x != nil {
+		return x.Side
+	}
+	return ""
+}
+
+type GuildWarFeed struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	At            *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=at,proto3" json:"at,omitempty"`
+	Text          string                 `protobuf:"bytes,2,opt,name=text,proto3" json:"text,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GuildWarFeed) Reset() {
+	*x = GuildWarFeed{}
+	mi := &file_social_guild_v1_guild_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GuildWarFeed) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GuildWarFeed) ProtoMessage() {}
+
+func (x *GuildWarFeed) ProtoReflect() protoreflect.Message {
+	mi := &file_social_guild_v1_guild_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GuildWarFeed.ProtoReflect.Descriptor instead.
+func (*GuildWarFeed) Descriptor() ([]byte, []int) {
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *GuildWarFeed) GetAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.At
+	}
+	return nil
+}
+
+func (x *GuildWarFeed) GetText() string {
+	if x != nil {
+		return x.Text
+	}
+	return ""
+}
+
 var File_social_guild_v1_guild_proto protoreflect.FileDescriptor
 
 const file_social_guild_v1_guild_proto_rawDesc = "" +
@@ -2226,7 +2669,48 @@ const file_social_guild_v1_guild_proto_rawDesc = "" +
 	"\ftemplate_key\x18\x02 \x01(\tR\vtemplateKey\x12!\n" +
 	"\ftarget_value\x18\x03 \x01(\x05R\vtargetValue\"Z\n" +
 	"\x1cCreateGuildChallengeResponse\x12:\n" +
-	"\tchallenge\x18\x01 \x01(\v2\x1c.guild.v1.GuildChallengeDataR\tchallenge*q\n" +
+	"\tchallenge\x18\x01 \x01(\v2\x1c.guild.v1.GuildChallengeDataR\tchallenge\"\x14\n" +
+	"\x12GetGuildWarRequest\"C\n" +
+	"\x13GetGuildWarResponse\x12,\n" +
+	"\x03war\x18\x01 \x01(\v2\x1a.guild.v1.GuildWarSnapshotR\x03war\"\xeb\x03\n" +
+	"\x10GuildWarSnapshot\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12$\n" +
+	"\x0eour_guild_name\x18\x02 \x01(\tR\fourGuildName\x12(\n" +
+	"\x10their_guild_name\x18\x03 \x01(\tR\x0etheirGuildName\x12\x1b\n" +
+	"\tour_score\x18\x04 \x01(\x05R\bourScore\x12\x1f\n" +
+	"\vtheir_score\x18\x05 \x01(\x05R\n" +
+	"theirScore\x12\x1d\n" +
+	"\n" +
+	"day_number\x18\x06 \x01(\x05R\tdayNumber\x12\x1d\n" +
+	"\n" +
+	"total_days\x18\a \x01(\x05R\ttotalDays\x12!\n" +
+	"\four_deployed\x18\b \x01(\x05R\vourDeployed\x12\x1d\n" +
+	"\n" +
+	"our_roster\x18\t \x01(\x05R\tourRoster\x123\n" +
+	"\aends_at\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\x06endsAt\x12-\n" +
+	"\x05front\x18\v \x03(\v2\x17.guild.v1.GuildWarFrontR\x05front\x12)\n" +
+	"\x04mvps\x18\f \x03(\v2\x15.guild.v1.GuildWarMvpR\x04mvps\x12*\n" +
+	"\x04feed\x18\r \x03(\v2\x16.guild.v1.GuildWarFeedR\x04feed\"\xd8\x01\n" +
+	"\rGuildWarFront\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1d\n" +
+	"\n" +
+	"our_rounds\x18\x02 \x01(\x05R\tourRounds\x12!\n" +
+	"\ftheir_rounds\x18\x03 \x01(\x05R\vtheirRounds\x12%\n" +
+	"\x0eduration_label\x18\x04 \x01(\tR\rdurationLabel\x12\x16\n" +
+	"\x06status\x18\x05 \x01(\tR\x06status\x12\x15\n" +
+	"\x06is_hot\x18\x06 \x01(\bR\x05isHot\x12\x1b\n" +
+	"\tis_danger\x18\a \x01(\bR\bisDanger\"\x88\x01\n" +
+	"\vGuildWarMvp\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\x12\x1d\n" +
+	"\n" +
+	"guild_name\x18\x02 \x01(\tR\tguildName\x12\x12\n" +
+	"\x04wins\x18\x03 \x01(\x05R\x04wins\x12\x16\n" +
+	"\x06losses\x18\x04 \x01(\x05R\x06losses\x12\x12\n" +
+	"\x04side\x18\x05 \x01(\tR\x04side\"N\n" +
+	"\fGuildWarFeed\x12*\n" +
+	"\x02at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\x02at\x12\x12\n" +
+	"\x04text\x18\x02 \x01(\tR\x04text*q\n" +
 	"\x0fGuildMemberRole\x12!\n" +
 	"\x1dGUILD_MEMBER_ROLE_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19GUILD_MEMBER_ROLE_CREATOR\x10\x01\x12\x1c\n" +
@@ -2235,7 +2719,7 @@ const file_social_guild_v1_guild_proto_rawDesc = "" +
 	"$GUILD_MEMBER_ACTION_TYPE_UNSPECIFIED\x10\x00\x12\"\n" +
 	"\x1eGUILD_MEMBER_ACTION_TYPE_DAILY\x10\x01\x12!\n" +
 	"\x1dGUILD_MEMBER_ACTION_TYPE_DUEL\x10\x02\x12!\n" +
-	"\x1dGUILD_MEMBER_ACTION_TYPE_MOCK\x10\x032\xfd\f\n" +
+	"\x1dGUILD_MEMBER_ACTION_TYPE_MOCK\x10\x032\xe5\r\n" +
 	"\fGuildService\x12_\n" +
 	"\n" +
 	"ListGuilds\x12\x1b.guild.v1.ListGuildsRequest\x1a\x1c.guild.v1.ListGuildsResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/api/v1/guilds\x12_\n" +
@@ -2251,7 +2735,8 @@ const file_social_guild_v1_guild_proto_rawDesc = "" +
 	"\rGetGuildPulse\x12\x1e.guild.v1.GetGuildPulseRequest\x1a\x1f.guild.v1.GetGuildPulseResponse\"'\x82\xd3\xe4\x93\x02!\x12\x1f/api/v1/guilds/{guild_id}/pulse\x12\x92\x01\n" +
 	"\x13GetGuildMemberStats\x12$.guild.v1.GetGuildMemberStatsRequest\x1a%.guild.v1.GetGuildMemberStatsResponse\".\x82\xd3\xe4\x93\x02(\x12&/api/v1/guilds/{guild_id}/member-stats\x12\x9b\x01\n" +
 	"\x17GetActiveGuildChallenge\x12(.guild.v1.GetActiveGuildChallengeRequest\x1a).guild.v1.GetActiveGuildChallengeResponse\"+\x82\xd3\xe4\x93\x02%\x12#/api/v1/guilds/{guild_id}/challenge\x12\x95\x01\n" +
-	"\x14CreateGuildChallenge\x12%.guild.v1.CreateGuildChallengeRequest\x1a&.guild.v1.CreateGuildChallengeResponse\".\x82\xd3\xe4\x93\x02(:\x01*\"#/api/v1/guilds/{guild_id}/challengeB\x19Z\x17api/pkg/api/guild/v1;v1b\x06proto3"
+	"\x14CreateGuildChallenge\x12%.guild.v1.CreateGuildChallengeRequest\x1a&.guild.v1.CreateGuildChallengeResponse\".\x82\xd3\xe4\x93\x02(:\x01*\"#/api/v1/guilds/{guild_id}/challenge\x12f\n" +
+	"\vGetGuildWar\x12\x1c.guild.v1.GetGuildWarRequest\x1a\x1d.guild.v1.GetGuildWarResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/guilds/warB\x19Z\x17api/pkg/api/guild/v1;v1b\x06proto3"
 
 var (
 	file_social_guild_v1_guild_proto_rawDescOnce sync.Once
@@ -2266,7 +2751,7 @@ func file_social_guild_v1_guild_proto_rawDescGZIP() []byte {
 }
 
 var file_social_guild_v1_guild_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_social_guild_v1_guild_proto_msgTypes = make([]protoimpl.MessageInfo, 33)
+var file_social_guild_v1_guild_proto_msgTypes = make([]protoimpl.MessageInfo, 39)
 var file_social_guild_v1_guild_proto_goTypes = []any{
 	(GuildMemberRole)(0),                    // 0: guild.v1.GuildMemberRole
 	(GuildMemberActionType)(0),              // 1: guild.v1.GuildMemberActionType
@@ -2303,68 +2788,82 @@ var file_social_guild_v1_guild_proto_goTypes = []any{
 	(*GetActiveGuildChallengeResponse)(nil), // 32: guild.v1.GetActiveGuildChallengeResponse
 	(*CreateGuildChallengeRequest)(nil),     // 33: guild.v1.CreateGuildChallengeRequest
 	(*CreateGuildChallengeResponse)(nil),    // 34: guild.v1.CreateGuildChallengeResponse
-	(v1.OperationStatus)(0),                 // 35: common.v1.OperationStatus
-	(*timestamppb.Timestamp)(nil),           // 36: google.protobuf.Timestamp
-	(v11.EventListFilter)(0),                // 37: event.v1.EventListFilter
-	(*v11.Event)(nil),                       // 38: event.v1.Event
+	(*GetGuildWarRequest)(nil),              // 35: guild.v1.GetGuildWarRequest
+	(*GetGuildWarResponse)(nil),             // 36: guild.v1.GetGuildWarResponse
+	(*GuildWarSnapshot)(nil),                // 37: guild.v1.GuildWarSnapshot
+	(*GuildWarFront)(nil),                   // 38: guild.v1.GuildWarFront
+	(*GuildWarMvp)(nil),                     // 39: guild.v1.GuildWarMvp
+	(*GuildWarFeed)(nil),                    // 40: guild.v1.GuildWarFeed
+	(v1.OperationStatus)(0),                 // 41: common.v1.OperationStatus
+	(*timestamppb.Timestamp)(nil),           // 42: google.protobuf.Timestamp
+	(v11.EventListFilter)(0),                // 43: event.v1.EventListFilter
+	(*v11.Event)(nil),                       // 44: event.v1.Event
 }
 var file_social_guild_v1_guild_proto_depIdxs = []int32{
 	21, // 0: guild.v1.ListGuildsResponse.guilds:type_name -> guild.v1.Guild
 	21, // 1: guild.v1.GuildResponse.guild:type_name -> guild.v1.Guild
-	35, // 2: guild.v1.JoinGuildResponse.status:type_name -> common.v1.OperationStatus
-	35, // 3: guild.v1.LeaveGuildResponse.status:type_name -> common.v1.OperationStatus
-	35, // 4: guild.v1.InviteToGuildResponse.status:type_name -> common.v1.OperationStatus
+	41, // 2: guild.v1.JoinGuildResponse.status:type_name -> common.v1.OperationStatus
+	41, // 3: guild.v1.LeaveGuildResponse.status:type_name -> common.v1.OperationStatus
+	41, // 4: guild.v1.InviteToGuildResponse.status:type_name -> common.v1.OperationStatus
 	0,  // 5: guild.v1.GuildMember.role:type_name -> guild.v1.GuildMemberRole
-	36, // 6: guild.v1.GuildMember.joined_at:type_name -> google.protobuf.Timestamp
+	42, // 6: guild.v1.GuildMember.joined_at:type_name -> google.protobuf.Timestamp
 	13, // 7: guild.v1.ListGuildMembersResponse.members:type_name -> guild.v1.GuildMember
-	37, // 8: guild.v1.ListGuildEventsRequest.status:type_name -> event.v1.EventListFilter
-	38, // 9: guild.v1.ListGuildEventsResponse.events:type_name -> event.v1.Event
-	38, // 10: guild.v1.CreateGuildEventResponse.event:type_name -> event.v1.Event
-	35, // 11: guild.v1.DeleteGuildResponse.status:type_name -> common.v1.OperationStatus
-	36, // 12: guild.v1.Guild.created_at:type_name -> google.protobuf.Timestamp
+	43, // 8: guild.v1.ListGuildEventsRequest.status:type_name -> event.v1.EventListFilter
+	44, // 9: guild.v1.ListGuildEventsResponse.events:type_name -> event.v1.Event
+	44, // 10: guild.v1.CreateGuildEventResponse.event:type_name -> event.v1.Event
+	41, // 11: guild.v1.DeleteGuildResponse.status:type_name -> common.v1.OperationStatus
+	42, // 12: guild.v1.Guild.created_at:type_name -> google.protobuf.Timestamp
 	1,  // 13: guild.v1.GuildMemberAction.action_type:type_name -> guild.v1.GuildMemberActionType
-	36, // 14: guild.v1.GuildMemberAction.happened_at:type_name -> google.protobuf.Timestamp
+	42, // 14: guild.v1.GuildMemberAction.happened_at:type_name -> google.protobuf.Timestamp
 	23, // 15: guild.v1.GetGuildPulseResponse.week_activity:type_name -> guild.v1.GuildDayActivity
 	24, // 16: guild.v1.GetGuildPulseResponse.recent_actions:type_name -> guild.v1.GuildMemberAction
 	0,  // 17: guild.v1.GuildMemberStatsEntry.role:type_name -> guild.v1.GuildMemberRole
-	36, // 18: guild.v1.GuildMemberStatsEntry.joined_at:type_name -> google.protobuf.Timestamp
+	42, // 18: guild.v1.GuildMemberStatsEntry.joined_at:type_name -> google.protobuf.Timestamp
 	27, // 19: guild.v1.GetGuildMemberStatsResponse.members:type_name -> guild.v1.GuildMemberStatsEntry
-	36, // 20: guild.v1.GuildChallengeData.starts_at:type_name -> google.protobuf.Timestamp
-	36, // 21: guild.v1.GuildChallengeData.ends_at:type_name -> google.protobuf.Timestamp
+	42, // 20: guild.v1.GuildChallengeData.starts_at:type_name -> google.protobuf.Timestamp
+	42, // 21: guild.v1.GuildChallengeData.ends_at:type_name -> google.protobuf.Timestamp
 	30, // 22: guild.v1.GuildChallengeData.progress:type_name -> guild.v1.ChallengeMemberProgress
 	31, // 23: guild.v1.GetActiveGuildChallengeResponse.challenge:type_name -> guild.v1.GuildChallengeData
 	31, // 24: guild.v1.CreateGuildChallengeResponse.challenge:type_name -> guild.v1.GuildChallengeData
-	2,  // 25: guild.v1.GuildService.ListGuilds:input_type -> guild.v1.ListGuildsRequest
-	3,  // 26: guild.v1.GuildService.CreateGuild:input_type -> guild.v1.CreateGuildRequest
-	4,  // 27: guild.v1.GuildService.JoinGuild:input_type -> guild.v1.JoinGuildRequest
-	5,  // 28: guild.v1.GuildService.LeaveGuild:input_type -> guild.v1.LeaveGuildRequest
-	10, // 29: guild.v1.GuildService.InviteToGuild:input_type -> guild.v1.InviteToGuildRequest
-	12, // 30: guild.v1.GuildService.ListGuildMembers:input_type -> guild.v1.ListGuildMembersRequest
-	15, // 31: guild.v1.GuildService.ListGuildEvents:input_type -> guild.v1.ListGuildEventsRequest
-	17, // 32: guild.v1.GuildService.CreateGuildEvent:input_type -> guild.v1.CreateGuildEventRequest
-	19, // 33: guild.v1.GuildService.DeleteGuild:input_type -> guild.v1.DeleteGuildRequest
-	22, // 34: guild.v1.GuildService.GetGuildPulse:input_type -> guild.v1.GetGuildPulseRequest
-	26, // 35: guild.v1.GuildService.GetGuildMemberStats:input_type -> guild.v1.GetGuildMemberStatsRequest
-	29, // 36: guild.v1.GuildService.GetActiveGuildChallenge:input_type -> guild.v1.GetActiveGuildChallengeRequest
-	33, // 37: guild.v1.GuildService.CreateGuildChallenge:input_type -> guild.v1.CreateGuildChallengeRequest
-	6,  // 38: guild.v1.GuildService.ListGuilds:output_type -> guild.v1.ListGuildsResponse
-	7,  // 39: guild.v1.GuildService.CreateGuild:output_type -> guild.v1.GuildResponse
-	8,  // 40: guild.v1.GuildService.JoinGuild:output_type -> guild.v1.JoinGuildResponse
-	9,  // 41: guild.v1.GuildService.LeaveGuild:output_type -> guild.v1.LeaveGuildResponse
-	11, // 42: guild.v1.GuildService.InviteToGuild:output_type -> guild.v1.InviteToGuildResponse
-	14, // 43: guild.v1.GuildService.ListGuildMembers:output_type -> guild.v1.ListGuildMembersResponse
-	16, // 44: guild.v1.GuildService.ListGuildEvents:output_type -> guild.v1.ListGuildEventsResponse
-	18, // 45: guild.v1.GuildService.CreateGuildEvent:output_type -> guild.v1.CreateGuildEventResponse
-	20, // 46: guild.v1.GuildService.DeleteGuild:output_type -> guild.v1.DeleteGuildResponse
-	25, // 47: guild.v1.GuildService.GetGuildPulse:output_type -> guild.v1.GetGuildPulseResponse
-	28, // 48: guild.v1.GuildService.GetGuildMemberStats:output_type -> guild.v1.GetGuildMemberStatsResponse
-	32, // 49: guild.v1.GuildService.GetActiveGuildChallenge:output_type -> guild.v1.GetActiveGuildChallengeResponse
-	34, // 50: guild.v1.GuildService.CreateGuildChallenge:output_type -> guild.v1.CreateGuildChallengeResponse
-	38, // [38:51] is the sub-list for method output_type
-	25, // [25:38] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	37, // 25: guild.v1.GetGuildWarResponse.war:type_name -> guild.v1.GuildWarSnapshot
+	42, // 26: guild.v1.GuildWarSnapshot.ends_at:type_name -> google.protobuf.Timestamp
+	38, // 27: guild.v1.GuildWarSnapshot.front:type_name -> guild.v1.GuildWarFront
+	39, // 28: guild.v1.GuildWarSnapshot.mvps:type_name -> guild.v1.GuildWarMvp
+	40, // 29: guild.v1.GuildWarSnapshot.feed:type_name -> guild.v1.GuildWarFeed
+	42, // 30: guild.v1.GuildWarFeed.at:type_name -> google.protobuf.Timestamp
+	2,  // 31: guild.v1.GuildService.ListGuilds:input_type -> guild.v1.ListGuildsRequest
+	3,  // 32: guild.v1.GuildService.CreateGuild:input_type -> guild.v1.CreateGuildRequest
+	4,  // 33: guild.v1.GuildService.JoinGuild:input_type -> guild.v1.JoinGuildRequest
+	5,  // 34: guild.v1.GuildService.LeaveGuild:input_type -> guild.v1.LeaveGuildRequest
+	10, // 35: guild.v1.GuildService.InviteToGuild:input_type -> guild.v1.InviteToGuildRequest
+	12, // 36: guild.v1.GuildService.ListGuildMembers:input_type -> guild.v1.ListGuildMembersRequest
+	15, // 37: guild.v1.GuildService.ListGuildEvents:input_type -> guild.v1.ListGuildEventsRequest
+	17, // 38: guild.v1.GuildService.CreateGuildEvent:input_type -> guild.v1.CreateGuildEventRequest
+	19, // 39: guild.v1.GuildService.DeleteGuild:input_type -> guild.v1.DeleteGuildRequest
+	22, // 40: guild.v1.GuildService.GetGuildPulse:input_type -> guild.v1.GetGuildPulseRequest
+	26, // 41: guild.v1.GuildService.GetGuildMemberStats:input_type -> guild.v1.GetGuildMemberStatsRequest
+	29, // 42: guild.v1.GuildService.GetActiveGuildChallenge:input_type -> guild.v1.GetActiveGuildChallengeRequest
+	33, // 43: guild.v1.GuildService.CreateGuildChallenge:input_type -> guild.v1.CreateGuildChallengeRequest
+	35, // 44: guild.v1.GuildService.GetGuildWar:input_type -> guild.v1.GetGuildWarRequest
+	6,  // 45: guild.v1.GuildService.ListGuilds:output_type -> guild.v1.ListGuildsResponse
+	7,  // 46: guild.v1.GuildService.CreateGuild:output_type -> guild.v1.GuildResponse
+	8,  // 47: guild.v1.GuildService.JoinGuild:output_type -> guild.v1.JoinGuildResponse
+	9,  // 48: guild.v1.GuildService.LeaveGuild:output_type -> guild.v1.LeaveGuildResponse
+	11, // 49: guild.v1.GuildService.InviteToGuild:output_type -> guild.v1.InviteToGuildResponse
+	14, // 50: guild.v1.GuildService.ListGuildMembers:output_type -> guild.v1.ListGuildMembersResponse
+	16, // 51: guild.v1.GuildService.ListGuildEvents:output_type -> guild.v1.ListGuildEventsResponse
+	18, // 52: guild.v1.GuildService.CreateGuildEvent:output_type -> guild.v1.CreateGuildEventResponse
+	20, // 53: guild.v1.GuildService.DeleteGuild:output_type -> guild.v1.DeleteGuildResponse
+	25, // 54: guild.v1.GuildService.GetGuildPulse:output_type -> guild.v1.GetGuildPulseResponse
+	28, // 55: guild.v1.GuildService.GetGuildMemberStats:output_type -> guild.v1.GetGuildMemberStatsResponse
+	32, // 56: guild.v1.GuildService.GetActiveGuildChallenge:output_type -> guild.v1.GetActiveGuildChallengeResponse
+	34, // 57: guild.v1.GuildService.CreateGuildChallenge:output_type -> guild.v1.CreateGuildChallengeResponse
+	36, // 58: guild.v1.GuildService.GetGuildWar:output_type -> guild.v1.GetGuildWarResponse
+	45, // [45:59] is the sub-list for method output_type
+	31, // [31:45] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_social_guild_v1_guild_proto_init() }
@@ -2378,7 +2877,7 @@ func file_social_guild_v1_guild_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_social_guild_v1_guild_proto_rawDesc), len(file_social_guild_v1_guild_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   33,
+			NumMessages:   39,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

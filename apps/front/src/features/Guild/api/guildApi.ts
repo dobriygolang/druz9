@@ -141,4 +141,106 @@ export const guildApi = {
     })
     return r.data.challenge
   },
+
+  getGuildWar: async (): Promise<GuildWar | null> => {
+    const r = await apiClient.get<{ war?: BackendGuildWar | null }>('/api/v1/guilds/war')
+    return r.data.war ? normalizeGuildWar(r.data.war) : null
+  },
+}
+
+// ── Guild war ──────────────────────────────────────────────────────────
+
+export interface GuildWarFront {
+  name: string
+  ourRounds: number
+  theirRounds: number
+  durationLabel: string
+  status: string
+  isHot: boolean
+  isDanger: boolean
+}
+
+export interface GuildWarMvp {
+  username: string
+  guildName: string
+  wins: number
+  losses: number
+  side: 'ours' | 'theirs'
+}
+
+export interface GuildWarFeedEntry {
+  at: string
+  text: string
+}
+
+export interface GuildWar {
+  id: string
+  ourGuildName: string
+  theirGuildName: string
+  ourScore: number
+  theirScore: number
+  dayNumber: number
+  totalDays: number
+  ourDeployed: number
+  ourRoster: number
+  endsAt: string
+  front: GuildWarFront[]
+  mvps: GuildWarMvp[]
+  feed: GuildWarFeedEntry[]
+}
+
+type BackendGuildWar = {
+  id?: string
+  ourGuildName?: string
+  theirGuildName?: string
+  ourScore?: number
+  theirScore?: number
+  dayNumber?: number
+  totalDays?: number
+  ourDeployed?: number
+  ourRoster?: number
+  endsAt?: string
+  front?: Array<{
+    name?: string; ourRounds?: number; theirRounds?: number
+    durationLabel?: string; status?: string; isHot?: boolean; isDanger?: boolean
+  }>
+  mvps?: Array<{
+    username?: string; guildName?: string; wins?: number; losses?: number; side?: string
+  }>
+  feed?: Array<{ at?: string; text?: string }>
+}
+
+function normalizeGuildWar(w: BackendGuildWar): GuildWar {
+  return {
+    id: w.id ?? '',
+    ourGuildName: w.ourGuildName ?? '',
+    theirGuildName: w.theirGuildName ?? '',
+    ourScore: w.ourScore ?? 0,
+    theirScore: w.theirScore ?? 0,
+    dayNumber: w.dayNumber ?? 1,
+    totalDays: w.totalDays ?? 3,
+    ourDeployed: w.ourDeployed ?? 0,
+    ourRoster: w.ourRoster ?? 0,
+    endsAt: w.endsAt ?? '',
+    front: (w.front ?? []).map((f) => ({
+      name: f.name ?? '',
+      ourRounds: f.ourRounds ?? 0,
+      theirRounds: f.theirRounds ?? 0,
+      durationLabel: f.durationLabel ?? '',
+      status: f.status ?? 'contested',
+      isHot: f.isHot ?? false,
+      isDanger: f.isDanger ?? false,
+    })),
+    mvps: (w.mvps ?? []).map((m) => ({
+      username: m.username ?? '',
+      guildName: m.guildName ?? '',
+      wins: m.wins ?? 0,
+      losses: m.losses ?? 0,
+      side: m.side === 'theirs' ? 'theirs' : 'ours',
+    })),
+    feed: (w.feed ?? []).map((f) => ({
+      at: f.at ?? '',
+      text: f.text ?? '',
+    })),
+  }
 }
