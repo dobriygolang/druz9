@@ -151,3 +151,14 @@ jobs:
 
               exit 1
             fi
+
+      - name: Cleanup old Docker build cache on server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ env.DEPLOY_SSH_KEY }}
+          port: ${{ env.DEPLOY_SSH_PORT }}
+          script: |
+            set -euo pipefail
+            docker builder prune -a -f

@@ -20,3 +20,4 @@ pnpm-debug.log*
 Thumbs.db
 /AGENTS.md
 /CLAUDE.md
+.claude
