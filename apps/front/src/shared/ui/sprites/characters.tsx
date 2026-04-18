@@ -39,24 +39,61 @@ const HERO_PALETTE: Record<string, string> = {
 
 export type HeroPose = 'idle' | 'wave' | 'trophy'
 
+// HeroSlots lets the profile render cosmetic overlays on top of the base
+// sprite, driven by what the user has equipped in the shop. Keys are
+// slot names (as defined in shop_items.slot); values are item slugs —
+// e.g. slots={{ pose: 'pose:wave', pet: 'pet:raven' }}. Unknown values
+// are ignored so future slugs/slots don't crash the client.
+export type HeroSlots = {
+  pose?: string
+  pet?: string
+  aura?: string
+  head?: string
+  back?: string
+  frame?: string
+}
+
+function poseFromSlug(slug?: string): HeroPose {
+  if (slug === 'pose:wave') return 'wave'
+  if (slug === 'pose:trophy') return 'trophy'
+  return 'idle'
+}
+
 export function Hero({
   scale = 4,
-  pose = 'idle',
+  pose,
+  slots,
   className = '',
 }: {
   scale?: number
+  // Back-compat: explicit pose wins. When omitted, derived from slots.pose.
   pose?: HeroPose
+  slots?: HeroSlots
   className?: string
 }) {
+  const effectivePose: HeroPose = pose ?? poseFromSlug(slots?.pose)
+  const hasAura = !!slots?.aura
   return (
     <div
       className={`hero-sprite ${className}`}
       style={{ display: 'inline-block', position: 'relative' }}
     >
+      {hasAura && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: -scale * 4,
+            borderRadius: '50%',
+            background:
+              'radial-gradient(ellipse, rgba(233,184,102,0.35) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
       <div className="rpg-idle-bob">
         <PixelGrid map={HERO_MAP} palette={HERO_PALETTE} scale={scale} />
       </div>
-      {pose === 'wave' && (
+      {effectivePose === 'wave' && (
         <div style={{ position: 'absolute', top: scale * 5, right: -scale * 3 }}>
           <PixelGrid
             map={`..BB..\n.BBBB.\nBBBBBB\n.BBBB.`}
@@ -65,13 +102,23 @@ export function Hero({
           />
         </div>
       )}
-      {pose === 'trophy' && (
+      {effectivePose === 'trophy' && (
         <div style={{ position: 'absolute', top: -scale * 3, left: scale * 6 }}>
           <PixelGrid
             map={`EEEEE\nEGGGE\nEGGGE\n.EEE.\n..G..\n.GGG.`}
             palette={{ E: '#7a3d12', G: '#e9b866' }}
             scale={scale}
           />
+        </div>
+      )}
+      {slots?.pet === 'pet:raven' && (
+        <div style={{ position: 'absolute', bottom: scale * 2, right: -scale * 5 }}>
+          <RavenPet scale={Math.max(2, scale - 1)} />
+        </div>
+      )}
+      {slots?.pet === 'pet:orb' && (
+        <div style={{ position: 'absolute', bottom: scale * 3, right: -scale * 4 }}>
+          <SpiritOrb scale={Math.max(2, scale - 1)} />
         </div>
       )}
     </div>

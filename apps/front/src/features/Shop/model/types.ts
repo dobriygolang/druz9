@@ -38,6 +38,9 @@ export interface ShopItem {
   isActive: boolean
   isSeasonal: boolean
   rotatesAt?: string
+  // Cosmetic slot the item occupies when equipped. Empty string = legacy /
+  // non-equippable item — inventory shows no equip button.
+  slot?: string
 }
 
 export interface ShopCategoryInfo {

@@ -1,5 +1,5 @@
 export { PixelGrid, type PixelGridProps } from './PixelGrid'
-export { Hero, SlimePet, RavenPet, SpiritOrb, type HeroPose } from './characters'
+export { Hero, SlimePet, RavenPet, SpiritOrb, type HeroPose, type HeroSlots } from './characters'
 export {
   Torch,
   Bookshelf,

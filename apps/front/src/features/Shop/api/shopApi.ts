@@ -45,4 +45,12 @@ export const shopApi = {
     const { data } = await apiClient.post<PurchaseResponse>('/api/v1/shop/purchase', { itemId })
     return data
   },
+
+  equipCosmetic: async (itemId: string, unequip = false): Promise<OwnedItem[]> => {
+    const { data } = await apiClient.post<{ items?: OwnedItem[] }>('/api/v1/shop/equip', {
+      itemId,
+      unequip,
+    })
+    return data.items ?? []
+  },
 }

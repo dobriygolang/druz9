@@ -25,6 +25,7 @@ import { useAuth } from '@/app/providers/AuthProvider'
 import { authApi, type ProfileAchievement, type ProfileActivityEntry } from '@/features/Auth/api/authApi'
 import { shopApi } from '@/features/Shop/api/shopApi'
 import { ItemCategory, type OwnedItem, rarityLabel } from '@/features/Shop/model/types'
+import { InventoryModal } from '@/features/Shop/ui/InventoryModal'
 import type { ProfileProgress } from '@/entities/User/model/types'
 
 export function ProfilePage() {
@@ -34,6 +35,7 @@ export function ProfilePage() {
   const [tweaks] = useTweaks()
   const [visitorMode, setVisitorMode] = useState(false)
   const [editRoom, setEditRoom] = useState(false)
+  const [inventoryOpen, setInventoryOpen] = useState(false)
   const [inventoryFallback, setInventoryFallback] = useState(buildInventory(t))
   const [dragIdx, setDragIdx] = useState<number | null>(null)
   const [overIdx, setOverIdx] = useState<number | null>(null)
@@ -121,7 +123,7 @@ export function ProfilePage() {
               <RpgButton size="sm" onClick={() => setVisitorMode(true)}>
                 {t('profile.viewAsVisitor')}
               </RpgButton>
-              <RpgButton size="sm" variant="primary" onClick={() => navigate('/settings?tab=tweaks')}>
+              <RpgButton size="sm" variant="primary" onClick={() => setInventoryOpen(true)}>
                 {t('profile.customize', { defaultValue: 'Customize avatar' })}
               </RpgButton>
             </div>
@@ -150,7 +152,7 @@ export function ProfilePage() {
 
           {/* hero center stage */}
           <div style={{ position: 'absolute', left: '44%', bottom: 10 }}>
-            <Hero scale={5} pose={tweaks.heroPose} />
+            <Hero scale={5} pose={tweaks.heroPose} slots={equippedSlots(owned)} />
             <div
               style={{
                 position: 'absolute',
@@ -570,8 +572,30 @@ export function ProfilePage() {
           ))}
         </div>
       </Panel>
+
+      <InventoryModal
+        open={inventoryOpen}
+        onClose={() => setInventoryOpen(false)}
+        initialItems={owned ?? []}
+        onInventoryChange={setOwned}
+      />
     </>
   )
+}
+
+// Derive HeroSlots from the currently-equipped inventory rows. Each slot
+// only cares about the item's slug, not its full metadata, since the
+// Hero sprite branches on slugs to pick overlays.
+function equippedSlots(owned: OwnedItem[] | null): import('@/shared/ui/sprites').HeroSlots | undefined {
+  if (!owned || owned.length === 0) return undefined
+  const out: Record<string, string> = {}
+  for (const o of owned) {
+    if (!o.equipped) continue
+    const slot = (o.item.slot ?? '').trim()
+    if (!slot) continue
+    out[slot] = o.item.slug
+  }
+  return out
 }
 
 // Zero-state stats for new users (before the progress endpoint responds).
