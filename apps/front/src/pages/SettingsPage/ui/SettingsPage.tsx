@@ -1,10 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Panel, PageHeader } from '@/shared/ui/pixel'
 import { Hero } from '@/shared/ui/sprites'
 import { notificationApi, type NotificationSettings } from '@/features/Notification/api/notificationApi'
 import { addToast } from '@/shared/lib/toasts'
-import { useTweaks, type RoomLayout, type HeroPose, type Pet, type Season, type Density } from '@/shared/lib/gameState'
+import { useTweaks, type Density } from '@/shared/lib/gameState'
 import { useAuth } from '@/app/providers/AuthProvider'
 
 // Gameplay / Privacy / Keybindings / Accessibility tabs were removed —
@@ -366,34 +367,74 @@ function SettingsLanguage() {
 // app feel a certain way", and removed the floating overlay entirely.
 function SettingsTweaks() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [tweaks, update] = useTweaks()
 
-  const roomLayouts: RoomLayout[] = ['cozy', 'scholar', 'warrior']
-  const heroPoses: HeroPose[]    = ['idle', 'wave', 'trophy']
-  const pets: Pet[]              = ['slime', 'raven', 'orb', 'none']
-  const seasons: Season[]        = ['day', 'dusk', 'night', 'winter']
-  const densities: Density[]     = ['compact', 'normal', 'roomy']
+  // Only the built-in defaults live in Settings. Extra room layouts,
+  // hero poses, pets and time-of-day skins are cosmetic unlocks that
+  // come through the tavern or the season pass — the user asked us to
+  // stop exposing all options here and surface them as earned content.
+  // `density` stays because it's a pure accessibility toggle (UI
+  // compactness), not a cosmetic.
+  const densities: Density[] = ['compact', 'normal', 'roomy']
 
   return (
     <>
       <h3 className="font-display" style={{ fontSize: 17, marginBottom: 16 }}>
         {t('settings.tweaks.title', { defaultValue: 'Flavour & tweaks' })}
       </h3>
-      <Setting label={t('settings.tweaks.roomLayout', { defaultValue: 'Room layout' })} help={t('settings.tweaks.roomLayoutHelp', { defaultValue: 'Sets the top-strip backdrop mood' })}>
-        <ChipGroup options={roomLayouts} active={tweaks.roomLayout} onChange={(v) => update({ roomLayout: v as RoomLayout })} />
-      </Setting>
-      <Setting label={t('settings.tweaks.heroPose', { defaultValue: 'Hero pose' })}>
-        <ChipGroup options={heroPoses} active={tweaks.heroPose} onChange={(v) => update({ heroPose: v as HeroPose })} />
-      </Setting>
-      <Setting label={t('settings.tweaks.companion', { defaultValue: 'Companion' })}>
-        <ChipGroup options={pets} active={tweaks.pet} onChange={(v) => update({ pet: v as Pet })} />
-      </Setting>
-      <Setting label={t('settings.tweaks.season', { defaultValue: 'Time of day' })}>
-        <ChipGroup options={seasons} active={tweaks.season} onChange={(v) => update({ season: v as Season })} />
-      </Setting>
-      <Setting label={t('settings.tweaks.density', { defaultValue: 'Layout density' })}>
+
+      <Panel variant="recessed" style={{ padding: 14, marginBottom: 18 }}>
+        <div
+          className="font-silkscreen uppercase"
+          style={{ fontSize: 10, letterSpacing: '0.1em', color: 'var(--ember-1)', marginBottom: 6 }}
+        >
+          unlock cosmetics
+        </div>
+        <div style={{ color: 'var(--ink-2)', fontSize: 12, lineHeight: 1.5, marginBottom: 10 }}>
+          Room layouts (Scholar, Warrior), hero poses (Wave, Trophy), companions
+          (Raven, Spirit orb) and time-of-day skins (Dusk, Night, Winter) now live
+          in the tavern and season pass. Earn or buy them, equip from the
+          inventory, and they'll render everywhere you appear.
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            className="rpg-btn rpg-btn--sm"
+            onClick={() => navigate('/tavern')}
+            style={{ fontFamily: 'Pixelify Sans, monospace' }}
+          >
+            Browse tavern →
+          </button>
+          <button
+            className="rpg-btn rpg-btn--sm rpg-btn--primary"
+            onClick={() => navigate('/seasonpass')}
+            style={{ fontFamily: 'Pixelify Sans, monospace' }}
+          >
+            Season pass →
+          </button>
+        </div>
+      </Panel>
+
+      <Setting
+        label={t('settings.tweaks.density', { defaultValue: 'Layout density' })}
+        help={t('settings.tweaks.densityHelp', {
+          defaultValue: 'Accessibility toggle — how tightly the UI packs.',
+        })}
+      >
         <ChipGroup options={densities} active={tweaks.density} onChange={(v) => update({ density: v as Density })} />
       </Setting>
+
+      <div
+        style={{
+          marginTop: 16,
+          padding: 10,
+          fontSize: 11,
+          color: 'var(--ink-3)',
+          borderTop: '1px dashed var(--ink-3)',
+        }}
+      >
+        Active cosmetic: {tweaks.roomLayout} room · {tweaks.heroPose} pose · {tweaks.pet} pet · {tweaks.season} time.
+      </div>
     </>
   )
 }
