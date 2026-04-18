@@ -283,6 +283,10 @@ func mapTask(task *model.InterviewPrepTask) *v1.InterviewPrepTask {
 		ReferenceSolution:  task.ReferenceSolution,
 		CodeTaskId:         codeTaskID,
 		IsActive:           task.IsActive,
+		AiReviewPrompt:     task.AIReviewPrompt,
+		IsPracticeEnabled:  task.IsPracticeEnabled,
+		IsMockEnabled:      task.IsMockEnabled,
+		PoolCount:          task.PoolCount,
 		CreatedAt:          timestamppb.New(task.CreatedAt),
 		UpdatedAt:          timestamppb.New(task.UpdatedAt),
 	}

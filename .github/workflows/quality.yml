@@ -127,24 +127,26 @@ jobs:
   sast:
     name: Semgrep SAST
     runs-on: ubuntu-latest
-    container:
-      image: semgrep/semgrep
     steps:
       - uses: actions/checkout@v4
 
       - name: Run Semgrep
-        run: >
-          semgrep scan --error
-          --config p/ci
-          --config p/golang
-          --config p/typescript
-          --config p/dockerfile
-          --config p/secrets
-          --exclude apps/api/pkg/api
-          --exclude apps/api/pkg/adapter
-          --exclude apps/notification-service/pkg
-          --exclude apps/api/third_party
-          --exclude apps/notification-service/third_party
+        run: |
+          docker run --rm \
+            -v "$PWD:/src" \
+            -w /src \
+            semgrep/semgrep \
+            semgrep scan --error \
+              --config p/ci \
+              --config p/golang \
+              --config p/typescript \
+              --config p/dockerfile \
+              --config p/secrets \
+              --exclude apps/api/pkg/api \
+              --exclude apps/api/pkg/adapter \
+              --exclude apps/notification-service/pkg \
+              --exclude apps/api/third_party \
+              --exclude apps/notification-service/third_party
 
   trivy:
     name: Trivy Config and Vulnerability Scan

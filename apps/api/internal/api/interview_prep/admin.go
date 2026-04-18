@@ -15,11 +15,10 @@ import (
 )
 
 func (i *Implementation) ListAdminTasks(ctx context.Context, req *v1.ListAdminTasksRequest) (*v1.ListAdminTasksResponse, error) {
-	_ = req
 	if err := requireAdmin(ctx); err != nil {
 		return nil, err
 	}
-	tasks, err := i.admin.ListAllTasks(ctx)
+	tasks, err := i.admin.ListTasksFiltered(ctx, req.GetCompanyTag(), req.GetPrepType(), req.GetSearch(), req.GetIncludeInactive())
 	if err != nil {
 		return nil, kratoserrors.InternalServer("INTERNAL_ERROR", err.Error())
 	}
@@ -28,6 +27,55 @@ func (i *Implementation) ListAdminTasks(ctx context.Context, req *v1.ListAdminTa
 		items = append(items, mapTask(task))
 	}
 	return &v1.ListAdminTasksResponse{Tasks: items}, nil
+}
+
+// BulkCreateAdminTasks iterates payloads, creating each one
+// independently. A single bad row doesn't abort the batch — callers
+// get a per-row result so the admin UI can show green/red ticks.
+func (i *Implementation) BulkCreateAdminTasks(ctx context.Context, req *v1.BulkCreateAdminTasksRequest) (*v1.BulkCreateAdminTasksResponse, error) {
+	if err := requireAdmin(ctx); err != nil {
+		return nil, err
+	}
+	results := make([]*v1.BulkCreateResult, 0, len(req.GetTasks()))
+	var created, failed int32
+	for _, payload := range req.GetTasks() {
+		slug := ""
+		if payload != nil {
+			slug = payload.Slug
+		}
+		task, err := buildTask(payload, uuid.New())
+		if err != nil {
+			failed++
+			results = append(results, &v1.BulkCreateResult{
+				Slug:      slug,
+				ErrorCode: "VALIDATION",
+				ErrorMsg:  err.Error(),
+			})
+			continue
+		}
+		now := time.Now().UTC()
+		task.CreatedAt = now
+		task.UpdatedAt = now
+		if err := i.admin.CreateTask(ctx, task); err != nil {
+			failed++
+			results = append(results, &v1.BulkCreateResult{
+				Slug:      task.Slug,
+				ErrorCode: "INSERT",
+				ErrorMsg:  err.Error(),
+			})
+			continue
+		}
+		created++
+		results = append(results, &v1.BulkCreateResult{
+			Slug:   task.Slug,
+			TaskId: task.ID.String(),
+		})
+	}
+	return &v1.BulkCreateAdminTasksResponse{
+		Results: results,
+		Created: created,
+		Failed:  failed,
+	}, nil
 }
 
 func (i *Implementation) CreateAdminTask(ctx context.Context, req *v1.CreateAdminTaskRequest) (*v1.AdminTaskEnvelope, error) {
@@ -369,6 +417,9 @@ func buildTask(payload *v1.AdminTaskPayload, taskID uuid.UUID) (*model.Interview
 		ReferenceSolution:  req.ReferenceSolution,
 		CodeTaskID:         parseOptionalUUID(req.CodeTaskId),
 		IsActive:           req.IsActive,
+		AIReviewPrompt:     strings.TrimSpace(req.AiReviewPrompt),
+		IsPracticeEnabled:  req.IsPracticeEnabled,
+		IsMockEnabled:      req.IsMockEnabled,
 	}, nil
 }
 

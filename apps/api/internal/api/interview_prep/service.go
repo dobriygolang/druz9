@@ -32,6 +32,7 @@ type Service interface {
 
 type AdminRepo interface {
 	ListAllTasks(ctx context.Context) ([]*model.InterviewPrepTask, error)
+	ListTasksFiltered(ctx context.Context, companyTag, prepType, search string, includeInactive bool) ([]*model.InterviewPrepTask, error)
 	CreateTask(ctx context.Context, task *model.InterviewPrepTask) error
 	UpdateTask(ctx context.Context, task *model.InterviewPrepTask) error
 	DeleteTask(ctx context.Context, taskID uuid.UUID) error

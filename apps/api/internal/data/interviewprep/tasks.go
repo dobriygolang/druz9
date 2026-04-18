@@ -17,7 +17,8 @@ func (r *Repo) ListActiveTasks(ctx context.Context) ([]*model.InterviewPrepTask,
 	rows, err := r.data.DB.Query(ctx, `
 		SELECT id, slug, title, candidate_prompt, round_type, language, legacy_company_tag, supported_languages, is_executable,
 		       execution_profile, runner_mode, duration_seconds, starter_code,
-		       reference_solution, linked_code_task_id, is_active, created_at, updated_at
+		       reference_solution, linked_code_task_id, is_active,
+		       ai_review_prompt, is_practice_enabled, is_mock_enabled, created_at, updated_at
 		FROM interview_items
 		WHERE is_active = TRUE
 		  AND is_practice_enabled = TRUE
@@ -43,7 +44,8 @@ func (r *Repo) GetTask(ctx context.Context, taskID uuid.UUID) (*model.InterviewP
 	row := r.data.DB.QueryRow(ctx, `
 		SELECT id, slug, title, candidate_prompt, round_type, language, legacy_company_tag, supported_languages, is_executable,
 		       execution_profile, runner_mode, duration_seconds, starter_code,
-		       reference_solution, linked_code_task_id, is_active, created_at, updated_at
+		       reference_solution, linked_code_task_id, is_active,
+		       ai_review_prompt, is_practice_enabled, is_mock_enabled, created_at, updated_at
 		FROM interview_items
 		WHERE id = $1
 	`, taskID)
@@ -59,21 +61,72 @@ func (r *Repo) GetTask(ctx context.Context, taskID uuid.UUID) (*model.InterviewP
 }
 
 func (r *Repo) ListAllTasks(ctx context.Context) ([]*model.InterviewPrepTask, error) {
-	rows, err := r.data.DB.Query(ctx, `
+	return r.ListTasksFiltered(ctx, "", "", "", true)
+}
+
+// ListTasksFiltered powers the admin list with optional company /
+// prep-type / free-text filters plus a toggle for hiding inactive rows.
+// The result includes pool_count so the UI can warn when a tagged task
+// isn't wired into any pool (which is why tagged-but-invisible tasks
+// happen in practice).
+func (r *Repo) ListTasksFiltered(ctx context.Context, companyTag, prepTypeFilter, search string, includeInactive bool) ([]*model.InterviewPrepTask, error) {
+	where := "TRUE"
+	args := []any{}
+	idx := 1
+	if !includeInactive {
+		where += " AND is_active = TRUE"
+	}
+	if tag := strings.TrimSpace(strings.ToLower(companyTag)); tag != "" {
+		where += fmt.Sprintf(" AND legacy_company_tag = $%d", idx)
+		args = append(args, tag)
+		idx++
+	}
+	if pt := strings.TrimSpace(strings.ToLower(prepTypeFilter)); pt != "" {
+		// PrepType name → round_type (same mapping as roundTypeForPrepTask).
+		roundType := pt
+		switch pt {
+		case "algorithm":
+			roundType = "coding_algorithmic"
+		case "coding":
+			roundType = "coding_practical"
+		case "system_design":
+			roundType = "system_design"
+		case "sql":
+			roundType = "sql"
+		case "behavioral":
+			roundType = "behavioral"
+		case "code_review":
+			roundType = "code_review"
+		}
+		where += fmt.Sprintf(" AND round_type = $%d", idx)
+		args = append(args, roundType)
+		idx++
+	}
+	if q := strings.TrimSpace(search); q != "" {
+		where += fmt.Sprintf(" AND (title ILIKE $%d OR slug ILIKE $%d OR candidate_prompt ILIKE $%d)", idx, idx, idx)
+		args = append(args, "%"+q+"%")
+		idx++
+	}
+	// pool_count via correlated subquery — keeps the row set small vs a LEFT JOIN + GROUP BY.
+	query := fmt.Sprintf(`
 		SELECT id, slug, title, candidate_prompt, round_type, language, legacy_company_tag, supported_languages, is_executable,
 		       execution_profile, runner_mode, duration_seconds, starter_code,
-		       reference_solution, linked_code_task_id, is_active, created_at, updated_at
+		       reference_solution, linked_code_task_id, is_active,
+		       ai_review_prompt, is_practice_enabled, is_mock_enabled, created_at, updated_at,
+		       (SELECT COUNT(*) FROM interview_pool_items WHERE item_id = interview_items.id AND is_active = TRUE) AS pool_count
 		FROM interview_items
+		WHERE %s
 		ORDER BY created_at DESC, slug ASC
-	`)
+	`, where)
+	rows, err := r.data.DB.Query(ctx, query, args...)
 	if err != nil {
-		return nil, fmt.Errorf("list all interview prep tasks: %w", err)
+		return nil, fmt.Errorf("list filtered interview prep tasks: %w", err)
 	}
 	defer rows.Close()
 
 	var items []*model.InterviewPrepTask
 	for rows.Next() {
-		item, err := scanTask(rows)
+		item, err := scanTaskWithPoolCount(rows)
 		if err != nil {
 			return nil, err
 		}
@@ -87,13 +140,26 @@ func (r *Repo) CreateTask(ctx context.Context, task *model.InterviewPrepTask) er
 	deliveryMode := deliveryModeForTask(task)
 	supportedLanguages := normalizeSupportedLanguages(task)
 
+	// Admin toggles drive is_practice_enabled / is_mock_enabled. Before
+	// this patch they were hard-coded TRUE — which is why tasks with
+	// missing flags on legacy rows were never the issue; the real
+	// invisibility comes from pool membership. ai_review_prompt is
+	// written straight through.
+	practice := task.IsPracticeEnabled
+	mock := task.IsMockEnabled
+	if !practice && !mock {
+		// Default for new tasks so admin doesn't have to remember to
+		// flip both toggles for a brand-new task to show up.
+		practice = true
+		mock = true
+	}
 	_, err := r.data.DB.Exec(ctx, `
 		INSERT INTO interview_items (
 			id, slug, title, round_type, delivery_mode, difficulty_level, duration_seconds, language, supported_languages, legacy_company_tag,
 			is_practice_enabled, is_mock_enabled, is_executable, execution_profile, runner_mode, linked_code_task_id,
-			candidate_prompt, interviewer_script, reference_solution, starter_code, debrief_template, is_active, created_at, updated_at
+			candidate_prompt, interviewer_script, reference_solution, starter_code, debrief_template, is_active, ai_review_prompt, created_at, updated_at
 		)
-		VALUES ($1,$2,$3,$4,$5,'mid',$6,$7,$8,$9,TRUE,TRUE,$10,$11,$12,$13,$14,'',$15,$16,'',$17,$18,$19)
+		VALUES ($1,$2,$3,$4,$5,'mid',$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,'',$17,$18,'',$19,$20,$21,$22)
 	`,
 		task.ID,
 		task.Slug,
@@ -104,6 +170,8 @@ func (r *Repo) CreateTask(ctx context.Context, task *model.InterviewPrepTask) er
 		task.Language,
 		supportedLanguages,
 		strings.TrimSpace(strings.ToLower(task.CompanyTag)),
+		practice,
+		mock,
 		task.IsExecutable,
 		task.ExecutionProfile,
 		task.RunnerMode,
@@ -112,6 +180,7 @@ func (r *Repo) CreateTask(ctx context.Context, task *model.InterviewPrepTask) er
 		task.ReferenceSolution,
 		task.StarterCode,
 		task.IsActive,
+		task.AIReviewPrompt,
 		task.CreatedAt,
 		task.UpdatedAt,
 	)
@@ -147,8 +216,9 @@ func (r *Repo) UpdateTask(ctx context.Context, task *model.InterviewPrepTask) er
 		    reference_solution = $15,
 		    starter_code = $16,
 		    is_active = $17,
-		    is_practice_enabled = TRUE,
-		    is_mock_enabled = TRUE,
+		    is_practice_enabled = $18,
+		    is_mock_enabled = $19,
+		    ai_review_prompt = $20,
 		    updated_at = NOW()
 		WHERE id = $1
 	`,
@@ -169,6 +239,9 @@ func (r *Repo) UpdateTask(ctx context.Context, task *model.InterviewPrepTask) er
 		task.ReferenceSolution,
 		task.StarterCode,
 		task.IsActive,
+		task.IsPracticeEnabled,
+		task.IsMockEnabled,
+		task.AIReviewPrompt,
 	)
 	if err != nil {
 		return fmt.Errorf("update interview prep task: %w", err)

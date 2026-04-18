@@ -65,6 +65,16 @@ service InterviewPrepService {
   rpc UpdateAdminTask(UpdateAdminTaskRequest) returns (AdminTaskEnvelope) {
     option (google.api.http) = { put: "/api/admin/interview-prep/tasks/{task_id}" body: "*" };
   }
+  // BulkCreateAdminTasks lets admin paste an array of tasks and create
+  // them in one call. Each payload is validated and inserted
+  // independently; failures are reported per-row.
+  rpc BulkCreateAdminTasks(BulkCreateAdminTasksRequest) returns (BulkCreateAdminTasksResponse) {
+    option (google.api.http) = {
+      post: "/api/admin/interview-prep/tasks/bulk"
+      body: "*"
+    };
+  }
+
   rpc DeleteAdminTask(DeleteAdminTaskRequest) returns (StatusResponse) {
     option (google.api.http) = { delete: "/api/admin/interview-prep/tasks/{task_id}" };
   }
@@ -277,7 +287,13 @@ message AbortMockSessionRequest {
   string session_id = 1;
 }
 
-message ListAdminTasksRequest {}
+message ListAdminTasksRequest {
+  // Optional filters — client passes empty strings for "no filter".
+  string company_tag = 1;
+  string prep_type   = 2; // matches PrepType enum name (e.g. "coding")
+  string search      = 3; // matches title / slug / statement ILIKE
+  bool   include_inactive = 4;
+}
 message GetAdminTaskRequest { string task_id = 1; }
 message DeleteAdminTaskRequest { string task_id = 1; }
 message ListAdminQuestionsRequest { string task_id = 1; }
@@ -352,10 +368,27 @@ message AdminTaskPayload {
   string              reference_solution  = 13;
   string              code_task_id        = 14;
   bool                is_active           = 15;
+  string              ai_review_prompt    = 16;
+  bool                is_practice_enabled = 17;
+  bool                is_mock_enabled     = 18;
 }
 message CreateAdminTaskRequest   { AdminTaskPayload task = 1; }
 message UpdateAdminTaskRequest   { string task_id = 1; AdminTaskPayload task = 2; }
 message ListAdminTasksResponse   { repeated InterviewPrepTask tasks = 1; }
+message BulkCreateAdminTasksRequest {
+  repeated AdminTaskPayload tasks = 1;
+}
+message BulkCreateResult {
+  string slug       = 1;
+  string task_id    = 2;  // empty on error
+  string error_code = 3;  // empty on success
+  string error_msg  = 4;
+}
+message BulkCreateAdminTasksResponse {
+  repeated BulkCreateResult results = 1;
+  int32 created = 2;
+  int32 failed  = 3;
+}
 message AdminTaskEnvelope        { InterviewPrepTask task = 1; }
 
 message AdminQuestionPayload     { int32 position = 1; string prompt = 2; string answer = 3; }
@@ -413,6 +446,13 @@ message InterviewPrepTask {
   bool                      is_active           = 16;
   google.protobuf.Timestamp created_at          = 17; // was: string
   google.protobuf.Timestamp updated_at          = 18; // was: string
+  string                    ai_review_prompt    = 19;
+  bool                      is_practice_enabled = 20;
+  bool                      is_mock_enabled     = 21;
+  // pool_count = how many interview_pool_items rows reference this
+  // task. 0 = task is tagged but hidden from mock sessions because no
+  // pool includes it. Purely informational, not stored.
+  int32                     pool_count          = 22;
 }
 
 message InterviewPrepQuestion {

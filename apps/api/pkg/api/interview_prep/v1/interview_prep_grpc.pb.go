@@ -37,6 +37,7 @@ const (
 	InterviewPrepService_CreateAdminTask_FullMethodName          = "/interview_prep.v1.InterviewPrepService/CreateAdminTask"
 	InterviewPrepService_GetAdminTask_FullMethodName             = "/interview_prep.v1.InterviewPrepService/GetAdminTask"
 	InterviewPrepService_UpdateAdminTask_FullMethodName          = "/interview_prep.v1.InterviewPrepService/UpdateAdminTask"
+	InterviewPrepService_BulkCreateAdminTasks_FullMethodName     = "/interview_prep.v1.InterviewPrepService/BulkCreateAdminTasks"
 	InterviewPrepService_DeleteAdminTask_FullMethodName          = "/interview_prep.v1.InterviewPrepService/DeleteAdminTask"
 	InterviewPrepService_ListAdminQuestions_FullMethodName       = "/interview_prep.v1.InterviewPrepService/ListAdminQuestions"
 	InterviewPrepService_CreateAdminQuestion_FullMethodName      = "/interview_prep.v1.InterviewPrepService/CreateAdminQuestion"
@@ -76,6 +77,10 @@ type InterviewPrepServiceClient interface {
 	CreateAdminTask(ctx context.Context, in *CreateAdminTaskRequest, opts ...grpc.CallOption) (*AdminTaskEnvelope, error)
 	GetAdminTask(ctx context.Context, in *GetAdminTaskRequest, opts ...grpc.CallOption) (*AdminTaskEnvelope, error)
 	UpdateAdminTask(ctx context.Context, in *UpdateAdminTaskRequest, opts ...grpc.CallOption) (*AdminTaskEnvelope, error)
+	// BulkCreateAdminTasks lets admin paste an array of tasks and create
+	// them in one call. Each payload is validated and inserted
+	// independently; failures are reported per-row.
+	BulkCreateAdminTasks(ctx context.Context, in *BulkCreateAdminTasksRequest, opts ...grpc.CallOption) (*BulkCreateAdminTasksResponse, error)
 	DeleteAdminTask(ctx context.Context, in *DeleteAdminTaskRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	ListAdminQuestions(ctx context.Context, in *ListAdminQuestionsRequest, opts ...grpc.CallOption) (*ListAdminQuestionsResponse, error)
 	CreateAdminQuestion(ctx context.Context, in *CreateAdminQuestionRequest, opts ...grpc.CallOption) (*AdminQuestionEnvelope, error)
@@ -281,6 +286,16 @@ func (c *interviewPrepServiceClient) UpdateAdminTask(ctx context.Context, in *Up
 	return out, nil
 }
 
+func (c *interviewPrepServiceClient) BulkCreateAdminTasks(ctx context.Context, in *BulkCreateAdminTasksRequest, opts ...grpc.CallOption) (*BulkCreateAdminTasksResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BulkCreateAdminTasksResponse)
+	err := c.cc.Invoke(ctx, InterviewPrepService_BulkCreateAdminTasks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *interviewPrepServiceClient) DeleteAdminTask(ctx context.Context, in *DeleteAdminTaskRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(StatusResponse)
@@ -453,6 +468,10 @@ type InterviewPrepServiceServer interface {
 	CreateAdminTask(context.Context, *CreateAdminTaskRequest) (*AdminTaskEnvelope, error)
 	GetAdminTask(context.Context, *GetAdminTaskRequest) (*AdminTaskEnvelope, error)
 	UpdateAdminTask(context.Context, *UpdateAdminTaskRequest) (*AdminTaskEnvelope, error)
+	// BulkCreateAdminTasks lets admin paste an array of tasks and create
+	// them in one call. Each payload is validated and inserted
+	// independently; failures are reported per-row.
+	BulkCreateAdminTasks(context.Context, *BulkCreateAdminTasksRequest) (*BulkCreateAdminTasksResponse, error)
 	DeleteAdminTask(context.Context, *DeleteAdminTaskRequest) (*StatusResponse, error)
 	ListAdminQuestions(context.Context, *ListAdminQuestionsRequest) (*ListAdminQuestionsResponse, error)
 	CreateAdminQuestion(context.Context, *CreateAdminQuestionRequest) (*AdminQuestionEnvelope, error)
@@ -531,6 +550,9 @@ func (UnimplementedInterviewPrepServiceServer) GetAdminTask(context.Context, *Ge
 }
 func (UnimplementedInterviewPrepServiceServer) UpdateAdminTask(context.Context, *UpdateAdminTaskRequest) (*AdminTaskEnvelope, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateAdminTask not implemented")
+}
+func (UnimplementedInterviewPrepServiceServer) BulkCreateAdminTasks(context.Context, *BulkCreateAdminTasksRequest) (*BulkCreateAdminTasksResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method BulkCreateAdminTasks not implemented")
 }
 func (UnimplementedInterviewPrepServiceServer) DeleteAdminTask(context.Context, *DeleteAdminTaskRequest) (*StatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteAdminTask not implemented")
@@ -922,6 +944,24 @@ func _InterviewPrepService_UpdateAdminTask_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _InterviewPrepService_BulkCreateAdminTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BulkCreateAdminTasksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InterviewPrepServiceServer).BulkCreateAdminTasks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InterviewPrepService_BulkCreateAdminTasks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InterviewPrepServiceServer).BulkCreateAdminTasks(ctx, req.(*BulkCreateAdminTasksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _InterviewPrepService_DeleteAdminTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteAdminTaskRequest)
 	if err := dec(in); err != nil {
@@ -1270,6 +1310,10 @@ var InterviewPrepService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateAdminTask",
 			Handler:    _InterviewPrepService_UpdateAdminTask_Handler,
+		},
+		{
+			MethodName: "BulkCreateAdminTasks",
+			Handler:    _InterviewPrepService_BulkCreateAdminTasks_Handler,
 		},
 		{
 			MethodName: "DeleteAdminTask",

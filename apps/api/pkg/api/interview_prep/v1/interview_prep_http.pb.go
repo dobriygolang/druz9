@@ -22,6 +22,7 @@ const _ = http.SupportPackageIsVersion1
 const OperationInterviewPrepServiceAbortMockSession = "/interview_prep.v1.InterviewPrepService/AbortMockSession"
 const OperationInterviewPrepServiceAnswerMockQuestion = "/interview_prep.v1.InterviewPrepService/AnswerMockQuestion"
 const OperationInterviewPrepServiceAnswerQuestion = "/interview_prep.v1.InterviewPrepService/AnswerQuestion"
+const OperationInterviewPrepServiceBulkCreateAdminTasks = "/interview_prep.v1.InterviewPrepService/BulkCreateAdminTasks"
 const OperationInterviewPrepServiceCreateAdminQuestion = "/interview_prep.v1.InterviewPrepService/CreateAdminQuestion"
 const OperationInterviewPrepServiceCreateAdminTask = "/interview_prep.v1.InterviewPrepService/CreateAdminTask"
 const OperationInterviewPrepServiceCreateMockCompanyPreset = "/interview_prep.v1.InterviewPrepService/CreateMockCompanyPreset"
@@ -57,6 +58,10 @@ type InterviewPrepServiceHTTPServer interface {
 	AbortMockSession(context.Context, *AbortMockSessionRequest) (*StatusResponse, error)
 	AnswerMockQuestion(context.Context, *AnswerMockQuestionRequest) (*AnswerMockQuestionResponse, error)
 	AnswerQuestion(context.Context, *AnswerQuestionRequest) (*AnswerQuestionResponse, error)
+	// BulkCreateAdminTasks BulkCreateAdminTasks lets admin paste an array of tasks and create
+	// them in one call. Each payload is validated and inserted
+	// independently; failures are reported per-row.
+	BulkCreateAdminTasks(context.Context, *BulkCreateAdminTasksRequest) (*BulkCreateAdminTasksResponse, error)
 	CreateAdminQuestion(context.Context, *CreateAdminQuestionRequest) (*AdminQuestionEnvelope, error)
 	CreateAdminTask(context.Context, *CreateAdminTaskRequest) (*AdminTaskEnvelope, error)
 	CreateMockCompanyPreset(context.Context, *CreateMockCompanyPresetRequest) (*MockCompanyPresetEnvelope, error)
@@ -109,6 +114,7 @@ func RegisterInterviewPrepServiceHTTPServer(s *http.Server, srv InterviewPrepSer
 	r.POST("/api/admin/interview-prep/tasks", _InterviewPrepService_CreateAdminTask0_HTTP_Handler(srv))
 	r.GET("/api/admin/interview-prep/tasks/{task_id}", _InterviewPrepService_GetAdminTask0_HTTP_Handler(srv))
 	r.PUT("/api/admin/interview-prep/tasks/{task_id}", _InterviewPrepService_UpdateAdminTask0_HTTP_Handler(srv))
+	r.POST("/api/admin/interview-prep/tasks/bulk", _InterviewPrepService_BulkCreateAdminTasks0_HTTP_Handler(srv))
 	r.DELETE("/api/admin/interview-prep/tasks/{task_id}", _InterviewPrepService_DeleteAdminTask0_HTTP_Handler(srv))
 	r.GET("/api/admin/interview-prep/tasks/{task_id}/questions", _InterviewPrepService_ListAdminQuestions0_HTTP_Handler(srv))
 	r.POST("/api/admin/interview-prep/tasks/{task_id}/questions", _InterviewPrepService_CreateAdminQuestion0_HTTP_Handler(srv))
@@ -534,6 +540,28 @@ func _InterviewPrepService_UpdateAdminTask0_HTTP_Handler(srv InterviewPrepServic
 	}
 }
 
+func _InterviewPrepService_BulkCreateAdminTasks0_HTTP_Handler(srv InterviewPrepServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in BulkCreateAdminTasksRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInterviewPrepServiceBulkCreateAdminTasks)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.BulkCreateAdminTasks(ctx, req.(*BulkCreateAdminTasksRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*BulkCreateAdminTasksResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _InterviewPrepService_DeleteAdminTask0_HTTP_Handler(srv InterviewPrepServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in DeleteAdminTaskRequest
@@ -871,6 +899,10 @@ type InterviewPrepServiceHTTPClient interface {
 	AbortMockSession(ctx context.Context, req *AbortMockSessionRequest, opts ...http.CallOption) (rsp *StatusResponse, err error)
 	AnswerMockQuestion(ctx context.Context, req *AnswerMockQuestionRequest, opts ...http.CallOption) (rsp *AnswerMockQuestionResponse, err error)
 	AnswerQuestion(ctx context.Context, req *AnswerQuestionRequest, opts ...http.CallOption) (rsp *AnswerQuestionResponse, err error)
+	// BulkCreateAdminTasks BulkCreateAdminTasks lets admin paste an array of tasks and create
+	// them in one call. Each payload is validated and inserted
+	// independently; failures are reported per-row.
+	BulkCreateAdminTasks(ctx context.Context, req *BulkCreateAdminTasksRequest, opts ...http.CallOption) (rsp *BulkCreateAdminTasksResponse, err error)
 	CreateAdminQuestion(ctx context.Context, req *CreateAdminQuestionRequest, opts ...http.CallOption) (rsp *AdminQuestionEnvelope, err error)
 	CreateAdminTask(ctx context.Context, req *CreateAdminTaskRequest, opts ...http.CallOption) (rsp *AdminTaskEnvelope, err error)
 	CreateMockCompanyPreset(ctx context.Context, req *CreateMockCompanyPresetRequest, opts ...http.CallOption) (rsp *MockCompanyPresetEnvelope, err error)
@@ -942,6 +974,22 @@ func (c *InterviewPrepServiceHTTPClientImpl) AnswerQuestion(ctx context.Context,
 	pattern := "/api/v1/interview-prep/sessions/{session_id}/questions/{question_id}/answer"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationInterviewPrepServiceAnswerQuestion))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// BulkCreateAdminTasks BulkCreateAdminTasks lets admin paste an array of tasks and create
+// them in one call. Each payload is validated and inserted
+// independently; failures are reported per-row.
+func (c *InterviewPrepServiceHTTPClientImpl) BulkCreateAdminTasks(ctx context.Context, in *BulkCreateAdminTasksRequest, opts ...http.CallOption) (*BulkCreateAdminTasksResponse, error) {
+	var out BulkCreateAdminTasksResponse
+	pattern := "/api/admin/interview-prep/tasks/bulk"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationInterviewPrepServiceBulkCreateAdminTasks))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

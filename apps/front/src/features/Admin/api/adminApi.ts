@@ -27,9 +27,32 @@ export const adminApi = {
   deleteCodeTask: async (taskId: string) => {
     await apiClient.delete(`/api/admin/code-editor/tasks/${taskId}`)
   },
-  listInterviewPrepTasks: async () => {
-    const r = await apiClient.get<{ tasks?: unknown[] }>('/api/admin/interview-prep/tasks')
+  listInterviewPrepTasks: async (filters?: { companyTag?: string; prepType?: string; search?: string; includeInactive?: boolean }) => {
+    const r = await apiClient.get<{ tasks?: unknown[] }>('/api/admin/interview-prep/tasks', {
+      params: {
+        companyTag: filters?.companyTag ?? '',
+        prepType: filters?.prepType ?? '',
+        search: filters?.search ?? '',
+        includeInactive: filters?.includeInactive ?? true,
+      },
+    })
     return r.data.tasks ?? []
+  },
+  bulkCreateInterviewPrepTasks: async (tasks: unknown[]): Promise<{ results: Array<{ slug: string; taskId: string; errorCode: string; errorMsg: string }>; created: number; failed: number }> => {
+    const r = await apiClient.post<{ results?: Array<{ slug?: string; taskId?: string; errorCode?: string; errorMsg?: string }>; created?: number; failed?: number }>(
+      '/api/admin/interview-prep/tasks/bulk',
+      { tasks },
+    )
+    return {
+      results: (r.data.results ?? []).map((x) => ({
+        slug: x.slug ?? '',
+        taskId: x.taskId ?? '',
+        errorCode: x.errorCode ?? '',
+        errorMsg: x.errorMsg ?? '',
+      })),
+      created: r.data.created ?? 0,
+      failed: r.data.failed ?? 0,
+    }
   },
   createInterviewPrepTask: async (payload: unknown) => {
     const r = await apiClient.post<{ task?: unknown }>('/api/admin/interview-prep/tasks', { task: payload })

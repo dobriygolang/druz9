@@ -26,8 +26,47 @@ func scanTask(s scanner) (*model.InterviewPrepTask, error) {
 		&item.ReferenceSolution,
 		&item.CodeTaskID,
 		&item.IsActive,
+		&item.AIReviewPrompt,
+		&item.IsPracticeEnabled,
+		&item.IsMockEnabled,
 		&item.CreatedAt,
 		&item.UpdatedAt,
+	); err != nil {
+		return nil, err
+	}
+	item.PrepType = model.InterviewPrepTypeFromRoundType(prepType)
+	return &item, nil
+}
+
+// scanTaskWithPoolCount reads the same row plus a trailing INT pool
+// count column. Used by the admin list so the UI can warn when a
+// tagged task isn't in any pool.
+func scanTaskWithPoolCount(s scanner) (*model.InterviewPrepTask, error) {
+	var item model.InterviewPrepTask
+	var prepType string
+	if err := s.Scan(
+		&item.ID,
+		&item.Slug,
+		&item.Title,
+		&item.Statement,
+		&prepType,
+		&item.Language,
+		&item.CompanyTag,
+		&item.SupportedLanguages,
+		&item.IsExecutable,
+		&item.ExecutionProfile,
+		&item.RunnerMode,
+		&item.DurationSeconds,
+		&item.StarterCode,
+		&item.ReferenceSolution,
+		&item.CodeTaskID,
+		&item.IsActive,
+		&item.AIReviewPrompt,
+		&item.IsPracticeEnabled,
+		&item.IsMockEnabled,
+		&item.CreatedAt,
+		&item.UpdatedAt,
+		&item.PoolCount,
 	); err != nil {
 		return nil, err
 	}

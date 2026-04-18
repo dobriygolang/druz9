@@ -5,28 +5,54 @@ linters:
   disable-all: true
   enable:
     - asasalint
+    - asciicheck
     - bidichk
     - bodyclose
     - canonicalheader
+    - containedctx
     - contextcheck
     - copyloopvar
+    - cyclop
+    - dogsled
+    - dupword
     - durationcheck
+    - err113
     - errchkjson
     - errcheck
     - errname
     - errorlint
     - exhaustive
+    - exptostd
     - fatcontext
+    - forbidigo
     - forcetypeassert
+    - gci
     - goconst
+    - gocheckcompilerdirectives
+    - gochecksumtype
+    - gocognit
     - gocritic
+    - gocyclo
+    - gofmt
+    - gofumpt
     - goimports
+    - gomoddirectives
     - gosec
     - govet
+    - grouper
+    - iface
     - ineffassign
+    - importas
+    - inamedparam
+    - interfacebloat
+    - intrange
     - loggercheck
     - makezero
+    - mirror
     - misspell
+    - musttag
+    - nakedret
+    - nestif
     - nilerr
     - nilnesserr
     - nilnil
@@ -34,9 +60,13 @@ linters:
     - nolintlint
     - nosprintfhostport
     - perfsprint
+    - paralleltest
     - prealloc
     - predeclared
+    - promlinter
+    - protogetter
     - reassign
+    - recvcheck
     - rowserrcheck
     - gosimple
     - spancheck
@@ -44,7 +74,9 @@ linters:
     - staticcheck
     - revive
     - testifylint
+    - testableexamples
     - thelper
+    - tparallel
     - typecheck
     - unconvert
     - unparam
@@ -53,10 +85,34 @@ linters:
     - usetesting
     - wastedassign
     - whitespace
+    - wrapcheck
 
 linters-settings:
+  cyclop:
+    max-complexity: 18
+    package-average: 12
+
   exhaustive:
     default-signifies-exhaustive: true
+
+  forbidigo:
+    forbid:
+      - pattern: ^fmt\.Print.*$
+        msg: use structured logger instead of fmt.Print*
+      - pattern: ^log\.Print.*$
+        msg: use structured logger instead of log.Print*
+      - pattern: ^log\.Fatal.*$
+        msg: return an error and let the application boundary decide how to exit
+
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix(notification-service)
+    custom-order: true
+
+  gocognit:
+    min-complexity: 25
 
   gocritic:
     enabled-tags:
@@ -68,9 +124,21 @@ linters-settings:
       - ifElseChain
       - unnamedResult
 
+  gocyclo:
+    min-complexity: 22
+
   gosec:
     excludes:
       - G115
+
+  interfacebloat:
+    max: 12
+
+  nakedret:
+    max-func-lines: 0
+
+  nestif:
+    min-complexity: 5
 
   nolintlint:
     require-explanation: true
@@ -97,3 +165,13 @@ issues:
     - path: "third_party/"
       linters:
         - all
+    - path: "scripts/"
+      linters:
+        - forbidigo
+        - gosec
+    - path: "(.+)_test\\.go"
+      linters:
+        - err113
+        - goconst
+        - musttag
+        - wrapcheck

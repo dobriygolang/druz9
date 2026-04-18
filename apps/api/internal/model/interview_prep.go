@@ -227,6 +227,10 @@ type InterviewPrepTask struct {
 	ReferenceSolution  string
 	CodeTaskID         *uuid.UUID
 	IsActive           bool
+	AIReviewPrompt     string
+	IsPracticeEnabled  bool
+	IsMockEnabled      bool
+	PoolCount          int32 // populated by list queries; 0 in create paths
 	CreatedAt          time.Time
 	UpdatedAt          time.Time
 }

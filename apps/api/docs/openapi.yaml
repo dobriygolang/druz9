@@ -263,6 +263,24 @@ paths:
             tags:
                 - InterviewPrepService
             operationId: InterviewPrepService_ListAdminTasks
+            parameters:
+                - name: companyTag
+                  in: query
+                  description: Optional filters — client passes empty strings for "no filter".
+                  schema:
+                    type: string
+                - name: prepType
+                  in: query
+                  schema:
+                    type: string
+                - name: search
+                  in: query
+                  schema:
+                    type: string
+                - name: includeInactive
+                  in: query
+                  schema:
+                    type: boolean
             responses:
                 "200":
                     description: OK
@@ -287,6 +305,28 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/interview_prep.v1.AdminTaskEnvelope'
+    /api/admin/interview-prep/tasks/bulk:
+        post:
+            tags:
+                - InterviewPrepService
+            description: |-
+                BulkCreateAdminTasks lets admin paste an array of tasks and create
+                 them in one call. Each payload is validated and inserted
+                 independently; failures are reported per-row.
+            operationId: InterviewPrepService_BulkCreateAdminTasks
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.BulkCreateAdminTasksRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.BulkCreateAdminTasksResponse'
     /api/admin/interview-prep/tasks/{taskId}:
         get:
             tags:
@@ -6156,6 +6196,12 @@ components:
                     type: string
                 isActive:
                     type: boolean
+                aiReviewPrompt:
+                    type: string
+                isPracticeEnabled:
+                    type: boolean
+                isMockEnabled:
+                    type: boolean
         interview_prep.v1.AnswerMockQuestionRequest:
             type: object
             properties:
@@ -6196,6 +6242,37 @@ components:
                     $ref: '#/components/schemas/interview_prep.v1.InterviewPrepQuestion'
                 review:
                     $ref: '#/components/schemas/interview_prep.v1.InterviewAnswerReview'
+        interview_prep.v1.BulkCreateAdminTasksRequest:
+            type: object
+            properties:
+                tasks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_prep.v1.AdminTaskPayload'
+        interview_prep.v1.BulkCreateAdminTasksResponse:
+            type: object
+            properties:
+                results:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_prep.v1.BulkCreateResult'
+                created:
+                    type: integer
+                    format: int32
+                failed:
+                    type: integer
+                    format: int32
+        interview_prep.v1.BulkCreateResult:
+            type: object
+            properties:
+                slug:
+                    type: string
+                taskId:
+                    type: string
+                errorCode:
+                    type: string
+                errorMsg:
+                    type: string
         interview_prep.v1.CreateAdminQuestionRequest:
             type: object
             properties:
@@ -6392,6 +6469,19 @@ components:
                 updatedAt:
                     type: string
                     format: date-time
+                aiReviewPrompt:
+                    type: string
+                isPracticeEnabled:
+                    type: boolean
+                isMockEnabled:
+                    type: boolean
+                poolCount:
+                    type: integer
+                    description: |-
+                        pool_count = how many interview_pool_items rows reference this
+                         task. 0 = task is tagged but hidden from mock sessions because no
+                         pool includes it. Purely informational, not stored.
+                    format: int32
         interview_prep.v1.ListAdminQuestionsResponse:
             type: object
             properties:
