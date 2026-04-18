@@ -71,10 +71,10 @@ export function GuildPage() {
 
   // Pick the user's first joined guild from the public list and load its
   // members. Works until a dedicated "my guild" endpoint ships.
-  // `guild` currently unused in render — kept in state so a follow-up can
-  // swap the hard-coded guild name ("Mossveil") in headings with guild.name.
-  const [, setGuild] = useState<Guild | null>(null)
+  const [guild, setGuild] = useState<Guild | null>(null)
   const [members, setMembers] = useState<MemberRow[]>([])
+  const [inviteOpen, setInviteOpen] = useState(false)
+  const [hallEditOpen, setHallEditOpen] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -102,8 +102,8 @@ export function GuildPage() {
         subtitle={t('guild.page.subtitle')}
         right={
           <div style={{ display: 'flex', gap: 8 }}>
-            <RpgButton size="sm">{t('guild.page.invite')}</RpgButton>
-            <RpgButton size="sm" variant="primary">
+            <RpgButton size="sm" onClick={() => setInviteOpen(true)}>{t('guild.page.invite')}</RpgButton>
+            <RpgButton size="sm" variant="primary" onClick={() => setHallEditOpen(true)}>
               {t('guild.page.customizeHall')}
             </RpgButton>
           </div>
@@ -605,6 +605,92 @@ export function GuildPage() {
           </Panel>
         </div>
       </div>
+
+      {inviteOpen && (
+        <InviteModal
+          guild={guild}
+          onClose={() => setInviteOpen(false)}
+        />
+      )}
+
+      {hallEditOpen && (
+        <HallEditModal onClose={() => setHallEditOpen(false)} />
+      )}
     </>
+  )
+}
+
+function InviteModal({ guild, onClose }: { guild: Guild | null; onClose: () => void }) {
+  const inviteLink = guild
+    ? `${window.location.origin}/guild?invite=${guild.id}`
+    : `${window.location.origin}/guild`
+  const [copied, setCopied] = useState(false)
+  const copy = () => {
+    try {
+      navigator.clipboard.writeText(inviteLink)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {
+      /* best effort */
+    }
+  }
+  return (
+    <div className="rpg-modal-backdrop" onClick={onClose}>
+      <div
+        className="rpg-panel rpg-panel--nailed"
+        style={{ padding: 24, maxWidth: 440, width: '90%' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="font-display" style={{ fontSize: 20, marginBottom: 8 }}>
+          Invite to {guild?.name || 'guild'}
+        </h3>
+        <div style={{ color: 'var(--ink-2)', fontSize: 13, marginBottom: 12 }}>
+          Share this link with a friend. They'll land on the guild page and see a join button.
+        </div>
+        <div
+          style={{
+            padding: '10px 12px',
+            border: '2px solid var(--ink-0)',
+            background: 'var(--parch-2)',
+            fontFamily: 'Pixelify Sans, monospace',
+            fontSize: 12,
+            wordBreak: 'break-all',
+            marginBottom: 12,
+          }}
+        >
+          {inviteLink}
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <RpgButton variant="primary" onClick={copy}>
+            {copied ? 'Copied!' : 'Copy link'}
+          </RpgButton>
+          <RpgButton onClick={onClose}>Close</RpgButton>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function HallEditModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="rpg-modal-backdrop" onClick={onClose}>
+      <div
+        className="rpg-panel rpg-panel--nailed"
+        style={{ padding: 24, maxWidth: 440, width: '90%' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="font-display" style={{ fontSize: 20, marginBottom: 8 }}>
+          Hall customisation
+        </h3>
+        <div style={{ color: 'var(--ink-2)', fontSize: 13, marginBottom: 12 }}>
+          Hall themes, banners and torches unlock through guild XP and seasonal
+          cosmetics from the shop. The editor ships together with the cosmetics
+          inventory — track its progress in the tavern's guild section.
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <RpgButton variant="primary" onClick={onClose}>Got it</RpgButton>
+        </div>
+      </div>
+    </div>
   )
 }

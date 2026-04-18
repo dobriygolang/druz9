@@ -17,6 +17,20 @@ const READINESS_BREAKDOWN: Array<[string, number]> = [
   ['behavioral', 74],
 ]
 
+// Companies we support for mock-style prep. Order matches the order we
+// want on the landing bar. Clicking pushes the key into the live-session
+// deep link so the backend can pre-select the right question pool.
+const COMPANIES: Array<{ key: string; label: string; accent: string }> = [
+  { key: 'yandex',  label: 'Yandex',  accent: '#fc3f1d' },
+  { key: 'ozon',    label: 'Ozon',    accent: '#005bff' },
+  { key: 'avito',   label: 'Avito',   accent: '#00a046' },
+  { key: 'tinkoff', label: 'Tinkoff', accent: '#ffdd2d' },
+  { key: 'vk',      label: 'VK',      accent: '#0077ff' },
+  { key: 'google',  label: 'Google',  accent: '#4285f4' },
+  { key: 'amazon',  label: 'Amazon',  accent: '#ff9900' },
+  { key: 'meta',    label: 'Meta',    accent: '#1877f2' },
+]
+
 const SUGGESTIONS = [
   ['consistencyModels', '+120 ✦'],
   ['graphDfs', '+320 ✦'],
@@ -49,12 +63,13 @@ export function InterviewHubPage() {
 
   const [mentors, setMentors] = useState<MockBlueprint[]>([])
   const [past, setPast] = useState<FeedItem[]>([])
+  const [weakest, setWeakest] = useState<Array<{ key: string; label: string; score: number }>>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let alive = true
-    // Mentors + past sessions load in parallel; each swallows its own
-    // error so a dead endpoint doesn't wipe the other panel.
+    // Mentors + past sessions + weakest-skills load in parallel; each
+    // swallows its own error so a dead endpoint doesn't wipe the others.
     Promise.all([
       interviewPrepApi.listMockBlueprints().catch(() => []),
       user?.id
@@ -62,10 +77,20 @@ export function InterviewHubPage() {
             items.filter((it) => it.type === 'mock_stage'),
           )
         : Promise.resolve([] as FeedItem[]),
-    ]).then(([blueprints, feed]) => {
+      user?.id
+        ? authApi.getProfileProgress(user.id).then((p) =>
+            (p.weakest ?? []).slice(0, 3).map((c) => ({
+              key: c.key,
+              label: c.label ?? c.key,
+              score: c.score ?? 0,
+            })),
+          ).catch(() => [])
+        : Promise.resolve([] as Array<{ key: string; label: string; score: number }>),
+    ]).then(([blueprints, feed, weak]) => {
       if (!alive) return
       setMentors(blueprints)
       setPast(feed)
+      setWeakest(weak)
       setLoading(false)
     })
     return () => {
@@ -87,6 +112,35 @@ export function InterviewHubPage() {
           </RpgButton>
         }
       />
+
+      {/* Company picker — starts a session tuned to the chosen company's
+          question pool. Deep link carries ?company=<key> so the
+          live-session page can pre-filter blueprints. */}
+      <Panel style={{ marginBottom: 18 }}>
+        <div
+          className="font-silkscreen uppercase"
+          style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em', marginBottom: 10 }}
+        >
+          {t('interviewHub.pickCompany', { defaultValue: 'Pick a company to prep for' })}
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {COMPANIES.map((c) => (
+            <button
+              key={c.key}
+              className="rpg-btn"
+              onClick={() => navigate(`/interview/live/new?company=${c.key}`)}
+              style={{
+                padding: '10px 14px',
+                borderLeft: `6px solid ${c.accent}`,
+                fontFamily: 'Pixelify Sans, monospace',
+                fontSize: 13,
+              }}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </Panel>
 
       {/* Readiness + mentors */}
       <div
@@ -387,7 +441,20 @@ export function InterviewHubPage() {
           >
             {t('interviewHub.basedOnGaps')}
           </div>
-          {SUGGESTIONS.map(([key, rw], i) => (
+          {(weakest.length > 0
+            ? weakest.map((w) => ({
+                key: w.key,
+                title: t('interviewHub.suggestion.weaknessTitle', { label: w.label, defaultValue: `Drill ${w.label}` }),
+                reason: t('interviewHub.suggestion.weaknessReason', { score: w.score, defaultValue: `Current score ${w.score} — biggest gap vs your target` }),
+                reward: '+xp',
+              }))
+            : SUGGESTIONS.map(([key, rw]) => ({
+                key,
+                title: t(`interviewHub.suggestion.${key}.title`),
+                reason: t(`interviewHub.suggestion.${key}.reason`),
+                reward: rw,
+              }))
+          ).map((s, i) => (
             <div
               key={i}
               style={{
@@ -398,15 +465,17 @@ export function InterviewHubPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
+                cursor: 'pointer',
               }}
+              onClick={() => navigate(`/interview/live/new?focus=${s.key}`)}
             >
               <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13 }}>{t(`interviewHub.suggestion.${key}.title`)}</div>
+                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13 }}>{s.title}</div>
                 <div
                   className="font-silkscreen uppercase"
                   style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
                 >
-                  {t(`interviewHub.suggestion.${key}.reason`)}
+                  {s.reason}
                 </div>
               </div>
               <span
@@ -418,7 +487,7 @@ export function InterviewHubPage() {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {rw}
+                {s.reward}
               </span>
             </div>
           ))}
