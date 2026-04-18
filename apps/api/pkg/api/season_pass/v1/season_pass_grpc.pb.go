@@ -22,6 +22,12 @@ const (
 	SeasonPassService_GetActive_FullMethodName       = "/season_pass.v1.SeasonPassService/GetActive"
 	SeasonPassService_ClaimTierReward_FullMethodName = "/season_pass.v1.SeasonPassService/ClaimTierReward"
 	SeasonPassService_PurchasePremium_FullMethodName = "/season_pass.v1.SeasonPassService/PurchasePremium"
+	SeasonPassService_AdminListPasses_FullMethodName = "/season_pass.v1.SeasonPassService/AdminListPasses"
+	SeasonPassService_AdminCreatePass_FullMethodName = "/season_pass.v1.SeasonPassService/AdminCreatePass"
+	SeasonPassService_AdminUpdatePass_FullMethodName = "/season_pass.v1.SeasonPassService/AdminUpdatePass"
+	SeasonPassService_AdminDeletePass_FullMethodName = "/season_pass.v1.SeasonPassService/AdminDeletePass"
+	SeasonPassService_AdminUpsertTier_FullMethodName = "/season_pass.v1.SeasonPassService/AdminUpsertTier"
+	SeasonPassService_AdminDeleteTier_FullMethodName = "/season_pass.v1.SeasonPassService/AdminDeleteTier"
 )
 
 // SeasonPassServiceClient is the client API for SeasonPassService service.
@@ -41,6 +47,12 @@ type SeasonPassServiceClient interface {
 	ClaimTierReward(ctx context.Context, in *ClaimTierRewardRequest, opts ...grpc.CallOption) (*ClaimTierRewardResponse, error)
 	// PurchasePremium flips has_premium for the current season. Idempotent.
 	PurchasePremium(ctx context.Context, in *PurchasePremiumRequest, opts ...grpc.CallOption) (*PurchasePremiumResponse, error)
+	AdminListPasses(ctx context.Context, in *AdminListPassesRequest, opts ...grpc.CallOption) (*AdminListPassesResponse, error)
+	AdminCreatePass(ctx context.Context, in *AdminCreatePassRequest, opts ...grpc.CallOption) (*SeasonPassAdminRow, error)
+	AdminUpdatePass(ctx context.Context, in *AdminUpdatePassRequest, opts ...grpc.CallOption) (*SeasonPassAdminRow, error)
+	AdminDeletePass(ctx context.Context, in *AdminDeletePassRequest, opts ...grpc.CallOption) (*AdminSeasonPassDeleteResponse, error)
+	AdminUpsertTier(ctx context.Context, in *AdminUpsertTierRequest, opts ...grpc.CallOption) (*SeasonPassTier, error)
+	AdminDeleteTier(ctx context.Context, in *AdminDeleteTierRequest, opts ...grpc.CallOption) (*AdminSeasonPassDeleteResponse, error)
 }
 
 type seasonPassServiceClient struct {
@@ -81,6 +93,66 @@ func (c *seasonPassServiceClient) PurchasePremium(ctx context.Context, in *Purch
 	return out, nil
 }
 
+func (c *seasonPassServiceClient) AdminListPasses(ctx context.Context, in *AdminListPassesRequest, opts ...grpc.CallOption) (*AdminListPassesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminListPassesResponse)
+	err := c.cc.Invoke(ctx, SeasonPassService_AdminListPasses_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *seasonPassServiceClient) AdminCreatePass(ctx context.Context, in *AdminCreatePassRequest, opts ...grpc.CallOption) (*SeasonPassAdminRow, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SeasonPassAdminRow)
+	err := c.cc.Invoke(ctx, SeasonPassService_AdminCreatePass_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *seasonPassServiceClient) AdminUpdatePass(ctx context.Context, in *AdminUpdatePassRequest, opts ...grpc.CallOption) (*SeasonPassAdminRow, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SeasonPassAdminRow)
+	err := c.cc.Invoke(ctx, SeasonPassService_AdminUpdatePass_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *seasonPassServiceClient) AdminDeletePass(ctx context.Context, in *AdminDeletePassRequest, opts ...grpc.CallOption) (*AdminSeasonPassDeleteResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminSeasonPassDeleteResponse)
+	err := c.cc.Invoke(ctx, SeasonPassService_AdminDeletePass_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *seasonPassServiceClient) AdminUpsertTier(ctx context.Context, in *AdminUpsertTierRequest, opts ...grpc.CallOption) (*SeasonPassTier, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SeasonPassTier)
+	err := c.cc.Invoke(ctx, SeasonPassService_AdminUpsertTier_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *seasonPassServiceClient) AdminDeleteTier(ctx context.Context, in *AdminDeleteTierRequest, opts ...grpc.CallOption) (*AdminSeasonPassDeleteResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminSeasonPassDeleteResponse)
+	err := c.cc.Invoke(ctx, SeasonPassService_AdminDeleteTier_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SeasonPassServiceServer is the server API for SeasonPassService service.
 // All implementations must embed UnimplementedSeasonPassServiceServer
 // for forward compatibility.
@@ -98,6 +170,12 @@ type SeasonPassServiceServer interface {
 	ClaimTierReward(context.Context, *ClaimTierRewardRequest) (*ClaimTierRewardResponse, error)
 	// PurchasePremium flips has_premium for the current season. Idempotent.
 	PurchasePremium(context.Context, *PurchasePremiumRequest) (*PurchasePremiumResponse, error)
+	AdminListPasses(context.Context, *AdminListPassesRequest) (*AdminListPassesResponse, error)
+	AdminCreatePass(context.Context, *AdminCreatePassRequest) (*SeasonPassAdminRow, error)
+	AdminUpdatePass(context.Context, *AdminUpdatePassRequest) (*SeasonPassAdminRow, error)
+	AdminDeletePass(context.Context, *AdminDeletePassRequest) (*AdminSeasonPassDeleteResponse, error)
+	AdminUpsertTier(context.Context, *AdminUpsertTierRequest) (*SeasonPassTier, error)
+	AdminDeleteTier(context.Context, *AdminDeleteTierRequest) (*AdminSeasonPassDeleteResponse, error)
 	mustEmbedUnimplementedSeasonPassServiceServer()
 }
 
@@ -116,6 +194,24 @@ func (UnimplementedSeasonPassServiceServer) ClaimTierReward(context.Context, *Cl
 }
 func (UnimplementedSeasonPassServiceServer) PurchasePremium(context.Context, *PurchasePremiumRequest) (*PurchasePremiumResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method PurchasePremium not implemented")
+}
+func (UnimplementedSeasonPassServiceServer) AdminListPasses(context.Context, *AdminListPassesRequest) (*AdminListPassesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminListPasses not implemented")
+}
+func (UnimplementedSeasonPassServiceServer) AdminCreatePass(context.Context, *AdminCreatePassRequest) (*SeasonPassAdminRow, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminCreatePass not implemented")
+}
+func (UnimplementedSeasonPassServiceServer) AdminUpdatePass(context.Context, *AdminUpdatePassRequest) (*SeasonPassAdminRow, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminUpdatePass not implemented")
+}
+func (UnimplementedSeasonPassServiceServer) AdminDeletePass(context.Context, *AdminDeletePassRequest) (*AdminSeasonPassDeleteResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminDeletePass not implemented")
+}
+func (UnimplementedSeasonPassServiceServer) AdminUpsertTier(context.Context, *AdminUpsertTierRequest) (*SeasonPassTier, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminUpsertTier not implemented")
+}
+func (UnimplementedSeasonPassServiceServer) AdminDeleteTier(context.Context, *AdminDeleteTierRequest) (*AdminSeasonPassDeleteResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminDeleteTier not implemented")
 }
 func (UnimplementedSeasonPassServiceServer) mustEmbedUnimplementedSeasonPassServiceServer() {}
 func (UnimplementedSeasonPassServiceServer) testEmbeddedByValue()                           {}
@@ -192,6 +288,114 @@ func _SeasonPassService_PurchasePremium_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SeasonPassService_AdminListPasses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminListPassesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SeasonPassServiceServer).AdminListPasses(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SeasonPassService_AdminListPasses_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SeasonPassServiceServer).AdminListPasses(ctx, req.(*AdminListPassesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SeasonPassService_AdminCreatePass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminCreatePassRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SeasonPassServiceServer).AdminCreatePass(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SeasonPassService_AdminCreatePass_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SeasonPassServiceServer).AdminCreatePass(ctx, req.(*AdminCreatePassRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SeasonPassService_AdminUpdatePass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminUpdatePassRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SeasonPassServiceServer).AdminUpdatePass(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SeasonPassService_AdminUpdatePass_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SeasonPassServiceServer).AdminUpdatePass(ctx, req.(*AdminUpdatePassRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SeasonPassService_AdminDeletePass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminDeletePassRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SeasonPassServiceServer).AdminDeletePass(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SeasonPassService_AdminDeletePass_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SeasonPassServiceServer).AdminDeletePass(ctx, req.(*AdminDeletePassRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SeasonPassService_AdminUpsertTier_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminUpsertTierRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SeasonPassServiceServer).AdminUpsertTier(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SeasonPassService_AdminUpsertTier_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SeasonPassServiceServer).AdminUpsertTier(ctx, req.(*AdminUpsertTierRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SeasonPassService_AdminDeleteTier_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminDeleteTierRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SeasonPassServiceServer).AdminDeleteTier(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SeasonPassService_AdminDeleteTier_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SeasonPassServiceServer).AdminDeleteTier(ctx, req.(*AdminDeleteTierRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SeasonPassService_ServiceDesc is the grpc.ServiceDesc for SeasonPassService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -210,6 +414,30 @@ var SeasonPassService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PurchasePremium",
 			Handler:    _SeasonPassService_PurchasePremium_Handler,
+		},
+		{
+			MethodName: "AdminListPasses",
+			Handler:    _SeasonPassService_AdminListPasses_Handler,
+		},
+		{
+			MethodName: "AdminCreatePass",
+			Handler:    _SeasonPassService_AdminCreatePass_Handler,
+		},
+		{
+			MethodName: "AdminUpdatePass",
+			Handler:    _SeasonPassService_AdminUpdatePass_Handler,
+		},
+		{
+			MethodName: "AdminDeletePass",
+			Handler:    _SeasonPassService_AdminDeletePass_Handler,
+		},
+		{
+			MethodName: "AdminUpsertTier",
+			Handler:    _SeasonPassService_AdminUpsertTier_Handler,
+		},
+		{
+			MethodName: "AdminDeleteTier",
+			Handler:    _SeasonPassService_AdminDeleteTier_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

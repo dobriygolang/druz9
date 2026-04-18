@@ -714,6 +714,642 @@ func (x *PurchasePremiumResponse) GetProgress() *SeasonPassProgress {
 	return nil
 }
 
+type SeasonPassAdminRow struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	SeasonNumber     int32                  `protobuf:"varint,2,opt,name=season_number,json=seasonNumber,proto3" json:"season_number,omitempty"`
+	Title            string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
+	Subtitle         string                 `protobuf:"bytes,4,opt,name=subtitle,proto3" json:"subtitle,omitempty"`
+	StartsAt         *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=starts_at,json=startsAt,proto3" json:"starts_at,omitempty"`
+	EndsAt           *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=ends_at,json=endsAt,proto3" json:"ends_at,omitempty"`
+	MaxTier          int32                  `protobuf:"varint,7,opt,name=max_tier,json=maxTier,proto3" json:"max_tier,omitempty"`
+	XpPerTier        int32                  `protobuf:"varint,8,opt,name=xp_per_tier,json=xpPerTier,proto3" json:"xp_per_tier,omitempty"`
+	PremiumPriceGems int32                  `protobuf:"varint,9,opt,name=premium_price_gems,json=premiumPriceGems,proto3" json:"premium_price_gems,omitempty"`
+	Tiers            []*SeasonPassTier      `protobuf:"bytes,10,rep,name=tiers,proto3" json:"tiers,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *SeasonPassAdminRow) Reset() {
+	*x = SeasonPassAdminRow{}
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SeasonPassAdminRow) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SeasonPassAdminRow) ProtoMessage() {}
+
+func (x *SeasonPassAdminRow) ProtoReflect() protoreflect.Message {
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SeasonPassAdminRow.ProtoReflect.Descriptor instead.
+func (*SeasonPassAdminRow) Descriptor() ([]byte, []int) {
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *SeasonPassAdminRow) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *SeasonPassAdminRow) GetSeasonNumber() int32 {
+	if x != nil {
+		return x.SeasonNumber
+	}
+	return 0
+}
+
+func (x *SeasonPassAdminRow) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *SeasonPassAdminRow) GetSubtitle() string {
+	if x != nil {
+		return x.Subtitle
+	}
+	return ""
+}
+
+func (x *SeasonPassAdminRow) GetStartsAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartsAt
+	}
+	return nil
+}
+
+func (x *SeasonPassAdminRow) GetEndsAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndsAt
+	}
+	return nil
+}
+
+func (x *SeasonPassAdminRow) GetMaxTier() int32 {
+	if x != nil {
+		return x.MaxTier
+	}
+	return 0
+}
+
+func (x *SeasonPassAdminRow) GetXpPerTier() int32 {
+	if x != nil {
+		return x.XpPerTier
+	}
+	return 0
+}
+
+func (x *SeasonPassAdminRow) GetPremiumPriceGems() int32 {
+	if x != nil {
+		return x.PremiumPriceGems
+	}
+	return 0
+}
+
+func (x *SeasonPassAdminRow) GetTiers() []*SeasonPassTier {
+	if x != nil {
+		return x.Tiers
+	}
+	return nil
+}
+
+type AdminListPassesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminListPassesRequest) Reset() {
+	*x = AdminListPassesRequest{}
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminListPassesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminListPassesRequest) ProtoMessage() {}
+
+func (x *AdminListPassesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminListPassesRequest.ProtoReflect.Descriptor instead.
+func (*AdminListPassesRequest) Descriptor() ([]byte, []int) {
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{10}
+}
+
+type AdminListPassesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Passes        []*SeasonPassAdminRow  `protobuf:"bytes,1,rep,name=passes,proto3" json:"passes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminListPassesResponse) Reset() {
+	*x = AdminListPassesResponse{}
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminListPassesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminListPassesResponse) ProtoMessage() {}
+
+func (x *AdminListPassesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminListPassesResponse.ProtoReflect.Descriptor instead.
+func (*AdminListPassesResponse) Descriptor() ([]byte, []int) {
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *AdminListPassesResponse) GetPasses() []*SeasonPassAdminRow {
+	if x != nil {
+		return x.Passes
+	}
+	return nil
+}
+
+type AdminCreatePassRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	SeasonNumber     int32                  `protobuf:"varint,1,opt,name=season_number,json=seasonNumber,proto3" json:"season_number,omitempty"`
+	Title            string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Subtitle         string                 `protobuf:"bytes,3,opt,name=subtitle,proto3" json:"subtitle,omitempty"`
+	StartsAt         string                 `protobuf:"bytes,4,opt,name=starts_at,json=startsAt,proto3" json:"starts_at,omitempty"` // RFC3339
+	EndsAt           string                 `protobuf:"bytes,5,opt,name=ends_at,json=endsAt,proto3" json:"ends_at,omitempty"`       // RFC3339
+	MaxTier          int32                  `protobuf:"varint,6,opt,name=max_tier,json=maxTier,proto3" json:"max_tier,omitempty"`
+	XpPerTier        int32                  `protobuf:"varint,7,opt,name=xp_per_tier,json=xpPerTier,proto3" json:"xp_per_tier,omitempty"`
+	PremiumPriceGems int32                  `protobuf:"varint,8,opt,name=premium_price_gems,json=premiumPriceGems,proto3" json:"premium_price_gems,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *AdminCreatePassRequest) Reset() {
+	*x = AdminCreatePassRequest{}
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminCreatePassRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminCreatePassRequest) ProtoMessage() {}
+
+func (x *AdminCreatePassRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminCreatePassRequest.ProtoReflect.Descriptor instead.
+func (*AdminCreatePassRequest) Descriptor() ([]byte, []int) {
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *AdminCreatePassRequest) GetSeasonNumber() int32 {
+	if x != nil {
+		return x.SeasonNumber
+	}
+	return 0
+}
+
+func (x *AdminCreatePassRequest) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *AdminCreatePassRequest) GetSubtitle() string {
+	if x != nil {
+		return x.Subtitle
+	}
+	return ""
+}
+
+func (x *AdminCreatePassRequest) GetStartsAt() string {
+	if x != nil {
+		return x.StartsAt
+	}
+	return ""
+}
+
+func (x *AdminCreatePassRequest) GetEndsAt() string {
+	if x != nil {
+		return x.EndsAt
+	}
+	return ""
+}
+
+func (x *AdminCreatePassRequest) GetMaxTier() int32 {
+	if x != nil {
+		return x.MaxTier
+	}
+	return 0
+}
+
+func (x *AdminCreatePassRequest) GetXpPerTier() int32 {
+	if x != nil {
+		return x.XpPerTier
+	}
+	return 0
+}
+
+func (x *AdminCreatePassRequest) GetPremiumPriceGems() int32 {
+	if x != nil {
+		return x.PremiumPriceGems
+	}
+	return 0
+}
+
+type AdminUpdatePassRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Title            string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Subtitle         string                 `protobuf:"bytes,3,opt,name=subtitle,proto3" json:"subtitle,omitempty"`
+	StartsAt         string                 `protobuf:"bytes,4,opt,name=starts_at,json=startsAt,proto3" json:"starts_at,omitempty"` // RFC3339
+	EndsAt           string                 `protobuf:"bytes,5,opt,name=ends_at,json=endsAt,proto3" json:"ends_at,omitempty"`       // RFC3339
+	MaxTier          int32                  `protobuf:"varint,6,opt,name=max_tier,json=maxTier,proto3" json:"max_tier,omitempty"`
+	XpPerTier        int32                  `protobuf:"varint,7,opt,name=xp_per_tier,json=xpPerTier,proto3" json:"xp_per_tier,omitempty"`
+	PremiumPriceGems int32                  `protobuf:"varint,8,opt,name=premium_price_gems,json=premiumPriceGems,proto3" json:"premium_price_gems,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *AdminUpdatePassRequest) Reset() {
+	*x = AdminUpdatePassRequest{}
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminUpdatePassRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminUpdatePassRequest) ProtoMessage() {}
+
+func (x *AdminUpdatePassRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminUpdatePassRequest.ProtoReflect.Descriptor instead.
+func (*AdminUpdatePassRequest) Descriptor() ([]byte, []int) {
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *AdminUpdatePassRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *AdminUpdatePassRequest) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *AdminUpdatePassRequest) GetSubtitle() string {
+	if x != nil {
+		return x.Subtitle
+	}
+	return ""
+}
+
+func (x *AdminUpdatePassRequest) GetStartsAt() string {
+	if x != nil {
+		return x.StartsAt
+	}
+	return ""
+}
+
+func (x *AdminUpdatePassRequest) GetEndsAt() string {
+	if x != nil {
+		return x.EndsAt
+	}
+	return ""
+}
+
+func (x *AdminUpdatePassRequest) GetMaxTier() int32 {
+	if x != nil {
+		return x.MaxTier
+	}
+	return 0
+}
+
+func (x *AdminUpdatePassRequest) GetXpPerTier() int32 {
+	if x != nil {
+		return x.XpPerTier
+	}
+	return 0
+}
+
+func (x *AdminUpdatePassRequest) GetPremiumPriceGems() int32 {
+	if x != nil {
+		return x.PremiumPriceGems
+	}
+	return 0
+}
+
+type AdminDeletePassRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminDeletePassRequest) Reset() {
+	*x = AdminDeletePassRequest{}
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminDeletePassRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminDeletePassRequest) ProtoMessage() {}
+
+func (x *AdminDeletePassRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminDeletePassRequest.ProtoReflect.Descriptor instead.
+func (*AdminDeletePassRequest) Descriptor() ([]byte, []int) {
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *AdminDeletePassRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type AdminSeasonPassDeleteResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ok            bool                   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminSeasonPassDeleteResponse) Reset() {
+	*x = AdminSeasonPassDeleteResponse{}
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminSeasonPassDeleteResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminSeasonPassDeleteResponse) ProtoMessage() {}
+
+func (x *AdminSeasonPassDeleteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminSeasonPassDeleteResponse.ProtoReflect.Descriptor instead.
+func (*AdminSeasonPassDeleteResponse) Descriptor() ([]byte, []int) {
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *AdminSeasonPassDeleteResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
+type AdminUpsertTierRequest struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	SeasonPassId        string                 `protobuf:"bytes,1,opt,name=season_pass_id,json=seasonPassId,proto3" json:"season_pass_id,omitempty"`
+	Tier                int32                  `protobuf:"varint,2,opt,name=tier,proto3" json:"tier,omitempty"`
+	FreeRewardKind      RewardKind             `protobuf:"varint,3,opt,name=free_reward_kind,json=freeRewardKind,proto3,enum=season_pass.v1.RewardKind" json:"free_reward_kind,omitempty"`
+	FreeRewardAmount    int32                  `protobuf:"varint,4,opt,name=free_reward_amount,json=freeRewardAmount,proto3" json:"free_reward_amount,omitempty"`
+	FreeRewardLabel     string                 `protobuf:"bytes,5,opt,name=free_reward_label,json=freeRewardLabel,proto3" json:"free_reward_label,omitempty"`
+	PremiumRewardKind   RewardKind             `protobuf:"varint,6,opt,name=premium_reward_kind,json=premiumRewardKind,proto3,enum=season_pass.v1.RewardKind" json:"premium_reward_kind,omitempty"`
+	PremiumRewardAmount int32                  `protobuf:"varint,7,opt,name=premium_reward_amount,json=premiumRewardAmount,proto3" json:"premium_reward_amount,omitempty"`
+	PremiumRewardLabel  string                 `protobuf:"bytes,8,opt,name=premium_reward_label,json=premiumRewardLabel,proto3" json:"premium_reward_label,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *AdminUpsertTierRequest) Reset() {
+	*x = AdminUpsertTierRequest{}
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminUpsertTierRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminUpsertTierRequest) ProtoMessage() {}
+
+func (x *AdminUpsertTierRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminUpsertTierRequest.ProtoReflect.Descriptor instead.
+func (*AdminUpsertTierRequest) Descriptor() ([]byte, []int) {
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *AdminUpsertTierRequest) GetSeasonPassId() string {
+	if x != nil {
+		return x.SeasonPassId
+	}
+	return ""
+}
+
+func (x *AdminUpsertTierRequest) GetTier() int32 {
+	if x != nil {
+		return x.Tier
+	}
+	return 0
+}
+
+func (x *AdminUpsertTierRequest) GetFreeRewardKind() RewardKind {
+	if x != nil {
+		return x.FreeRewardKind
+	}
+	return RewardKind_REWARD_KIND_UNSPECIFIED
+}
+
+func (x *AdminUpsertTierRequest) GetFreeRewardAmount() int32 {
+	if x != nil {
+		return x.FreeRewardAmount
+	}
+	return 0
+}
+
+func (x *AdminUpsertTierRequest) GetFreeRewardLabel() string {
+	if x != nil {
+		return x.FreeRewardLabel
+	}
+	return ""
+}
+
+func (x *AdminUpsertTierRequest) GetPremiumRewardKind() RewardKind {
+	if x != nil {
+		return x.PremiumRewardKind
+	}
+	return RewardKind_REWARD_KIND_UNSPECIFIED
+}
+
+func (x *AdminUpsertTierRequest) GetPremiumRewardAmount() int32 {
+	if x != nil {
+		return x.PremiumRewardAmount
+	}
+	return 0
+}
+
+func (x *AdminUpsertTierRequest) GetPremiumRewardLabel() string {
+	if x != nil {
+		return x.PremiumRewardLabel
+	}
+	return ""
+}
+
+type AdminDeleteTierRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SeasonPassId  string                 `protobuf:"bytes,1,opt,name=season_pass_id,json=seasonPassId,proto3" json:"season_pass_id,omitempty"`
+	Tier          int32                  `protobuf:"varint,2,opt,name=tier,proto3" json:"tier,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminDeleteTierRequest) Reset() {
+	*x = AdminDeleteTierRequest{}
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminDeleteTierRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminDeleteTierRequest) ProtoMessage() {}
+
+func (x *AdminDeleteTierRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminDeleteTierRequest.ProtoReflect.Descriptor instead.
+func (*AdminDeleteTierRequest) Descriptor() ([]byte, []int) {
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *AdminDeleteTierRequest) GetSeasonPassId() string {
+	if x != nil {
+		return x.SeasonPassId
+	}
+	return ""
+}
+
+func (x *AdminDeleteTierRequest) GetTier() int32 {
+	if x != nil {
+		return x.Tier
+	}
+	return 0
+}
+
 var File_game_season_pass_v1_season_pass_proto protoreflect.FileDescriptor
 
 const file_game_season_pass_v1_season_pass_proto_rawDesc = "" +
@@ -760,7 +1396,56 @@ const file_game_season_pass_v1_season_pass_proto_rawDesc = "" +
 	"\rclaimed_label\x18\x04 \x01(\tR\fclaimedLabel\"\x18\n" +
 	"\x16PurchasePremiumRequest\"Y\n" +
 	"\x17PurchasePremiumResponse\x12>\n" +
-	"\bprogress\x18\x01 \x01(\v2\".season_pass.v1.SeasonPassProgressR\bprogress*\xf4\x01\n" +
+	"\bprogress\x18\x01 \x01(\v2\".season_pass.v1.SeasonPassProgressR\bprogress\"\x88\x03\n" +
+	"\x12SeasonPassAdminRow\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12#\n" +
+	"\rseason_number\x18\x02 \x01(\x05R\fseasonNumber\x12\x14\n" +
+	"\x05title\x18\x03 \x01(\tR\x05title\x12\x1a\n" +
+	"\bsubtitle\x18\x04 \x01(\tR\bsubtitle\x127\n" +
+	"\tstarts_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\bstartsAt\x123\n" +
+	"\aends_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\x06endsAt\x12\x19\n" +
+	"\bmax_tier\x18\a \x01(\x05R\amaxTier\x12\x1e\n" +
+	"\vxp_per_tier\x18\b \x01(\x05R\txpPerTier\x12,\n" +
+	"\x12premium_price_gems\x18\t \x01(\x05R\x10premiumPriceGems\x124\n" +
+	"\x05tiers\x18\n" +
+	" \x03(\v2\x1e.season_pass.v1.SeasonPassTierR\x05tiers\"\x18\n" +
+	"\x16AdminListPassesRequest\"U\n" +
+	"\x17AdminListPassesResponse\x12:\n" +
+	"\x06passes\x18\x01 \x03(\v2\".season_pass.v1.SeasonPassAdminRowR\x06passes\"\x8e\x02\n" +
+	"\x16AdminCreatePassRequest\x12#\n" +
+	"\rseason_number\x18\x01 \x01(\x05R\fseasonNumber\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1a\n" +
+	"\bsubtitle\x18\x03 \x01(\tR\bsubtitle\x12\x1b\n" +
+	"\tstarts_at\x18\x04 \x01(\tR\bstartsAt\x12\x17\n" +
+	"\aends_at\x18\x05 \x01(\tR\x06endsAt\x12\x19\n" +
+	"\bmax_tier\x18\x06 \x01(\x05R\amaxTier\x12\x1e\n" +
+	"\vxp_per_tier\x18\a \x01(\x05R\txpPerTier\x12,\n" +
+	"\x12premium_price_gems\x18\b \x01(\x05R\x10premiumPriceGems\"\xf9\x01\n" +
+	"\x16AdminUpdatePassRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1a\n" +
+	"\bsubtitle\x18\x03 \x01(\tR\bsubtitle\x12\x1b\n" +
+	"\tstarts_at\x18\x04 \x01(\tR\bstartsAt\x12\x17\n" +
+	"\aends_at\x18\x05 \x01(\tR\x06endsAt\x12\x19\n" +
+	"\bmax_tier\x18\x06 \x01(\x05R\amaxTier\x12\x1e\n" +
+	"\vxp_per_tier\x18\a \x01(\x05R\txpPerTier\x12,\n" +
+	"\x12premium_price_gems\x18\b \x01(\x05R\x10premiumPriceGems\"(\n" +
+	"\x16AdminDeletePassRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"/\n" +
+	"\x1dAdminSeasonPassDeleteResponse\x12\x0e\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok\"\xa4\x03\n" +
+	"\x16AdminUpsertTierRequest\x12$\n" +
+	"\x0eseason_pass_id\x18\x01 \x01(\tR\fseasonPassId\x12\x12\n" +
+	"\x04tier\x18\x02 \x01(\x05R\x04tier\x12D\n" +
+	"\x10free_reward_kind\x18\x03 \x01(\x0e2\x1a.season_pass.v1.RewardKindR\x0efreeRewardKind\x12,\n" +
+	"\x12free_reward_amount\x18\x04 \x01(\x05R\x10freeRewardAmount\x12*\n" +
+	"\x11free_reward_label\x18\x05 \x01(\tR\x0ffreeRewardLabel\x12J\n" +
+	"\x13premium_reward_kind\x18\x06 \x01(\x0e2\x1a.season_pass.v1.RewardKindR\x11premiumRewardKind\x122\n" +
+	"\x15premium_reward_amount\x18\a \x01(\x05R\x13premiumRewardAmount\x120\n" +
+	"\x14premium_reward_label\x18\b \x01(\tR\x12premiumRewardLabel\"R\n" +
+	"\x16AdminDeleteTierRequest\x12$\n" +
+	"\x0eseason_pass_id\x18\x01 \x01(\tR\fseasonPassId\x12\x12\n" +
+	"\x04tier\x18\x02 \x01(\x05R\x04tier*\xf4\x01\n" +
 	"\n" +
 	"RewardKind\x12\x1b\n" +
 	"\x17REWARD_KIND_UNSPECIFIED\x10\x00\x12\x14\n" +
@@ -776,11 +1461,18 @@ const file_game_season_pass_v1_season_pass_proto_rawDesc = "" +
 	"\vRewardTrack\x12\x1c\n" +
 	"\x18REWARD_TRACK_UNSPECIFIED\x10\x00\x12\x15\n" +
 	"\x11REWARD_TRACK_FREE\x10\x01\x12\x18\n" +
-	"\x14REWARD_TRACK_PREMIUM\x10\x022\xaa\x03\n" +
+	"\x14REWARD_TRACK_PREMIUM\x10\x022\xa2\n" +
+	"\n" +
 	"\x11SeasonPassService\x12t\n" +
 	"\tGetActive\x12 .season_pass.v1.GetActiveRequest\x1a!.season_pass.v1.GetActiveResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/season-pass/active\x12\x88\x01\n" +
 	"\x0fClaimTierReward\x12&.season_pass.v1.ClaimTierRewardRequest\x1a'.season_pass.v1.ClaimTierRewardResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/season-pass/claim\x12\x93\x01\n" +
-	"\x0fPurchasePremium\x12&.season_pass.v1.PurchasePremiumRequest\x1a'.season_pass.v1.PurchasePremiumResponse\"/\x82\xd3\xe4\x93\x02):\x01*\"$/api/v1/season-pass/purchase-premiumB\x1fZ\x1dapi/pkg/api/season_pass/v1;v1b\x06proto3"
+	"\x0fPurchasePremium\x12&.season_pass.v1.PurchasePremiumRequest\x1a'.season_pass.v1.PurchasePremiumResponse\"/\x82\xd3\xe4\x93\x02):\x01*\"$/api/v1/season-pass/purchase-premium\x12\x85\x01\n" +
+	"\x0fAdminListPasses\x12&.season_pass.v1.AdminListPassesRequest\x1a'.season_pass.v1.AdminListPassesResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/admin/season-pass\x12\x83\x01\n" +
+	"\x0fAdminCreatePass\x12&.season_pass.v1.AdminCreatePassRequest\x1a\".season_pass.v1.SeasonPassAdminRow\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/admin/season-pass\x12\x88\x01\n" +
+	"\x0fAdminUpdatePass\x12&.season_pass.v1.AdminUpdatePassRequest\x1a\".season_pass.v1.SeasonPassAdminRow\")\x82\xd3\xe4\x93\x02#:\x01*\x1a\x1e/api/v1/admin/season-pass/{id}\x12\x90\x01\n" +
+	"\x0fAdminDeletePass\x12&.season_pass.v1.AdminDeletePassRequest\x1a-.season_pass.v1.AdminSeasonPassDeleteResponse\"&\x82\xd3\xe4\x93\x02 *\x1e/api/v1/admin/season-pass/{id}\x12\x9d\x01\n" +
+	"\x0fAdminUpsertTier\x12&.season_pass.v1.AdminUpsertTierRequest\x1a\x1e.season_pass.v1.SeasonPassTier\"B\x82\xd3\xe4\x93\x02<:\x01*\x1a7/api/v1/admin/season-pass/{season_pass_id}/tiers/{tier}\x12\xa9\x01\n" +
+	"\x0fAdminDeleteTier\x12&.season_pass.v1.AdminDeleteTierRequest\x1a-.season_pass.v1.AdminSeasonPassDeleteResponse\"?\x82\xd3\xe4\x93\x029*7/api/v1/admin/season-pass/{season_pass_id}/tiers/{tier}B\x1fZ\x1dapi/pkg/api/season_pass/v1;v1b\x06proto3"
 
 var (
 	file_game_season_pass_v1_season_pass_proto_rawDescOnce sync.Once
@@ -795,24 +1487,33 @@ func file_game_season_pass_v1_season_pass_proto_rawDescGZIP() []byte {
 }
 
 var file_game_season_pass_v1_season_pass_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_game_season_pass_v1_season_pass_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_game_season_pass_v1_season_pass_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_game_season_pass_v1_season_pass_proto_goTypes = []any{
-	(RewardKind)(0),                 // 0: season_pass.v1.RewardKind
-	(RewardTrack)(0),                // 1: season_pass.v1.RewardTrack
-	(*SeasonPass)(nil),              // 2: season_pass.v1.SeasonPass
-	(*SeasonPassTier)(nil),          // 3: season_pass.v1.SeasonPassTier
-	(*SeasonPassProgress)(nil),      // 4: season_pass.v1.SeasonPassProgress
-	(*GetActiveRequest)(nil),        // 5: season_pass.v1.GetActiveRequest
-	(*GetActiveResponse)(nil),       // 6: season_pass.v1.GetActiveResponse
-	(*ClaimTierRewardRequest)(nil),  // 7: season_pass.v1.ClaimTierRewardRequest
-	(*ClaimTierRewardResponse)(nil), // 8: season_pass.v1.ClaimTierRewardResponse
-	(*PurchasePremiumRequest)(nil),  // 9: season_pass.v1.PurchasePremiumRequest
-	(*PurchasePremiumResponse)(nil), // 10: season_pass.v1.PurchasePremiumResponse
-	(*timestamppb.Timestamp)(nil),   // 11: google.protobuf.Timestamp
+	(RewardKind)(0),                       // 0: season_pass.v1.RewardKind
+	(RewardTrack)(0),                      // 1: season_pass.v1.RewardTrack
+	(*SeasonPass)(nil),                    // 2: season_pass.v1.SeasonPass
+	(*SeasonPassTier)(nil),                // 3: season_pass.v1.SeasonPassTier
+	(*SeasonPassProgress)(nil),            // 4: season_pass.v1.SeasonPassProgress
+	(*GetActiveRequest)(nil),              // 5: season_pass.v1.GetActiveRequest
+	(*GetActiveResponse)(nil),             // 6: season_pass.v1.GetActiveResponse
+	(*ClaimTierRewardRequest)(nil),        // 7: season_pass.v1.ClaimTierRewardRequest
+	(*ClaimTierRewardResponse)(nil),       // 8: season_pass.v1.ClaimTierRewardResponse
+	(*PurchasePremiumRequest)(nil),        // 9: season_pass.v1.PurchasePremiumRequest
+	(*PurchasePremiumResponse)(nil),       // 10: season_pass.v1.PurchasePremiumResponse
+	(*SeasonPassAdminRow)(nil),            // 11: season_pass.v1.SeasonPassAdminRow
+	(*AdminListPassesRequest)(nil),        // 12: season_pass.v1.AdminListPassesRequest
+	(*AdminListPassesResponse)(nil),       // 13: season_pass.v1.AdminListPassesResponse
+	(*AdminCreatePassRequest)(nil),        // 14: season_pass.v1.AdminCreatePassRequest
+	(*AdminUpdatePassRequest)(nil),        // 15: season_pass.v1.AdminUpdatePassRequest
+	(*AdminDeletePassRequest)(nil),        // 16: season_pass.v1.AdminDeletePassRequest
+	(*AdminSeasonPassDeleteResponse)(nil), // 17: season_pass.v1.AdminSeasonPassDeleteResponse
+	(*AdminUpsertTierRequest)(nil),        // 18: season_pass.v1.AdminUpsertTierRequest
+	(*AdminDeleteTierRequest)(nil),        // 19: season_pass.v1.AdminDeleteTierRequest
+	(*timestamppb.Timestamp)(nil),         // 20: google.protobuf.Timestamp
 }
 var file_game_season_pass_v1_season_pass_proto_depIdxs = []int32{
-	11, // 0: season_pass.v1.SeasonPass.starts_at:type_name -> google.protobuf.Timestamp
-	11, // 1: season_pass.v1.SeasonPass.ends_at:type_name -> google.protobuf.Timestamp
+	20, // 0: season_pass.v1.SeasonPass.starts_at:type_name -> google.protobuf.Timestamp
+	20, // 1: season_pass.v1.SeasonPass.ends_at:type_name -> google.protobuf.Timestamp
 	0,  // 2: season_pass.v1.SeasonPassTier.free_reward_kind:type_name -> season_pass.v1.RewardKind
 	0,  // 3: season_pass.v1.SeasonPassTier.premium_reward_kind:type_name -> season_pass.v1.RewardKind
 	2,  // 4: season_pass.v1.GetActiveResponse.pass:type_name -> season_pass.v1.SeasonPass
@@ -822,17 +1523,35 @@ var file_game_season_pass_v1_season_pass_proto_depIdxs = []int32{
 	4,  // 8: season_pass.v1.ClaimTierRewardResponse.progress:type_name -> season_pass.v1.SeasonPassProgress
 	0,  // 9: season_pass.v1.ClaimTierRewardResponse.claimed_kind:type_name -> season_pass.v1.RewardKind
 	4,  // 10: season_pass.v1.PurchasePremiumResponse.progress:type_name -> season_pass.v1.SeasonPassProgress
-	5,  // 11: season_pass.v1.SeasonPassService.GetActive:input_type -> season_pass.v1.GetActiveRequest
-	7,  // 12: season_pass.v1.SeasonPassService.ClaimTierReward:input_type -> season_pass.v1.ClaimTierRewardRequest
-	9,  // 13: season_pass.v1.SeasonPassService.PurchasePremium:input_type -> season_pass.v1.PurchasePremiumRequest
-	6,  // 14: season_pass.v1.SeasonPassService.GetActive:output_type -> season_pass.v1.GetActiveResponse
-	8,  // 15: season_pass.v1.SeasonPassService.ClaimTierReward:output_type -> season_pass.v1.ClaimTierRewardResponse
-	10, // 16: season_pass.v1.SeasonPassService.PurchasePremium:output_type -> season_pass.v1.PurchasePremiumResponse
-	14, // [14:17] is the sub-list for method output_type
-	11, // [11:14] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	20, // 11: season_pass.v1.SeasonPassAdminRow.starts_at:type_name -> google.protobuf.Timestamp
+	20, // 12: season_pass.v1.SeasonPassAdminRow.ends_at:type_name -> google.protobuf.Timestamp
+	3,  // 13: season_pass.v1.SeasonPassAdminRow.tiers:type_name -> season_pass.v1.SeasonPassTier
+	11, // 14: season_pass.v1.AdminListPassesResponse.passes:type_name -> season_pass.v1.SeasonPassAdminRow
+	0,  // 15: season_pass.v1.AdminUpsertTierRequest.free_reward_kind:type_name -> season_pass.v1.RewardKind
+	0,  // 16: season_pass.v1.AdminUpsertTierRequest.premium_reward_kind:type_name -> season_pass.v1.RewardKind
+	5,  // 17: season_pass.v1.SeasonPassService.GetActive:input_type -> season_pass.v1.GetActiveRequest
+	7,  // 18: season_pass.v1.SeasonPassService.ClaimTierReward:input_type -> season_pass.v1.ClaimTierRewardRequest
+	9,  // 19: season_pass.v1.SeasonPassService.PurchasePremium:input_type -> season_pass.v1.PurchasePremiumRequest
+	12, // 20: season_pass.v1.SeasonPassService.AdminListPasses:input_type -> season_pass.v1.AdminListPassesRequest
+	14, // 21: season_pass.v1.SeasonPassService.AdminCreatePass:input_type -> season_pass.v1.AdminCreatePassRequest
+	15, // 22: season_pass.v1.SeasonPassService.AdminUpdatePass:input_type -> season_pass.v1.AdminUpdatePassRequest
+	16, // 23: season_pass.v1.SeasonPassService.AdminDeletePass:input_type -> season_pass.v1.AdminDeletePassRequest
+	18, // 24: season_pass.v1.SeasonPassService.AdminUpsertTier:input_type -> season_pass.v1.AdminUpsertTierRequest
+	19, // 25: season_pass.v1.SeasonPassService.AdminDeleteTier:input_type -> season_pass.v1.AdminDeleteTierRequest
+	6,  // 26: season_pass.v1.SeasonPassService.GetActive:output_type -> season_pass.v1.GetActiveResponse
+	8,  // 27: season_pass.v1.SeasonPassService.ClaimTierReward:output_type -> season_pass.v1.ClaimTierRewardResponse
+	10, // 28: season_pass.v1.SeasonPassService.PurchasePremium:output_type -> season_pass.v1.PurchasePremiumResponse
+	13, // 29: season_pass.v1.SeasonPassService.AdminListPasses:output_type -> season_pass.v1.AdminListPassesResponse
+	11, // 30: season_pass.v1.SeasonPassService.AdminCreatePass:output_type -> season_pass.v1.SeasonPassAdminRow
+	11, // 31: season_pass.v1.SeasonPassService.AdminUpdatePass:output_type -> season_pass.v1.SeasonPassAdminRow
+	17, // 32: season_pass.v1.SeasonPassService.AdminDeletePass:output_type -> season_pass.v1.AdminSeasonPassDeleteResponse
+	3,  // 33: season_pass.v1.SeasonPassService.AdminUpsertTier:output_type -> season_pass.v1.SeasonPassTier
+	17, // 34: season_pass.v1.SeasonPassService.AdminDeleteTier:output_type -> season_pass.v1.AdminSeasonPassDeleteResponse
+	26, // [26:35] is the sub-list for method output_type
+	17, // [17:26] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_game_season_pass_v1_season_pass_proto_init() }
@@ -846,7 +1565,7 @@ func file_game_season_pass_v1_season_pass_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_season_pass_v1_season_pass_proto_rawDesc), len(file_game_season_pass_v1_season_pass_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   9,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

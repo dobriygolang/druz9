@@ -183,6 +183,9 @@ const AdminNotificationsPage = lazy(() =>
 const AdminPodcastsPage = lazy(() =>
   import('@/pages/AdminPodcastsPage/ui/AdminPodcastsPage').then((m) => ({ default: m.AdminPodcastsPage })),
 )
+const AdminSeasonPassPage = lazy(() =>
+  import('@/pages/AdminSeasonPassPage/ui/AdminSeasonPassPage').then((m) => ({ default: m.AdminSeasonPassPage })),
+)
 
 const Fallback: React.FC = () => (
   <div
@@ -417,7 +420,7 @@ export const RouterProvider: React.FC = () => {
                 the corresponding admin RPCs ship. */}
             <Route path="/admin/podcasts"     element={<AdminPodcastsPage />} />
             <Route path="/admin/shop"         element={<AdminShopPage />} />
-            <Route path="/admin/seasonpass"   element={<AdminStub title="Season pass admin" />} />
+            <Route path="/admin/seasonpass"   element={<AdminSeasonPassPage />} />
             <Route path="/admin/ai-bots"      element={<AdminStub title="AI mentors admin" />} />
             <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
           </Route>

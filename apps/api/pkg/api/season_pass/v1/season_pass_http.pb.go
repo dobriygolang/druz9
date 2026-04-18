@@ -19,11 +19,23 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationSeasonPassServiceAdminCreatePass = "/season_pass.v1.SeasonPassService/AdminCreatePass"
+const OperationSeasonPassServiceAdminDeletePass = "/season_pass.v1.SeasonPassService/AdminDeletePass"
+const OperationSeasonPassServiceAdminDeleteTier = "/season_pass.v1.SeasonPassService/AdminDeleteTier"
+const OperationSeasonPassServiceAdminListPasses = "/season_pass.v1.SeasonPassService/AdminListPasses"
+const OperationSeasonPassServiceAdminUpdatePass = "/season_pass.v1.SeasonPassService/AdminUpdatePass"
+const OperationSeasonPassServiceAdminUpsertTier = "/season_pass.v1.SeasonPassService/AdminUpsertTier"
 const OperationSeasonPassServiceClaimTierReward = "/season_pass.v1.SeasonPassService/ClaimTierReward"
 const OperationSeasonPassServiceGetActive = "/season_pass.v1.SeasonPassService/GetActive"
 const OperationSeasonPassServicePurchasePremium = "/season_pass.v1.SeasonPassService/PurchasePremium"
 
 type SeasonPassServiceHTTPServer interface {
+	AdminCreatePass(context.Context, *AdminCreatePassRequest) (*SeasonPassAdminRow, error)
+	AdminDeletePass(context.Context, *AdminDeletePassRequest) (*AdminSeasonPassDeleteResponse, error)
+	AdminDeleteTier(context.Context, *AdminDeleteTierRequest) (*AdminSeasonPassDeleteResponse, error)
+	AdminListPasses(context.Context, *AdminListPassesRequest) (*AdminListPassesResponse, error)
+	AdminUpdatePass(context.Context, *AdminUpdatePassRequest) (*SeasonPassAdminRow, error)
+	AdminUpsertTier(context.Context, *AdminUpsertTierRequest) (*SeasonPassTier, error)
 	// ClaimTierReward ClaimTierReward claims one tier reward. Caller must have reached the
 	// tier; premium rewards require has_premium.
 	ClaimTierReward(context.Context, *ClaimTierRewardRequest) (*ClaimTierRewardResponse, error)
@@ -39,6 +51,12 @@ func RegisterSeasonPassServiceHTTPServer(s *http.Server, srv SeasonPassServiceHT
 	r.GET("/api/v1/season-pass/active", _SeasonPassService_GetActive0_HTTP_Handler(srv))
 	r.POST("/api/v1/season-pass/claim", _SeasonPassService_ClaimTierReward0_HTTP_Handler(srv))
 	r.POST("/api/v1/season-pass/purchase-premium", _SeasonPassService_PurchasePremium0_HTTP_Handler(srv))
+	r.GET("/api/v1/admin/season-pass", _SeasonPassService_AdminListPasses0_HTTP_Handler(srv))
+	r.POST("/api/v1/admin/season-pass", _SeasonPassService_AdminCreatePass0_HTTP_Handler(srv))
+	r.PUT("/api/v1/admin/season-pass/{id}", _SeasonPassService_AdminUpdatePass0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/admin/season-pass/{id}", _SeasonPassService_AdminDeletePass0_HTTP_Handler(srv))
+	r.PUT("/api/v1/admin/season-pass/{season_pass_id}/tiers/{tier}", _SeasonPassService_AdminUpsertTier0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/admin/season-pass/{season_pass_id}/tiers/{tier}", _SeasonPassService_AdminDeleteTier0_HTTP_Handler(srv))
 }
 
 func _SeasonPassService_GetActive0_HTTP_Handler(srv SeasonPassServiceHTTPServer) func(ctx http.Context) error {
@@ -104,7 +122,148 @@ func _SeasonPassService_PurchasePremium0_HTTP_Handler(srv SeasonPassServiceHTTPS
 	}
 }
 
+func _SeasonPassService_AdminListPasses0_HTTP_Handler(srv SeasonPassServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminListPassesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationSeasonPassServiceAdminListPasses)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminListPasses(ctx, req.(*AdminListPassesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AdminListPassesResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _SeasonPassService_AdminCreatePass0_HTTP_Handler(srv SeasonPassServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminCreatePassRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationSeasonPassServiceAdminCreatePass)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminCreatePass(ctx, req.(*AdminCreatePassRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SeasonPassAdminRow)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _SeasonPassService_AdminUpdatePass0_HTTP_Handler(srv SeasonPassServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminUpdatePassRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationSeasonPassServiceAdminUpdatePass)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminUpdatePass(ctx, req.(*AdminUpdatePassRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SeasonPassAdminRow)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _SeasonPassService_AdminDeletePass0_HTTP_Handler(srv SeasonPassServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminDeletePassRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationSeasonPassServiceAdminDeletePass)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminDeletePass(ctx, req.(*AdminDeletePassRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AdminSeasonPassDeleteResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _SeasonPassService_AdminUpsertTier0_HTTP_Handler(srv SeasonPassServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminUpsertTierRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationSeasonPassServiceAdminUpsertTier)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminUpsertTier(ctx, req.(*AdminUpsertTierRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SeasonPassTier)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _SeasonPassService_AdminDeleteTier0_HTTP_Handler(srv SeasonPassServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminDeleteTierRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationSeasonPassServiceAdminDeleteTier)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminDeleteTier(ctx, req.(*AdminDeleteTierRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AdminSeasonPassDeleteResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type SeasonPassServiceHTTPClient interface {
+	AdminCreatePass(ctx context.Context, req *AdminCreatePassRequest, opts ...http.CallOption) (rsp *SeasonPassAdminRow, err error)
+	AdminDeletePass(ctx context.Context, req *AdminDeletePassRequest, opts ...http.CallOption) (rsp *AdminSeasonPassDeleteResponse, err error)
+	AdminDeleteTier(ctx context.Context, req *AdminDeleteTierRequest, opts ...http.CallOption) (rsp *AdminSeasonPassDeleteResponse, err error)
+	AdminListPasses(ctx context.Context, req *AdminListPassesRequest, opts ...http.CallOption) (rsp *AdminListPassesResponse, err error)
+	AdminUpdatePass(ctx context.Context, req *AdminUpdatePassRequest, opts ...http.CallOption) (rsp *SeasonPassAdminRow, err error)
+	AdminUpsertTier(ctx context.Context, req *AdminUpsertTierRequest, opts ...http.CallOption) (rsp *SeasonPassTier, err error)
 	// ClaimTierReward ClaimTierReward claims one tier reward. Caller must have reached the
 	// tier; premium rewards require has_premium.
 	ClaimTierReward(ctx context.Context, req *ClaimTierRewardRequest, opts ...http.CallOption) (rsp *ClaimTierRewardResponse, err error)
@@ -121,6 +280,84 @@ type SeasonPassServiceHTTPClientImpl struct {
 
 func NewSeasonPassServiceHTTPClient(client *http.Client) SeasonPassServiceHTTPClient {
 	return &SeasonPassServiceHTTPClientImpl{client}
+}
+
+func (c *SeasonPassServiceHTTPClientImpl) AdminCreatePass(ctx context.Context, in *AdminCreatePassRequest, opts ...http.CallOption) (*SeasonPassAdminRow, error) {
+	var out SeasonPassAdminRow
+	pattern := "/api/v1/admin/season-pass"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationSeasonPassServiceAdminCreatePass))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *SeasonPassServiceHTTPClientImpl) AdminDeletePass(ctx context.Context, in *AdminDeletePassRequest, opts ...http.CallOption) (*AdminSeasonPassDeleteResponse, error) {
+	var out AdminSeasonPassDeleteResponse
+	pattern := "/api/v1/admin/season-pass/{id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationSeasonPassServiceAdminDeletePass))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *SeasonPassServiceHTTPClientImpl) AdminDeleteTier(ctx context.Context, in *AdminDeleteTierRequest, opts ...http.CallOption) (*AdminSeasonPassDeleteResponse, error) {
+	var out AdminSeasonPassDeleteResponse
+	pattern := "/api/v1/admin/season-pass/{season_pass_id}/tiers/{tier}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationSeasonPassServiceAdminDeleteTier))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *SeasonPassServiceHTTPClientImpl) AdminListPasses(ctx context.Context, in *AdminListPassesRequest, opts ...http.CallOption) (*AdminListPassesResponse, error) {
+	var out AdminListPassesResponse
+	pattern := "/api/v1/admin/season-pass"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationSeasonPassServiceAdminListPasses))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *SeasonPassServiceHTTPClientImpl) AdminUpdatePass(ctx context.Context, in *AdminUpdatePassRequest, opts ...http.CallOption) (*SeasonPassAdminRow, error) {
+	var out SeasonPassAdminRow
+	pattern := "/api/v1/admin/season-pass/{id}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationSeasonPassServiceAdminUpdatePass))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *SeasonPassServiceHTTPClientImpl) AdminUpsertTier(ctx context.Context, in *AdminUpsertTierRequest, opts ...http.CallOption) (*SeasonPassTier, error) {
+	var out SeasonPassTier
+	pattern := "/api/v1/admin/season-pass/{season_pass_id}/tiers/{tier}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationSeasonPassServiceAdminUpsertTier))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 // ClaimTierReward ClaimTierReward claims one tier reward. Caller must have reached the

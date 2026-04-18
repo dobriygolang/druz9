@@ -34,6 +34,41 @@ service SeasonPassService {
       body: "*"
     };
   }
+
+  // --- Admin CRUD (requires IsAdmin=true) -----------------------------------
+
+  rpc AdminListPasses(AdminListPassesRequest) returns (AdminListPassesResponse) {
+    option (google.api.http) = { get: "/api/v1/admin/season-pass" };
+  }
+
+  rpc AdminCreatePass(AdminCreatePassRequest) returns (SeasonPassAdminRow) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/season-pass"
+      body: "*"
+    };
+  }
+
+  rpc AdminUpdatePass(AdminUpdatePassRequest) returns (SeasonPassAdminRow) {
+    option (google.api.http) = {
+      put: "/api/v1/admin/season-pass/{id}"
+      body: "*"
+    };
+  }
+
+  rpc AdminDeletePass(AdminDeletePassRequest) returns (AdminSeasonPassDeleteResponse) {
+    option (google.api.http) = { delete: "/api/v1/admin/season-pass/{id}" };
+  }
+
+  rpc AdminUpsertTier(AdminUpsertTierRequest) returns (SeasonPassTier) {
+    option (google.api.http) = {
+      put: "/api/v1/admin/season-pass/{season_pass_id}/tiers/{tier}"
+      body: "*"
+    };
+  }
+
+  rpc AdminDeleteTier(AdminDeleteTierRequest) returns (AdminSeasonPassDeleteResponse) {
+    option (google.api.http) = { delete: "/api/v1/admin/season-pass/{season_pass_id}/tiers/{tier}" };
+  }
 }
 
 enum RewardKind {
@@ -109,4 +144,70 @@ message PurchasePremiumRequest {}
 
 message PurchasePremiumResponse {
   SeasonPassProgress progress = 1;
+}
+
+// --- Admin messages -------------------------------------------------------
+
+message SeasonPassAdminRow {
+  string                    id                 = 1;
+  int32                     season_number      = 2;
+  string                    title              = 3;
+  string                    subtitle           = 4;
+  google.protobuf.Timestamp starts_at          = 5;
+  google.protobuf.Timestamp ends_at            = 6;
+  int32                     max_tier           = 7;
+  int32                     xp_per_tier        = 8;
+  int32                     premium_price_gems = 9;
+  repeated SeasonPassTier   tiers              = 10;
+}
+
+message AdminListPassesRequest {}
+message AdminListPassesResponse {
+  repeated SeasonPassAdminRow passes = 1;
+}
+
+message AdminCreatePassRequest {
+  int32  season_number      = 1;
+  string title              = 2;
+  string subtitle           = 3;
+  string starts_at          = 4; // RFC3339
+  string ends_at            = 5; // RFC3339
+  int32  max_tier           = 6;
+  int32  xp_per_tier        = 7;
+  int32  premium_price_gems = 8;
+}
+
+message AdminUpdatePassRequest {
+  string id                 = 1;
+  string title              = 2;
+  string subtitle           = 3;
+  string starts_at          = 4; // RFC3339
+  string ends_at            = 5; // RFC3339
+  int32  max_tier           = 6;
+  int32  xp_per_tier        = 7;
+  int32  premium_price_gems = 8;
+}
+
+message AdminDeletePassRequest {
+  string id = 1;
+}
+
+message AdminSeasonPassDeleteResponse {
+  bool ok = 1;
+}
+
+message AdminUpsertTierRequest {
+  string     season_pass_id       = 1;
+  int32      tier                 = 2;
+  RewardKind free_reward_kind     = 3;
+  int32      free_reward_amount   = 4;
+  string     free_reward_label    = 5;
+  RewardKind premium_reward_kind  = 6;
+  int32      premium_reward_amount = 7;
+  string     premium_reward_label = 8;
+}
+
+message AdminDeleteTierRequest {
+  string season_pass_id = 1;
+  int32  tier           = 2;
 }

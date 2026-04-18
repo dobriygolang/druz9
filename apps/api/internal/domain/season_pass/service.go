@@ -33,6 +33,14 @@ type Repository interface {
 	SetPremium(ctx context.Context, userID, seasonPassID uuid.UUID) error
 	// AddXP increments a user's xp.
 	AddXP(ctx context.Context, userID, seasonPassID uuid.UUID, delta int32) error
+
+	// --- Admin CRUD ----------------------------------------------------------
+	AdminListPasses(ctx context.Context) ([]*model.SeasonPass, error)
+	AdminCreatePass(ctx context.Context, p *model.SeasonPass) (*model.SeasonPass, error)
+	AdminUpdatePass(ctx context.Context, p *model.SeasonPass) (*model.SeasonPass, error)
+	AdminDeletePass(ctx context.Context, id uuid.UUID) error
+	AdminUpsertTier(ctx context.Context, seasonPassID uuid.UUID, t *model.SeasonPassTier) (*model.SeasonPassTier, error)
+	AdminDeleteTier(ctx context.Context, seasonPassID uuid.UUID, tier int32) error
 }
 
 //go:generate mockery --case underscore --name Wallet --with-expecter --output mocks
@@ -221,6 +229,32 @@ func (s *Service) PurchasePremium(ctx context.Context, userID uuid.UUID) (*model
 	}
 	progress.CurrentTier = currentTierFor(progress.XP, pass.XPPerTier, pass.MaxTier)
 	return progress, nil
+}
+
+// --- Admin methods --------------------------------------------------------
+
+func (s *Service) AdminListPasses(ctx context.Context) ([]*model.SeasonPass, error) {
+	return s.repo.AdminListPasses(ctx)
+}
+
+func (s *Service) AdminCreatePass(ctx context.Context, p *model.SeasonPass) (*model.SeasonPass, error) {
+	return s.repo.AdminCreatePass(ctx, p)
+}
+
+func (s *Service) AdminUpdatePass(ctx context.Context, p *model.SeasonPass) (*model.SeasonPass, error) {
+	return s.repo.AdminUpdatePass(ctx, p)
+}
+
+func (s *Service) AdminDeletePass(ctx context.Context, id uuid.UUID) error {
+	return s.repo.AdminDeletePass(ctx, id)
+}
+
+func (s *Service) AdminUpsertTier(ctx context.Context, seasonPassID uuid.UUID, t *model.SeasonPassTier) (*model.SeasonPassTier, error) {
+	return s.repo.AdminUpsertTier(ctx, seasonPassID, t)
+}
+
+func (s *Service) AdminDeleteTier(ctx context.Context, seasonPassID uuid.UUID, tier int32) error {
+	return s.repo.AdminDeleteTier(ctx, seasonPassID, tier)
 }
 
 // AddXP is called by arena/interview/training when the user earns pass XP.

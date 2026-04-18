@@ -143,6 +143,30 @@ export const adminApi = {
     await apiClient.delete(`/api/v1/admin/shop/items/${id}`)
   },
 
+  // Season Pass admin — Wave E.2.
+  listSeasonPasses: async (): Promise<unknown[]> => {
+    const r = await apiClient.get<{ passes?: unknown[] }>('/api/v1/admin/season-pass')
+    return r.data.passes ?? []
+  },
+  createSeasonPass: async (payload: Record<string, unknown>): Promise<unknown> => {
+    const r = await apiClient.post<unknown>('/api/v1/admin/season-pass', payload)
+    return r.data
+  },
+  updateSeasonPass: async (id: string, payload: Record<string, unknown>): Promise<unknown> => {
+    const r = await apiClient.put<unknown>(`/api/v1/admin/season-pass/${id}`, { ...payload, id })
+    return r.data
+  },
+  deleteSeasonPass: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/v1/admin/season-pass/${id}`)
+  },
+  upsertSeasonPassTier: async (seasonPassId: string, tier: number, payload: Record<string, unknown>): Promise<unknown> => {
+    const r = await apiClient.put<unknown>(`/api/v1/admin/season-pass/${seasonPassId}/tiers/${tier}`, { ...payload, seasonPassId, tier })
+    return r.data
+  },
+  deleteSeasonPassTier: async (seasonPassId: string, tier: number): Promise<void> => {
+    await apiClient.delete(`/api/v1/admin/season-pass/${seasonPassId}/tiers/${tier}`)
+  },
+
   // Notifications broadcast — Wave E.4.
   broadcastNotification: async (
     title: string, body: string, deepLink: string, targetUserIds: string[]
