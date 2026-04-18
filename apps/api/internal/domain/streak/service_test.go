@@ -204,7 +204,8 @@ func TestPurchaseShield_RejectsOversizedCount(t *testing.T) {
 		Repository: &fakeRepo{},
 		Stats:      &fakeStats{},
 	})
-	_, _, _, err := svc.PurchaseShield(t.Context(), uuid.New(), 99)
+	_, _, balance, err := svc.PurchaseShield(t.Context(), uuid.New(), 99)
+	_ = balance
 	if !errors.Is(err, ErrInvalidCount) {
 		t.Fatalf("expected ErrInvalidCount, got %v", err)
 	}

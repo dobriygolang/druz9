@@ -2,7 +2,6 @@ package geo
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	"api/internal/cache"
@@ -34,7 +33,6 @@ type Service struct {
 	resolver       Resolver
 	activityCache  *cache.TTLCache[time.Time]
 	communityCache *cache.TTLCache[[]*model.CommunityMapPoint]
-	communityMu    sync.RWMutex
 }
 
 // NewService creates new geo domain service.

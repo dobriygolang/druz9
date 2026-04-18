@@ -382,6 +382,7 @@ WHERE e.id = $1
 		if err := rows.Err(); err != nil {
 			return nil, fmt.Errorf("iterate event: %w", err)
 		}
+		//nolint:nilnil // Missing event is represented as nil for service-level not-found handling.
 		return nil, nil
 	}
 

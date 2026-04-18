@@ -29,6 +29,7 @@ func resolveArenaActor(ctx context.Context, requireIdentity bool) (*model.User, 
 		if requireIdentity {
 			return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
 		}
+		//nolint:nilnil // Anonymous read-only arena views are allowed when identity is optional.
 		return nil, nil
 	}
 

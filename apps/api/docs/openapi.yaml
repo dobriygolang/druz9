@@ -663,6 +663,76 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/admin.v1.GetRuntimeConfigResponse'
+    /api/v1/admin/ai-mentors:
+        get:
+            tags:
+                - AIMentorService
+            operationId: AIMentorService_ListAIMentors
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.ListAIMentorsResponse'
+        post:
+            tags:
+                - AIMentorService
+            operationId: AIMentorService_CreateAIMentor
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/admin.v1.CreateAIMentorRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.AIMentor'
+    /api/v1/admin/ai-mentors/{id}:
+        put:
+            tags:
+                - AIMentorService
+            operationId: AIMentorService_UpdateAIMentor
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/admin.v1.UpdateAIMentorRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.AIMentor'
+        delete:
+            tags:
+                - AIMentorService
+            operationId: AIMentorService_DeleteAIMentor
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.DeleteAIMentorResponse'
     /api/v1/admin/notifications/broadcast:
         post:
             tags:
@@ -685,6 +755,129 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/notification.v1.AdminBroadcastResponse'
+    /api/v1/admin/season-pass:
+        get:
+            tags:
+                - SeasonPassService
+            operationId: SeasonPassService_AdminListPasses
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/season_pass.v1.AdminListPassesResponse'
+        post:
+            tags:
+                - SeasonPassService
+            operationId: SeasonPassService_AdminCreatePass
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/season_pass.v1.AdminCreatePassRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/season_pass.v1.SeasonPassAdminRow'
+    /api/v1/admin/season-pass/{id}:
+        put:
+            tags:
+                - SeasonPassService
+            operationId: SeasonPassService_AdminUpdatePass
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/season_pass.v1.AdminUpdatePassRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/season_pass.v1.SeasonPassAdminRow'
+        delete:
+            tags:
+                - SeasonPassService
+            operationId: SeasonPassService_AdminDeletePass
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/season_pass.v1.AdminSeasonPassDeleteResponse'
+    /api/v1/admin/season-pass/{seasonPassId}/tiers/{tier}:
+        put:
+            tags:
+                - SeasonPassService
+            operationId: SeasonPassService_AdminUpsertTier
+            parameters:
+                - name: seasonPassId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: tier
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: int32
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/season_pass.v1.AdminUpsertTierRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/season_pass.v1.SeasonPassTier'
+        delete:
+            tags:
+                - SeasonPassService
+            operationId: SeasonPassService_AdminDeleteTier
+            parameters:
+                - name: seasonPassId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: tier
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/season_pass.v1.AdminSeasonPassDeleteResponse'
     /api/v1/admin/shop/items:
         get:
             tags:
@@ -3924,6 +4117,24 @@ paths:
                                 $ref: '#/components/schemas/profile.v1.GetWalletResponse'
 components:
     schemas:
+        admin.v1.AIMentor:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                provider:
+                    type: string
+                modelId:
+                    type: string
+                tier:
+                    type: integer
+                    format: int32
+                promptTemplate:
+                    type: string
+                isActive:
+                    type: boolean
         admin.v1.AdminStatusResponse:
             type: object
             properties:
@@ -3945,6 +4156,27 @@ components:
                     type: string
                 group:
                     type: string
+        admin.v1.CreateAIMentorRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                provider:
+                    type: string
+                modelId:
+                    type: string
+                tier:
+                    type: integer
+                    format: int32
+                promptTemplate:
+                    type: string
+                isActive:
+                    type: boolean
+        admin.v1.DeleteAIMentorResponse:
+            type: object
+            properties:
+                ok:
+                    type: boolean
         admin.v1.GetConfigResponse:
             type: object
             properties:
@@ -3967,6 +4199,13 @@ components:
                     type: boolean
                 arenaRequireAuth:
                     type: boolean
+        admin.v1.ListAIMentorsResponse:
+            type: object
+            properties:
+                mentors:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/admin.v1.AIMentor'
         admin.v1.ListConfigResponse:
             type: object
             properties:
@@ -3974,6 +4213,24 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/admin.v1.ConfigItem'
+        admin.v1.UpdateAIMentorRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                provider:
+                    type: string
+                modelId:
+                    type: string
+                tier:
+                    type: integer
+                    format: int32
+                promptTemplate:
+                    type: string
+                isActive:
+                    type: boolean
         admin.v1.UpdateConfigRequest:
             type: object
             properties:
@@ -8113,6 +8370,87 @@ components:
                     type: string
                 referral:
                     $ref: '#/components/schemas/referral.v1.ReferralPayload'
+        season_pass.v1.AdminCreatePassRequest:
+            type: object
+            properties:
+                seasonNumber:
+                    type: integer
+                    format: int32
+                title:
+                    type: string
+                subtitle:
+                    type: string
+                startsAt:
+                    type: string
+                endsAt:
+                    type: string
+                maxTier:
+                    type: integer
+                    format: int32
+                xpPerTier:
+                    type: integer
+                    format: int32
+                premiumPriceGems:
+                    type: integer
+                    format: int32
+        season_pass.v1.AdminListPassesResponse:
+            type: object
+            properties:
+                passes:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/season_pass.v1.SeasonPassAdminRow'
+        season_pass.v1.AdminSeasonPassDeleteResponse:
+            type: object
+            properties:
+                ok:
+                    type: boolean
+        season_pass.v1.AdminUpdatePassRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                subtitle:
+                    type: string
+                startsAt:
+                    type: string
+                endsAt:
+                    type: string
+                maxTier:
+                    type: integer
+                    format: int32
+                xpPerTier:
+                    type: integer
+                    format: int32
+                premiumPriceGems:
+                    type: integer
+                    format: int32
+        season_pass.v1.AdminUpsertTierRequest:
+            type: object
+            properties:
+                seasonPassId:
+                    type: string
+                tier:
+                    type: integer
+                    format: int32
+                freeRewardKind:
+                    type: integer
+                    format: enum
+                freeRewardAmount:
+                    type: integer
+                    format: int32
+                freeRewardLabel:
+                    type: string
+                premiumRewardKind:
+                    type: integer
+                    format: enum
+                premiumRewardAmount:
+                    type: integer
+                    format: int32
+                premiumRewardLabel:
+                    type: string
         season_pass.v1.ClaimTierRewardRequest:
             type: object
             properties:
@@ -8181,6 +8519,37 @@ components:
                 premiumPriceGems:
                     type: integer
                     format: int32
+        season_pass.v1.SeasonPassAdminRow:
+            type: object
+            properties:
+                id:
+                    type: string
+                seasonNumber:
+                    type: integer
+                    format: int32
+                title:
+                    type: string
+                subtitle:
+                    type: string
+                startsAt:
+                    type: string
+                    format: date-time
+                endsAt:
+                    type: string
+                    format: date-time
+                maxTier:
+                    type: integer
+                    format: int32
+                xpPerTier:
+                    type: integer
+                    format: int32
+                premiumPriceGems:
+                    type: integer
+                    format: int32
+                tiers:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/season_pass.v1.SeasonPassTier'
         season_pass.v1.SeasonPassProgress:
             type: object
             properties:
@@ -8962,6 +9331,7 @@ components:
                 actual:
                     type: string
 tags:
+    - name: AIMentorService
     - name: AdminService
     - name: ArenaService
     - name: ChallengeService

@@ -24,6 +24,122 @@ func (_m *Repository) EXPECT() *Repository_Expecter {
 	return &Repository_Expecter{mock: &_m.Mock}
 }
 
+// AdminListItems provides a mock function with given fields: ctx, category, rarity, limit, offset
+func (_m *Repository) AdminListItems(ctx context.Context, category model.ItemCategory, rarity model.ItemRarity, limit int32, offset int32) ([]*model.ShopItem, int32, error) {
+	ret := _m.Called(ctx, category, rarity, limit, offset)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AdminListItems")
+	}
+
+	var r0 []*model.ShopItem
+	var r1 int32
+	var r2 error
+	if rf, ok := ret.Get(0).(func(context.Context, model.ItemCategory, model.ItemRarity, int32, int32) ([]*model.ShopItem, int32, error)); ok {
+		return rf(ctx, category, rarity, limit, offset)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, model.ItemCategory, model.ItemRarity, int32, int32) []*model.ShopItem); ok {
+		r0 = rf(ctx, category, rarity, limit, offset)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*model.ShopItem)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, model.ItemCategory, model.ItemRarity, int32, int32) int32); ok {
+		r1 = rf(ctx, category, rarity, limit, offset)
+	} else {
+		r1 = ret.Get(1).(int32)
+	}
+
+	if rf, ok := ret.Get(2).(func(context.Context, model.ItemCategory, model.ItemRarity, int32, int32) error); ok {
+		r2 = rf(ctx, category, rarity, limit, offset)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
+// Repository_AdminListItems_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AdminListItems'
+type Repository_AdminListItems_Call struct {
+	*mock.Call
+}
+
+// AdminListItems is a helper method to define mock.On call
+//   - ctx context.Context
+//   - category model.ItemCategory
+//   - rarity model.ItemRarity
+//   - limit int32
+//   - offset int32
+func (_e *Repository_Expecter) AdminListItems(ctx interface{}, category interface{}, rarity interface{}, limit interface{}, offset interface{}) *Repository_AdminListItems_Call {
+	return &Repository_AdminListItems_Call{Call: _e.mock.On("AdminListItems", ctx, category, rarity, limit, offset)}
+}
+
+func (_c *Repository_AdminListItems_Call) Run(run func(ctx context.Context, category model.ItemCategory, rarity model.ItemRarity, limit int32, offset int32)) *Repository_AdminListItems_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.ItemCategory), args[2].(model.ItemRarity), args[3].(int32), args[4].(int32))
+	})
+	return _c
+}
+
+func (_c *Repository_AdminListItems_Call) Return(_a0 []*model.ShopItem, _a1 int32, _a2 error) *Repository_AdminListItems_Call {
+	_c.Call.Return(_a0, _a1, _a2)
+	return _c
+}
+
+func (_c *Repository_AdminListItems_Call) RunAndReturn(run func(context.Context, model.ItemCategory, model.ItemRarity, int32, int32) ([]*model.ShopItem, int32, error)) *Repository_AdminListItems_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteItem provides a mock function with given fields: ctx, id
+func (_m *Repository) DeleteItem(ctx context.Context, id uuid.UUID) error {
+	ret := _m.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteItem")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) error); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Repository_DeleteItem_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteItem'
+type Repository_DeleteItem_Call struct {
+	*mock.Call
+}
+
+// DeleteItem is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *Repository_Expecter) DeleteItem(ctx interface{}, id interface{}) *Repository_DeleteItem_Call {
+	return &Repository_DeleteItem_Call{Call: _e.mock.On("DeleteItem", ctx, id)}
+}
+
+func (_c *Repository_DeleteItem_Call) Run(run func(ctx context.Context, id uuid.UUID)) *Repository_DeleteItem_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Repository_DeleteItem_Call) Return(_a0 error) *Repository_DeleteItem_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Repository_DeleteItem_Call) RunAndReturn(run func(context.Context, uuid.UUID) error) *Repository_DeleteItem_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetInventory provides a mock function with given fields: ctx, userID
 func (_m *Repository) GetInventory(ctx context.Context, userID uuid.UUID) ([]*model.ShopOwnedItem, error) {
 	ret := _m.Called(ctx, userID)
@@ -197,6 +313,65 @@ func (_c *Repository_GetItemBySlug_Call) Return(_a0 *model.ShopItem, _a1 error) 
 }
 
 func (_c *Repository_GetItemBySlug_Call) RunAndReturn(run func(context.Context, string) (*model.ShopItem, error)) *Repository_GetItemBySlug_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// InsertItem provides a mock function with given fields: ctx, item
+func (_m *Repository) InsertItem(ctx context.Context, item *model.ShopItem) (*model.ShopItem, error) {
+	ret := _m.Called(ctx, item)
+
+	if len(ret) == 0 {
+		panic("no return value specified for InsertItem")
+	}
+
+	var r0 *model.ShopItem
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *model.ShopItem) (*model.ShopItem, error)); ok {
+		return rf(ctx, item)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *model.ShopItem) *model.ShopItem); ok {
+		r0 = rf(ctx, item)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.ShopItem)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *model.ShopItem) error); ok {
+		r1 = rf(ctx, item)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Repository_InsertItem_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'InsertItem'
+type Repository_InsertItem_Call struct {
+	*mock.Call
+}
+
+// InsertItem is a helper method to define mock.On call
+//   - ctx context.Context
+//   - item *model.ShopItem
+func (_e *Repository_Expecter) InsertItem(ctx interface{}, item interface{}) *Repository_InsertItem_Call {
+	return &Repository_InsertItem_Call{Call: _e.mock.On("InsertItem", ctx, item)}
+}
+
+func (_c *Repository_InsertItem_Call) Run(run func(ctx context.Context, item *model.ShopItem)) *Repository_InsertItem_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*model.ShopItem))
+	})
+	return _c
+}
+
+func (_c *Repository_InsertItem_Call) Return(_a0 *model.ShopItem, _a1 error) *Repository_InsertItem_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Repository_InsertItem_Call) RunAndReturn(run func(context.Context, *model.ShopItem) (*model.ShopItem, error)) *Repository_InsertItem_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -444,6 +619,126 @@ func (_c *Repository_ListItems_Call) Return(_a0 []*model.ShopItem, _a1 int32, _a
 }
 
 func (_c *Repository_ListItems_Call) RunAndReturn(run func(context.Context, model.ItemCategory, model.ItemRarity, int32, int32) ([]*model.ShopItem, int32, error)) *Repository_ListItems_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetEquippedForSlot provides a mock function with given fields: ctx, userID, slot, equipItemID
+func (_m *Repository) SetEquippedForSlot(ctx context.Context, userID uuid.UUID, slot string, equipItemID uuid.UUID) ([]*model.ShopOwnedItem, error) {
+	ret := _m.Called(ctx, userID, slot, equipItemID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetEquippedForSlot")
+	}
+
+	var r0 []*model.ShopOwnedItem
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string, uuid.UUID) ([]*model.ShopOwnedItem, error)); ok {
+		return rf(ctx, userID, slot, equipItemID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string, uuid.UUID) []*model.ShopOwnedItem); ok {
+		r0 = rf(ctx, userID, slot, equipItemID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*model.ShopOwnedItem)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, string, uuid.UUID) error); ok {
+		r1 = rf(ctx, userID, slot, equipItemID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Repository_SetEquippedForSlot_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetEquippedForSlot'
+type Repository_SetEquippedForSlot_Call struct {
+	*mock.Call
+}
+
+// SetEquippedForSlot is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - slot string
+//   - equipItemID uuid.UUID
+func (_e *Repository_Expecter) SetEquippedForSlot(ctx interface{}, userID interface{}, slot interface{}, equipItemID interface{}) *Repository_SetEquippedForSlot_Call {
+	return &Repository_SetEquippedForSlot_Call{Call: _e.mock.On("SetEquippedForSlot", ctx, userID, slot, equipItemID)}
+}
+
+func (_c *Repository_SetEquippedForSlot_Call) Run(run func(ctx context.Context, userID uuid.UUID, slot string, equipItemID uuid.UUID)) *Repository_SetEquippedForSlot_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(string), args[3].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Repository_SetEquippedForSlot_Call) Return(_a0 []*model.ShopOwnedItem, _a1 error) *Repository_SetEquippedForSlot_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Repository_SetEquippedForSlot_Call) RunAndReturn(run func(context.Context, uuid.UUID, string, uuid.UUID) ([]*model.ShopOwnedItem, error)) *Repository_SetEquippedForSlot_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateItem provides a mock function with given fields: ctx, item
+func (_m *Repository) UpdateItem(ctx context.Context, item *model.ShopItem) (*model.ShopItem, error) {
+	ret := _m.Called(ctx, item)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateItem")
+	}
+
+	var r0 *model.ShopItem
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *model.ShopItem) (*model.ShopItem, error)); ok {
+		return rf(ctx, item)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *model.ShopItem) *model.ShopItem); ok {
+		r0 = rf(ctx, item)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.ShopItem)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *model.ShopItem) error); ok {
+		r1 = rf(ctx, item)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Repository_UpdateItem_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateItem'
+type Repository_UpdateItem_Call struct {
+	*mock.Call
+}
+
+// UpdateItem is a helper method to define mock.On call
+//   - ctx context.Context
+//   - item *model.ShopItem
+func (_e *Repository_Expecter) UpdateItem(ctx interface{}, item interface{}) *Repository_UpdateItem_Call {
+	return &Repository_UpdateItem_Call{Call: _e.mock.On("UpdateItem", ctx, item)}
+}
+
+func (_c *Repository_UpdateItem_Call) Run(run func(ctx context.Context, item *model.ShopItem)) *Repository_UpdateItem_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*model.ShopItem))
+	})
+	return _c
+}
+
+func (_c *Repository_UpdateItem_Call) Return(_a0 *model.ShopItem, _a1 error) *Repository_UpdateItem_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Repository_UpdateItem_Call) RunAndReturn(run func(context.Context, *model.ShopItem) (*model.ShopItem, error)) *Repository_UpdateItem_Call {
 	_c.Call.Return(run)
 	return _c
 }

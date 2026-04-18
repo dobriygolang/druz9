@@ -35,6 +35,8 @@ func (s *Service) SubmitSolution(
 		return nil, ErrNotParticipant
 	}
 	switch ch.Status {
+	case model.ChallengeStatusUnspecified, model.ChallengeStatusPending, model.ChallengeStatusInProgress:
+		// Submission is allowed for pending and in-progress challenges.
 	case model.ChallengeStatusCompleted:
 		return nil, ErrAlreadyCompleted
 	case model.ChallengeStatusExpired:

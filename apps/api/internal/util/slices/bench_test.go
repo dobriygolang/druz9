@@ -47,7 +47,7 @@ func BenchmarkMap(b *testing.B) {
 	b.Run("map to bool", func(b *testing.B) {
 		b.ReportAllocs()
 		for range b.N {
-			_ = Map(s, func(s string) bool { return len(s) > 0 })
+			_ = Map(s, func(s string) bool { return s != "" })
 		}
 	})
 }

@@ -75,6 +75,337 @@ func (_c *Repository_AddXP_Call) RunAndReturn(run func(context.Context, uuid.UUI
 	return _c
 }
 
+// AdminCreatePass provides a mock function with given fields: ctx, p
+func (_m *Repository) AdminCreatePass(ctx context.Context, p *model.SeasonPass) (*model.SeasonPass, error) {
+	ret := _m.Called(ctx, p)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AdminCreatePass")
+	}
+
+	var r0 *model.SeasonPass
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *model.SeasonPass) (*model.SeasonPass, error)); ok {
+		return rf(ctx, p)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *model.SeasonPass) *model.SeasonPass); ok {
+		r0 = rf(ctx, p)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.SeasonPass)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *model.SeasonPass) error); ok {
+		r1 = rf(ctx, p)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Repository_AdminCreatePass_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AdminCreatePass'
+type Repository_AdminCreatePass_Call struct {
+	*mock.Call
+}
+
+// AdminCreatePass is a helper method to define mock.On call
+//   - ctx context.Context
+//   - p *model.SeasonPass
+func (_e *Repository_Expecter) AdminCreatePass(ctx interface{}, p interface{}) *Repository_AdminCreatePass_Call {
+	return &Repository_AdminCreatePass_Call{Call: _e.mock.On("AdminCreatePass", ctx, p)}
+}
+
+func (_c *Repository_AdminCreatePass_Call) Run(run func(ctx context.Context, p *model.SeasonPass)) *Repository_AdminCreatePass_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*model.SeasonPass))
+	})
+	return _c
+}
+
+func (_c *Repository_AdminCreatePass_Call) Return(_a0 *model.SeasonPass, _a1 error) *Repository_AdminCreatePass_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Repository_AdminCreatePass_Call) RunAndReturn(run func(context.Context, *model.SeasonPass) (*model.SeasonPass, error)) *Repository_AdminCreatePass_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// AdminDeletePass provides a mock function with given fields: ctx, id
+func (_m *Repository) AdminDeletePass(ctx context.Context, id uuid.UUID) error {
+	ret := _m.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AdminDeletePass")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) error); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Repository_AdminDeletePass_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AdminDeletePass'
+type Repository_AdminDeletePass_Call struct {
+	*mock.Call
+}
+
+// AdminDeletePass is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id uuid.UUID
+func (_e *Repository_Expecter) AdminDeletePass(ctx interface{}, id interface{}) *Repository_AdminDeletePass_Call {
+	return &Repository_AdminDeletePass_Call{Call: _e.mock.On("AdminDeletePass", ctx, id)}
+}
+
+func (_c *Repository_AdminDeletePass_Call) Run(run func(ctx context.Context, id uuid.UUID)) *Repository_AdminDeletePass_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Repository_AdminDeletePass_Call) Return(_a0 error) *Repository_AdminDeletePass_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Repository_AdminDeletePass_Call) RunAndReturn(run func(context.Context, uuid.UUID) error) *Repository_AdminDeletePass_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// AdminDeleteTier provides a mock function with given fields: ctx, seasonPassID, tier
+func (_m *Repository) AdminDeleteTier(ctx context.Context, seasonPassID uuid.UUID, tier int32) error {
+	ret := _m.Called(ctx, seasonPassID, tier)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AdminDeleteTier")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, int32) error); ok {
+		r0 = rf(ctx, seasonPassID, tier)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Repository_AdminDeleteTier_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AdminDeleteTier'
+type Repository_AdminDeleteTier_Call struct {
+	*mock.Call
+}
+
+// AdminDeleteTier is a helper method to define mock.On call
+//   - ctx context.Context
+//   - seasonPassID uuid.UUID
+//   - tier int32
+func (_e *Repository_Expecter) AdminDeleteTier(ctx interface{}, seasonPassID interface{}, tier interface{}) *Repository_AdminDeleteTier_Call {
+	return &Repository_AdminDeleteTier_Call{Call: _e.mock.On("AdminDeleteTier", ctx, seasonPassID, tier)}
+}
+
+func (_c *Repository_AdminDeleteTier_Call) Run(run func(ctx context.Context, seasonPassID uuid.UUID, tier int32)) *Repository_AdminDeleteTier_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(int32))
+	})
+	return _c
+}
+
+func (_c *Repository_AdminDeleteTier_Call) Return(_a0 error) *Repository_AdminDeleteTier_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Repository_AdminDeleteTier_Call) RunAndReturn(run func(context.Context, uuid.UUID, int32) error) *Repository_AdminDeleteTier_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// AdminListPasses provides a mock function with given fields: ctx
+func (_m *Repository) AdminListPasses(ctx context.Context) ([]*model.SeasonPass, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AdminListPasses")
+	}
+
+	var r0 []*model.SeasonPass
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]*model.SeasonPass, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []*model.SeasonPass); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*model.SeasonPass)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Repository_AdminListPasses_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AdminListPasses'
+type Repository_AdminListPasses_Call struct {
+	*mock.Call
+}
+
+// AdminListPasses is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *Repository_Expecter) AdminListPasses(ctx interface{}) *Repository_AdminListPasses_Call {
+	return &Repository_AdminListPasses_Call{Call: _e.mock.On("AdminListPasses", ctx)}
+}
+
+func (_c *Repository_AdminListPasses_Call) Run(run func(ctx context.Context)) *Repository_AdminListPasses_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *Repository_AdminListPasses_Call) Return(_a0 []*model.SeasonPass, _a1 error) *Repository_AdminListPasses_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Repository_AdminListPasses_Call) RunAndReturn(run func(context.Context) ([]*model.SeasonPass, error)) *Repository_AdminListPasses_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// AdminUpdatePass provides a mock function with given fields: ctx, p
+func (_m *Repository) AdminUpdatePass(ctx context.Context, p *model.SeasonPass) (*model.SeasonPass, error) {
+	ret := _m.Called(ctx, p)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AdminUpdatePass")
+	}
+
+	var r0 *model.SeasonPass
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *model.SeasonPass) (*model.SeasonPass, error)); ok {
+		return rf(ctx, p)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *model.SeasonPass) *model.SeasonPass); ok {
+		r0 = rf(ctx, p)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.SeasonPass)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *model.SeasonPass) error); ok {
+		r1 = rf(ctx, p)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Repository_AdminUpdatePass_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AdminUpdatePass'
+type Repository_AdminUpdatePass_Call struct {
+	*mock.Call
+}
+
+// AdminUpdatePass is a helper method to define mock.On call
+//   - ctx context.Context
+//   - p *model.SeasonPass
+func (_e *Repository_Expecter) AdminUpdatePass(ctx interface{}, p interface{}) *Repository_AdminUpdatePass_Call {
+	return &Repository_AdminUpdatePass_Call{Call: _e.mock.On("AdminUpdatePass", ctx, p)}
+}
+
+func (_c *Repository_AdminUpdatePass_Call) Run(run func(ctx context.Context, p *model.SeasonPass)) *Repository_AdminUpdatePass_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*model.SeasonPass))
+	})
+	return _c
+}
+
+func (_c *Repository_AdminUpdatePass_Call) Return(_a0 *model.SeasonPass, _a1 error) *Repository_AdminUpdatePass_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Repository_AdminUpdatePass_Call) RunAndReturn(run func(context.Context, *model.SeasonPass) (*model.SeasonPass, error)) *Repository_AdminUpdatePass_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// AdminUpsertTier provides a mock function with given fields: ctx, seasonPassID, t
+func (_m *Repository) AdminUpsertTier(ctx context.Context, seasonPassID uuid.UUID, t *model.SeasonPassTier) (*model.SeasonPassTier, error) {
+	ret := _m.Called(ctx, seasonPassID, t)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AdminUpsertTier")
+	}
+
+	var r0 *model.SeasonPassTier
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *model.SeasonPassTier) (*model.SeasonPassTier, error)); ok {
+		return rf(ctx, seasonPassID, t)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *model.SeasonPassTier) *model.SeasonPassTier); ok {
+		r0 = rf(ctx, seasonPassID, t)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.SeasonPassTier)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, *model.SeasonPassTier) error); ok {
+		r1 = rf(ctx, seasonPassID, t)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Repository_AdminUpsertTier_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AdminUpsertTier'
+type Repository_AdminUpsertTier_Call struct {
+	*mock.Call
+}
+
+// AdminUpsertTier is a helper method to define mock.On call
+//   - ctx context.Context
+//   - seasonPassID uuid.UUID
+//   - t *model.SeasonPassTier
+func (_e *Repository_Expecter) AdminUpsertTier(ctx interface{}, seasonPassID interface{}, t interface{}) *Repository_AdminUpsertTier_Call {
+	return &Repository_AdminUpsertTier_Call{Call: _e.mock.On("AdminUpsertTier", ctx, seasonPassID, t)}
+}
+
+func (_c *Repository_AdminUpsertTier_Call) Run(run func(ctx context.Context, seasonPassID uuid.UUID, t *model.SeasonPassTier)) *Repository_AdminUpsertTier_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*model.SeasonPassTier))
+	})
+	return _c
+}
+
+func (_c *Repository_AdminUpsertTier_Call) Return(_a0 *model.SeasonPassTier, _a1 error) *Repository_AdminUpsertTier_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Repository_AdminUpsertTier_Call) RunAndReturn(run func(context.Context, uuid.UUID, *model.SeasonPassTier) (*model.SeasonPassTier, error)) *Repository_AdminUpsertTier_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetActive provides a mock function with given fields: ctx, at
 func (_m *Repository) GetActive(ctx context.Context, at time.Time) (*model.SeasonPass, error) {
 	ret := _m.Called(ctx, at)

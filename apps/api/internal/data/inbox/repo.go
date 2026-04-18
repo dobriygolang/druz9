@@ -82,6 +82,7 @@ func (r *Repo) GetThread(ctx context.Context, userID, threadID uuid.UUID) (*mode
 	t, err := scanThread(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
+			//nolint:nilnil // Missing thread is represented as nil for service-level not-found handling.
 			return nil, nil
 		}
 		return nil, fmt.Errorf("get thread: %w", err)

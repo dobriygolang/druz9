@@ -382,6 +382,8 @@ func rewardLabelsForNode(node *nodeDefinition, taskCount int32) []string {
 func buildConstraints(task *codeeditordomain.Task) []string {
 	constraints := []string{}
 	switch task.Difficulty {
+	case model.TaskDifficultyUnknown:
+		constraints = append(constraints, "Start by clarifying constraints before choosing an approach.")
 	case model.TaskDifficultyEasy:
 		constraints = append(constraints, "Aim for a clear linear or near-linear solution.")
 	case model.TaskDifficultyMedium:

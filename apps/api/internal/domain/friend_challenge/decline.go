@@ -22,6 +22,8 @@ func (s *Service) Decline(ctx context.Context, userID, challengeID uuid.UUID) (*
 		return nil, ErrOnlyOpponentCanDecline
 	}
 	switch ch.Status {
+	case model.ChallengeStatusUnspecified, model.ChallengeStatusPending, model.ChallengeStatusInProgress:
+		// Decline is allowed for pending and in-progress challenges.
 	case model.ChallengeStatusCompleted:
 		return nil, ErrAlreadyCompleted
 	case model.ChallengeStatusExpired:

@@ -126,6 +126,7 @@ func (r *Repo) ResolveMockBlueprint(ctx context.Context, companyTag string, prog
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
+			//nolint:nilnil // Missing blueprint is represented as nil for fallback resolution.
 			return nil, nil
 		}
 		return nil, fmt.Errorf("resolve mock blueprint: %w", err)
@@ -493,6 +494,7 @@ func (r *Repo) GetMockSession(ctx context.Context, sessionID uuid.UUID) (*model.
 	session, err := scanMockSession(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
+			//nolint:nilnil // Missing mock session is represented as nil for not-found handling upstream.
 			return nil, nil
 		}
 		return nil, fmt.Errorf("get mock session: %w", err)

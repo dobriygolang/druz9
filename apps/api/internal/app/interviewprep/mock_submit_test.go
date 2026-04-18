@@ -191,6 +191,7 @@ func (r *mockSubmitTestRepo) GetTask(_ context.Context, taskID uuid.UUID) (*mode
 	if r.task != nil && r.task.ID == taskID {
 		return r.task, nil
 	}
+	//nolint:nilnil // Test fake mirrors repository not-found behavior.
 	return nil, nil
 }
 
@@ -270,6 +271,7 @@ func (r *mockSubmitTestRepo) GetMockSession(_ context.Context, sessionID uuid.UU
 	if r.session != nil && r.session.ID == sessionID {
 		return r.session, nil
 	}
+	//nolint:nilnil // Test fake mirrors repository not-found behavior.
 	return nil, nil
 }
 

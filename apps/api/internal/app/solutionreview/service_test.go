@@ -74,6 +74,7 @@ func (m *mockRepo) GetBySubmission(_ context.Context, submissionID uuid.UUID) (*
 			return r, nil
 		}
 	}
+	//nolint:nilnil // Test fake mirrors repository not-found behavior.
 	return nil, nil
 }
 

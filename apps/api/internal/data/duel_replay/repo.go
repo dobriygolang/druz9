@@ -35,6 +35,7 @@ func (r *Repo) GetSummary(ctx context.Context, replayID uuid.UUID) (*model.DuelR
 	s, err := scanSummary(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
+			//nolint:nilnil // Missing replay is represented as nil for service-level not-found handling.
 			return nil, nil
 		}
 		return nil, fmt.Errorf("get summary: %w", err)

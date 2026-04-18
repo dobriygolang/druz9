@@ -283,6 +283,7 @@ func deliveryModeForTask(task *model.InterviewPrepTask) string {
 		return "text_answer"
 	}
 	switch task.PrepType {
+	case model.InterviewPrepTypeUnknown, model.InterviewPrepTypeCoding, model.InterviewPrepTypeAlgorithm, model.InterviewPrepTypeSQL:
 	case model.InterviewPrepTypeSystemDesign:
 		return "system_design_form"
 	case model.InterviewPrepTypeBehavioral, model.InterviewPrepTypeCodeReview:

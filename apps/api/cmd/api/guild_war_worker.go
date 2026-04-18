@@ -90,6 +90,8 @@ func runGuildWarTick(ctx context.Context, warRepo *guilddata.Repo, now time.Time
 		runPhaseTransition(ctx, warRepo, "active", "champions_duel")
 	case time.Sunday:
 		runSundayResolution(ctx, warRepo)
+	case time.Tuesday, time.Thursday, time.Friday:
+		return
 	}
 }
 

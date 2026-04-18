@@ -11,7 +11,6 @@ import (
 
 func (r *Repo) AddParticipant(ctx context.Context, roomID uuid.UUID, participant *codeeditordomain.Participant) (*codeeditordomain.Room, error) {
 	if participant.UserID != nil {
-		// Single UPSERT: insert or update name/is_guest on conflict with existing user_id
 		_, err := r.data.DB.Exec(
 			ctx,
 			`INSERT INTO code_participants (room_id, user_id, name, is_guest, is_ready, is_winner, joined_at)

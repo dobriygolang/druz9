@@ -136,6 +136,7 @@ func (s *liveService) GetSkillTree(ctx context.Context, userID uuid.UUID) (*v1.G
 func (s *liveService) GetTask(ctx context.Context, userID uuid.UUID, moduleID string) (*TaskView, error) {
 	task, node := s.resolveTaskForModule(ctx, userID, moduleID)
 	if task == nil || node == nil {
+		//nolint:nilnil // No task for the module is represented as an empty view.
 		return nil, nil
 	}
 	return buildTaskView(node, task), nil
@@ -144,6 +145,7 @@ func (s *liveService) GetTask(ctx context.Context, userID uuid.UUID, moduleID st
 func (s *liveService) EvaluateTaskSolution(ctx context.Context, userID uuid.UUID, moduleID string, language v1.TrainingProgrammingLanguage, code string, mode v1.TrainingEvaluationMode) (*EvaluationResult, error) {
 	task, node := s.resolveTaskForModule(ctx, userID, moduleID)
 	if task == nil || node == nil {
+		//nolint:nilnil // No task for the module is represented as an empty evaluation.
 		return nil, nil
 	}
 

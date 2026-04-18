@@ -7,6 +7,8 @@ import (
 )
 
 func TestContains(t *testing.T) {
+	t.Parallel()
+
 	s := []string{"a", "b", "c", "d", "e"}
 
 	assert.True(t, Contains(s, "c"))
@@ -15,6 +17,8 @@ func TestContains(t *testing.T) {
 }
 
 func TestContainsSet(t *testing.T) {
+	t.Parallel()
+
 	set := map[string]struct{}{
 		"a": {},
 		"b": {},
@@ -27,6 +31,8 @@ func TestContainsSet(t *testing.T) {
 }
 
 func TestNewSet(t *testing.T) {
+	t.Parallel()
+
 	s := []string{"a", "b", "c", "a", "b"}
 
 	set := NewSet(s)
@@ -39,6 +45,8 @@ func TestNewSet(t *testing.T) {
 }
 
 func TestUnique(t *testing.T) {
+	t.Parallel()
+
 	s := []string{"a", "b", "c", "a", "b", "d"}
 
 	result := Unique(s)
@@ -48,6 +56,8 @@ func TestUnique(t *testing.T) {
 }
 
 func TestMap(t *testing.T) {
+	t.Parallel()
+
 	s := []int{1, 2, 3}
 
 	result := Map(s, func(i int) int { return i * 2 })
@@ -56,6 +66,8 @@ func TestMap(t *testing.T) {
 }
 
 func TestFilter(t *testing.T) {
+	t.Parallel()
+
 	s := []int{1, 2, 3, 4, 5}
 
 	result := Filter(s, func(i int) bool { return i%2 == 0 })
@@ -64,6 +76,8 @@ func TestFilter(t *testing.T) {
 }
 
 func TestFindFirst(t *testing.T) {
+	t.Parallel()
+
 	s := []int{1, 2, 3, 4, 5}
 
 	val, ok := FindFirst(s, func(i int) bool { return i > 3 })
@@ -76,6 +90,8 @@ func TestFindFirst(t *testing.T) {
 }
 
 func TestGroupBy(t *testing.T) {
+	t.Parallel()
+
 	s := []struct {
 		Name string
 		Age  int
@@ -99,6 +115,8 @@ func TestGroupBy(t *testing.T) {
 }
 
 func TestKeys(t *testing.T) {
+	t.Parallel()
+
 	m := map[string]int{
 		"a": 1,
 		"b": 2,
@@ -110,6 +128,8 @@ func TestKeys(t *testing.T) {
 }
 
 func TestValues(t *testing.T) {
+	t.Parallel()
+
 	m := map[string]int{
 		"a": 1,
 		"b": 2,
@@ -121,6 +141,8 @@ func TestValues(t *testing.T) {
 }
 
 func TestReduce(t *testing.T) {
+	t.Parallel()
+
 	s := []int{1, 2, 3, 4, 5}
 
 	sum := Reduce(s, 0, func(acc, v int) int { return acc + v })

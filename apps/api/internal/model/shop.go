@@ -20,6 +20,8 @@ const (
 
 func (c ItemCategory) String() string {
 	switch c {
+	case ItemCategoryUnspecified:
+		return "misc"
 	case ItemCategoryDecor:
 		return "decor"
 	case ItemCategoryCosmetics:

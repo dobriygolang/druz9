@@ -112,6 +112,8 @@ func (r *Repo) ChangeBalance(
 // derived from user input.
 func columnFor(c walletdomain.Currency) string {
 	switch c {
+	case walletdomain.CurrencyUnspecified:
+		return "gold"
 	case walletdomain.CurrencyGold:
 		return "gold"
 	case walletdomain.CurrencyGems:

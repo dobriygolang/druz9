@@ -490,6 +490,67 @@ func (_c *Repository_RemoveFriendship_Call) RunAndReturn(run func(context.Contex
 	return _c
 }
 
+// SearchUsers provides a mock function with given fields: ctx, viewerID, query, limit
+func (_m *Repository) SearchUsers(ctx context.Context, viewerID uuid.UUID, query string, limit int32) ([]*model.UserHit, error) {
+	ret := _m.Called(ctx, viewerID, query, limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SearchUsers")
+	}
+
+	var r0 []*model.UserHit
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string, int32) ([]*model.UserHit, error)); ok {
+		return rf(ctx, viewerID, query, limit)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string, int32) []*model.UserHit); ok {
+		r0 = rf(ctx, viewerID, query, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*model.UserHit)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, string, int32) error); ok {
+		r1 = rf(ctx, viewerID, query, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Repository_SearchUsers_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SearchUsers'
+type Repository_SearchUsers_Call struct {
+	*mock.Call
+}
+
+// SearchUsers is a helper method to define mock.On call
+//   - ctx context.Context
+//   - viewerID uuid.UUID
+//   - query string
+//   - limit int32
+func (_e *Repository_Expecter) SearchUsers(ctx interface{}, viewerID interface{}, query interface{}, limit interface{}) *Repository_SearchUsers_Call {
+	return &Repository_SearchUsers_Call{Call: _e.mock.On("SearchUsers", ctx, viewerID, query, limit)}
+}
+
+func (_c *Repository_SearchUsers_Call) Run(run func(ctx context.Context, viewerID uuid.UUID, query string, limit int32)) *Repository_SearchUsers_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(string), args[3].(int32))
+	})
+	return _c
+}
+
+func (_c *Repository_SearchUsers_Call) Return(_a0 []*model.UserHit, _a1 error) *Repository_SearchUsers_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Repository_SearchUsers_Call) RunAndReturn(run func(context.Context, uuid.UUID, string, int32) ([]*model.UserHit, error)) *Repository_SearchUsers_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateRequestStatus provides a mock function with given fields: ctx, id, status, now
 func (_m *Repository) UpdateRequestStatus(ctx context.Context, id uuid.UUID, status model.FriendRequestStatus, now time.Time) error {
 	ret := _m.Called(ctx, id, status, now)
