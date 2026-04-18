@@ -33,6 +33,15 @@ export function GuildWarPage() {
   const navigate = useNavigate()
   const [war, setWar] = useState<GuildWar | null>(null)
   const [loaded, setLoaded] = useState(false)
+  const [busyFrontId, setBusyFrontId] = useState<string | null>(null)
+  const [toast, setToast] = useState<string | null>(null)
+
+  const reload = async () => {
+    try {
+      const w = await guildApi.getGuildWar()
+      setWar(w)
+    } catch { /* ignore */ }
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -43,6 +52,20 @@ export function GuildWarPage() {
       .finally(() => { if (!cancelled) setLoaded(true) })
     return () => { cancelled = true }
   }, [])
+
+  const contribute = async (frontId: string) => {
+    setBusyFrontId(frontId)
+    try {
+      const r = await guildApi.contributeToFront(frontId, 1)
+      if (r.captured) setToast(`Captured ${r.front.name}!`)
+      await reload()
+    } catch (e: unknown) {
+      setToast(e instanceof Error ? e.message : 'Contribution failed')
+    } finally {
+      setBusyFrontId(null)
+      setTimeout(() => setToast(null), 4000)
+    }
+  }
 
   if (loaded && !war) {
     return (
@@ -88,6 +111,14 @@ export function GuildWarPage() {
           </div>
         }
       />
+
+      {toast && (
+        <div style={{
+          position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)',
+          padding: '8px 16px', background: 'var(--ink-0)', color: 'var(--parch-0)',
+          zIndex: 2000, fontSize: 12,
+        }}>{toast}</div>
+      )}
 
       {/* Score banner */}
       <Panel variant="dark" style={{ padding: 0, overflow: 'hidden', marginBottom: 14 }}>
@@ -220,7 +251,18 @@ export function GuildWarPage() {
                       losing
                     </span>
                   )}
-                  <RpgButton size="sm">Join</RpgButton>
+                  {f.id ? (
+                    <RpgButton
+                      size="sm"
+                      variant="primary"
+                      disabled={busyFrontId === f.id || f.status === 'won' || f.status === 'lost'}
+                      onClick={() => contribute(f.id!)}
+                    >
+                      {busyFrontId === f.id ? '…' : '+1 round'}
+                    </RpgButton>
+                  ) : (
+                    <RpgButton size="sm" disabled>demo</RpgButton>
+                  )}
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

@@ -89,6 +89,44 @@ service GuildService {
   rpc GetGuildWar(GetGuildWarRequest) returns (GetGuildWarResponse) {
     option (google.api.http) = { get: "/api/v1/guilds/war" };
   }
+
+  // ContributeToFront adds rounds to a front's our_rounds counter. The
+  // caller must be a member of the war's owning guild; the backend
+  // records the contribution for later MVP queries. When a front's
+  // our_rounds reaches the win threshold (10) it is captured.
+  rpc ContributeToFront(ContributeToFrontRequest) returns (ContributeToFrontResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/guilds/war/fronts/{front_id}/contribute"
+      body: "*"
+    };
+  }
+
+  rpc ListTerritories(ListTerritoriesRequest) returns (ListTerritoriesResponse) {
+    option (google.api.http) = { get: "/api/v1/guilds/{guild_id}/territories" };
+  }
+}
+
+message ContributeToFrontRequest {
+  string front_id = 1;
+  int32  rounds   = 2;  // clamped to [1, 5]
+}
+message ContributeToFrontResponse {
+  GuildWarFront front    = 1;
+  bool          captured = 2;  // flipped true the call that tips the front
+}
+
+message ListTerritoriesRequest {
+  string guild_id = 1;
+}
+message GuildTerritory {
+  string id          = 1;
+  string guild_id    = 2;
+  string name        = 3;
+  string buff        = 4;
+  google.protobuf.Timestamp captured_at = 5;
+}
+message ListTerritoriesResponse {
+  repeated GuildTerritory territories = 1;
 }
 
 enum GuildMemberRole {
@@ -339,6 +377,10 @@ message GuildWarFront {
   string status        = 5;
   bool   is_hot        = 6;
   bool   is_danger     = 7;
+  // Persistent-war additions. `id` is empty for the legacy demo-mode
+  // response (no backing row); clients that see an empty id disable the
+  // contribute button.
+  string id            = 8;
 }
 
 message GuildWarMvp {

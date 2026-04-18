@@ -19,6 +19,7 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationGuildServiceContributeToFront = "/guild.v1.GuildService/ContributeToFront"
 const OperationGuildServiceCreateGuild = "/guild.v1.GuildService/CreateGuild"
 const OperationGuildServiceCreateGuildChallenge = "/guild.v1.GuildService/CreateGuildChallenge"
 const OperationGuildServiceCreateGuildEvent = "/guild.v1.GuildService/CreateGuildEvent"
@@ -33,8 +34,14 @@ const OperationGuildServiceLeaveGuild = "/guild.v1.GuildService/LeaveGuild"
 const OperationGuildServiceListGuildEvents = "/guild.v1.GuildService/ListGuildEvents"
 const OperationGuildServiceListGuildMembers = "/guild.v1.GuildService/ListGuildMembers"
 const OperationGuildServiceListGuilds = "/guild.v1.GuildService/ListGuilds"
+const OperationGuildServiceListTerritories = "/guild.v1.GuildService/ListTerritories"
 
 type GuildServiceHTTPServer interface {
+	// ContributeToFront ContributeToFront adds rounds to a front's our_rounds counter. The
+	// caller must be a member of the war's owning guild; the backend
+	// records the contribution for later MVP queries. When a front's
+	// our_rounds reaches the win threshold (10) it is captured.
+	ContributeToFront(context.Context, *ContributeToFrontRequest) (*ContributeToFrontResponse, error)
 	CreateGuild(context.Context, *CreateGuildRequest) (*GuildResponse, error)
 	CreateGuildChallenge(context.Context, *CreateGuildChallengeRequest) (*CreateGuildChallengeResponse, error)
 	CreateGuildEvent(context.Context, *CreateGuildEventRequest) (*CreateGuildEventResponse, error)
@@ -53,6 +60,7 @@ type GuildServiceHTTPServer interface {
 	ListGuildEvents(context.Context, *ListGuildEventsRequest) (*ListGuildEventsResponse, error)
 	ListGuildMembers(context.Context, *ListGuildMembersRequest) (*ListGuildMembersResponse, error)
 	ListGuilds(context.Context, *ListGuildsRequest) (*ListGuildsResponse, error)
+	ListTerritories(context.Context, *ListTerritoriesRequest) (*ListTerritoriesResponse, error)
 }
 
 func RegisterGuildServiceHTTPServer(s *http.Server, srv GuildServiceHTTPServer) {
@@ -71,6 +79,8 @@ func RegisterGuildServiceHTTPServer(s *http.Server, srv GuildServiceHTTPServer) 
 	r.GET("/api/v1/guilds/{guild_id}/challenge", _GuildService_GetActiveGuildChallenge0_HTTP_Handler(srv))
 	r.POST("/api/v1/guilds/{guild_id}/challenge", _GuildService_CreateGuildChallenge0_HTTP_Handler(srv))
 	r.GET("/api/v1/guilds/war", _GuildService_GetGuildWar0_HTTP_Handler(srv))
+	r.POST("/api/v1/guilds/war/fronts/{front_id}/contribute", _GuildService_ContributeToFront0_HTTP_Handler(srv))
+	r.GET("/api/v1/guilds/{guild_id}/territories", _GuildService_ListTerritories0_HTTP_Handler(srv))
 }
 
 func _GuildService_ListGuilds0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
@@ -390,7 +400,59 @@ func _GuildService_GetGuildWar0_HTTP_Handler(srv GuildServiceHTTPServer) func(ct
 	}
 }
 
+func _GuildService_ContributeToFront0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ContributeToFrontRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGuildServiceContributeToFront)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ContributeToFront(ctx, req.(*ContributeToFrontRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ContributeToFrontResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _GuildService_ListTerritories0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListTerritoriesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGuildServiceListTerritories)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListTerritories(ctx, req.(*ListTerritoriesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListTerritoriesResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type GuildServiceHTTPClient interface {
+	// ContributeToFront ContributeToFront adds rounds to a front's our_rounds counter. The
+	// caller must be a member of the war's owning guild; the backend
+	// records the contribution for later MVP queries. When a front's
+	// our_rounds reaches the win threshold (10) it is captured.
+	ContributeToFront(ctx context.Context, req *ContributeToFrontRequest, opts ...http.CallOption) (rsp *ContributeToFrontResponse, err error)
 	CreateGuild(ctx context.Context, req *CreateGuildRequest, opts ...http.CallOption) (rsp *GuildResponse, err error)
 	CreateGuildChallenge(ctx context.Context, req *CreateGuildChallengeRequest, opts ...http.CallOption) (rsp *CreateGuildChallengeResponse, err error)
 	CreateGuildEvent(ctx context.Context, req *CreateGuildEventRequest, opts ...http.CallOption) (rsp *CreateGuildEventResponse, err error)
@@ -409,6 +471,7 @@ type GuildServiceHTTPClient interface {
 	ListGuildEvents(ctx context.Context, req *ListGuildEventsRequest, opts ...http.CallOption) (rsp *ListGuildEventsResponse, err error)
 	ListGuildMembers(ctx context.Context, req *ListGuildMembersRequest, opts ...http.CallOption) (rsp *ListGuildMembersResponse, err error)
 	ListGuilds(ctx context.Context, req *ListGuildsRequest, opts ...http.CallOption) (rsp *ListGuildsResponse, err error)
+	ListTerritories(ctx context.Context, req *ListTerritoriesRequest, opts ...http.CallOption) (rsp *ListTerritoriesResponse, err error)
 }
 
 type GuildServiceHTTPClientImpl struct {
@@ -417,6 +480,23 @@ type GuildServiceHTTPClientImpl struct {
 
 func NewGuildServiceHTTPClient(client *http.Client) GuildServiceHTTPClient {
 	return &GuildServiceHTTPClientImpl{client}
+}
+
+// ContributeToFront ContributeToFront adds rounds to a front's our_rounds counter. The
+// caller must be a member of the war's owning guild; the backend
+// records the contribution for later MVP queries. When a front's
+// our_rounds reaches the win threshold (10) it is captured.
+func (c *GuildServiceHTTPClientImpl) ContributeToFront(ctx context.Context, in *ContributeToFrontRequest, opts ...http.CallOption) (*ContributeToFrontResponse, error) {
+	var out ContributeToFrontResponse
+	pattern := "/api/v1/guilds/war/fronts/{front_id}/contribute"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationGuildServiceContributeToFront))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *GuildServiceHTTPClientImpl) CreateGuild(ctx context.Context, in *CreateGuildRequest, opts ...http.CallOption) (*GuildResponse, error) {
@@ -597,6 +677,19 @@ func (c *GuildServiceHTTPClientImpl) ListGuilds(ctx context.Context, in *ListGui
 	pattern := "/api/v1/guilds"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationGuildServiceListGuilds))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *GuildServiceHTTPClientImpl) ListTerritories(ctx context.Context, in *ListTerritoriesRequest, opts ...http.CallOption) (*ListTerritoriesResponse, error) {
+	var out ListTerritoriesResponse
+	pattern := "/api/v1/guilds/{guild_id}/territories"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationGuildServiceListTerritories))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

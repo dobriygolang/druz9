@@ -85,12 +85,30 @@ func (i *Implementation) GetGuildWar(ctx context.Context, _ *v1.GetGuildWarReque
 	if seed < 0 {
 		seed = -seed
 	}
-	front := []*v1.GuildWarFront{
-		{Name: "Graphs Bastion", OurRounds: 4, TheirRounds: 3, DurationLabel: "14m left", Status: "contested", IsHot: true},
-		{Name: "Systems Tower", OurRounds: 3, TheirRounds: 1, DurationLabel: "32m left", Status: "leading"},
-		{Name: "DP Canyon", OurRounds: 1, TheirRounds: 4, DurationLabel: "9m left", Status: "losing", IsDanger: true},
-		{Name: "String Bridge", OurRounds: 2, TheirRounds: 2, DurationLabel: "1h left", Status: "contested"},
-		{Name: "Algo Plaza", OurRounds: 2, TheirRounds: 0, DurationLabel: "next round", Status: "leading"},
+	var front []*v1.GuildWarFront
+	// Prefer persistent war state when the repo is wired (Wave B.5).
+	// Fronts carry a real id so the client can invoke ContributeToFront.
+	if i.warRepo != nil {
+		war, _, errWar := i.ensureActiveWar(ctx, user.ID)
+		if errWar == nil && war != nil {
+			fronts, errFronts := i.warRepo.ListFronts(ctx, war.ID)
+			if errFronts == nil && len(fronts) > 0 {
+				for _, f := range fronts {
+					front = append(front, mapFrontRow(f))
+				}
+			}
+		}
+	}
+	// Legacy demo fronts — rendered when the repo hasn't produced rows
+	// yet. Clients disable the contribute button when front.id is "".
+	if len(front) == 0 {
+		front = []*v1.GuildWarFront{
+			{Name: "Graphs Bastion", OurRounds: 4, TheirRounds: 3, DurationLabel: "14m left", Status: "contested", IsHot: true},
+			{Name: "Systems Tower", OurRounds: 3, TheirRounds: 1, DurationLabel: "32m left", Status: "leading"},
+			{Name: "DP Canyon", OurRounds: 1, TheirRounds: 4, DurationLabel: "9m left", Status: "losing", IsDanger: true},
+			{Name: "String Bridge", OurRounds: 2, TheirRounds: 2, DurationLabel: "1h left", Status: "contested"},
+			{Name: "Algo Plaza", OurRounds: 2, TheirRounds: 0, DurationLabel: "next round", Status: "leading"},
+		}
 	}
 
 	ourScore := int32(0)

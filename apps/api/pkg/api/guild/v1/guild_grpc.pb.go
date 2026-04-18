@@ -33,6 +33,8 @@ const (
 	GuildService_GetActiveGuildChallenge_FullMethodName = "/guild.v1.GuildService/GetActiveGuildChallenge"
 	GuildService_CreateGuildChallenge_FullMethodName    = "/guild.v1.GuildService/CreateGuildChallenge"
 	GuildService_GetGuildWar_FullMethodName             = "/guild.v1.GuildService/GetGuildWar"
+	GuildService_ContributeToFront_FullMethodName       = "/guild.v1.GuildService/ContributeToFront"
+	GuildService_ListTerritories_FullMethodName         = "/guild.v1.GuildService/ListTerritories"
 )
 
 // GuildServiceClient is the client API for GuildService service.
@@ -57,6 +59,12 @@ type GuildServiceClient interface {
 	// nil war field so the client can render a "no active war" state rather
 	// than 404.
 	GetGuildWar(ctx context.Context, in *GetGuildWarRequest, opts ...grpc.CallOption) (*GetGuildWarResponse, error)
+	// ContributeToFront adds rounds to a front's our_rounds counter. The
+	// caller must be a member of the war's owning guild; the backend
+	// records the contribution for later MVP queries. When a front's
+	// our_rounds reaches the win threshold (10) it is captured.
+	ContributeToFront(ctx context.Context, in *ContributeToFrontRequest, opts ...grpc.CallOption) (*ContributeToFrontResponse, error)
+	ListTerritories(ctx context.Context, in *ListTerritoriesRequest, opts ...grpc.CallOption) (*ListTerritoriesResponse, error)
 }
 
 type guildServiceClient struct {
@@ -207,6 +215,26 @@ func (c *guildServiceClient) GetGuildWar(ctx context.Context, in *GetGuildWarReq
 	return out, nil
 }
 
+func (c *guildServiceClient) ContributeToFront(ctx context.Context, in *ContributeToFrontRequest, opts ...grpc.CallOption) (*ContributeToFrontResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContributeToFrontResponse)
+	err := c.cc.Invoke(ctx, GuildService_ContributeToFront_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *guildServiceClient) ListTerritories(ctx context.Context, in *ListTerritoriesRequest, opts ...grpc.CallOption) (*ListTerritoriesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListTerritoriesResponse)
+	err := c.cc.Invoke(ctx, GuildService_ListTerritories_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GuildServiceServer is the server API for GuildService service.
 // All implementations must embed UnimplementedGuildServiceServer
 // for forward compatibility.
@@ -229,6 +257,12 @@ type GuildServiceServer interface {
 	// nil war field so the client can render a "no active war" state rather
 	// than 404.
 	GetGuildWar(context.Context, *GetGuildWarRequest) (*GetGuildWarResponse, error)
+	// ContributeToFront adds rounds to a front's our_rounds counter. The
+	// caller must be a member of the war's owning guild; the backend
+	// records the contribution for later MVP queries. When a front's
+	// our_rounds reaches the win threshold (10) it is captured.
+	ContributeToFront(context.Context, *ContributeToFrontRequest) (*ContributeToFrontResponse, error)
+	ListTerritories(context.Context, *ListTerritoriesRequest) (*ListTerritoriesResponse, error)
 	mustEmbedUnimplementedGuildServiceServer()
 }
 
@@ -280,6 +314,12 @@ func (UnimplementedGuildServiceServer) CreateGuildChallenge(context.Context, *Cr
 }
 func (UnimplementedGuildServiceServer) GetGuildWar(context.Context, *GetGuildWarRequest) (*GetGuildWarResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetGuildWar not implemented")
+}
+func (UnimplementedGuildServiceServer) ContributeToFront(context.Context, *ContributeToFrontRequest) (*ContributeToFrontResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ContributeToFront not implemented")
+}
+func (UnimplementedGuildServiceServer) ListTerritories(context.Context, *ListTerritoriesRequest) (*ListTerritoriesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListTerritories not implemented")
 }
 func (UnimplementedGuildServiceServer) mustEmbedUnimplementedGuildServiceServer() {}
 func (UnimplementedGuildServiceServer) testEmbeddedByValue()                      {}
@@ -554,6 +594,42 @@ func _GuildService_GetGuildWar_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GuildService_ContributeToFront_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ContributeToFrontRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GuildServiceServer).ContributeToFront(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GuildService_ContributeToFront_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GuildServiceServer).ContributeToFront(ctx, req.(*ContributeToFrontRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GuildService_ListTerritories_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTerritoriesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GuildServiceServer).ListTerritories(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GuildService_ListTerritories_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GuildServiceServer).ListTerritories(ctx, req.(*ListTerritoriesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // GuildService_ServiceDesc is the grpc.ServiceDesc for GuildService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -616,6 +692,14 @@ var GuildService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetGuildWar",
 			Handler:    _GuildService_GetGuildWar_Handler,
+		},
+		{
+			MethodName: "ContributeToFront",
+			Handler:    _GuildService_ContributeToFront_Handler,
+		},
+		{
+			MethodName: "ListTerritories",
+			Handler:    _GuildService_ListTerritories_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

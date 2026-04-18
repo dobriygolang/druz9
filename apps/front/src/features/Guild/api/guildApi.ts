@@ -146,11 +146,62 @@ export const guildApi = {
     const r = await apiClient.get<{ war?: BackendGuildWar | null }>('/api/v1/guilds/war')
     return r.data.war ? normalizeGuildWar(r.data.war) : null
   },
+
+  contributeToFront: async (frontId: string, rounds = 1): Promise<{ front: GuildWarFront; captured: boolean }> => {
+    const r = await apiClient.post<{ front?: BackendGuildWar['front'] extends (infer T)[] | undefined ? T : never; captured?: boolean }>(
+      `/api/v1/guilds/war/fronts/${frontId}/contribute`,
+      { frontId, rounds },
+    )
+    const f = (r.data as any).front ?? {}
+    return {
+      front: {
+        id: f.id ?? '',
+        name: f.name ?? '',
+        ourRounds: f.ourRounds ?? 0,
+        theirRounds: f.theirRounds ?? 0,
+        durationLabel: f.durationLabel ?? '',
+        status: f.status ?? 'contested',
+        isHot: f.isHot ?? false,
+        isDanger: f.isDanger ?? false,
+      },
+      captured: r.data.captured ?? false,
+    }
+  },
+
+  listTerritories: async (guildId: string): Promise<GuildTerritory[]> => {
+    const r = await apiClient.get<{ territories?: BackendTerritory[] }>(
+      `/api/v1/guilds/${guildId}/territories`,
+    )
+    return (r.data.territories ?? []).map((t) => ({
+      id: t.id ?? '',
+      guildId: t.guildId ?? guildId,
+      name: t.name ?? '',
+      buff: t.buff ?? '',
+      capturedAt: t.capturedAt ?? '',
+    }))
+  },
+}
+
+export interface GuildTerritory {
+  id: string
+  guildId: string
+  name: string
+  buff: string
+  capturedAt: string
+}
+
+type BackendTerritory = {
+  id?: string
+  guildId?: string
+  name?: string
+  buff?: string
+  capturedAt?: string
 }
 
 // ── Guild war ──────────────────────────────────────────────────────────
 
 export interface GuildWarFront {
+  id?: string  // empty string = legacy demo front (contribute disabled)
   name: string
   ourRounds: number
   theirRounds: number
@@ -201,6 +252,7 @@ type BackendGuildWar = {
   ourRoster?: number
   endsAt?: string
   front?: Array<{
+    id?: string
     name?: string; ourRounds?: number; theirRounds?: number
     durationLabel?: string; status?: string; isHot?: boolean; isDanger?: boolean
   }>
@@ -223,6 +275,7 @@ function normalizeGuildWar(w: BackendGuildWar): GuildWar {
     ourRoster: w.ourRoster ?? 0,
     endsAt: w.endsAt ?? '',
     front: (w.front ?? []).map((f) => ({
+      id: f.id ?? '',
       name: f.name ?? '',
       ourRounds: f.ourRounds ?? 0,
       theirRounds: f.theirRounds ?? 0,

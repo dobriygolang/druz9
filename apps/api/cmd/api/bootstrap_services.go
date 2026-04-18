@@ -276,7 +276,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		profileService:          profileservice.New(profileServiceDomain, cookies, profileservice.NewCachedProgressRepository(storage.profileRepo), storage.walletRepo, notifSender),
 		geoService:              geoservice.New(geoServiceDomain),
 		hubService:              hubservice.New(storage.profileRepo, missionServiceDomain, eventServiceDomain, arenaServiceDomain, guildServiceDomain, seasonPassDomain),
-		guildService:            guildservice.New(guildServiceDomain, eventServiceDomain, notifSender),
+		guildService:            guildservice.New(guildServiceDomain, eventServiceDomain, notifSender).WithWarRepo(storage.guildRepo),
 		eventService:            eventservice.New(eventServiceDomain),
 		podcastService:          podcastservice.New(podcastServiceDomain),
 		referralService:         referralservice.New(referralServiceDomain),

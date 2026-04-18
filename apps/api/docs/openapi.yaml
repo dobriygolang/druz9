@@ -1876,6 +1876,35 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/guild.v1.GetGuildWarResponse'
+    /api/v1/guilds/war/fronts/{frontId}/contribute:
+        post:
+            tags:
+                - GuildService
+            description: |-
+                ContributeToFront adds rounds to a front's our_rounds counter. The
+                 caller must be a member of the war's owning guild; the backend
+                 records the contribution for later MVP queries. When a front's
+                 our_rounds reaches the win threshold (10) it is captured.
+            operationId: GuildService_ContributeToFront
+            parameters:
+                - name: frontId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/guild.v1.ContributeToFrontRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.ContributeToFrontResponse'
     /api/v1/guilds/{guildId}:
         delete:
             tags:
@@ -2107,6 +2136,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/guild.v1.GetGuildPulseResponse'
+    /api/v1/guilds/{guildId}/territories:
+        get:
+            tags:
+                - GuildService
+            operationId: GuildService_ListTerritories
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.ListTerritoriesResponse'
     /api/v1/hub/overview:
         get:
             tags:
@@ -5324,6 +5371,21 @@ components:
                 current:
                     type: integer
                     format: int32
+        guild.v1.ContributeToFrontRequest:
+            type: object
+            properties:
+                frontId:
+                    type: string
+                rounds:
+                    type: integer
+                    format: int32
+        guild.v1.ContributeToFrontResponse:
+            type: object
+            properties:
+                front:
+                    $ref: '#/components/schemas/guild.v1.GuildWarFront'
+                captured:
+                    type: boolean
         guild.v1.CreateGuildChallengeRequest:
             type: object
             properties:
@@ -5552,6 +5614,20 @@ components:
             properties:
                 guild:
                     $ref: '#/components/schemas/guild.v1.Guild'
+        guild.v1.GuildTerritory:
+            type: object
+            properties:
+                id:
+                    type: string
+                guildId:
+                    type: string
+                name:
+                    type: string
+                buff:
+                    type: string
+                capturedAt:
+                    type: string
+                    format: date-time
         guild.v1.GuildWarFeed:
             type: object
             properties:
@@ -5582,6 +5658,12 @@ components:
                     type: boolean
                 isDanger:
                     type: boolean
+                id:
+                    type: string
+                    description: |-
+                        Persistent-war additions. `id` is empty for the legacy demo-mode
+                         response (no backing row); clients that see an empty id disable the
+                         contribute button.
         guild.v1.GuildWarMvp:
             type: object
             properties:
@@ -5699,6 +5781,13 @@ components:
                 totalCount:
                     type: integer
                     format: int32
+        guild.v1.ListTerritoriesResponse:
+            type: object
+            properties:
+                territories:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/guild.v1.GuildTerritory'
         hub.v1.GetOverviewResponse:
             type: object
             properties:
