@@ -12,14 +12,24 @@ proto-stubs:
 
 .PHONY: api
 # generate api proto
+# Protos live in grouped subdirs (core/, game/, learning/, social/) under api/.
+# We use paths=import + module=api so protoc strips the Go module prefix from
+# each go_package option and writes generated files flat into pkg/api/{domain}/v1/
+# regardless of where the proto source resides. All existing Go imports are stable.
 api:
 	mkdir -p ./pkg/api
 	mkdir -p ./docs
 	protoc --proto_path=./api \
 	       --proto_path=./third_party \
- 	       --go_out=paths=source_relative:./pkg/api \
- 	       --go-http_out=paths=source_relative:./pkg/api \
- 	       --go-grpc_out=paths=source_relative:./pkg/api \
+	       --go_out=. \
+	       --go_opt=paths=import \
+	       --go_opt=module=api \
+	       --go-http_out=. \
+	       --go-http_opt=paths=import \
+	       --go-http_opt=module=api \
+	       --go-grpc_out=. \
+	       --go-grpc_opt=paths=import \
+	       --go-grpc_opt=module=api \
 	       --openapi_out=fq_schema_naming=true,default_response=false:./docs \
 	       $(API_PROTO_FILES)
 

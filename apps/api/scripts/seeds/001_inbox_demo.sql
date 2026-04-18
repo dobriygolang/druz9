@@ -23,12 +23,12 @@ mentor_threads AS (
 ),
 mentor_msgs AS (
     INSERT INTO inbox_messages (thread_id, sender_kind, sender_id, sender_name, body, read, created_at)
-    SELECT mt.id, 3::SMALLINT, NULL, 'Varek',
+    SELECT mt.id, 3::SMALLINT, NULL::UUID, 'Varek',
            'Hey! I reviewed your last DFS submission. Solid approach overall.',
            FALSE, NOW() - INTERVAL '2 hours 15 minutes'
     FROM mentor_threads mt
     UNION ALL
-    SELECT mt.id, 3::SMALLINT, NULL, 'Varek',
+    SELECT mt.id, 3::SMALLINT, NULL::UUID, 'Varek',
            'Your DFS solution is solid but watch the space complexity on deeply nested trees — you''re O(h) but h could be O(n) worst case.',
            FALSE, NOW() - INTERVAL '2 hours'
     FROM mentor_threads mt
@@ -46,7 +46,7 @@ guild_threads AS (
 ),
 guild_msgs AS (
     INSERT INTO inbox_messages (thread_id, sender_kind, sender_id, sender_name, body, read, created_at)
-    SELECT gt.id, 4::SMALLINT, NULL, 'Guild Bot',
+    SELECT gt.id, 4::SMALLINT, NULL::UUID, 'Guild Bot',
            '⚔ Raid on Red Ravens begins in 2h. Please confirm participation in the guild hall.',
            FALSE, NOW() - INTERVAL '5 hours'
     FROM guild_threads gt
@@ -64,12 +64,12 @@ system_threads AS (
 ),
 system_msgs AS (
     INSERT INTO inbox_messages (thread_id, sender_kind, sender_id, sender_name, body, read, created_at)
-    SELECT st.id, 2::SMALLINT, NULL, 'Druz9',
+    SELECT st.id, 2::SMALLINT, NULL::UUID, 'Druz9',
            '🔥 Season III — The Ember Pact — is live. Complete the chapter to unlock the Ember Sovereign frame.',
            TRUE, NOW() - INTERVAL '2 days'
     FROM system_threads st
     UNION ALL
-    SELECT st.id, 2::SMALLINT, NULL, 'Druz9',
+    SELECT st.id, 2::SMALLINT, NULL::UUID, 'Druz9',
            'Weekly wrap: 3 duels won, 1 mock completed. Top 4% globally — keep the streak.',
            TRUE, NOW() - INTERVAL '2 days 10 minutes'
     FROM system_threads st

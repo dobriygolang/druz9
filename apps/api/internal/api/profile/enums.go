@@ -104,32 +104,6 @@ func mapCompetencyLevel(level string) v1.ProfileCompetencyLevel {
 	}
 }
 
-func mapAchievementCategory(category string) v1.AchievementCategory {
-	switch category {
-	case "practice":
-		return v1.AchievementCategory_ACHIEVEMENT_CATEGORY_PRACTICE
-	case "streak":
-		return v1.AchievementCategory_ACHIEVEMENT_CATEGORY_STREAK
-	default:
-		return v1.AchievementCategory_ACHIEVEMENT_CATEGORY_UNSPECIFIED
-	}
-}
-
-func mapAchievementTier(tier string) v1.AchievementTier {
-	switch tier {
-	case "bronze":
-		return v1.AchievementTier_ACHIEVEMENT_TIER_BRONZE
-	case "silver":
-		return v1.AchievementTier_ACHIEVEMENT_TIER_SILVER
-	case "gold":
-		return v1.AchievementTier_ACHIEVEMENT_TIER_GOLD
-	case "diamond":
-		return v1.AchievementTier_ACHIEVEMENT_TIER_DIAMOND
-	default:
-		return v1.AchievementTier_ACHIEVEMENT_TIER_UNSPECIFIED
-	}
-}
-
 func mapFeedItemType(itemType string) v1.FeedItemType {
 	switch itemType {
 	case "mock_stage":

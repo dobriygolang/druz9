@@ -19,12 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	NotificationService_Send_FullMethodName                 = "/notification.v1.NotificationService/Send"
-	NotificationService_SendBatch_FullMethodName            = "/notification.v1.NotificationService/SendBatch"
-	NotificationService_RegisterChat_FullMethodName         = "/notification.v1.NotificationService/RegisterChat"
-	NotificationService_LinkTelegram_FullMethodName         = "/notification.v1.NotificationService/LinkTelegram"
-	NotificationService_UpdateSettings_FullMethodName       = "/notification.v1.NotificationService/UpdateSettings"
-	NotificationService_GetSettings_FullMethodName          = "/notification.v1.NotificationService/GetSettings"
+	NotificationService_Send_FullMethodName                = "/notification.v1.NotificationService/Send"
+	NotificationService_SendBatch_FullMethodName           = "/notification.v1.NotificationService/SendBatch"
+	NotificationService_RegisterChat_FullMethodName        = "/notification.v1.NotificationService/RegisterChat"
+	NotificationService_LinkTelegram_FullMethodName        = "/notification.v1.NotificationService/LinkTelegram"
+	NotificationService_UpdateSettings_FullMethodName      = "/notification.v1.NotificationService/UpdateSettings"
+	NotificationService_GetSettings_FullMethodName         = "/notification.v1.NotificationService/GetSettings"
 	NotificationService_UpdateGuildSettings_FullMethodName = "/notification.v1.NotificationService/UpdateGuildSettings"
 )
 

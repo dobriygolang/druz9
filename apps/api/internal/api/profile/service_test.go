@@ -9,7 +9,6 @@ import (
 	"api/internal/api/profile/mocks"
 	notif "api/internal/clients/notification"
 	"api/internal/model"
-	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/profile/v1"
 
 	"github.com/google/uuid"
@@ -92,39 +91,6 @@ func TestCreateTelegramAuthChallenge(t *testing.T) {
 	}
 }
 
-func TestConfirmTelegramAuth(t *testing.T) {
-	t.Parallel()
-
-	mockService := mocks.NewService(t)
-	mockService.On("ConfirmTelegramAuth", mock.Anything, "bot-secret", "challenge-token", model.TelegramAuthPayload{
-		ID:        123,
-		FirstName: "John",
-		LastName:  "Doe",
-		Username:  "johndoe",
-		PhotoURL:  "https://example.com/avatar.jpg",
-	}).Return("123456", nil).Once()
-
-	impl := New(mockService, mocks.NewSessionCookieManager(t), nil, notif.Noop{})
-
-	resp, err := impl.ConfirmTelegramAuth(context.Background(), &v1.ConfirmTelegramAuthRequest{
-		Token:      "challenge-token",
-		BotToken:   "bot-secret",
-		TelegramId: 123,
-		FirstName:  "John",
-		LastName:   "Doe",
-		Username:   "johndoe",
-		PhotoUrl:   "https://example.com/avatar.jpg",
-	})
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if resp.Status != commonv1.OperationStatus_OPERATION_STATUS_OK {
-		t.Fatalf("expected ok status, got %q", resp.Status)
-	}
-	if resp.Code != "123456" {
-		t.Fatalf("expected code 123456, got %q", resp.Code)
-	}
-}
 
 func TestGetProfileByID(t *testing.T) {
 	t.Parallel()

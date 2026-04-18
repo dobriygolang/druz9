@@ -1,0 +1,311 @@
+syntax = "proto3";
+
+package arena.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "core/common/v1/common.proto";
+
+option go_package = "api/pkg/api/arena/v1;v1";
+
+service ArenaService {
+  rpc CreateMatch(CreateMatchRequest) returns (ArenaMatchResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/matches"
+      body: "*"
+    };
+  }
+
+  rpc GetMatch(GetMatchRequest) returns (ArenaMatchResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/arena/matches/{match_id}"
+    };
+  }
+
+  rpc JoinMatch(JoinMatchRequest) returns (ArenaMatchResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/matches/{match_id}/join"
+      body: "*"
+    };
+  }
+
+  rpc SubmitCode(SubmitCodeRequest) returns (SubmitCodeResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/matches/{match_id}/submit"
+      body: "*"
+    };
+  }
+
+  rpc GetLeaderboard(GetLeaderboardRequest) returns (GetLeaderboardResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/arena/leaderboard"
+    };
+  }
+
+  // GuildsLeaderboard ranks guilds by aggregate wins + member average
+  // rating. Powers the /leaderboards "guilds" tab.
+  rpc GuildsLeaderboard(GuildsLeaderboardRequest) returns (GuildsLeaderboardResponse) {
+    option (google.api.http) = { get: "/api/v1/arena/leaderboard/guilds" };
+  }
+
+  // SeasonXPLeaderboard ranks users by their current season-pass XP.
+  // Powers the /leaderboards "season" tab.
+  rpc SeasonXPLeaderboard(SeasonXPLeaderboardRequest) returns (SeasonXPLeaderboardResponse) {
+    option (google.api.http) = { get: "/api/v1/arena/leaderboard/season-xp" };
+  }
+
+  rpc LeaveMatch(LeaveMatchRequest) returns (ArenaMatchResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/matches/{match_id}/leave"
+      body: "*"
+    };
+  }
+
+  rpc GetPlayerStats(GetPlayerStatsRequest) returns (ArenaPlayerStatsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/arena/stats/{user_id}"
+    };
+  }
+
+  rpc ReportAntiCheatEvent(ReportAntiCheatEventRequest) returns (ArenaStatusResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/anti-cheat/event"
+      body: "*"
+    };
+  }
+}
+
+// ── Enums ──────────────────────────────────────────────────────────────────
+
+enum ArenaMatchStatus {
+  ARENA_MATCH_STATUS_UNSPECIFIED = 0;
+  ARENA_MATCH_STATUS_WAITING     = 1;
+  ARENA_MATCH_STATUS_ACTIVE      = 2;
+  ARENA_MATCH_STATUS_FINISHED    = 3;
+}
+
+enum ArenaLeague {
+  ARENA_LEAGUE_UNSPECIFIED = 0;
+  ARENA_LEAGUE_BRONZE      = 1;
+  ARENA_LEAGUE_SILVER      = 2;
+  ARENA_LEAGUE_GOLD        = 3;
+  ARENA_LEAGUE_PLATINUM    = 4;
+  ARENA_LEAGUE_DIAMOND     = 5;
+  ARENA_LEAGUE_MASTER      = 6;
+  ARENA_LEAGUE_LEGEND      = 7; // deprecated, kept for wire compat
+}
+
+enum ArenaPlayerSide {
+  ARENA_PLAYER_SIDE_UNSPECIFIED = 0;
+  ARENA_PLAYER_SIDE_LEFT        = 1;
+  ARENA_PLAYER_SIDE_RIGHT       = 2;
+}
+
+enum WinnerReason {
+  WINNER_REASON_UNSPECIFIED     = 0;
+  WINNER_REASON_ACCEPTED_TIME   = 1;
+  WINNER_REASON_RUNTIME         = 2;
+  WINNER_REASON_TIMEOUT         = 3;
+  WINNER_REASON_SINGLE_AC       = 4;
+  WINNER_REASON_NONE            = 5;
+  WINNER_REASON_ANTI_CHEAT      = 6;
+  WINNER_REASON_OPPONENT_LEFT   = 7;
+}
+
+// AntiCheatEventReason classifies the suspicious behaviour being reported.
+enum AntiCheatEventReason {
+  ANTI_CHEAT_EVENT_REASON_UNSPECIFIED    = 0;
+  ANTI_CHEAT_EVENT_REASON_TAB_SWITCH     = 1;
+  ANTI_CHEAT_EVENT_REASON_COPY_PASTE     = 2;
+  ANTI_CHEAT_EVENT_REASON_EXTERNAL_CODE  = 3;
+  ANTI_CHEAT_EVENT_REASON_OTHER          = 4;
+}
+
+// ── Request / Response messages ────────────────────────────────────────────
+
+message CreateMatchRequest {
+  string     topic              = 1;
+  common.v1.Difficulty difficulty         = 2;
+  bool       obfuscate_opponent = 3;
+}
+
+message GetMatchRequest {
+  string match_id = 1;
+}
+
+message JoinMatchRequest {
+  string match_id = 1;
+}
+
+message LeaveMatchRequest {
+  string match_id = 1;
+}
+
+message SubmitCodeRequest {
+  string match_id = 1;
+  string code     = 2;
+}
+
+message GetLeaderboardRequest {
+  int32 limit = 1;
+}
+
+// ---------- Guilds leaderboard ----------
+
+message GuildLeaderboardEntry {
+  string guild_id          = 1;
+  string name              = 2;
+  int32  member_count      = 3;
+  int32  total_wins        = 4;
+  int32  aggregate_points  = 5;
+  int32  avg_rating        = 6;
+  int32  delta_week        = 7;  // wins this week — signed
+}
+
+message GuildsLeaderboardRequest {
+  int32 limit = 1;
+}
+
+message GuildsLeaderboardResponse {
+  repeated GuildLeaderboardEntry entries = 1;
+}
+
+// ---------- Season XP leaderboard ----------
+
+message SeasonXPEntry {
+  string user_id      = 1;
+  string username     = 2;
+  string display_name = 3;
+  string avatar_url   = 4;
+  string guild_name   = 5;
+  int32  xp           = 6;
+  int32  current_tier = 7;
+  int32  trophies     = 8;
+}
+
+message SeasonXPLeaderboardRequest {
+  int32 limit = 1;
+}
+
+message SeasonXPLeaderboardResponse {
+  repeated SeasonXPEntry entries       = 1;
+  int32                  season_number = 2;
+}
+
+message GetPlayerStatsRequest {
+  string user_id = 1;
+}
+
+message ReportAntiCheatEventRequest {
+  string              match_id = 1;
+  AntiCheatEventReason reason  = 2;  // was: string
+}
+
+// ── Response messages ──────────────────────────────────────────────────────
+
+message ArenaMatchResponse {
+  ArenaMatch match = 1;
+}
+
+message SubmitCodeResponse {
+  string                    output           = 1;
+  string                    error            = 2;
+  bool                      is_correct       = 3;
+  int32                     passed_count     = 4;
+  int32                     total_count      = 5;
+  int64                     runtime_ms       = 6;
+  google.protobuf.Timestamp freeze_until     = 7;
+  ArenaMatch                match            = 8;
+  int32                     failed_test_index = 9;
+  common.v1.SubmitFailureKind          failure_kind     = 10;
+  string                    submission_id    = 11;
+}
+
+message GetLeaderboardResponse {
+  repeated ArenaLeaderboardEntry entries = 1;
+  ArenaSeasonInfo season                 = 2;
+}
+
+message ArenaSeasonInfo {
+  int32                     season_number = 1;
+  google.protobuf.Timestamp starts_at     = 2;
+  google.protobuf.Timestamp ends_at       = 3;
+}
+
+message ArenaPlayerStatsResponse {
+  ArenaPlayerStats stats = 1;
+}
+
+message ArenaStatusResponse {
+  common.v1.OperationStatus status = 1;
+}
+
+// ── Domain entities ────────────────────────────────────────────────────────
+
+message ArenaMatch {
+  string                    id                 = 1;
+  string                    task_id            = 2;
+  string                    task_title         = 3;
+  string                    task_statement     = 4;
+  string                    starter_code       = 5;
+  string                    topic              = 6;
+  common.v1.Difficulty      difficulty         = 7;
+  ArenaMatchStatus          status             = 8;
+  int32                     duration_seconds   = 9;
+  bool                      obfuscate_opponent = 10;
+  string                    winner_user_id     = 11;
+  WinnerReason              winner_reason      = 12;
+  google.protobuf.Timestamp started_at         = 13;
+  google.protobuf.Timestamp finished_at        = 14;
+  google.protobuf.Timestamp created_at         = 15;
+  repeated ArenaPlayer      players            = 16;
+  bool                      is_rated           = 17;
+  string                    unrated_reason     = 18;  // free-form; set by domain
+  bool                      anti_cheat_enabled = 19;
+}
+
+message ArenaPlayer {
+  string                    user_id             = 1;
+  string                    display_name        = 2;
+  ArenaPlayerSide           side                = 3;
+  bool                      is_creator          = 4;
+  google.protobuf.Timestamp freeze_until        = 5;
+  google.protobuf.Timestamp accepted_at         = 6;
+  int64                     best_runtime_ms     = 7;
+  bool                      is_winner           = 8;
+  google.protobuf.Timestamp joined_at           = 9;
+  string                    current_code        = 10;
+  int32                     suspicion_count     = 11;
+  bool                      anti_cheat_penalized = 12;
+}
+
+message ArenaPlayerStats {
+  string      user_id            = 1;
+  string      display_name       = 2;
+  int32       rating             = 3;
+  ArenaLeague league             = 4;
+  int32       wins               = 5;
+  int32       losses             = 6;
+  int32       matches            = 7;
+  double      win_rate           = 8;
+  int64       best_runtime       = 9;
+  int32       peak_rating        = 10;
+  int32       current_win_streak = 11;
+  int32       best_win_streak    = 12;
+  int32       league_rank        = 13;  // position within current league
+  int32       league_total       = 14;  // total players in current league
+  int32       next_league_at     = 15;  // rating needed for next league, -1 if top
+}
+
+message ArenaLeaderboardEntry {
+  string      user_id      = 1;
+  string      display_name = 2;
+  int32       wins         = 3;
+  int32       matches      = 4;
+  double      win_rate     = 5;
+  int64       best_runtime = 6;
+  int32       rating       = 7;
+  ArenaLeague league       = 8;
+  int32       losses       = 9;
+  int32       peak_rating  = 10;
+}

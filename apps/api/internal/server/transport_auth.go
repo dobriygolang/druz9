@@ -34,8 +34,9 @@ var publicOperations = map[string]struct{}{
 	profilev1.OperationProfileServiceYandexAuth:                  {},
 	profilev1.OperationProfileServiceTelegramAuth:                {},
 	profilev1.OperationProfileServiceCreateTelegramAuthChallenge: {},
-	profilev1.OperationProfileServiceConfirmTelegramAuth:         {},
-	profilev1.OperationProfileServiceCompleteRegistration:        {},
+	// ConfirmTelegramAuth HTTP endpoint removed — the bot calls the domain
+	// service directly. No HTTP route to allow-list here.
+	profilev1.OperationProfileServiceCompleteRegistration: {},
 
 	// ── Collaborative code editor (public sandboxing is the product) ──
 	codeeditorv1.OperationCodeEditorServiceCreateRoom:           {},

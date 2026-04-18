@@ -26,16 +26,16 @@ const (
 type NotificationKind int32
 
 const (
-	NotificationKind_NOTIFICATION_KIND_UNSPECIFIED                NotificationKind = 0
-	NotificationKind_NOTIFICATION_KIND_DUEL_INVITE                NotificationKind = 1
-	NotificationKind_NOTIFICATION_KIND_DUEL_MATCH_FOUND           NotificationKind = 2
-	NotificationKind_NOTIFICATION_KIND_DUEL_RESULT                NotificationKind = 3
-	NotificationKind_NOTIFICATION_KIND_DUEL_WIN_STREAK            NotificationKind = 4
-	NotificationKind_NOTIFICATION_KIND_STREAK_WARNING             NotificationKind = 5
-	NotificationKind_NOTIFICATION_KIND_STREAK_MILESTONE           NotificationKind = 6
-	NotificationKind_NOTIFICATION_KIND_RATING_MILESTONE           NotificationKind = 7
-	NotificationKind_NOTIFICATION_KIND_MOCK_RESULT                NotificationKind = 8
-	NotificationKind_NOTIFICATION_KIND_REVIEW_READY               NotificationKind = 9
+	NotificationKind_NOTIFICATION_KIND_UNSPECIFIED               NotificationKind = 0
+	NotificationKind_NOTIFICATION_KIND_DUEL_INVITE               NotificationKind = 1
+	NotificationKind_NOTIFICATION_KIND_DUEL_MATCH_FOUND          NotificationKind = 2
+	NotificationKind_NOTIFICATION_KIND_DUEL_RESULT               NotificationKind = 3
+	NotificationKind_NOTIFICATION_KIND_DUEL_WIN_STREAK           NotificationKind = 4
+	NotificationKind_NOTIFICATION_KIND_STREAK_WARNING            NotificationKind = 5
+	NotificationKind_NOTIFICATION_KIND_STREAK_MILESTONE          NotificationKind = 6
+	NotificationKind_NOTIFICATION_KIND_RATING_MILESTONE          NotificationKind = 7
+	NotificationKind_NOTIFICATION_KIND_MOCK_RESULT               NotificationKind = 8
+	NotificationKind_NOTIFICATION_KIND_REVIEW_READY              NotificationKind = 9
 	NotificationKind_NOTIFICATION_KIND_GUILD_EVENT_CREATED       NotificationKind = 10
 	NotificationKind_NOTIFICATION_KIND_GUILD_EVENT_REMINDER      NotificationKind = 11
 	NotificationKind_NOTIFICATION_KIND_GUILD_INVITE              NotificationKind = 12
@@ -43,9 +43,9 @@ const (
 	NotificationKind_NOTIFICATION_KIND_GUILD_MEMBER_JOINED       NotificationKind = 14
 	NotificationKind_NOTIFICATION_KIND_GUILD_CHALLENGE_PROGRESS  NotificationKind = 15
 	NotificationKind_NOTIFICATION_KIND_GUILD_WEEKLY_DIGEST       NotificationKind = 16
-	NotificationKind_NOTIFICATION_KIND_DAILY_CHALLENGE            NotificationKind = 17
+	NotificationKind_NOTIFICATION_KIND_DAILY_CHALLENGE           NotificationKind = 17
 	NotificationKind_NOTIFICATION_KIND_RE_ENGAGEMENT_GUILD       NotificationKind = 18
-	NotificationKind_NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL     NotificationKind = 19
+	NotificationKind_NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL    NotificationKind = 19
 )
 
 // Enum value maps for NotificationKind.
@@ -73,16 +73,16 @@ var (
 		19: "NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL",
 	}
 	NotificationKind_value = map[string]int32{
-		"NOTIFICATION_KIND_UNSPECIFIED":                0,
-		"NOTIFICATION_KIND_DUEL_INVITE":                1,
-		"NOTIFICATION_KIND_DUEL_MATCH_FOUND":           2,
-		"NOTIFICATION_KIND_DUEL_RESULT":                3,
-		"NOTIFICATION_KIND_DUEL_WIN_STREAK":            4,
-		"NOTIFICATION_KIND_STREAK_WARNING":             5,
-		"NOTIFICATION_KIND_STREAK_MILESTONE":           6,
-		"NOTIFICATION_KIND_RATING_MILESTONE":           7,
-		"NOTIFICATION_KIND_MOCK_RESULT":                8,
-		"NOTIFICATION_KIND_REVIEW_READY":               9,
+		"NOTIFICATION_KIND_UNSPECIFIED":               0,
+		"NOTIFICATION_KIND_DUEL_INVITE":               1,
+		"NOTIFICATION_KIND_DUEL_MATCH_FOUND":          2,
+		"NOTIFICATION_KIND_DUEL_RESULT":               3,
+		"NOTIFICATION_KIND_DUEL_WIN_STREAK":           4,
+		"NOTIFICATION_KIND_STREAK_WARNING":            5,
+		"NOTIFICATION_KIND_STREAK_MILESTONE":          6,
+		"NOTIFICATION_KIND_RATING_MILESTONE":          7,
+		"NOTIFICATION_KIND_MOCK_RESULT":               8,
+		"NOTIFICATION_KIND_REVIEW_READY":              9,
 		"NOTIFICATION_KIND_GUILD_EVENT_CREATED":       10,
 		"NOTIFICATION_KIND_GUILD_EVENT_REMINDER":      11,
 		"NOTIFICATION_KIND_GUILD_INVITE":              12,
@@ -90,9 +90,9 @@ var (
 		"NOTIFICATION_KIND_GUILD_MEMBER_JOINED":       14,
 		"NOTIFICATION_KIND_GUILD_CHALLENGE_PROGRESS":  15,
 		"NOTIFICATION_KIND_GUILD_WEEKLY_DIGEST":       16,
-		"NOTIFICATION_KIND_DAILY_CHALLENGE":            17,
+		"NOTIFICATION_KIND_DAILY_CHALLENGE":           17,
 		"NOTIFICATION_KIND_RE_ENGAGEMENT_GUILD":       18,
-		"NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL":     19,
+		"NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL":    19,
 	}
 )
 
@@ -552,7 +552,7 @@ type UpdateSettingsRequest struct {
 	UserId                string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	DuelsEnabled          *bool                  `protobuf:"varint,2,opt,name=duels_enabled,json=duelsEnabled,proto3,oneof" json:"duels_enabled,omitempty"`
 	ProgressEnabled       *bool                  `protobuf:"varint,3,opt,name=progress_enabled,json=progressEnabled,proto3,oneof" json:"progress_enabled,omitempty"`
-	GuildsEnabled        *bool                  `protobuf:"varint,4,opt,name=guilds_enabled,json=guildsEnabled,proto3,oneof" json:"guilds_enabled,omitempty"`
+	GuildsEnabled         *bool                  `protobuf:"varint,4,opt,name=guilds_enabled,json=guildsEnabled,proto3,oneof" json:"guilds_enabled,omitempty"`
 	DailyChallengeEnabled *bool                  `protobuf:"varint,5,opt,name=daily_challenge_enabled,json=dailyChallengeEnabled,proto3,oneof" json:"daily_challenge_enabled,omitempty"`
 	QuietHoursStart       *int32                 `protobuf:"varint,6,opt,name=quiet_hours_start,json=quietHoursStart,proto3,oneof" json:"quiet_hours_start,omitempty"`
 	QuietHoursEnd         *int32                 `protobuf:"varint,7,opt,name=quiet_hours_end,json=quietHoursEnd,proto3,oneof" json:"quiet_hours_end,omitempty"`
@@ -731,7 +731,7 @@ type GetSettingsResponse struct {
 	state                 protoimpl.MessageState `protogen:"open.v1"`
 	DuelsEnabled          bool                   `protobuf:"varint,1,opt,name=duels_enabled,json=duelsEnabled,proto3" json:"duels_enabled,omitempty"`
 	ProgressEnabled       bool                   `protobuf:"varint,2,opt,name=progress_enabled,json=progressEnabled,proto3" json:"progress_enabled,omitempty"`
-	GuildsEnabled        bool                   `protobuf:"varint,3,opt,name=guilds_enabled,json=guildsEnabled,proto3" json:"guilds_enabled,omitempty"`
+	GuildsEnabled         bool                   `protobuf:"varint,3,opt,name=guilds_enabled,json=guildsEnabled,proto3" json:"guilds_enabled,omitempty"`
 	DailyChallengeEnabled bool                   `protobuf:"varint,4,opt,name=daily_challenge_enabled,json=dailyChallengeEnabled,proto3" json:"daily_challenge_enabled,omitempty"`
 	QuietHoursStart       int32                  `protobuf:"varint,5,opt,name=quiet_hours_start,json=quietHoursStart,proto3" json:"quiet_hours_start,omitempty"`
 	QuietHoursEnd         int32                  `protobuf:"varint,6,opt,name=quiet_hours_end,json=quietHoursEnd,proto3" json:"quiet_hours_end,omitempty"`
@@ -830,7 +830,7 @@ func (x *GetSettingsResponse) GetTelegramChatId() int64 {
 type UpdateGuildSettingsRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	UserId          string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	GuildId        string                 `protobuf:"bytes,2,opt,name=guild_id,json=guildId,proto3" json:"guild_id,omitempty"`
+	GuildId         string                 `protobuf:"bytes,2,opt,name=guild_id,json=guildId,proto3" json:"guild_id,omitempty"`
 	EventsEnabled   *bool                  `protobuf:"varint,3,opt,name=events_enabled,json=eventsEnabled,proto3,oneof" json:"events_enabled,omitempty"`
 	ActivityEnabled *bool                  `protobuf:"varint,4,opt,name=activity_enabled,json=activityEnabled,proto3,oneof" json:"activity_enabled,omitempty"`
 	DigestEnabled   *bool                  `protobuf:"varint,5,opt,name=digest_enabled,json=digestEnabled,proto3,oneof" json:"digest_enabled,omitempty"`
@@ -978,38 +978,38 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1f\n" +
 	"\vtelegram_id\x18\x02 \x01(\x03R\n" +
 	"telegramId\"\x16\n" +
-	"\x14LinkTelegramResponse\"\x82\x04\n" +
+	"\x14LinkTelegramResponse\"\xff\x03\n" +
 	"\x15UpdateSettingsRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12(\n" +
 	"\rduels_enabled\x18\x02 \x01(\bH\x00R\fduelsEnabled\x88\x01\x01\x12.\n" +
-	"\x10progress_enabled\x18\x03 \x01(\bH\x01R\x0fprogressEnabled\x88\x01\x01\x12,\n" +
-	"\x0fguilds_enabled\x18\x04 \x01(\bH\x02R\x0eguildsEnabled\x88\x01\x01\x12;\n" +
+	"\x10progress_enabled\x18\x03 \x01(\bH\x01R\x0fprogressEnabled\x88\x01\x01\x12*\n" +
+	"\x0eguilds_enabled\x18\x04 \x01(\bH\x02R\rguildsEnabled\x88\x01\x01\x12;\n" +
 	"\x17daily_challenge_enabled\x18\x05 \x01(\bH\x03R\x15dailyChallengeEnabled\x88\x01\x01\x12/\n" +
 	"\x11quiet_hours_start\x18\x06 \x01(\x05H\x04R\x0fquietHoursStart\x88\x01\x01\x12+\n" +
 	"\x0fquiet_hours_end\x18\a \x01(\x05H\x05R\rquietHoursEnd\x88\x01\x01\x12\x1f\n" +
 	"\btimezone\x18\b \x01(\tH\x06R\btimezone\x88\x01\x01B\x10\n" +
 	"\x0e_duels_enabledB\x13\n" +
-	"\x11_progress_enabledB\x12\n" +
-	"\x10_guilds_enabledB\x1a\n" +
+	"\x11_progress_enabledB\x11\n" +
+	"\x0f_guilds_enabledB\x1a\n" +
 	"\x18_daily_challenge_enabledB\x14\n" +
 	"\x12_quiet_hours_startB\x12\n" +
 	"\x10_quiet_hours_endB\v\n" +
 	"\t_timezone\"\x18\n" +
 	"\x16UpdateSettingsResponse\"-\n" +
 	"\x12GetSettingsRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\"\xe0\x02\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"\xde\x02\n" +
 	"\x13GetSettingsResponse\x12#\n" +
 	"\rduels_enabled\x18\x01 \x01(\bR\fduelsEnabled\x12)\n" +
-	"\x10progress_enabled\x18\x02 \x01(\bR\x0fprogressEnabled\x12'\n" +
-	"\x0fguilds_enabled\x18\x03 \x01(\bR\x0eguildsEnabled\x126\n" +
+	"\x10progress_enabled\x18\x02 \x01(\bR\x0fprogressEnabled\x12%\n" +
+	"\x0eguilds_enabled\x18\x03 \x01(\bR\rguildsEnabled\x126\n" +
 	"\x17daily_challenge_enabled\x18\x04 \x01(\bR\x15dailyChallengeEnabled\x12*\n" +
 	"\x11quiet_hours_start\x18\x05 \x01(\x05R\x0fquietHoursStart\x12&\n" +
 	"\x0fquiet_hours_end\x18\x06 \x01(\x05R\rquietHoursEnd\x12\x1a\n" +
 	"\btimezone\x18\a \x01(\tR\btimezone\x12(\n" +
-	"\x10telegram_chat_id\x18\b \x01(\x03R\x0etelegramChatId\"\xbb\x02\n" +
-	"\x1bUpdateGuildSettingsRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
-	"\tguild_id\x18\x02 \x01(\tR\bguildId\x12*\n" +
+	"\x10telegram_chat_id\x18\b \x01(\x03R\x0etelegramChatId\"\xb8\x02\n" +
+	"\x1aUpdateGuildSettingsRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x19\n" +
+	"\bguild_id\x18\x02 \x01(\tR\aguildId\x12*\n" +
 	"\x0eevents_enabled\x18\x03 \x01(\bH\x00R\reventsEnabled\x88\x01\x01\x12.\n" +
 	"\x10activity_enabled\x18\x04 \x01(\bH\x01R\x0factivityEnabled\x88\x01\x01\x12*\n" +
 	"\x0edigest_enabled\x18\x05 \x01(\bH\x02R\rdigestEnabled\x88\x01\x01\x12\x19\n" +
@@ -1017,8 +1017,8 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\x0f_events_enabledB\x13\n" +
 	"\x11_activity_enabledB\x11\n" +
 	"\x0f_digest_enabledB\b\n" +
-	"\x06_muted\"\x1e\n" +
-	"\x1cUpdateGuildSettingsResponse*\xc1\x06\n" +
+	"\x06_muted\"\x1d\n" +
+	"\x1bUpdateGuildSettingsResponse*\xb9\x06\n" +
 	"\x10NotificationKind\x12!\n" +
 	"\x1dNOTIFICATION_KIND_UNSPECIFIED\x10\x00\x12!\n" +
 	"\x1dNOTIFICATION_KIND_DUEL_INVITE\x10\x01\x12&\n" +
@@ -1029,26 +1029,26 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\"NOTIFICATION_KIND_STREAK_MILESTONE\x10\x06\x12&\n" +
 	"\"NOTIFICATION_KIND_RATING_MILESTONE\x10\a\x12!\n" +
 	"\x1dNOTIFICATION_KIND_MOCK_RESULT\x10\b\x12\"\n" +
-	"\x1eNOTIFICATION_KIND_REVIEW_READY\x10\t\x12*\n" +
-	"&NOTIFICATION_KIND_GUILD_EVENT_CREATED\x10\n" +
-	"\x12+\n" +
-	"'NOTIFICATION_KIND_GUILD_EVENT_REMINDER\x10\v\x12#\n" +
-	"\x1fNOTIFICATION_KIND_GUILD_INVITE\x10\f\x120\n" +
-	",NOTIFICATION_KIND_GUILD_CHALLENGE_COMPLETED\x10\r\x12*\n" +
-	"&NOTIFICATION_KIND_GUILD_MEMBER_JOINED\x10\x0e\x12/\n" +
-	"+NOTIFICATION_KIND_GUILD_CHALLENGE_PROGRESS\x10\x0f\x12*\n" +
-	"&NOTIFICATION_KIND_GUILD_WEEKLY_DIGEST\x10\x10\x12%\n" +
-	"!NOTIFICATION_KIND_DAILY_CHALLENGE\x10\x11\x12*\n" +
-	"&NOTIFICATION_KIND_RE_ENGAGEMENT_GUILD\x10\x12\x12,\n" +
-	"(NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL\x10\x132\x9a\x05\n" +
+	"\x1eNOTIFICATION_KIND_REVIEW_READY\x10\t\x12)\n" +
+	"%NOTIFICATION_KIND_GUILD_EVENT_CREATED\x10\n" +
+	"\x12*\n" +
+	"&NOTIFICATION_KIND_GUILD_EVENT_REMINDER\x10\v\x12\"\n" +
+	"\x1eNOTIFICATION_KIND_GUILD_INVITE\x10\f\x12/\n" +
+	"+NOTIFICATION_KIND_GUILD_CHALLENGE_COMPLETED\x10\r\x12)\n" +
+	"%NOTIFICATION_KIND_GUILD_MEMBER_JOINED\x10\x0e\x12.\n" +
+	"*NOTIFICATION_KIND_GUILD_CHALLENGE_PROGRESS\x10\x0f\x12)\n" +
+	"%NOTIFICATION_KIND_GUILD_WEEKLY_DIGEST\x10\x10\x12%\n" +
+	"!NOTIFICATION_KIND_DAILY_CHALLENGE\x10\x11\x12)\n" +
+	"%NOTIFICATION_KIND_RE_ENGAGEMENT_GUILD\x10\x12\x12,\n" +
+	"(NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL\x10\x132\x97\x05\n" +
 	"\x13NotificationService\x12C\n" +
 	"\x04Send\x12\x1c.notification.v1.SendRequest\x1a\x1d.notification.v1.SendResponse\x12R\n" +
 	"\tSendBatch\x12!.notification.v1.SendBatchRequest\x1a\".notification.v1.SendBatchResponse\x12[\n" +
 	"\fRegisterChat\x12$.notification.v1.RegisterChatRequest\x1a%.notification.v1.RegisterChatResponse\x12[\n" +
 	"\fLinkTelegram\x12$.notification.v1.LinkTelegramRequest\x1a%.notification.v1.LinkTelegramResponse\x12a\n" +
 	"\x0eUpdateSettings\x12&.notification.v1.UpdateSettingsRequest\x1a'.notification.v1.UpdateSettingsResponse\x12X\n" +
-	"\vGetSettings\x12#.notification.v1.GetSettingsRequest\x1a$.notification.v1.GetSettingsResponse\x12s\n" +
-	"\x14UpdateGuildSettings\x12,.notification.v1.UpdateGuildSettingsRequest\x1a-.notification.v1.UpdateGuildSettingsResponseB-Z+notification-service/pkg/notification/v1;v1b\x06proto3"
+	"\vGetSettings\x12#.notification.v1.GetSettingsRequest\x1a$.notification.v1.GetSettingsResponse\x12p\n" +
+	"\x13UpdateGuildSettings\x12+.notification.v1.UpdateGuildSettingsRequest\x1a,.notification.v1.UpdateGuildSettingsResponseB-Z+notification-service/pkg/notification/v1;v1b\x06proto3"
 
 var (
 	file_notification_v1_notification_proto_rawDescOnce sync.Once
@@ -1065,23 +1065,23 @@ func file_notification_v1_notification_proto_rawDescGZIP() []byte {
 var file_notification_v1_notification_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_notification_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_notification_v1_notification_proto_goTypes = []any{
-	(NotificationKind)(0),                // 0: notification.v1.NotificationKind
-	(*SendRequest)(nil),                  // 1: notification.v1.SendRequest
-	(*SendResponse)(nil),                 // 2: notification.v1.SendResponse
-	(*SendBatchRequest)(nil),             // 3: notification.v1.SendBatchRequest
-	(*SendBatchResponse)(nil),            // 4: notification.v1.SendBatchResponse
-	(*RegisterChatRequest)(nil),          // 5: notification.v1.RegisterChatRequest
-	(*RegisterChatResponse)(nil),         // 6: notification.v1.RegisterChatResponse
-	(*LinkTelegramRequest)(nil),          // 7: notification.v1.LinkTelegramRequest
-	(*LinkTelegramResponse)(nil),         // 8: notification.v1.LinkTelegramResponse
-	(*UpdateSettingsRequest)(nil),        // 9: notification.v1.UpdateSettingsRequest
-	(*UpdateSettingsResponse)(nil),       // 10: notification.v1.UpdateSettingsResponse
-	(*GetSettingsRequest)(nil),           // 11: notification.v1.GetSettingsRequest
-	(*GetSettingsResponse)(nil),          // 12: notification.v1.GetSettingsResponse
+	(NotificationKind)(0),               // 0: notification.v1.NotificationKind
+	(*SendRequest)(nil),                 // 1: notification.v1.SendRequest
+	(*SendResponse)(nil),                // 2: notification.v1.SendResponse
+	(*SendBatchRequest)(nil),            // 3: notification.v1.SendBatchRequest
+	(*SendBatchResponse)(nil),           // 4: notification.v1.SendBatchResponse
+	(*RegisterChatRequest)(nil),         // 5: notification.v1.RegisterChatRequest
+	(*RegisterChatResponse)(nil),        // 6: notification.v1.RegisterChatResponse
+	(*LinkTelegramRequest)(nil),         // 7: notification.v1.LinkTelegramRequest
+	(*LinkTelegramResponse)(nil),        // 8: notification.v1.LinkTelegramResponse
+	(*UpdateSettingsRequest)(nil),       // 9: notification.v1.UpdateSettingsRequest
+	(*UpdateSettingsResponse)(nil),      // 10: notification.v1.UpdateSettingsResponse
+	(*GetSettingsRequest)(nil),          // 11: notification.v1.GetSettingsRequest
+	(*GetSettingsResponse)(nil),         // 12: notification.v1.GetSettingsResponse
 	(*UpdateGuildSettingsRequest)(nil),  // 13: notification.v1.UpdateGuildSettingsRequest
 	(*UpdateGuildSettingsResponse)(nil), // 14: notification.v1.UpdateGuildSettingsResponse
-	(*structpb.Struct)(nil),              // 15: google.protobuf.Struct
-	(*timestamppb.Timestamp)(nil),        // 16: google.protobuf.Timestamp
+	(*structpb.Struct)(nil),             // 15: google.protobuf.Struct
+	(*timestamppb.Timestamp)(nil),       // 16: google.protobuf.Timestamp
 }
 var file_notification_v1_notification_proto_depIdxs = []int32{
 	0,  // 0: notification.v1.SendRequest.kind:type_name -> notification.v1.NotificationKind

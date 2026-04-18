@@ -1,0 +1,387 @@
+syntax = "proto3";
+
+package profile.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "core/common/v1/common.proto";
+
+option go_package = "api/pkg/api/profile/v1;v1";
+
+service ProfileService {
+  rpc CreateTelegramAuthChallenge(CreateTelegramAuthChallengeRequest) returns (CreateTelegramAuthChallengeResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/auth/telegram/challenge"
+      body: "*"
+    };
+  }
+
+  rpc TelegramAuth(TelegramAuthRequest) returns (ProfileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/auth/telegram"
+      body: "*"
+    };
+  }
+
+  rpc StartYandexAuth(StartYandexAuthRequest) returns (StartYandexAuthResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/auth/yandex/start" };
+  }
+
+  rpc YandexAuth(YandexAuthRequest) returns (ProfileResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/auth/yandex/callback" };
+  }
+
+  rpc CompleteRegistration(CompleteRegistrationRequest) returns (ProfileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/auth/complete-registration"
+      body: "*"
+    };
+  }
+
+  rpc GetProfile(GetProfileRequest) returns (ProfileResponse) {
+    option (google.api.http) = { get: "/api/v1/profile" };
+  }
+
+  rpc GetProfileByID(GetProfileByIDRequest) returns (ProfileResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/{user_id}" };
+  }
+
+  rpc UpdateLocation(UpdateLocationRequest) returns (ProfileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/location"
+      body: "*"
+    };
+  }
+
+  rpc UpdateProfile(UpdateProfileRequest) returns (ProfileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/update"
+      body: "*"
+    };
+  }
+
+  rpc Logout(LogoutRequest) returns (ProfileStatusResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/auth/logout"
+      body: "*"
+    };
+  }
+
+  rpc BindTelegram(BindTelegramRequest) returns (ProfileStatusResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/bind-telegram"
+      body: "*"
+    };
+  }
+
+  rpc GetProfileProgress(GetProfileProgressRequest) returns (ProfileProgressResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/{user_id}/progress" };
+  }
+
+  rpc SetUserGoal(SetUserGoalRequest) returns (SetUserGoalResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/goal"
+      body: "*"
+    };
+  }
+
+  rpc GetReadiness(GetReadinessRequest) returns (GetReadinessResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/{user_id}/readiness" };
+  }
+
+  rpc GetProfileFeed(GetProfileFeedRequest) returns (GetProfileFeedResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/{user_id}/feed" };
+  }
+}
+
+enum UserGoalKind {
+  USER_GOAL_KIND_UNSPECIFIED    = 0;
+  USER_GOAL_KIND_GENERAL_GROWTH = 1;
+  USER_GOAL_KIND_WEAKEST_FIRST  = 2;
+  USER_GOAL_KIND_COMPANY_PREP   = 3;
+}
+
+enum ReadinessLevel {
+  READINESS_LEVEL_UNSPECIFIED  = 0;
+  READINESS_LEVEL_NOVICE       = 1;
+  READINESS_LEVEL_FOUNDATION   = 2;
+  READINESS_LEVEL_PRACTITIONER = 3;
+  READINESS_LEVEL_CANDIDATE    = 4;
+  READINESS_LEVEL_READY        = 5;
+}
+
+enum ProfileActionType {
+  PROFILE_ACTION_TYPE_UNSPECIFIED = 0;
+  PROFILE_ACTION_TYPE_PRACTICE    = 1;
+  PROFILE_ACTION_TYPE_MOCK        = 2;
+  PROFILE_ACTION_TYPE_DAILY       = 3;
+  PROFILE_ACTION_TYPE_DUEL        = 4;
+  PROFILE_ACTION_TYPE_CHECKPOINT  = 5;
+  PROFILE_ACTION_TYPE_ARENA       = 6;
+}
+
+enum ProfileCompetencyConfidence {
+  PROFILE_COMPETENCY_CONFIDENCE_UNSPECIFIED = 0;
+  PROFILE_COMPETENCY_CONFIDENCE_LOW         = 1;
+  PROFILE_COMPETENCY_CONFIDENCE_MEDIUM      = 2;
+  PROFILE_COMPETENCY_CONFIDENCE_VERIFIED    = 3;
+}
+
+enum ProfileCompetencyLevel {
+  PROFILE_COMPETENCY_LEVEL_UNSPECIFIED = 0;
+  PROFILE_COMPETENCY_LEVEL_BEGINNER    = 1;
+  PROFILE_COMPETENCY_LEVEL_CONFIDENT   = 2;
+  PROFILE_COMPETENCY_LEVEL_STRONG      = 3;
+  PROFILE_COMPETENCY_LEVEL_EXPERT      = 4;
+}
+
+enum FeedItemType {
+  FEED_ITEM_TYPE_UNSPECIFIED = 0;
+  FEED_ITEM_TYPE_MOCK_STAGE  = 1;
+  FEED_ITEM_TYPE_PRACTICE    = 2;
+}
+
+// ── Request messages ───────────────────────────────────────────────────────
+
+message CreateTelegramAuthChallengeRequest {}
+
+message TelegramAuthRequest {
+  string token = 1;
+  string code  = 2;
+}
+
+message StartYandexAuthRequest {}
+
+message YandexAuthRequest {
+  string state = 1;
+  string code  = 2;
+}
+
+// field 1 was previously used and removed; fields 2-6 keep their original numbers
+// for binary-wire compatibility with existing gRPC clients.
+message CompleteRegistrationRequest {
+  reserved 1;
+  string region    = 2;
+  string country   = 3;
+  string city      = 4;
+  double latitude  = 5;
+  double longitude = 6;
+}
+
+message GetProfileRequest {}
+
+message GetProfileByIDRequest {
+  string user_id = 1;
+}
+
+// field 1 was previously used and removed; kept reserved for wire compatibility.
+message UpdateLocationRequest {
+  reserved 1;
+  string region    = 2;
+  string country   = 3;
+  string city      = 4;
+  double latitude  = 5;
+  double longitude = 6;
+}
+
+message UpdateProfileRequest {
+  string current_workplace = 1;
+}
+
+message LogoutRequest {}
+
+// BindTelegram links an existing account to a Telegram identity via challenge flow.
+message BindTelegramRequest {
+  string token = 1;
+  string code  = 2;
+}
+
+message GetProfileProgressRequest  { string user_id = 1; }
+
+message SetUserGoalRequest {
+  UserGoalKind kind    = 1;
+  string company = 2;
+}
+
+message GetReadinessRequest { string user_id = 1; }
+
+message SetUserGoalResponse {
+  UserGoal goal = 1;
+}
+
+message GetReadinessResponse {
+  int32                        score             = 1;
+  ReadinessLevel               level             = 2;
+  string                       level_label       = 3;
+  ProfileCompetency            weakest_skill     = 4;
+  ProfileCompetency            strongest_skill   = 5;
+  ReadinessNextAction          next_action       = 6;
+  repeated CompanyReadiness    company_readiness = 7;
+  int32                        streak_days       = 8;
+  int32                        active_days       = 9;
+}
+
+message ReadinessNextAction {
+  string title       = 1;
+  string description = 2;
+  ProfileActionType action_type = 3;
+  string action_url  = 4;
+  string skill_key   = 5;
+}
+
+message CompanyReadiness {
+  string company          = 1;
+  int32  total_stages     = 2;
+  int32  completed_stages = 3;
+  int32  percent          = 4;
+  bool   has_active       = 5;
+}
+
+// ── Response messages ──────────────────────────────────────────────────────
+
+// ProfileStatusResponse replaces the separate LogoutResponse and BindTelegramResponse.
+message ProfileStatusResponse {
+  common.v1.OperationStatus status = 1;
+}
+
+message CreateTelegramAuthChallengeResponse {
+  string                    token         = 1;
+  string                    bot_start_url = 2;
+  google.protobuf.Timestamp expires_at    = 3;
+}
+
+message StartYandexAuthResponse {
+  string                    state    = 1;
+  string                    auth_url = 2;
+  google.protobuf.Timestamp expires_at = 3;
+}
+
+message ProfileResponse {
+  User user                      = 1;
+  bool needs_profile_complete    = 2;
+}
+
+// ── Profile progress / activity ────────────────────────────────────────────
+
+message ProfileProgressOverview {
+  int32                     practice_sessions        = 1;
+  int32                     practice_passed_sessions = 2;
+  int32                     practice_active_days     = 3;
+  int32                     completed_mock_sessions  = 4;
+  int32                     completed_mock_stages    = 5;
+  int32                     answered_questions       = 6;
+  double                    average_stage_score      = 7;
+  double                    average_question_score   = 8;
+  int32                     current_streak_days      = 9;
+  google.protobuf.Timestamp last_activity_at         = 10;
+  int32                     level                    = 11;
+  double                    level_progress           = 12;
+  int32                     total_xp                 = 13;
+  int32                     longest_streak_days      = 14;
+  int32                     activity_percentile      = 15;
+}
+
+message ProfileCompetency {
+  string key                      = 1;
+  string label                    = 2;
+  int32  score                    = 3;
+  int32  practice_score           = 4;
+  int32  verified_score           = 5;
+  int32  stage_count              = 6;
+  int32  question_count           = 7;
+  int32  practice_sessions        = 8;
+  int32  practice_passed_sessions = 9;
+  int32  practice_days            = 10;
+  ProfileCompetencyConfidence confidence = 11;
+  double average_score            = 12;
+  ProfileCompetencyLevel level    = 13;
+  double level_progress           = 14;
+  string next_milestone           = 15;
+  int32  score_delta_30d          = 16;
+}
+
+message ProfileProgressRecommendation {
+  string key         = 1;
+  string title       = 2;
+  string description = 3;
+  string href        = 4;
+}
+
+message ProfileCheckpointProgress {
+  string                    id          = 1;
+  string                    task_id     = 2;
+  string                    task_title  = 3;
+  string                    skill_key   = 4;
+  string                    skill_label = 5;
+  int32                     score       = 6;
+  google.protobuf.Timestamp finished_at = 7;
+}
+
+message NextAction {
+  string title       = 1;
+  string description = 2;
+  ProfileActionType action_type = 3;
+  string action_url  = 4;
+  int32  priority    = 5;
+  string skill_key   = 6;
+}
+
+message UserGoal {
+  UserGoalKind kind    = 1;
+  string company = 2;
+}
+
+message ProfileProgress {
+  ProfileProgressOverview              overview         = 1;
+  repeated ProfileCompetency           competencies     = 2;
+  repeated ProfileCompetency           strongest        = 3;
+  repeated ProfileCompetency           weakest          = 4;
+  repeated ProfileProgressRecommendation recommendations = 5;
+  repeated ProfileCheckpointProgress  checkpoints      = 6;
+  repeated string                     companies        = 7;
+  repeated NextAction                 next_actions     = 8;
+  UserGoal                            goal             = 9;
+}
+
+message ProfileProgressResponse {
+  ProfileProgress progress = 1;
+}
+
+message FeedItem {
+  FeedItemType              type        = 1;
+  string                    title       = 2;
+  string                    description = 3;
+  int32                     score       = 4;
+  google.protobuf.Timestamp timestamp   = 5;
+}
+
+message GetProfileFeedRequest {
+  string user_id = 1;
+  int32  limit   = 2;
+}
+
+message GetProfileFeedResponse {
+  repeated FeedItem items = 1;
+}
+
+// ── Domain entities ────────────────────────────────────────────────────────
+
+message User {
+  string                    id                  = 1;
+  string                    username            = 2;
+  string                    first_name          = 3;
+  string                    last_name           = 4;
+  string                    avatar_url          = 5;
+  string                    region              = 6;
+  google.protobuf.Timestamp created_at          = 7;
+  double                    latitude            = 8;
+  double                    longitude           = 9;
+  common.v1.UserActivityStatus activity_status   = 10;
+  string                    current_workplace   = 11;
+  bool                      is_admin            = 12;
+  bool                      is_trusted          = 13;
+  repeated string           connected_providers = 14;
+  string                    primary_provider    = 15;
+  string                    telegram_username   = 16;
+  repeated string           pinned_achievements = 17;
+}

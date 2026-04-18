@@ -1,0 +1,155 @@
+syntax = "proto3";
+
+package podcast.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "core/common/v1/common.proto";
+
+option go_package = "api/pkg/api/podcast/v1;v1";
+
+service PodcastService {
+  rpc ListPodcasts(ListPodcastsRequest) returns (ListPodcastsResponse) {
+    option (google.api.http) = { get: "/api/v1/podcasts" };
+  }
+
+  rpc GetPodcast(GetPodcastRequest) returns (PodcastResponse) {
+    option (google.api.http) = { get: "/api/v1/podcasts/{podcast_id}" };
+  }
+
+  rpc CreatePodcast(CreatePodcastRequest) returns (PodcastResponse) {
+    option (google.api.http) = {
+      post: "/api/admin/podcasts"
+      body: "*"
+    };
+  }
+
+  rpc UploadPodcast(UploadPodcastRequest) returns (PodcastResponse) {
+    option (google.api.http) = {
+      post: "/api/admin/podcasts/{podcast_id}/upload"
+      body: "*"
+    };
+  }
+
+  rpc PreparePodcastUpload(PreparePodcastUploadRequest) returns (PreparePodcastUploadResponse) {
+    option (google.api.http) = {
+      post: "/api/admin/podcasts/{podcast_id}/upload/prepare"
+      body: "*"
+    };
+  }
+
+  rpc CompletePodcastUpload(CompletePodcastUploadRequest) returns (PodcastResponse) {
+    option (google.api.http) = {
+      post: "/api/admin/podcasts/{podcast_id}/upload/complete"
+      body: "*"
+    };
+  }
+
+  rpc DeletePodcast(DeletePodcastRequest) returns (PodcastStatusResponse) {
+    option (google.api.http) = { delete: "/api/admin/podcasts/{podcast_id}" };
+  }
+
+  rpc PlayPodcast(PlayPodcastRequest) returns (PlayPodcastResponse) {
+    option (google.api.http) = { get: "/api/v1/podcasts/{podcast_id}/play" };
+  }
+}
+
+// ── Enums ──────────────────────────────────────────────────────────────────
+
+enum MediaContentType {
+  MEDIA_CONTENT_TYPE_UNSPECIFIED = 0;
+  MEDIA_CONTENT_TYPE_AUDIO_MPEG  = 1;  // audio/mpeg
+  MEDIA_CONTENT_TYPE_AUDIO_WAV   = 2;  // audio/wav
+  MEDIA_CONTENT_TYPE_AUDIO_OGG   = 3;  // audio/ogg
+  MEDIA_CONTENT_TYPE_AUDIO_MP4   = 4;  // audio/mp4
+}
+
+// ── Request messages ───────────────────────────────────────────────────────
+
+message ListPodcastsRequest {
+  int32 limit  = 1;
+  int32 offset = 2;
+}
+
+message GetPodcastRequest {
+  string podcast_id = 1;
+}
+
+message CreatePodcastRequest {
+  string title = 1;
+}
+
+message UploadPodcastRequest {
+  string           podcast_id       = 1;
+  string           file_name        = 2;
+  MediaContentType content_type     = 3;  // was: string
+  bytes            content          = 4;
+  uint32           duration_seconds = 5;
+}
+
+message PreparePodcastUploadRequest {
+  string           podcast_id       = 1;
+  string           file_name        = 2;
+  MediaContentType content_type     = 3;  // was: string
+  uint32           duration_seconds = 4;
+}
+
+message CompletePodcastUploadRequest {
+  string           podcast_id       = 1;
+  string           file_name        = 2;
+  MediaContentType content_type     = 3;  // was: string
+  uint32           duration_seconds = 4;
+  string           object_key       = 5;
+}
+
+message DeletePodcastRequest {
+  string podcast_id = 1;
+}
+
+message PlayPodcastRequest {
+  string podcast_id = 1;
+}
+
+// ── Response messages ──────────────────────────────────────────────────────
+
+message ListPodcastsResponse {
+  repeated Podcast podcasts      = 1;
+  int32            limit         = 2;
+  int32            offset        = 3;
+  int32            total_count   = 4;
+  bool             has_next_page = 5;
+}
+
+message PodcastResponse {
+  Podcast podcast = 1;
+}
+
+message PodcastStatusResponse {
+  common.v1.OperationStatus status = 1;
+}
+
+message PreparePodcastUploadResponse {
+  string  upload_url = 1;
+  string  object_key = 2;
+  Podcast podcast    = 3;
+}
+
+message PlayPodcastResponse {
+  Podcast podcast    = 1;
+  string  stream_url = 2;
+}
+
+// ── Domain entities ────────────────────────────────────────────────────────
+
+message Podcast {
+  string                    id               = 1;
+  string                    title            = 2;
+  string                    author_id        = 3;
+  string                    author_name      = 4;
+  uint32                    duration_seconds = 5;
+  uint64                    listens_count    = 6;
+  string                    file_name        = 7;
+  MediaContentType          content_type     = 8;
+  bool                      is_uploaded      = 9;
+  google.protobuf.Timestamp created_at       = 10;
+}

@@ -40,10 +40,6 @@ func (c *CachedProgressRepository) GetProfileProgress(ctx context.Context, userI
 	return progress, nil
 }
 
-func (c *CachedProgressRepository) GetDailyActivity(ctx context.Context, userID uuid.UUID, days int) (map[string]int, error) {
-	return c.inner.GetDailyActivity(ctx, userID, days)
-}
-
 func (c *CachedProgressRepository) SaveUserGoal(ctx context.Context, userID uuid.UUID, goal *model.UserGoal) error {
 	return c.inner.SaveUserGoal(ctx, userID, goal)
 }
