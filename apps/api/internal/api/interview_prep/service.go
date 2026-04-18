@@ -5,6 +5,7 @@ import (
 
 	appinterviewprep "api/internal/app/interviewprep"
 	notif "api/internal/clients/notification"
+	interviewprepdata "api/internal/data/interviewprep"
 	"api/internal/model"
 	v1 "api/pkg/api/interview_prep/v1"
 
@@ -47,6 +48,14 @@ type AdminRepo interface {
 	CreateMockCompanyPreset(ctx context.Context, item *model.InterviewPrepMockCompanyPreset) error
 	UpdateMockCompanyPreset(ctx context.Context, item *model.InterviewPrepMockCompanyPreset) error
 	DeleteMockCompanyPreset(ctx context.Context, itemID uuid.UUID) error
+
+	// Interview Experience Board (killer feature #5). Kept on the
+	// existing AdminRepo interface to avoid adding a whole new repo
+	// dep — the underlying *interviewprepdata.Repo implements all of
+	// these. Moderation flow is intentionally minimal for MVP: every
+	// post lands as moderation_status='approved' (see handler).
+	InsertInterviewExperience(ctx context.Context, row *interviewprepdata.InterviewExperienceRow) (*interviewprepdata.InterviewExperienceRow, error)
+	ListApprovedExperiences(ctx context.Context, companyTag string, limit, offset int32) ([]*interviewprepdata.InterviewExperienceRow, int32, error)
 }
 
 // Implementation of interview_prep service.

@@ -1,0 +1,21 @@
+title = "druz9 gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allow committed examples and generated documentation"
+paths = [
+  '''(^|/)\\.env\\.example$''',
+  '''(^|/)\\.env\\.prod\\.example$''',
+  '''(^|/)docs/openapi\\.yaml$''',
+  '''(^|/)pkg/api/.+\\.pb\\.go$''',
+  '''(^|/)pkg/api/.+_http\\.pb\\.go$''',
+  '''(^|/)pkg/api/.+_grpc\\.pb\\.go$''',
+  '''(^|/)third_party/''',
+]
+regexes = [
+  '''CHANGE_ME''',
+  '''example(_|-)?(token|secret|password|key)''',
+  '''your(_|-)?(token|secret|password|key)''',
+]

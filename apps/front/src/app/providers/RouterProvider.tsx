@@ -171,6 +171,9 @@ const AdminDashboardPage = lazy(() =>
     default: m.AdminDashboardPage,
   })),
 )
+const InterviewBoardPage = lazy(() =>
+  import('@/pages/InterviewBoardPage/ui/InterviewBoardPage').then((m) => ({ default: m.InterviewBoardPage })),
+)
 const AdminShopPage = lazy(() =>
   import('@/pages/AdminShopPage/ui/AdminShopPage').then((m) => ({ default: m.AdminShopPage })),
 )
@@ -325,6 +328,10 @@ export const RouterProvider: React.FC = () => {
             <Route
               path="/interview/peer"
               element={gate ? <Navigate to="/login" replace /> : <PeerMocksPage />}
+            />
+            <Route
+              path="/interview/board"
+              element={gate ? <Navigate to="/login" replace /> : <InterviewBoardPage />}
             />
             <Route
               path="/interview/live/:sessionId"

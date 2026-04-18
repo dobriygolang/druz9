@@ -4,14 +4,96 @@ run:
 linters:
   disable-all: true
   enable:
+    - asasalint
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - contextcheck
+    - copyloopvar
+    - durationcheck
+    - errchkjson
     - errcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - fatcontext
+    - forcetypeassert
     - goconst
+    - gocritic
     - goimports
     - gosec
     - govet
     - ineffassign
+    - loggercheck
+    - makezero
+    - misspell
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - noctx
+    - nolintlint
+    - nosprintfhostport
+    - perfsprint
+    - prealloc
+    - predeclared
+    - reassign
+    - rowserrcheck
     - gosimple
+    - spancheck
+    - sqlclosecheck
     - staticcheck
     - revive
+    - testifylint
+    - thelper
     - typecheck
+    - unconvert
+    - unparam
     - unused
+    - usestdlibvars
+    - usetesting
+    - wastedassign
+    - whitespace
+
+linters-settings:
+  exhaustive:
+    default-signifies-exhaustive: true
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - performance
+      - style
+    disabled-checks:
+      - hugeParam
+      - ifElseChain
+      - unnamedResult
+
+  gosec:
+    excludes:
+      - G115
+
+  nolintlint:
+    require-explanation: true
+    require-specific: true
+
+  prealloc:
+    simple: true
+    range-loops: true
+    for-loops: false
+
+  testifylint:
+    enable-all: true
+
+  revive:
+    rules:
+      - name: exported
+        severity: warning
+
+issues:
+  exclude-rules:
+    - path: "pkg/.*\\.pb\\.go"
+      linters:
+        - all
+    - path: "third_party/"
+      linters:
+        - all

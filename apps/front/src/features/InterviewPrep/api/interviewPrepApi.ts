@@ -240,4 +240,64 @@ export const interviewPrepApi = {
   abortMockSession: async (sessionId: string): Promise<void> => {
     await apiClient.post(`/api/v1/interview-prep/mock-sessions/${sessionId}/abort`, {})
   },
+
+  // Killer feature #5 — interview experience board.
+  postExperience: async (payload: InterviewExperienceDraft): Promise<InterviewExperience> => {
+    const r = await apiClient.post<InterviewExperience>('/api/v1/interview-board', payload)
+    return normalizeExperience(r.data)
+  },
+  listExperiences: async (companyTag = '', limit = 50): Promise<{ experiences: InterviewExperience[]; total: number }> => {
+    const r = await apiClient.get<{ experiences?: unknown[]; total?: number }>('/api/v1/interview-board', {
+      params: { companyTag, limit },
+    })
+    return {
+      experiences: (r.data.experiences ?? []).map(normalizeExperience),
+      total: r.data.total ?? 0,
+    }
+  },
+}
+
+export interface InterviewExperience {
+  id: string
+  userId: string
+  companyTag: string
+  role: string
+  level: string
+  overallRating: number
+  loopStructure: string
+  questions: string
+  feedbackReceived: string
+  outcome: string
+  isAnonymous: boolean
+  moderationStatus: string
+  postedAt: string
+}
+export interface InterviewExperienceDraft {
+  companyTag: string
+  role: string
+  level: string
+  overallRating: number
+  loopStructure: string
+  questions: string
+  feedbackReceived: string
+  outcome: string
+  isAnonymous: boolean
+}
+function normalizeExperience(r: unknown): InterviewExperience {
+  const x = r as Record<string, unknown>
+  return {
+    id: (x.id as string) ?? '',
+    userId: (x.userId as string) ?? '',
+    companyTag: (x.companyTag as string) ?? '',
+    role: (x.role as string) ?? '',
+    level: (x.level as string) ?? '',
+    overallRating: (x.overallRating as number) ?? 0,
+    loopStructure: (x.loopStructure as string) ?? '',
+    questions: (x.questions as string) ?? '',
+    feedbackReceived: (x.feedbackReceived as string) ?? '',
+    outcome: (x.outcome as string) ?? '',
+    isAnonymous: Boolean(x.isAnonymous),
+    moderationStatus: (x.moderationStatus as string) ?? 'approved',
+    postedAt: (x.postedAt as string) ?? '',
+  }
 }

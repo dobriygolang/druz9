@@ -2279,6 +2279,50 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/inbox.v1.GetUnreadCountResponse'
+    /api/v1/interview-board:
+        get:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_ListInterviewExperiences
+            parameters:
+                - name: companyTag
+                  in: query
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.ListInterviewExperiencesResponse'
+        post:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_PostInterviewExperience
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.PostInterviewExperienceRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.InterviewExperience'
     /api/v1/interview-prep/companies:
         get:
             tags:
@@ -6190,6 +6234,40 @@ components:
                     type: array
                     items:
                         type: string
+        interview_prep.v1.InterviewExperience:
+            type: object
+            properties:
+                id:
+                    type: string
+                userId:
+                    type: string
+                    description: |-
+                        user_id is empty when is_anonymous=true so client-side can't
+                         deanonymise authors.
+                companyTag:
+                    type: string
+                role:
+                    type: string
+                level:
+                    type: string
+                overallRating:
+                    type: integer
+                    format: int32
+                loopStructure:
+                    type: string
+                questions:
+                    type: string
+                feedbackReceived:
+                    type: string
+                outcome:
+                    type: string
+                isAnonymous:
+                    type: boolean
+                moderationStatus:
+                    type: string
+                postedAt:
+                    type: string
+                    format: date-time
         interview_prep.v1.InterviewPrepQuestion:
             type: object
             properties:
@@ -6335,6 +6413,16 @@ components:
                     type: array
                     items:
                         type: string
+        interview_prep.v1.ListInterviewExperiencesResponse:
+            type: object
+            properties:
+                experiences:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_prep.v1.InterviewExperience'
+                total:
+                    type: integer
+                    format: int32
         interview_prep.v1.ListMockBlueprintsResponse:
             type: object
             properties:
@@ -6654,6 +6742,28 @@ components:
                     type: string
                 candidateInstructions:
                     type: string
+        interview_prep.v1.PostInterviewExperienceRequest:
+            type: object
+            properties:
+                companyTag:
+                    type: string
+                role:
+                    type: string
+                level:
+                    type: string
+                overallRating:
+                    type: integer
+                    format: int32
+                loopStructure:
+                    type: string
+                questions:
+                    type: string
+                feedbackReceived:
+                    type: string
+                outcome:
+                    type: string
+                isAnonymous:
+                    type: boolean
         interview_prep.v1.ReviewMockSystemDesignRequest:
             type: object
             properties:

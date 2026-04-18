@@ -19,37 +19,39 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	InterviewPrepService_ListTasks_FullMethodName               = "/interview_prep.v1.InterviewPrepService/ListTasks"
-	InterviewPrepService_StartSession_FullMethodName            = "/interview_prep.v1.InterviewPrepService/StartSession"
-	InterviewPrepService_GetSession_FullMethodName              = "/interview_prep.v1.InterviewPrepService/GetSession"
-	InterviewPrepService_SubmitSession_FullMethodName           = "/interview_prep.v1.InterviewPrepService/SubmitSession"
-	InterviewPrepService_AnswerQuestion_FullMethodName          = "/interview_prep.v1.InterviewPrepService/AnswerQuestion"
-	InterviewPrepService_ReviewSystemDesign_FullMethodName      = "/interview_prep.v1.InterviewPrepService/ReviewSystemDesign"
-	InterviewPrepService_ListCompanies_FullMethodName           = "/interview_prep.v1.InterviewPrepService/ListCompanies"
-	InterviewPrepService_ListMockBlueprints_FullMethodName      = "/interview_prep.v1.InterviewPrepService/ListMockBlueprints"
-	InterviewPrepService_StartMockSession_FullMethodName        = "/interview_prep.v1.InterviewPrepService/StartMockSession"
-	InterviewPrepService_GetMockSession_FullMethodName          = "/interview_prep.v1.InterviewPrepService/GetMockSession"
-	InterviewPrepService_SubmitMockStage_FullMethodName         = "/interview_prep.v1.InterviewPrepService/SubmitMockStage"
-	InterviewPrepService_ReviewMockSystemDesign_FullMethodName  = "/interview_prep.v1.InterviewPrepService/ReviewMockSystemDesign"
-	InterviewPrepService_AnswerMockQuestion_FullMethodName      = "/interview_prep.v1.InterviewPrepService/AnswerMockQuestion"
-	InterviewPrepService_AbortMockSession_FullMethodName        = "/interview_prep.v1.InterviewPrepService/AbortMockSession"
-	InterviewPrepService_ListAdminTasks_FullMethodName          = "/interview_prep.v1.InterviewPrepService/ListAdminTasks"
-	InterviewPrepService_CreateAdminTask_FullMethodName         = "/interview_prep.v1.InterviewPrepService/CreateAdminTask"
-	InterviewPrepService_GetAdminTask_FullMethodName            = "/interview_prep.v1.InterviewPrepService/GetAdminTask"
-	InterviewPrepService_UpdateAdminTask_FullMethodName         = "/interview_prep.v1.InterviewPrepService/UpdateAdminTask"
-	InterviewPrepService_DeleteAdminTask_FullMethodName         = "/interview_prep.v1.InterviewPrepService/DeleteAdminTask"
-	InterviewPrepService_ListAdminQuestions_FullMethodName      = "/interview_prep.v1.InterviewPrepService/ListAdminQuestions"
-	InterviewPrepService_CreateAdminQuestion_FullMethodName     = "/interview_prep.v1.InterviewPrepService/CreateAdminQuestion"
-	InterviewPrepService_UpdateAdminQuestion_FullMethodName     = "/interview_prep.v1.InterviewPrepService/UpdateAdminQuestion"
-	InterviewPrepService_DeleteAdminQuestion_FullMethodName     = "/interview_prep.v1.InterviewPrepService/DeleteAdminQuestion"
-	InterviewPrepService_ListMockQuestionPools_FullMethodName   = "/interview_prep.v1.InterviewPrepService/ListMockQuestionPools"
-	InterviewPrepService_CreateMockQuestionPool_FullMethodName  = "/interview_prep.v1.InterviewPrepService/CreateMockQuestionPool"
-	InterviewPrepService_UpdateMockQuestionPool_FullMethodName  = "/interview_prep.v1.InterviewPrepService/UpdateMockQuestionPool"
-	InterviewPrepService_DeleteMockQuestionPool_FullMethodName  = "/interview_prep.v1.InterviewPrepService/DeleteMockQuestionPool"
-	InterviewPrepService_ListMockCompanyPresets_FullMethodName  = "/interview_prep.v1.InterviewPrepService/ListMockCompanyPresets"
-	InterviewPrepService_CreateMockCompanyPreset_FullMethodName = "/interview_prep.v1.InterviewPrepService/CreateMockCompanyPreset"
-	InterviewPrepService_UpdateMockCompanyPreset_FullMethodName = "/interview_prep.v1.InterviewPrepService/UpdateMockCompanyPreset"
-	InterviewPrepService_DeleteMockCompanyPreset_FullMethodName = "/interview_prep.v1.InterviewPrepService/DeleteMockCompanyPreset"
+	InterviewPrepService_ListTasks_FullMethodName                = "/interview_prep.v1.InterviewPrepService/ListTasks"
+	InterviewPrepService_StartSession_FullMethodName             = "/interview_prep.v1.InterviewPrepService/StartSession"
+	InterviewPrepService_GetSession_FullMethodName               = "/interview_prep.v1.InterviewPrepService/GetSession"
+	InterviewPrepService_SubmitSession_FullMethodName            = "/interview_prep.v1.InterviewPrepService/SubmitSession"
+	InterviewPrepService_AnswerQuestion_FullMethodName           = "/interview_prep.v1.InterviewPrepService/AnswerQuestion"
+	InterviewPrepService_ReviewSystemDesign_FullMethodName       = "/interview_prep.v1.InterviewPrepService/ReviewSystemDesign"
+	InterviewPrepService_ListCompanies_FullMethodName            = "/interview_prep.v1.InterviewPrepService/ListCompanies"
+	InterviewPrepService_ListMockBlueprints_FullMethodName       = "/interview_prep.v1.InterviewPrepService/ListMockBlueprints"
+	InterviewPrepService_StartMockSession_FullMethodName         = "/interview_prep.v1.InterviewPrepService/StartMockSession"
+	InterviewPrepService_GetMockSession_FullMethodName           = "/interview_prep.v1.InterviewPrepService/GetMockSession"
+	InterviewPrepService_SubmitMockStage_FullMethodName          = "/interview_prep.v1.InterviewPrepService/SubmitMockStage"
+	InterviewPrepService_ReviewMockSystemDesign_FullMethodName   = "/interview_prep.v1.InterviewPrepService/ReviewMockSystemDesign"
+	InterviewPrepService_AnswerMockQuestion_FullMethodName       = "/interview_prep.v1.InterviewPrepService/AnswerMockQuestion"
+	InterviewPrepService_AbortMockSession_FullMethodName         = "/interview_prep.v1.InterviewPrepService/AbortMockSession"
+	InterviewPrepService_ListAdminTasks_FullMethodName           = "/interview_prep.v1.InterviewPrepService/ListAdminTasks"
+	InterviewPrepService_CreateAdminTask_FullMethodName          = "/interview_prep.v1.InterviewPrepService/CreateAdminTask"
+	InterviewPrepService_GetAdminTask_FullMethodName             = "/interview_prep.v1.InterviewPrepService/GetAdminTask"
+	InterviewPrepService_UpdateAdminTask_FullMethodName          = "/interview_prep.v1.InterviewPrepService/UpdateAdminTask"
+	InterviewPrepService_DeleteAdminTask_FullMethodName          = "/interview_prep.v1.InterviewPrepService/DeleteAdminTask"
+	InterviewPrepService_ListAdminQuestions_FullMethodName       = "/interview_prep.v1.InterviewPrepService/ListAdminQuestions"
+	InterviewPrepService_CreateAdminQuestion_FullMethodName      = "/interview_prep.v1.InterviewPrepService/CreateAdminQuestion"
+	InterviewPrepService_UpdateAdminQuestion_FullMethodName      = "/interview_prep.v1.InterviewPrepService/UpdateAdminQuestion"
+	InterviewPrepService_DeleteAdminQuestion_FullMethodName      = "/interview_prep.v1.InterviewPrepService/DeleteAdminQuestion"
+	InterviewPrepService_ListMockQuestionPools_FullMethodName    = "/interview_prep.v1.InterviewPrepService/ListMockQuestionPools"
+	InterviewPrepService_CreateMockQuestionPool_FullMethodName   = "/interview_prep.v1.InterviewPrepService/CreateMockQuestionPool"
+	InterviewPrepService_UpdateMockQuestionPool_FullMethodName   = "/interview_prep.v1.InterviewPrepService/UpdateMockQuestionPool"
+	InterviewPrepService_DeleteMockQuestionPool_FullMethodName   = "/interview_prep.v1.InterviewPrepService/DeleteMockQuestionPool"
+	InterviewPrepService_ListMockCompanyPresets_FullMethodName   = "/interview_prep.v1.InterviewPrepService/ListMockCompanyPresets"
+	InterviewPrepService_CreateMockCompanyPreset_FullMethodName  = "/interview_prep.v1.InterviewPrepService/CreateMockCompanyPreset"
+	InterviewPrepService_UpdateMockCompanyPreset_FullMethodName  = "/interview_prep.v1.InterviewPrepService/UpdateMockCompanyPreset"
+	InterviewPrepService_DeleteMockCompanyPreset_FullMethodName  = "/interview_prep.v1.InterviewPrepService/DeleteMockCompanyPreset"
+	InterviewPrepService_PostInterviewExperience_FullMethodName  = "/interview_prep.v1.InterviewPrepService/PostInterviewExperience"
+	InterviewPrepService_ListInterviewExperiences_FullMethodName = "/interview_prep.v1.InterviewPrepService/ListInterviewExperiences"
 )
 
 // InterviewPrepServiceClient is the client API for InterviewPrepService service.
@@ -87,6 +89,8 @@ type InterviewPrepServiceClient interface {
 	CreateMockCompanyPreset(ctx context.Context, in *CreateMockCompanyPresetRequest, opts ...grpc.CallOption) (*MockCompanyPresetEnvelope, error)
 	UpdateMockCompanyPreset(ctx context.Context, in *UpdateMockCompanyPresetRequest, opts ...grpc.CallOption) (*MockCompanyPresetEnvelope, error)
 	DeleteMockCompanyPreset(ctx context.Context, in *DeleteMockCompanyPresetRequest, opts ...grpc.CallOption) (*StatusResponse, error)
+	PostInterviewExperience(ctx context.Context, in *PostInterviewExperienceRequest, opts ...grpc.CallOption) (*InterviewExperience, error)
+	ListInterviewExperiences(ctx context.Context, in *ListInterviewExperiencesRequest, opts ...grpc.CallOption) (*ListInterviewExperiencesResponse, error)
 }
 
 type interviewPrepServiceClient struct {
@@ -407,6 +411,26 @@ func (c *interviewPrepServiceClient) DeleteMockCompanyPreset(ctx context.Context
 	return out, nil
 }
 
+func (c *interviewPrepServiceClient) PostInterviewExperience(ctx context.Context, in *PostInterviewExperienceRequest, opts ...grpc.CallOption) (*InterviewExperience, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InterviewExperience)
+	err := c.cc.Invoke(ctx, InterviewPrepService_PostInterviewExperience_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *interviewPrepServiceClient) ListInterviewExperiences(ctx context.Context, in *ListInterviewExperiencesRequest, opts ...grpc.CallOption) (*ListInterviewExperiencesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListInterviewExperiencesResponse)
+	err := c.cc.Invoke(ctx, InterviewPrepService_ListInterviewExperiences_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InterviewPrepServiceServer is the server API for InterviewPrepService service.
 // All implementations must embed UnimplementedInterviewPrepServiceServer
 // for forward compatibility.
@@ -442,6 +466,8 @@ type InterviewPrepServiceServer interface {
 	CreateMockCompanyPreset(context.Context, *CreateMockCompanyPresetRequest) (*MockCompanyPresetEnvelope, error)
 	UpdateMockCompanyPreset(context.Context, *UpdateMockCompanyPresetRequest) (*MockCompanyPresetEnvelope, error)
 	DeleteMockCompanyPreset(context.Context, *DeleteMockCompanyPresetRequest) (*StatusResponse, error)
+	PostInterviewExperience(context.Context, *PostInterviewExperienceRequest) (*InterviewExperience, error)
+	ListInterviewExperiences(context.Context, *ListInterviewExperiencesRequest) (*ListInterviewExperiencesResponse, error)
 	mustEmbedUnimplementedInterviewPrepServiceServer()
 }
 
@@ -544,6 +570,12 @@ func (UnimplementedInterviewPrepServiceServer) UpdateMockCompanyPreset(context.C
 }
 func (UnimplementedInterviewPrepServiceServer) DeleteMockCompanyPreset(context.Context, *DeleteMockCompanyPresetRequest) (*StatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteMockCompanyPreset not implemented")
+}
+func (UnimplementedInterviewPrepServiceServer) PostInterviewExperience(context.Context, *PostInterviewExperienceRequest) (*InterviewExperience, error) {
+	return nil, status.Error(codes.Unimplemented, "method PostInterviewExperience not implemented")
+}
+func (UnimplementedInterviewPrepServiceServer) ListInterviewExperiences(context.Context, *ListInterviewExperiencesRequest) (*ListInterviewExperiencesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListInterviewExperiences not implemented")
 }
 func (UnimplementedInterviewPrepServiceServer) mustEmbedUnimplementedInterviewPrepServiceServer() {}
 func (UnimplementedInterviewPrepServiceServer) testEmbeddedByValue()                              {}
@@ -1124,6 +1156,42 @@ func _InterviewPrepService_DeleteMockCompanyPreset_Handler(srv interface{}, ctx 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _InterviewPrepService_PostInterviewExperience_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostInterviewExperienceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InterviewPrepServiceServer).PostInterviewExperience(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InterviewPrepService_PostInterviewExperience_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InterviewPrepServiceServer).PostInterviewExperience(ctx, req.(*PostInterviewExperienceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InterviewPrepService_ListInterviewExperiences_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListInterviewExperiencesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InterviewPrepServiceServer).ListInterviewExperiences(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InterviewPrepService_ListInterviewExperiences_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InterviewPrepServiceServer).ListInterviewExperiences(ctx, req.(*ListInterviewExperiencesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // InterviewPrepService_ServiceDesc is the grpc.ServiceDesc for InterviewPrepService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1254,6 +1322,14 @@ var InterviewPrepService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteMockCompanyPreset",
 			Handler:    _InterviewPrepService_DeleteMockCompanyPreset_Handler,
+		},
+		{
+			MethodName: "PostInterviewExperience",
+			Handler:    _InterviewPrepService_PostInterviewExperience_Handler,
+		},
+		{
+			MethodName: "ListInterviewExperiences",
+			Handler:    _InterviewPrepService_ListInterviewExperiences_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

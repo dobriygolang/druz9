@@ -1,0 +1,172 @@
+name: Quality Gates
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  go-lint:
+    name: Go Lint (${{ matrix.module.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - name: api
+            path: apps/api
+          - name: notification-service
+            path: apps/notification-service
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ matrix.module.path }}/go.mod
+          cache-dependency-path: ${{ matrix.module.path }}/go.sum
+
+      - name: Run golangci-lint on changed issues
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.64.8
+          working-directory: ${{ matrix.module.path }}
+          args: --timeout=8m --new-from-rev=${{ github.event.pull_request.base.sha || github.event.before || 'HEAD~1' }}
+
+  frontend-lint:
+    name: Frontend Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/front
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/front/package-lock.json
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run oxlint
+        run: npm run lint
+
+      - name: Audit npm dependencies
+        run: npm run audit:high
+
+  repo-lint:
+    name: Repository Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint GitHub Actions
+        uses: raven-actions/actionlint@v2
+
+      - name: Lint shell scripts
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: ./apps
+          severity: warning
+
+      - name: Lint Dockerfiles
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: apps/api/Dockerfile
+          config: apps/.hadolint.yaml
+
+      - name: Lint notification-service Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: apps/notification-service/Dockerfile
+          config: apps/.hadolint.yaml
+
+      - name: Lint frontend Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: apps/front/Dockerfile
+          config: apps/.hadolint.yaml
+
+      - name: Validate production compose
+        run: |
+          docker compose \
+            --env-file apps/deploy/.env.prod.example \
+            -f apps/deploy/docker-compose.prod.yml \
+            config >/dev/null
+
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          args: detect --source . --config apps/.gitleaks.toml --redact --verbose
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  sast:
+    name: Semgrep SAST
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        run: >
+          semgrep scan --error
+          --config p/ci
+          --config p/golang
+          --config p/typescript
+          --config p/dockerfile
+          --config p/secrets
+          --exclude apps/api/pkg/api
+          --exclude apps/api/pkg/adapter
+          --exclude apps/notification-service/pkg
+          --exclude apps/api/third_party
+          --exclude apps/notification-service/third_party
+
+  trivy:
+    name: Trivy Config and Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: apps
+          trivyignores: apps/.trivyignore
+          scanners: vuln,secret,config
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Upload Trivy SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif

@@ -105,6 +105,58 @@ service InterviewPrepService {
     option (google.api.http) = { delete: "/api/admin/interview-prep/mock-company-presets/{id}" };
   }
 
+  // --- Killer feature #5: Anonymous Interview Experience Board ----------
+
+  rpc PostInterviewExperience(PostInterviewExperienceRequest) returns (InterviewExperience) {
+    option (google.api.http) = {
+      post: "/api/v1/interview-board"
+      body: "*"
+    };
+  }
+
+  rpc ListInterviewExperiences(ListInterviewExperiencesRequest) returns (ListInterviewExperiencesResponse) {
+    option (google.api.http) = { get: "/api/v1/interview-board" };
+  }
+}
+
+message InterviewExperience {
+  string id                 = 1;
+  // user_id is empty when is_anonymous=true so client-side can't
+  // deanonymise authors.
+  string user_id            = 2;
+  string company_tag        = 3;
+  string role               = 4;
+  string level              = 5;
+  int32  overall_rating     = 6;   // 1..5
+  string loop_structure     = 7;
+  string questions          = 8;
+  string feedback_received  = 9;
+  string outcome            = 10;
+  bool   is_anonymous       = 11;
+  string moderation_status  = 12;  // pending/approved/rejected
+  google.protobuf.Timestamp posted_at = 13;
+}
+
+message PostInterviewExperienceRequest {
+  string company_tag       = 1;
+  string role              = 2;
+  string level             = 3;
+  int32  overall_rating    = 4;
+  string loop_structure    = 5;
+  string questions         = 6;
+  string feedback_received = 7;
+  string outcome           = 8;
+  bool   is_anonymous      = 9;
+}
+
+message ListInterviewExperiencesRequest {
+  string company_tag = 1;  // empty = all companies
+  int32  limit       = 2;
+  int32  offset      = 3;
+}
+message ListInterviewExperiencesResponse {
+  repeated InterviewExperience experiences = 1;
+  int32                        total       = 2;
 }
 
 // ── Enums ──────────────────────────────────────────────────────────────────
