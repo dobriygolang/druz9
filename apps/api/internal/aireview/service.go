@@ -60,6 +60,11 @@ type InterviewSolutionReviewRequest struct {
 	CandidateLanguage string
 	CandidateCode     string
 	CandidateNotes    string
+	// CustomRubric is the admin-authored task-specific AI-review prompt
+	// (interview_items.ai_review_prompt). When non-empty it's appended to
+	// the default prompt as additional instructions so the evaluator
+	// focuses on the axes the task cares about.
+	CustomRubric      string
 }
 
 type InterviewSolutionReview struct {
@@ -285,6 +290,15 @@ func buildInterviewSolutionPrompt(req InterviewSolutionReviewRequest) string {
 		}
 		b.WriteString(":\n")
 		b.WriteString(truncate(value, maxPromptCandidateCodeChars))
+	}
+	// Admin-authored custom rubric wins — appended AFTER the default
+	// instructions so any conflict resolves toward the task-specific
+	// grading axes. Kept as an append (not replacement) so platform
+	// guarantees about JSON output shape still hold.
+	if rubric := strings.TrimSpace(req.CustomRubric); rubric != "" {
+		b.WriteString("\n\n## Task-specific rubric (admin-authored)\n")
+		b.WriteString(truncate(rubric, maxPromptTaskStatementChars))
+		b.WriteString("\n\nAlways follow these task-specific instructions alongside the JSON output contract above.")
 	}
 	return b.String()
 }

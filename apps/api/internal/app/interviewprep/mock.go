@@ -281,6 +281,7 @@ func (s *Service) SubmitMockStage(
 		CandidateLanguage: solveLanguage,
 		CandidateCode:     code,
 		CandidateNotes:    notes,
+		CustomRubric:      stage.Task.AIReviewPrompt,
 	})
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
