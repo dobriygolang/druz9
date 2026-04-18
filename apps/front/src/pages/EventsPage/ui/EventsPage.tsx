@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Panel, RpgButton, Badge, Bar, PageHeader } from '@/shared/ui/pixel'
 import { Trophy, Sword, Banner, Statue, Chest, SpiritOrb } from '@/shared/ui/sprites'
 import { eventApi } from '@/features/Event/api/eventApi'
 import type { Event as ApiEvent } from '@/features/Event/api/eventApi'
+import { useActiveSeason } from '@/features/Hub/api/useActiveSeason'
 
 type EventType = 'all' | 'seasonal' | 'tournament' | 'guild' | 'weekly' | 'lecture' | 'raid'
 
@@ -68,9 +69,19 @@ function eventIcon(type: Event['type']) {
 
 export function EventsPage() {
   const { t } = useTranslation()
+  const season = useActiveSeason()
   const [cat, setCat] = useState<EventType>('all')
   const [events, setEvents] = useState<UIEvent[]>([])
   const [loading, setLoading] = useState(true)
+  // Calendar strip header lets the player flip months without persistence —
+  // offset is in months from "now". Zero shows the current month.
+  const [monthOffset, setMonthOffset] = useState(0)
+  const monthDate = useMemo(() => {
+    const d = new Date()
+    d.setMonth(d.getMonth() + monthOffset)
+    return d
+  }, [monthOffset])
+  const monthLabel = monthDate.toLocaleString(undefined, { month: 'long', year: 'numeric' })
 
   useEffect(() => {
     let cancelled = false
@@ -104,12 +115,17 @@ export function EventsPage() {
         title={t('eventsHub.title')}
         subtitle={t('eventsHub.subtitle')}
         right={
-          <span
-            className="font-silkscreen uppercase"
-            style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em' }}
-          >
-            {t('eventsHub.active')}
-          </span>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'baseline' }}>
+            <Badge>{t('eventsHub.activeCount', { count: events.filter((e) => !e.d || new Date(e.d) > new Date(Date.now() - 7 * 86400_000)).length, defaultValue: `${events.length} active` })}</Badge>
+            {season && (
+              <span
+                className="font-silkscreen uppercase"
+                style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em' }}
+              >
+                {`${t('eventsHub.season', { defaultValue: 'season' })} ${season.roman}`}
+              </span>
+            )}
+          </div>
         }
       />
 
@@ -124,11 +140,15 @@ export function EventsPage() {
           }}
         >
           <h3 className="font-display" style={{ fontSize: 17 }}>
-            {t('eventsHub.month')}
+            {monthLabel}
           </h3>
           <div style={{ display: 'flex', gap: 8 }}>
-            <RpgButton size="sm">{t('eventsHub.prev')}</RpgButton>
-            <RpgButton size="sm">{t('eventsHub.next')}</RpgButton>
+            <RpgButton size="sm" onClick={() => setMonthOffset((m) => m - 1)}>
+              {t('eventsHub.prev')}
+            </RpgButton>
+            <RpgButton size="sm" onClick={() => setMonthOffset((m) => m + 1)}>
+              {t('eventsHub.next')}
+            </RpgButton>
           </div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>

@@ -46,18 +46,23 @@ const SERIES: Array<[string, number, string]> = [
   ['Career Trail', 30, '#3b6a8f'],
 ]
 
-const QUEUE: Array<[string, string, string]> = [
-  ['up next', 'Rituals of the Mock Interview', '38m'],
-  ['queued', 'Why the Ember Bearers fell', '61m'],
-  ['queued', 'Dungeons & Databases', '44m'],
-  ['queued', 'Scrolls of Concurrency', '28m'],
-]
+// Listener queue lives in-memory only for now — we track it client-side
+// until the backend grows a /podcasts/queue endpoint.
+type QueueItem = { episodeId: string; title: string; mins: number; slot: string }
 
 export function PodcastsPage() {
   const [tab, setTab] = useState<Tab>('featured')
   const [episodes, setEpisodes] = useState<Episode[]>([])
   const [totalCatalog, setTotalCatalog] = useState(0)
   const [playing, setPlaying] = useState<{ title: string; host: string; ep: string; pos: number } | null>(null)
+  const [history, setHistory] = useState<Episode[]>([])
+  const [saved, _setSaved] = useState<Set<string>>(() => {
+    try {
+      return new Set(JSON.parse(localStorage.getItem('podcast:saved') ?? '[]'))
+    } catch { return new Set() }
+  })
+  const [queue, _setQueue] = useState<QueueItem[]>([])
+  void _setSaved; void _setQueue
 
   useEffect(() => {
     let cancelled = false
@@ -207,15 +212,15 @@ export function PodcastsPage() {
             ['featured', 'Featured'],
             ['series', 'Series'],
             ['history', 'History'],
-            ['saved', 'Saved (12)'],
+            ['saved', `Saved (${saved.size})`],
           ] as const
-        ).map(([id, t]) => (
+        ).map(([id, label]) => (
           <div
             key={id}
             className={`rpg-tab ${tab === id ? 'rpg-tab--active' : ''}`}
             onClick={() => setTab(id as Tab)}
           >
-            {t}
+            {label}
           </div>
         ))}
       </div>
@@ -223,22 +228,26 @@ export function PodcastsPage() {
       <div className="rpg-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 18 }}>
         <div>
           <h3 className="font-display" style={{ fontSize: 17, marginBottom: 12 }}>
-            New from the hearth
+            {tab === 'featured' && 'New from the hearth'}
+            {tab === 'series' && 'Series ladders'}
+            {tab === 'history' && 'Recently played'}
+            {tab === 'saved' && 'Saved for later'}
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            {episodes.map((p) => (
+            {(tab === 'history' ? history : tab === 'saved' ? episodes.filter((e) => saved.has(e.id)) : episodes).map((p) => (
               <Panel
                 key={p.ep}
                 variant="tight"
                 style={{ padding: 12, cursor: 'pointer' }}
-                onClick={() =>
+                onClick={() => {
                   setPlaying({
                     title: p.t,
                     host: p.h,
                     ep: `Ep. ${p.ep} · ${p.d}`,
                     pos: 0,
                   })
-                }
+                  setHistory((h) => [p, ...h.filter((e) => e.id !== p.id)].slice(0, 20))
+                }}
               >
                 <div style={{ display: 'flex', gap: 12, alignItems: 'stretch' }}>
                   <div
@@ -307,6 +316,7 @@ export function PodcastsPage() {
             ))}
           </div>
 
+          {tab !== 'history' && tab !== 'saved' && (<>
           <h3 className="font-display" style={{ fontSize: 17, marginTop: 16, marginBottom: 12 }}>
             Series
           </h3>
@@ -349,38 +359,50 @@ export function PodcastsPage() {
               </div>
             ))}
           </div>
+          </>)}
         </div>
 
         <div>
           <Panel variant="recessed" style={{ padding: 14, marginBottom: 12 }}>
             <h3 className="font-display" style={{ fontSize: 17, marginBottom: 10 }}>
-              Queue · 5
+              Queue · {queue.length}
             </h3>
-            {QUEUE.map(([s, t, d], i) => (
+            {queue.length === 0 && (
               <div
-                key={i}
+                className="font-silkscreen uppercase"
+                style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em', padding: '6px 0' }}
+              >
+                your queue is empty
+              </div>
+            )}
+            {queue.map((q, i) => (
+              <div
+                key={q.episodeId}
                 style={{
                   padding: '8px 0',
-                  borderBottom: i < QUEUE.length - 1 ? '1px dashed var(--ink-3)' : 'none',
+                  borderBottom: i < queue.length - 1 ? '1px dashed var(--ink-3)' : 'none',
                 }}
               >
                 <div
                   className="font-silkscreen uppercase"
                   style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
                 >
-                  {s}
+                  {q.slot}
                 </div>
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 12 }}>{t}</div>
+                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 12 }}>{q.title}</div>
                 <div
                   className="font-silkscreen uppercase"
                   style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
                 >
-                  {d}
+                  {q.mins}m
                 </div>
               </div>
             ))}
           </Panel>
 
+          {/* Listening pact: stats endpoint lives on the roadmap. Until
+              it exists we don't invent numbers; keep the slot copy
+              short so the column still reads cleanly. */}
           <Panel>
             <h3 className="font-display" style={{ fontSize: 17 }}>
               Listening pact
@@ -391,33 +413,10 @@ export function PodcastsPage() {
                 fontSize: 9,
                 color: 'var(--ink-2)',
                 letterSpacing: '0.08em',
-                marginBottom: 8,
-              }}
-            >
-              this month
-            </div>
-            <div
-              style={{
-                fontFamily: 'Pixelify Sans, monospace',
-                fontSize: 32,
-                color: 'var(--ember-1)',
-              }}
-            >
-              14h 20m
-            </div>
-            <div style={{ marginTop: 8 }}>
-              <Bar value={71} />
-            </div>
-            <div
-              className="font-silkscreen uppercase"
-              style={{
-                fontSize: 9,
-                color: 'var(--ink-2)',
-                letterSpacing: '0.08em',
                 marginTop: 6,
               }}
             >
-              71% of 20h goal · +200 ✦ on complete
+              listening goals unlock once we wire the stats endpoint — hang tight.
             </div>
           </Panel>
         </div>

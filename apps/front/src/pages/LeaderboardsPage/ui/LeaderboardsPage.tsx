@@ -8,6 +8,7 @@ import {
   type GuildLeaderboardEntry,
   type SeasonXPEntry,
 } from '@/features/Arena/api/arenaApi'
+import { useActiveSeason } from '@/features/Hub/api/useActiveSeason'
 
 type Tab = 'arena' | 'guilds' | 'season'
 type Scope = 'global' | 'friends'
@@ -39,6 +40,7 @@ function rowBg(i: number, isYou: boolean) {
 export function LeaderboardsPage() {
   const { t } = useTranslation()
   const { user } = useAuth()
+  const season = useActiveSeason()
   const [tab, setTab]     = useState<Tab>('arena')
   const [scope, setScope] = useState<Scope>('global')
   const [topic, setTopic] = useState('all')
@@ -94,7 +96,9 @@ export function LeaderboardsPage() {
         subtitle={t('leaderboards.subtitle')}
         right={
           <span className="font-silkscreen uppercase" style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em' }}>
-            {t('leaderboards.seasonInfo')}
+            {season
+              ? `${t('leaderboards.season', { defaultValue: 'season' })} ${season.roman} · ${season.daysLeftLabel}`
+              : t('leaderboards.offSeason', { defaultValue: 'off-season' })}
           </span>
         }
       />

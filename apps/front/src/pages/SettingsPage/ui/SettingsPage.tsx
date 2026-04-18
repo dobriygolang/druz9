@@ -1,8 +1,10 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Panel, RpgButton, PageHeader } from '@/shared/ui/pixel'
 import { Hero } from '@/shared/ui/sprites'
 import { isSoundEnabled, setSoundEnabled, play } from '@/shared/lib/sound'
+import { notificationApi, type NotificationSettings } from '@/features/Notification/api/notificationApi'
+import { addToast } from '@/shared/lib/toasts'
 
 type Section = 'account' | 'display' | 'notifs' | 'gameplay' | 'privacy' | 'keys' | 'access' | 'language'
 
@@ -311,26 +313,63 @@ function SettingsDisplay() {
 
 function SettingsNotifs() {
   const { t } = useTranslation()
-  const rows: Array<[string, string, boolean]> = [
-    [t('settings.notifs.duelInvites'),   t('settings.notifs.duelInvitesHelp'),   true],
-    [t('settings.notifs.guildWar'),      t('settings.notifs.guildWarHelp'),       true],
-    [t('settings.notifs.friendOnline'),  t('settings.notifs.friendOnlineHelp'),   false],
-    [t('settings.notifs.weeklyReset'),   t('settings.notifs.weeklyResetHelp'),    true],
-    [t('settings.notifs.eventReminders'),t('settings.notifs.eventRemindersHelp'), true],
-    [t('settings.notifs.mentorReady'),   t('settings.notifs.mentorReadyHelp'),    true],
-    [t('settings.notifs.podcastEpisode'),t('settings.notifs.podcastEpisodeHelp'), false],
-    [t('settings.notifs.marketing'),     t('settings.notifs.marketingHelp'),      false],
-  ]
+  const [settings, setSettings] = useState<NotificationSettings | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    notificationApi.getSettings().then(setSettings).catch(() => {})
+  }, [])
+
+  const patch = async (key: keyof NotificationSettings, value: boolean) => {
+    if (!settings || busy) return
+    setBusy(true)
+    const prev = settings
+    setSettings({ ...settings, [key]: value })
+    try {
+      await notificationApi.updateSettings({ [key]: value })
+    } catch {
+      setSettings(prev)
+      addToast({ kind: 'QUEST', title: t('settings.notifs.saveFailed', { defaultValue: 'Could not save' }), body: '', icon: '!', color: 'var(--rpg-danger)' })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  if (!settings) {
+    return (
+      <>
+        <h3 className="font-display" style={{ fontSize: 17, marginBottom: 16 }}>
+          {t('settings.notifs.title')}
+        </h3>
+        <div style={{ color: 'var(--ink-2)', fontSize: 12 }}>
+          {t('settings.notifs.loading', { defaultValue: 'Loading…' })}
+        </div>
+      </>
+    )
+  }
+
   return (
     <>
       <h3 className="font-display" style={{ fontSize: 17, marginBottom: 16 }}>
         {t('settings.notifs.title')}
       </h3>
-      {rows.map(([l, h, on]) => (
-        <Setting key={l} label={l} help={h}>
-          <Toggle on={on} />
-        </Setting>
-      ))}
+      <Setting label={t('settings.notifs.duelInvites')} help={t('settings.notifs.duelInvitesHelp')}>
+        <Toggle on={settings.duelsEnabled} onClick={() => patch('duelsEnabled', !settings.duelsEnabled)} />
+      </Setting>
+      <Setting label={t('settings.notifs.guildWar')} help={t('settings.notifs.guildWarHelp')}>
+        <Toggle on={settings.guildsEnabled} onClick={() => patch('guildsEnabled', !settings.guildsEnabled)} />
+      </Setting>
+      <Setting label={t('settings.notifs.progress', { defaultValue: 'Progress updates' })} help={t('settings.notifs.progressHelp', { defaultValue: 'Level-ups, season tiers, achievements' })}>
+        <Toggle on={settings.progressEnabled} onClick={() => patch('progressEnabled', !settings.progressEnabled)} />
+      </Setting>
+      <Setting label={t('settings.notifs.dailyChallenge', { defaultValue: 'Daily challenge reminder' })} help={t('settings.notifs.dailyChallengeHelp', { defaultValue: 'One nudge a day if you haven\'t played' })}>
+        <Toggle on={settings.dailyChallengeEnabled} onClick={() => patch('dailyChallengeEnabled', !settings.dailyChallengeEnabled)} />
+      </Setting>
+      <Setting label={t('settings.notifs.telegramLinked', { defaultValue: 'Telegram linked' })} help={t('settings.notifs.telegramLinkedHelp', { defaultValue: 'Notifications are sent via the Telegram bot' })}>
+        <span className="font-silkscreen uppercase" style={{ fontSize: 10, color: settings.telegramLinked ? 'var(--moss-1)' : 'var(--ink-2)', letterSpacing: '0.08em' }}>
+          {settings.telegramLinked ? t('settings.notifs.linked', { defaultValue: 'linked' }) : t('settings.notifs.notLinked', { defaultValue: 'not linked' })}
+        </span>
+      </Setting>
     </>
   )
 }

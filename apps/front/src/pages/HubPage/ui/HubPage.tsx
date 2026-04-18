@@ -715,5 +715,6 @@ function emptyOverview(name: string): HubOverview {
     events: [],
     guild: null,
     merchantPicks: [],
+    activeSeason: null,
   }
 }
