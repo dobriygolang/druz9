@@ -9,6 +9,7 @@ import (
 
 	"api/internal/apihelpers"
 	seasonpassdomain "api/internal/domain/season_pass"
+	walletdomain "api/internal/domain/wallet"
 	v1 "api/pkg/api/season_pass/v1"
 )
 
@@ -24,7 +25,8 @@ func (i *Implementation) PurchasePremium(ctx context.Context, _ *v1.PurchasePrem
 			return nil, errors.NotFound("NO_ACTIVE_PASS", "no active season pass")
 		case goerr.Is(err, seasonpassdomain.ErrAlreadyPurchased):
 			return nil, errors.Conflict("ALREADY_PURCHASED", "premium already active")
-		case goerr.Is(err, seasonpassdomain.ErrInsufficientGems):
+		case goerr.Is(err, seasonpassdomain.ErrInsufficientGems),
+			goerr.Is(err, walletdomain.ErrInsufficientFunds):
 			return nil, errors.BadRequest("INSUFFICIENT_GEMS", "not enough gems")
 		default:
 			klog.Errorf("season_pass: purchase premium user=%s: %v", user.ID, err)

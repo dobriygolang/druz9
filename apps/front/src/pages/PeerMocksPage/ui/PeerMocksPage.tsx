@@ -6,6 +6,7 @@ import {
   peerMockApi,
   SlotType,
   SlotLevel,
+  SlotStatus,
   BookingStatus,
   type Slot,
   type Booking,
@@ -334,13 +335,21 @@ function SlotCard({
         {slot.priceGold > 0 && <Badge variant="ember">{slot.priceGold} gold</Badge>}
       </div>
       {slot.note && <div style={{ fontSize: 12, color: 'var(--ink-2)' }}>{slot.note}</div>}
+      {/* Status chip tells the owner why Cancel might be disabled —
+          previously once a slot was booked or cancelled, the Cancel
+          button was still live and hit a 409 SLOT_NOT_OPEN toast. */}
+      {ownerView && slot.status !== SlotStatus.OPEN && (
+        <Badge variant={slot.status === SlotStatus.BOOKED ? 'ember' : 'dark'}>
+          {slot.status === SlotStatus.BOOKED ? 'booked' : slot.status === SlotStatus.COMPLETED ? 'completed' : 'cancelled'}
+        </Badge>
+      )}
       <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
         {onBook && (
           <RpgButton size="sm" variant="primary" disabled={busy} onClick={onBook}>
             {busy ? 'Booking…' : 'Book'}
           </RpgButton>
         )}
-        {onCancel && (
+        {onCancel && slot.status === SlotStatus.OPEN && (
           <RpgButton size="sm" disabled={busy} onClick={onCancel}>
             {busy ? '…' : 'Cancel slot'}
           </RpgButton>

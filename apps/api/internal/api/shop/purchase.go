@@ -9,6 +9,7 @@ import (
 
 	"api/internal/apihelpers"
 	shopdomain "api/internal/domain/shop"
+	walletdomain "api/internal/domain/wallet"
 	v1 "api/pkg/api/shop/v1"
 )
 
@@ -34,7 +35,13 @@ func (i *Implementation) Purchase(ctx context.Context, req *v1.PurchaseRequest) 
 			return nil, errors.Conflict("ITEM_INACTIVE", "item is no longer for sale")
 		case goerr.Is(err, shopdomain.ErrAlreadyOwned):
 			return nil, errors.Conflict("ALREADY_OWNED", "you already own this item")
-		case goerr.Is(err, shopdomain.ErrInsufficientFunds):
+		// Two separate sentinels exist: shopdomain.ErrInsufficientFunds
+		// (if the shop service errors out before the wallet is touched)
+		// and walletdomain.ErrInsufficientFunds (wrapped by
+		// wallet.mapFundsErr when the actual debit fails). Catch both
+		// so the client always sees 400 INSUFFICIENT_FUNDS instead of
+		// a red 500 "internal" toast.
+		case goerr.Is(err, shopdomain.ErrInsufficientFunds), goerr.Is(err, walletdomain.ErrInsufficientFunds):
 			return nil, errors.BadRequest("INSUFFICIENT_FUNDS", "not enough currency")
 		case goerr.Is(err, shopdomain.ErrUnsupportedCurrency):
 			return nil, errors.BadRequest("UNSUPPORTED_CURRENCY", "currency is not supported for purchase")
