@@ -69,30 +69,66 @@ export function GuildPage() {
   const [hallTheme] = useState<HallTheme>('moss')
   const { wall: wallColor, floor: floorColor } = HALL_COLORS[hallTheme]
 
-  // Pick the user's first joined guild from the public list and load its
-  // members. Works until a dedicated "my guild" endpoint ships.
+  // Only load the user's own guild. If they aren't in one, render the
+  // onboarding screen (join existing / create new) instead of showing
+  // someone else's hall. That was the staging complaint — hardcoded
+  // Mossveil always appeared.
   const [guild, setGuild] = useState<Guild | null>(null)
+  const [loaded, setLoaded] = useState(false)
   const [members, setMembers] = useState<MemberRow[]>([])
   const [inviteOpen, setInviteOpen] = useState(false)
   const [hallEditOpen, setHallEditOpen] = useState(false)
+
+  const reloadMine = () => {
+    setLoaded(false)
+    guildApi
+      .listGuilds({ limit: 50 })
+      .then((r) => {
+        const mine = r.guilds.find((g) => g.isJoined) ?? null
+        setGuild(mine)
+        return mine ? guildApi.listMembers(mine.id) : null
+      })
+      .then((list) => {
+        if (list) setMembers(list.map(memberToRow))
+        else setMembers([])
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true))
+  }
 
   useEffect(() => {
     let cancelled = false
     guildApi
       .listGuilds({ limit: 50 })
       .then((r) => {
-        const mine = r.guilds.find((g) => g.isJoined) ?? r.guilds[0]
-        if (!mine || cancelled) return
+        if (cancelled) return
+        const mine = r.guilds.find((g) => g.isJoined) ?? null
         setGuild(mine)
-        return guildApi.listMembers(mine.id)
+        return mine ? guildApi.listMembers(mine.id) : null
       })
       .then((list) => {
-        if (!list || cancelled) return
-        setMembers(list.map(memberToRow))
+        if (cancelled) return
+        if (list) setMembers(list.map(memberToRow))
       })
       .catch(() => {})
+      .finally(() => { if (!cancelled) setLoaded(true) })
     return () => { cancelled = true }
   }, [])
+
+  // No joined guild yet → onboarding screen.
+  if (loaded && !guild) {
+    return <GuildOnboarding onJoined={reloadMine} />
+  }
+
+  if (!loaded || !guild) {
+    return (
+      <Panel>
+        <div style={{ padding: 16, textAlign: 'center', color: 'var(--ink-2)' }}>
+          {t('guild.page.loading', { defaultValue: 'Loading your guild…' })}
+        </div>
+      </Panel>
+    )
+  }
 
   return (
     <>
@@ -692,5 +728,250 @@ function HallEditModal({ onClose }: { onClose: () => void }) {
         </div>
       </div>
     </div>
+  )
+}
+
+// Shown when the signed-in user is not a member of any guild. Has two
+// paths: join an existing public guild (search + join) or create your
+// own. Replaces the old behaviour of rendering some other guild's hall
+// as if it were the user's.
+function GuildOnboarding({ onJoined }: { onJoined: () => void }) {
+  const navigate = useNavigate()
+  const [mode, setMode] = useState<'browse' | 'create'>('browse')
+  const [guilds, setGuilds] = useState<Guild[]>([])
+  const [query, setQuery] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [busyId, setBusyId] = useState<string | null>(null)
+
+  // Create-guild form state.
+  const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
+  const [creating, setCreating] = useState(false)
+  const [createError, setCreateError] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+    guildApi.listGuilds({ limit: 100 })
+      .then((r) => { if (!cancelled) setGuilds(r.guilds.filter((g) => g.isPublic)) })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
+  }, [])
+
+  const filtered = guilds.filter((g) => {
+    const q = query.trim().toLowerCase()
+    if (!q) return true
+    return g.name.toLowerCase().includes(q) || (g.description ?? '').toLowerCase().includes(q)
+  })
+
+  const join = async (g: Guild) => {
+    setBusyId(g.id)
+    try {
+      await guildApi.joinGuild(g.id)
+      onJoined()
+    } catch (e) {
+      setBusyId(null)
+    }
+  }
+
+  const createGuild = async () => {
+    const trimmed = name.trim()
+    if (trimmed.length < 3) {
+      setCreateError('Name must be at least 3 characters')
+      return
+    }
+    setCreateError('')
+    setCreating(true)
+    try {
+      await guildApi.createGuild({
+        name: trimmed,
+        description: description.trim(),
+        isPublic: true,
+      })
+      onJoined()
+    } catch (e) {
+      setCreateError('Could not create guild — maybe the name is taken.')
+    } finally {
+      setCreating(false)
+    }
+  }
+
+  return (
+    <>
+      <PageHeader
+        eyebrow="Guild · onboarding"
+        title="Find your guild"
+        subtitle="Guilds unlock campaigns, wars and shared buffs. Join an existing one or start your own — you can always switch later."
+        right={
+          <RpgButton size="sm" onClick={() => navigate('/hub')}>
+            Back to hub
+          </RpgButton>
+        }
+      />
+
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        <RpgButton
+          size="sm"
+          variant={mode === 'browse' ? 'primary' : 'default'}
+          onClick={() => setMode('browse')}
+        >
+          Browse guilds
+        </RpgButton>
+        <RpgButton
+          size="sm"
+          variant={mode === 'create' ? 'primary' : 'default'}
+          onClick={() => setMode('create')}
+        >
+          Create your own
+        </RpgButton>
+      </div>
+
+      {mode === 'browse' && (
+        <Panel>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 14 }}>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="search by name or description…"
+              style={{
+                flex: 1,
+                padding: '8px 10px',
+                border: '3px solid var(--ink-0)',
+                background: 'var(--parch-2)',
+                fontFamily: 'IBM Plex Sans, system-ui',
+                color: 'var(--ink-0)',
+                outline: 'none',
+              }}
+            />
+            <span
+              className="font-silkscreen uppercase"
+              style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em' }}
+            >
+              {loading ? 'loading…' : `${filtered.length} of ${guilds.length} guilds`}
+            </span>
+          </div>
+          {!loading && filtered.length === 0 && (
+            <div style={{ padding: 24, textAlign: 'center', color: 'var(--ink-2)', fontSize: 13 }}>
+              No guilds match that query. Try a different word — or start your own.
+            </div>
+          )}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
+            {filtered.map((g) => (
+              <div
+                key={g.id}
+                style={{
+                  padding: 12,
+                  border: '3px solid var(--ink-0)',
+                  background: 'var(--parch-0)',
+                  boxShadow: '3px 3px 0 var(--ink-0)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 6,
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 16 }}>{g.name}</div>
+                  <span
+                    className="font-silkscreen uppercase"
+                    style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em', whiteSpace: 'nowrap' }}
+                  >
+                    {g.memberCount} members
+                  </span>
+                </div>
+                {g.description && (
+                  <div style={{ fontSize: 12, color: 'var(--ink-2)', minHeight: 28 }}>{g.description}</div>
+                )}
+                <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+                  <RpgButton
+                    size="sm"
+                    variant="primary"
+                    disabled={busyId === g.id}
+                    onClick={() => join(g)}
+                  >
+                    {busyId === g.id ? 'Joining…' : 'Join'}
+                  </RpgButton>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      )}
+
+      {mode === 'create' && (
+        <Panel>
+          <div style={{ maxWidth: 520, margin: '0 auto', padding: 8 }}>
+            <h3 className="font-display" style={{ fontSize: 20, marginBottom: 6 }}>
+              Start your own guild
+            </h3>
+            <div style={{ color: 'var(--ink-2)', fontSize: 13, marginBottom: 16 }}>
+              You'll be the creator — members join with a shareable link.
+              Pick a name that's easy to remember.
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <div
+                className="font-silkscreen uppercase"
+                style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em', marginBottom: 4 }}
+              >
+                guild name
+              </div>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={40}
+                placeholder="The Ember Pact"
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  border: '3px solid var(--ink-0)',
+                  background: 'var(--parch-2)',
+                  fontFamily: 'Pixelify Sans, monospace',
+                  fontSize: 18,
+                  color: 'var(--ink-0)',
+                  outline: 'none',
+                }}
+              />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <div
+                className="font-silkscreen uppercase"
+                style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em', marginBottom: 4 }}
+              >
+                description (optional)
+              </div>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                maxLength={240}
+                rows={3}
+                placeholder="what the guild is about, tags, playstyle…"
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  border: '3px solid var(--ink-0)',
+                  background: 'var(--parch-2)',
+                  fontFamily: 'IBM Plex Sans, system-ui',
+                  fontSize: 13,
+                  color: 'var(--ink-0)',
+                  outline: 'none',
+                  resize: 'vertical',
+                }}
+              />
+            </div>
+            {createError && (
+              <div style={{ color: 'var(--rpg-danger, #a23a2a)', fontSize: 12, marginBottom: 12 }}>
+                {createError}
+              </div>
+            )}
+            <RpgButton
+              variant="primary"
+              disabled={creating || name.trim().length < 3}
+              onClick={createGuild}
+            >
+              {creating ? 'Forging…' : 'Create guild'}
+            </RpgButton>
+          </div>
+        </Panel>
+      )}
+    </>
   )
 }

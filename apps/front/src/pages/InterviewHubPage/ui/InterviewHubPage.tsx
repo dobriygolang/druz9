@@ -65,6 +65,9 @@ export function InterviewHubPage() {
   const [past, setPast] = useState<FeedItem[]>([])
   const [weakest, setWeakest] = useState<Array<{ key: string; label: string; score: number }>>([])
   const [loading, setLoading] = useState(true)
+  // Which company chip is currently kicking off a mock session (null = none).
+  // Prevents double-click from spawning two sessions.
+  const [startingCompany, setStartingCompany] = useState<string | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -113,10 +116,11 @@ export function InterviewHubPage() {
         }
       />
 
-      {/* Company picker — starts a session tuned to the chosen company's
-          question pool. Deep link carries ?company=<key> so the
-          live-session page can pre-filter blueprints. */}
-      <Panel style={{ marginBottom: 18 }}>
+      {/* Company picker — kicks off a real mock-session bound to the
+          chosen company's question pool (StartMockSession RPC). The
+          previous version just deep-linked to /interview/live/new which
+          is an AI chat, not a mock-interview flow. */}
+      <Panel data-hub-section="companies" style={{ marginBottom: 18 }}>
         <div
           className="font-silkscreen uppercase"
           style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em', marginBottom: 10 }}
@@ -128,7 +132,24 @@ export function InterviewHubPage() {
             <button
               key={c.key}
               className="rpg-btn"
-              onClick={() => navigate(`/interview/live/new?company=${c.key}`)}
+              disabled={startingCompany !== null}
+              onClick={async () => {
+                if (startingCompany) return
+                setStartingCompany(c.key)
+                try {
+                  const session = await interviewPrepApi.startMockSession({ companyTag: c.key })
+                  if (session?.id) {
+                    navigate(`/interview/mock/${session.id}`)
+                    return
+                  }
+                  // No blueprint for this company yet — fall back to the
+                  // hub-level picker so the user sees the actual list
+                  // of available programs instead of a dead click.
+                  navigate(`/interview?company=${c.key}`)
+                } catch {
+                  setStartingCompany(null)
+                }
+              }}
               style={{
                 padding: '10px 14px',
                 borderLeft: `6px solid ${c.accent}`,
@@ -136,7 +157,7 @@ export function InterviewHubPage() {
                 fontSize: 13,
               }}
             >
-              {c.label}
+              {startingCompany === c.key ? 'Starting…' : c.label}
             </button>
           ))}
         </div>
@@ -491,7 +512,16 @@ export function InterviewHubPage() {
               </span>
             </div>
           ))}
-          <RpgButton style={{ width: '100%', marginTop: 8 }} onClick={() => navigate('/interview/live/new')}>
+          <RpgButton
+            style={{ width: '100%', marginTop: 8 }}
+            onClick={() => {
+              // "Schedule" conceptually means a peer-to-peer mock slot.
+              // We're building that as a dedicated tab (Wave B.2b). Until
+              // it lands the button routes to the company picker above so
+              // users don't land on a disconnected AI chat.
+              document.querySelector('[data-hub-section="companies"]')?.scrollIntoView({ behavior: 'smooth' })
+            }}
+          >
             {t('interviewHub.scheduleMock')}
           </RpgButton>
         </Panel>
