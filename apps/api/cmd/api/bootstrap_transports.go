@@ -215,4 +215,7 @@ func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.S
 
 	challengev1.RegisterChallengeServiceHTTPServer(httpServer, services.challengeService)
 	challengev1.RegisterChallengeServiceServer(grpcServer, services.challengeService)
+
+	adminv1.RegisterAIMentorServiceHTTPServer(httpServer, services.aiMentorService)
+	adminv1.RegisterAIMentorServiceServer(grpcServer, services.aiMentorService)
 }

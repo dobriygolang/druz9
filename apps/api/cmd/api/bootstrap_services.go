@@ -98,6 +98,7 @@ type serviceContext struct {
 	shopService            *shopservice.Implementation
 	socialService          *socialservice.Implementation
 	peerMockService        *peermockservice.Implementation
+	aiMentorService        *adminservice.AIMentorImpl
 }
 
 func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*serviceContext, error) {
@@ -298,5 +299,6 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		shopService:            shopservice.New(shopDomain),
 		socialService:          socialservice.New(socialDomain),
 		peerMockService:        peermockservice.New(storage.peerMockRepo),
+		aiMentorService:        adminservice.NewAIMentorImpl(storage.aiMentorRepo),
 	}, nil
 }

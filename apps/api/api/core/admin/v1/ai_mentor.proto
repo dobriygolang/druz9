@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package admin.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "api/pkg/api/admin/v1;v1";
+
+service AIMentorService {
+  rpc ListAIMentors(ListAIMentorsRequest) returns (ListAIMentorsResponse) {
+    option (google.api.http) = { get: "/api/v1/admin/ai-mentors" };
+  }
+  rpc CreateAIMentor(CreateAIMentorRequest) returns (AIMentor) {
+    option (google.api.http) = { post: "/api/v1/admin/ai-mentors", body: "*" };
+  }
+  rpc UpdateAIMentor(UpdateAIMentorRequest) returns (AIMentor) {
+    option (google.api.http) = { put: "/api/v1/admin/ai-mentors/{id}", body: "*" };
+  }
+  rpc DeleteAIMentor(DeleteAIMentorRequest) returns (DeleteAIMentorResponse) {
+    option (google.api.http) = { delete: "/api/v1/admin/ai-mentors/{id}" };
+  }
+}
+
+message AIMentor {
+  string id              = 1;
+  string name            = 2;
+  string provider        = 3;
+  string model_id        = 4;
+  int32  tier            = 5;
+  string prompt_template = 6;
+  bool   is_active       = 7;
+}
+
+message ListAIMentorsRequest {}
+message ListAIMentorsResponse {
+  repeated AIMentor mentors = 1;
+}
+
+message CreateAIMentorRequest {
+  string name            = 1;
+  string provider        = 2;
+  string model_id        = 3;
+  int32  tier            = 4;
+  string prompt_template = 5;
+  bool   is_active       = 6;
+}
+
+message UpdateAIMentorRequest {
+  string id              = 1;
+  string name            = 2;
+  string provider        = 3;
+  string model_id        = 4;
+  int32  tier            = 5;
+  string prompt_template = 6;
+  bool   is_active       = 7;
+}
+
+message DeleteAIMentorRequest {
+  string id = 1;
+}
+
+message DeleteAIMentorResponse {
+  bool ok = 1;
+}

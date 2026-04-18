@@ -167,6 +167,23 @@ export const adminApi = {
     await apiClient.delete(`/api/v1/admin/season-pass/${seasonPassId}/tiers/${tier}`)
   },
 
+  // AI Mentors admin — Wave E.3.
+  listAIMentors: async (): Promise<unknown[]> => {
+    const r = await apiClient.get<{ mentors?: unknown[] }>('/api/v1/admin/ai-mentors')
+    return r.data.mentors ?? []
+  },
+  createAIMentor: async (payload: Record<string, unknown>): Promise<unknown> => {
+    const r = await apiClient.post<unknown>('/api/v1/admin/ai-mentors', payload)
+    return r.data
+  },
+  updateAIMentor: async (id: string, payload: Record<string, unknown>): Promise<unknown> => {
+    const r = await apiClient.put<unknown>(`/api/v1/admin/ai-mentors/${id}`, { ...payload, id })
+    return r.data
+  },
+  deleteAIMentor: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/v1/admin/ai-mentors/${id}`)
+  },
+
   // Notifications broadcast — Wave E.4.
   broadcastNotification: async (
     title: string, body: string, deepLink: string, targetUserIds: string[]

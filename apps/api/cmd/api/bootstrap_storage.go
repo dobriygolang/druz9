@@ -8,6 +8,7 @@ import (
 
 	"api/internal/clients/geocoder"
 	"api/internal/closer"
+	aimdata "api/internal/data/ai_mentor"
 	arenadata "api/internal/data/arena"
 	challengedata "api/internal/data/challenge"
 	codeeditordata "api/internal/data/code_editor"
@@ -65,6 +66,7 @@ type storageContext struct {
 	walletRepo           *walletdata.Repo
 	skillsRepo           *skillsdata.Repo
 	peerMockRepo         *peermockdata.Repo
+	aiMentorRepo         *aimdata.Repo
 }
 
 func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
@@ -142,6 +144,7 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 		walletRepo:   walletdata.NewRepo(store, bootstrap.kratosLogger),
 		skillsRepo:   skillsdata.NewRepo(store),
 		peerMockRepo: peermockdata.NewRepo(store),
+		aiMentorRepo: aimdata.NewRepo(store),
 	}, nil
 }
 

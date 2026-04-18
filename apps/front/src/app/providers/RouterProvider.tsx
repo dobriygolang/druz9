@@ -186,6 +186,9 @@ const AdminPodcastsPage = lazy(() =>
 const AdminSeasonPassPage = lazy(() =>
   import('@/pages/AdminSeasonPassPage/ui/AdminSeasonPassPage').then((m) => ({ default: m.AdminSeasonPassPage })),
 )
+const AdminAIBotsPage = lazy(() =>
+  import('@/pages/AdminAIBotsPage/ui/AdminAIBotsPage').then((m) => ({ default: m.AdminAIBotsPage })),
+)
 
 const Fallback: React.FC = () => (
   <div
@@ -421,7 +424,7 @@ export const RouterProvider: React.FC = () => {
             <Route path="/admin/podcasts"     element={<AdminPodcastsPage />} />
             <Route path="/admin/shop"         element={<AdminShopPage />} />
             <Route path="/admin/seasonpass"   element={<AdminSeasonPassPage />} />
-            <Route path="/admin/ai-bots"      element={<AdminStub title="AI mentors admin" />} />
+            <Route path="/admin/ai-bots"      element={<AdminAIBotsPage />} />
             <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
           </Route>
 
@@ -446,16 +449,3 @@ export const RouterProvider: React.FC = () => {
   )
 }
 
-// Placeholder for admin sections whose UI is still being built. Keeps
-// dashboard links navigable and tells the admin what's coming.
-function AdminStub({ title }: { title: string }) {
-  return (
-    <div style={{ padding: 24 }}>
-      <h1 className="font-display" style={{ fontSize: 26, marginBottom: 8 }}>{title}</h1>
-      <div style={{ color: 'var(--ink-2)', fontSize: 14, maxWidth: 520 }}>
-        Content editor for this section is being built — the RPCs are already on the backend.
-        Reach out in #admin if you need a manual insert in the meantime.
-      </div>
-    </div>
-  )
-}
