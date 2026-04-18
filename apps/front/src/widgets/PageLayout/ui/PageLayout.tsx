@@ -4,7 +4,6 @@ import { HeroStrip } from '@/widgets/HeroStrip'
 import { Sidebar } from '@/widgets/Sidebar'
 import { OnboardingFlow } from '@/widgets/Onboarding'
 import {
-  TweaksPanel,
   ToastStack,
   NotificationsPanel,
   LevelUpModal,
@@ -29,7 +28,6 @@ export function PageLayout() {
   useApplySeasonToHtml()
   const user = useGameUser()
 
-  const [tweaksOpen, setTweaksOpen] = useState(false)
   const [notifsOpen, setNotifsOpen] = useState(false)
   const [levelUpOpen, setLevelUpOpen] = useState(false)
   const [onboardingOpen, setOnboardingOpen] = useState(() => needsOnboarding())
@@ -45,7 +43,6 @@ export function PageLayout() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <HeroStrip
-        onOpenTweaks={() => setTweaksOpen(true)}
         onToggleSidebar={() => setSidebarOpen((v) => !v)}
         onOpenNotifs={() => setNotifsOpen(true)}
       />
@@ -65,18 +62,8 @@ export function PageLayout() {
         </main>
       </div>
 
-      {/* global overlays — NotificationBell now lives inside HeroStrip */}
-      <TweaksPanel
-        open={tweaksOpen}
-        onClose={() => setTweaksOpen(false)}
-        onOpenNotifs={() => setNotifsOpen(true)}
-        onOpenLevelUp={() => setLevelUpOpen(true)}
-        onOpenOnboarding={() => setOnboardingOpen(true)}
-        onOpenStreakRecovery={() => setStreakRecoveryOpen(true)}
-        onOpenSeasonComplete={() => setSeasonCompleteOpen(true)}
-        onStartTour={() => setTourActive(true)}
-        onOpenDemo={() => setDemoOpen(true)}
-      />
+      {/* global overlays — NotificationBell now lives inside HeroStrip.
+          TweaksPanel was retired: all knobs live in /settings → Flavour & tweaks. */}
       <ToastStack />
       {notifsOpen && <NotificationsPanel onClose={() => setNotifsOpen(false)} />}
       <LevelUpModal

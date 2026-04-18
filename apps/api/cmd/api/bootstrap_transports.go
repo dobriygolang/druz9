@@ -1,8 +1,8 @@
 package main
 
 import (
+	authcallbackadapter "api/internal/adapter/authcallback"
 	interviewlive "api/internal/api/interview_live"
-	profileservice "api/internal/api/profile"
 	"api/internal/closer"
 	server "api/internal/server"
 	"api/internal/server/wshandler"
@@ -69,6 +69,7 @@ func initializeTransports(
 
 	registerManualHTTPRoutes(httpServer, bootstrap, storage, services)
 	registerAPIServices(httpServer, grpcServer, services)
+	authcallbackadapter.RegisterGRPC(grpcServer, services.profileServiceDomain)
 
 	app := kratos.New(
 		kratos.Name("api"),
@@ -145,7 +146,7 @@ func registerManualHTTPRoutes(
 
 func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.Server, services *serviceContext) {
 	profilev1.RegisterProfileServiceHTTPServer(httpServer, services.profileService)
-	profileservice.RegisterCompatProfileServiceServer(grpcServer, services.profileService)
+	profilev1.RegisterProfileServiceServer(grpcServer, services.profileService)
 
 	adminv1.RegisterAdminServiceHTTPServer(httpServer, services.adminService)
 	adminv1.RegisterAdminServiceServer(grpcServer, services.adminService)

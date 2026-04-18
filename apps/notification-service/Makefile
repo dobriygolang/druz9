@@ -3,6 +3,20 @@ DOCKER_GOOSE_IMAGE=golang:1.25
 GOCACHE_DIR ?= /tmp/notification-service-go-build
 GOLANGCI_LINT_CACHE_DIR ?= /tmp/notification-service-golangci-lint
 GOOSE_TABLE ?= notification_goose_db_version
+PROTO_FILES=$(shell find api -name "*.proto")
+
+.PHONY: proto
+# generate grpc proto contracts
+proto:
+	mkdir -p ./pkg
+	protoc --proto_path=./api \
+	       --go_out=. \
+	       --go_opt=paths=import \
+	       --go_opt=module=notification-service \
+	       --go-grpc_out=. \
+	       --go-grpc_opt=paths=import \
+	       --go-grpc_opt=module=notification-service \
+	       $(PROTO_FILES)
 
 .PHONY: build
 # build
@@ -12,6 +26,7 @@ build:
 .PHONY: generate
 # generate rtc config and tidy module
 generate:
+	$(MAKE) proto
 	GOCACHE=$(GOCACHE_DIR) go generate ./internal/rtc/...
 	GOCACHE=$(GOCACHE_DIR) go generate ./...
 	GOCACHE=$(GOCACHE_DIR) go mod tidy

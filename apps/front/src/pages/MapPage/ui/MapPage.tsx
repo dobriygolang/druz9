@@ -1,25 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import maplibregl, { Map as MaplibreMap, Marker as MaplibreMarker } from 'maplibre-gl'
+import 'maplibre-gl/dist/maplibre-gl.css'
 import { Panel, RpgButton, Badge, PageHeader } from '@/shared/ui/pixel'
-import { Fireflies } from '@/shared/ui/sprites'
 import { geoApi, WorldPinKind, type WorldPin } from '@/features/Geo/api/geoApi'
-
-// ---------- projection ----------
-//
-// Simplified equirectangular projection good enough for a pixel-style map:
-// the SVG viewBox is exactly 360×180 (degrees), so lat/lon map directly to
-// x/y coordinates. Pins are clamped to the viewport so mis-entered
-// coordinates don't fly off-screen.
-
-const VIEW_W = 360
-const VIEW_H = 180
-
-function project(lat: number, lon: number): { x: number; y: number } {
-  const x = Math.max(0, Math.min(VIEW_W, lon + 180))
-  const y = Math.max(0, Math.min(VIEW_H, 90 - lat))
-  return { x, y }
-}
 
 // ---------- pin styling ----------
 
@@ -36,41 +21,6 @@ function pinColor(p: WorldPin): string {
       return 'var(--ink-1)'
   }
 }
-
-function pinKindLabel(kind: WorldPinKind): string {
-  switch (kind) {
-    case WorldPinKind.GUILD: return 'гильдия'
-    case WorldPinKind.EVENT: return 'событие'
-    case WorldPinKind.PLAYER: return 'игрок'
-    default: return '—'
-  }
-}
-
-// ---------- Continents (simplified pixel-friendly polygons) ----------
-//
-// Very low-poly continental outlines, designed to read as "world map" in a
-// pixelated style. Coordinates are lon/lat expressed directly in the
-// 360×180 viewBox space (note: y grows downward, so higher latitudes have
-// smaller y-values).
-
-const CONTINENT_POLYGONS: { d: string; fill: string; opacity?: number }[] = [
-  // North America (rough continental shape)
-  { d: 'M 20,20 L 90,20 L 110,40 L 105,60 L 90,75 L 70,80 L 55,95 L 40,95 L 30,75 L 15,55 Z', fill: '#6b8a6a' },
-  // South America
-  { d: 'M 90,90 L 115,85 L 125,105 L 120,135 L 105,150 L 95,135 L 90,110 Z', fill: '#6b8a6a' },
-  // Africa
-  { d: 'M 175,60 L 215,55 L 225,80 L 220,110 L 200,135 L 185,135 L 170,105 L 170,80 Z', fill: '#b8692a' },
-  // Europe
-  { d: 'M 170,35 L 220,30 L 240,45 L 235,60 L 215,65 L 195,62 L 175,55 Z', fill: '#3d6149' },
-  // Asia
-  { d: 'M 225,25 L 320,25 L 335,50 L 340,70 L 320,85 L 290,85 L 260,75 L 230,65 L 225,45 Z', fill: '#3d6149' },
-  // Oceania
-  { d: 'M 300,115 L 340,110 L 350,130 L 335,145 L 310,140 L 295,125 Z', fill: '#b8692a' },
-  // Antarctica strip
-  { d: 'M 5,165 L 355,165 L 355,178 L 5,178 Z', fill: '#e8eef3', opacity: 0.6 },
-  // Greenland blob
-  { d: 'M 125,15 L 145,18 L 150,32 L 140,40 L 125,35 Z', fill: '#c0cad2' },
-]
 
 // ---------- page ----------
 
@@ -170,105 +120,7 @@ export function MapPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 18 }}>
         {/* Map */}
         <Panel style={{ padding: 0, overflow: 'hidden', position: 'relative' }}>
-          <div
-            style={{
-              height: 520,
-              position: 'relative',
-              background: '#ecdcb2',
-              backgroundImage:
-                // subtle parchment grid
-                'repeating-linear-gradient(90deg, transparent 0 40px, rgba(59,42,26,0.06) 40px 41px), repeating-linear-gradient(0deg, transparent 0 40px, rgba(59,42,26,0.06) 40px 41px)',
-            }}
-          >
-            {/* The world itself, rendered as a single SVG so shape-rendering:crispEdges
-                keeps the pixelated look consistent across zoom levels. */}
-            <svg
-              viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-              preserveAspectRatio="none"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-              }}
-              shapeRendering="crispEdges"
-            >
-              {/* ocean wash */}
-              <rect x="0" y="0" width={VIEW_W} height={VIEW_H} fill="#d4e5ec" opacity="0.35" />
-              {/* continents */}
-              {CONTINENT_POLYGONS.map((c, i) => (
-                <path key={i} d={c.d} fill={c.fill} opacity={c.opacity ?? 0.85} stroke="#2a1f14" strokeWidth="0.5" />
-              ))}
-              {/* equator / tropics faint lines */}
-              <line x1="0" y1="90" x2={VIEW_W} y2="90" stroke="#2a1f14" strokeOpacity="0.15" strokeDasharray="2 3" strokeWidth="0.5" />
-              <line x1="0" y1="66.5" x2={VIEW_W} y2="66.5" stroke="#2a1f14" strokeOpacity="0.1" strokeDasharray="1 4" strokeWidth="0.3" />
-              <line x1="0" y1="113.5" x2={VIEW_W} y2="113.5" stroke="#2a1f14" strokeOpacity="0.1" strokeDasharray="1 4" strokeWidth="0.3" />
-
-              {/* pins */}
-              {filtered.map((p) => {
-                const { x, y } = project(p.latitude, p.longitude)
-                const color = pinColor(p)
-                const isSel = selected?.id === p.id
-                const size = p.isHot ? 5 : 4
-                return (
-                  <g key={p.id} style={{ cursor: 'pointer' }} onClick={() => openPin(p)}>
-                    {/* halo for selected */}
-                    {isSel && (
-                      <rect
-                        x={x - size - 2}
-                        y={y - size - 2}
-                        width={(size + 2) * 2}
-                        height={(size + 2) * 2}
-                        fill="none"
-                        stroke="var(--ember-3)"
-                        strokeWidth="1.5"
-                        shapeRendering="crispEdges"
-                      />
-                    )}
-                    <rect
-                      x={x - size / 2}
-                      y={y - size / 2}
-                      width={size}
-                      height={size}
-                      fill={color}
-                      stroke="#2a1f14"
-                      strokeWidth="0.6"
-                    />
-                  </g>
-                )
-              })}
-            </svg>
-
-            <Fireflies count={6} />
-
-            {/* Hovered pin tooltip */}
-            {selected && (
-              <div
-                style={{
-                  position: 'absolute',
-                  left: `${(project(selected.latitude, selected.longitude).x / VIEW_W) * 100}%`,
-                  top: `${(project(selected.latitude, selected.longitude).y / VIEW_H) * 100}%`,
-                  transform: 'translate(-50%, -100%) translateY(-10px)',
-                  background: 'var(--parch-0)',
-                  border: '2px solid var(--ink-0)',
-                  boxShadow: '2px 2px 0 var(--ink-0)',
-                  padding: '4px 8px',
-                  whiteSpace: 'nowrap',
-                  pointerEvents: 'none',
-                }}
-              >
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 12 }}>
-                  {selected.title}
-                </div>
-                <div
-                  className="font-silkscreen uppercase"
-                  style={{ fontSize: 8, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
-                >
-                  {pinKindLabel(selected.kind)}{selected.subtitle ? ` · ${selected.subtitle}` : ''}
-                </div>
-              </div>
-            )}
-          </div>
+          <MapLibreCanvas pins={filtered} selected={selected} onSelect={openPin} />
 
           {/* Legend */}
           <div
@@ -389,4 +241,123 @@ export function MapPage() {
       </div>
     </>
   )
+}
+
+// ─── MapLibre canvas ────────────────────────────────────────────────────
+// We render real map tiles (OSM raster via OSM's free provider, not Mapbox)
+// and tint the whole canvas with a warm parchment overlay so it still reads
+// as "druz9 map" rather than a bare world-view. Markers are plain DOM nodes
+// — cheap enough for a few hundred pins, and they inherit the pixel UI
+// styles.
+
+const OSM_RASTER_STYLE: maplibregl.StyleSpecification = {
+  version: 8,
+  sources: {
+    osm: {
+      type: 'raster',
+      tiles: ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'],
+      tileSize: 256,
+      attribution: '© OpenStreetMap',
+    },
+  },
+  layers: [
+    {
+      id: 'osm',
+      type: 'raster',
+      source: 'osm',
+      paint: {
+        // Desaturate + warm tint to match the parchment theme.
+        'raster-saturation': -0.6,
+        'raster-brightness-max': 0.9,
+        'raster-contrast': 0.1,
+      },
+    },
+  ],
+}
+
+function MapLibreCanvas({
+  pins,
+  selected,
+  onSelect,
+}: {
+  pins: WorldPin[]
+  selected: WorldPin | null
+  onSelect: (p: WorldPin) => void
+}) {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const mapRef = useRef<MaplibreMap | null>(null)
+  const markersRef = useRef<Map<string, MaplibreMarker>>(new globalThis.Map())
+  const onSelectRef = useRef(onSelect)
+  onSelectRef.current = onSelect
+
+  // Initialise map once.
+  useEffect(() => {
+    if (!containerRef.current || mapRef.current) return
+    const map = new maplibregl.Map({
+      container: containerRef.current,
+      style: OSM_RASTER_STYLE,
+      center: [30, 50], // roughly eastern Europe — our primary audience
+      zoom: 2,
+      attributionControl: false,
+    })
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
+    map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right')
+    mapRef.current = map
+    return () => {
+      map.remove()
+      mapRef.current = null
+      markersRef.current.clear()
+    }
+  }, [])
+
+  // Sync markers with pin list. Diff-based so we don't flicker on each render.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+
+    const wanted = new Set(pins.map((p) => p.id))
+    // Drop markers that were removed from the list.
+    for (const [id, marker] of markersRef.current) {
+      if (!wanted.has(id)) {
+        marker.remove()
+        markersRef.current.delete(id)
+      }
+    }
+    // Add new markers + update existing ones.
+    for (const p of pins) {
+      let marker = markersRef.current.get(p.id)
+      const el = marker?.getElement() ?? document.createElement('div')
+      el.className = 'druz9-map-pin'
+      el.style.cssText = `
+        width: ${p.isHot ? 16 : 12}px;
+        height: ${p.isHot ? 16 : 12}px;
+        background: ${pinColor(p)};
+        border: 2px solid var(--ink-0);
+        box-shadow: 2px 2px 0 var(--ink-0);
+        cursor: pointer;
+        outline: ${selected?.id === p.id ? '2px solid var(--ember-3)' : 'none'};
+        outline-offset: 2px;
+      `
+      el.title = p.title
+      el.onclick = (e) => {
+        e.stopPropagation()
+        onSelectRef.current(p)
+      }
+      if (!marker) {
+        marker = new maplibregl.Marker({ element: el }).setLngLat([p.longitude, p.latitude]).addTo(map)
+        markersRef.current.set(p.id, marker)
+      } else {
+        marker.setLngLat([p.longitude, p.latitude])
+      }
+    }
+  }, [pins, selected?.id])
+
+  // Fly to selected pin without re-centering on every unrelated render.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !selected) return
+    map.flyTo({ center: [selected.longitude, selected.latitude], zoom: Math.max(4, map.getZoom()) })
+  }, [selected?.id])
+
+  return <div ref={containerRef} style={{ width: '100%', height: 520 }} />
 }

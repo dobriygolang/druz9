@@ -10,7 +10,6 @@ import (
 	notif "api/internal/clients/notification"
 	"api/internal/model"
 	v1 "api/pkg/api/profile/v1"
-	authcallbackv1 "api/pkg/auth_callback/v1"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
@@ -89,40 +88,6 @@ func TestCreateTelegramAuthChallenge(t *testing.T) {
 	}
 	if resp.BotStartUrl == "" || resp.ExpiresAt == nil {
 		t.Fatalf("expected filled challenge response, got %+v", resp)
-	}
-}
-
-func TestConfirmTelegramAuthCallback(t *testing.T) {
-	t.Parallel()
-
-	mockService := mocks.NewService(t)
-	mockService.On("ConfirmTelegramAuth", mock.Anything, "bot-secret", "challenge-token", model.TelegramAuthPayload{
-		ID:        42,
-		FirstName: "Sergey",
-		LastName:  "Dorofeev",
-		Username:  "sedorofeevd",
-		PhotoURL:  "https://example.com/avatar.jpg",
-	}).Return("123456", nil).Once()
-
-	impl := New(mockService, mocks.NewSessionCookieManager(t), nil, nil, notif.Noop{})
-
-	resp, err := impl.ConfirmTelegramAuth(context.Background(), &authcallbackv1.ConfirmTelegramAuthRequest{
-		Token:      "challenge-token",
-		BotToken:   "bot-secret",
-		TelegramId: 42,
-		FirstName:  "Sergey",
-		LastName:   "Dorofeev",
-		Username:   "sedorofeevd",
-		PhotoUrl:   "https://example.com/avatar.jpg",
-	})
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if resp.GetStatus() != authcallbackv1.OperationStatus_OPERATION_STATUS_OK {
-		t.Fatalf("unexpected status: %v", resp.GetStatus())
-	}
-	if resp.GetCode() != "123456" {
-		t.Fatalf("unexpected code: %q", resp.GetCode())
 	}
 }
 

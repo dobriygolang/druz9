@@ -14,11 +14,9 @@ const SKY: Record<string, string> = {
 }
 
 export function HeroStrip({
-  onOpenTweaks,
   onToggleSidebar,
   onOpenNotifs,
 }: {
-  onOpenTweaks?: () => void
   onToggleSidebar?: () => void
   onOpenNotifs?: () => void
 }) {
@@ -322,9 +320,9 @@ export function HeroStrip({
           </RpgButton>
           <RpgButton
             size="sm"
-            onClick={onOpenTweaks}
-            aria-label={t('heroStrip.tweaks')}
-            title={t('heroStrip.tweaks')}
+            onClick={() => navigate('/settings')}
+            aria-label={t('heroStrip.settings', { defaultValue: 'Settings' })}
+            title={t('heroStrip.settings', { defaultValue: 'Settings' })}
             style={{ padding: '10px 12px' }}
           >
             ⚙

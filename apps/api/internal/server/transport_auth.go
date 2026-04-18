@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	authmiddleware "api/internal/middleware"
+	authcallbackv1 "api/pkg/adapter/auth_callback/v1"
 	codeeditorv1 "api/pkg/api/code_editor/v1"
 	profilev1 "api/pkg/api/profile/v1"
 
@@ -34,7 +35,7 @@ var publicOperations = map[string]struct{}{
 	profilev1.OperationProfileServiceYandexAuth:                  {},
 	profilev1.OperationProfileServiceTelegramAuth:                {},
 	profilev1.OperationProfileServiceCreateTelegramAuthChallenge: {},
-	"/profile.v1.ProfileService/ConfirmTelegramAuth":             {},
+	authcallbackv1.AuthCallbackService_ConfirmTelegramAuth_FullMethodName: {},
 	profilev1.OperationProfileServiceCompleteRegistration:        {},
 
 	// ── Collaborative code editor (public sandboxing is the product) ──

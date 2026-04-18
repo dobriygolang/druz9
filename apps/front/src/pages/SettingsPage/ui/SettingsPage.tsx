@@ -5,12 +5,14 @@ import { Hero } from '@/shared/ui/sprites'
 import { isSoundEnabled, setSoundEnabled, play } from '@/shared/lib/sound'
 import { notificationApi, type NotificationSettings } from '@/features/Notification/api/notificationApi'
 import { addToast } from '@/shared/lib/toasts'
+import { useTweaks, type RoomLayout, type HeroPose, type Pet, type Season, type Density } from '@/shared/lib/gameState'
 
-type Section = 'account' | 'display' | 'notifs' | 'gameplay' | 'privacy' | 'keys' | 'access' | 'language'
+type Section = 'account' | 'display' | 'tweaks' | 'notifs' | 'gameplay' | 'privacy' | 'keys' | 'access' | 'language'
 
 const ICONS: Record<Section, string> = {
   account:  '◎',
   display:  '▦',
+  tweaks:   '✦',
   notifs:   '✉',
   gameplay: '⚔',
   privacy:  '⛨',
@@ -26,6 +28,7 @@ export function SettingsPage() {
   const TABS: Array<[Section, string]> = [
     ['account',  t('settings.tab.account')],
     ['display',  t('settings.tab.display')],
+    ['tweaks',   t('settings.tab.tweaks', { defaultValue: 'Flavour & tweaks' })],
     ['notifs',   t('settings.tab.notifications')],
     ['gameplay', t('settings.tab.gameplay')],
     ['privacy',  t('settings.tab.privacy')],
@@ -82,6 +85,7 @@ export function SettingsPage() {
           <div style={{ padding: 24 }}>
             {tab === 'account'  && <SettingsAccount />}
             {tab === 'display'  && <SettingsDisplay />}
+            {tab === 'tweaks'   && <SettingsTweaks />}
             {tab === 'notifs'   && <SettingsNotifs />}
             {tab === 'gameplay' && <SettingsGameplay />}
             {tab === 'privacy'  && <SettingsPrivacy />}
@@ -167,9 +171,11 @@ function Toggle({ on: initial = false, onClick }: { on?: boolean; onClick?: () =
 function ChipGroup({
   options,
   active,
+  onChange,
 }: {
   options: string[]
   active: string
+  onChange?: (value: string) => void
 }) {
   return (
     <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
@@ -177,6 +183,8 @@ function ChipGroup({
         <span
           key={s}
           className={`rpg-tweak-chip ${s === active ? 'rpg-tweak-chip--on' : ''}`}
+          onClick={() => onChange?.(s)}
+          style={onChange ? { cursor: 'pointer' } : undefined}
         >
           {s}
         </span>
@@ -604,6 +612,43 @@ function SettingsLanguage() {
       </Setting>
       <Setting label={t('settings.lang.timeFormat')}>
         <ChipGroup options={[t('settings.option.12h'), t('settings.option.24h')]} active={t('settings.option.24h')} />
+      </Setting>
+    </>
+  )
+}
+
+// Flavour knobs that used to live behind a gear-icon overlay (TweaksPanel).
+// We folded them into Settings so there's one place for "how do I make the
+// app feel a certain way", and removed the floating overlay entirely.
+function SettingsTweaks() {
+  const { t } = useTranslation()
+  const [tweaks, update] = useTweaks()
+
+  const roomLayouts: RoomLayout[] = ['cozy', 'scholar', 'warrior']
+  const heroPoses: HeroPose[]    = ['idle', 'wave', 'trophy']
+  const pets: Pet[]              = ['slime', 'raven', 'orb', 'none']
+  const seasons: Season[]        = ['day', 'dusk', 'night', 'winter']
+  const densities: Density[]     = ['compact', 'normal', 'roomy']
+
+  return (
+    <>
+      <h3 className="font-display" style={{ fontSize: 17, marginBottom: 16 }}>
+        {t('settings.tweaks.title', { defaultValue: 'Flavour & tweaks' })}
+      </h3>
+      <Setting label={t('settings.tweaks.roomLayout', { defaultValue: 'Room layout' })} help={t('settings.tweaks.roomLayoutHelp', { defaultValue: 'Sets the top-strip backdrop mood' })}>
+        <ChipGroup options={roomLayouts} active={tweaks.roomLayout} onChange={(v) => update({ roomLayout: v as RoomLayout })} />
+      </Setting>
+      <Setting label={t('settings.tweaks.heroPose', { defaultValue: 'Hero pose' })}>
+        <ChipGroup options={heroPoses} active={tweaks.heroPose} onChange={(v) => update({ heroPose: v as HeroPose })} />
+      </Setting>
+      <Setting label={t('settings.tweaks.companion', { defaultValue: 'Companion' })}>
+        <ChipGroup options={pets} active={tweaks.pet} onChange={(v) => update({ pet: v as Pet })} />
+      </Setting>
+      <Setting label={t('settings.tweaks.season', { defaultValue: 'Time of day' })}>
+        <ChipGroup options={seasons} active={tweaks.season} onChange={(v) => update({ season: v as Season })} />
+      </Setting>
+      <Setting label={t('settings.tweaks.density', { defaultValue: 'Layout density' })}>
+        <ChipGroup options={densities} active={tweaks.density} onChange={(v) => update({ density: v as Density })} />
       </Setting>
     </>
   )

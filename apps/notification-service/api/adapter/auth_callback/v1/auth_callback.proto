@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package profile.callback.v1;
+
+option go_package = "notification-service/pkg/adapter/auth_callback/v1;v1";
+
+service AuthCallbackService {
+  rpc ConfirmTelegramAuth(ConfirmTelegramAuthRequest) returns (ConfirmTelegramAuthResponse);
+}
+
+enum OperationStatus {
+  OPERATION_STATUS_UNSPECIFIED = 0;
+  OPERATION_STATUS_OK          = 1;
+}
+
+message ConfirmTelegramAuthRequest {
+  string token       = 1;
+  string bot_token   = 2;
+  int64  telegram_id = 3;
+  string first_name  = 4;
+  string last_name   = 5;
+  string username    = 6;
+  string photo_url   = 7;
+}
+
+message ConfirmTelegramAuthResponse {
+  OperationStatus status = 1;
+  string code           = 2;
+}

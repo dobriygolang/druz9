@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 
+	authcallbackadapter "notification-service/internal/adapter/authcallback"
 	notificationapi "notification-service/internal/api/notification"
 	"notification-service/internal/bot"
 	"notification-service/internal/closer"
@@ -102,7 +103,7 @@ func newApp() (*kratos.App, *appLogger.Logger, error) {
 		klog.Warn("API_GRPC_ADDR is not set — bot auth callback disabled")
 	}
 	if cfg.Telegram.BotToken != "" && cfg.API.GRPCAddr != "" {
-		authAdapter, authErr := bot.NewGRPCAuthAdapter(cfg.API.GRPCAddr, cfg.Telegram.BotToken)
+		authAdapter, authErr := authcallbackadapter.NewGRPCAdapter(cfg.API.GRPCAddr, cfg.Telegram.BotToken)
 		if authErr != nil {
 			return nil, nil, authErr
 		}

@@ -1,12 +1,10 @@
 syntax = "proto3";
 
-// This mirrors the API's profile.v1 package so the gRPC client can call
-// ProfileService.ConfirmTelegramAuth on the API's gRPC server directly.
-package profile.v1;
+package profile.callback.v1;
 
-option go_package = "notification-service/pkg/auth_callback/v1;v1";
+option go_package = "api/pkg/adapter/auth_callback/v1;v1";
 
-service ProfileService {
+service AuthCallbackService {
   rpc ConfirmTelegramAuth(ConfirmTelegramAuthRequest) returns (ConfirmTelegramAuthResponse);
 }
 
@@ -21,11 +19,11 @@ message ConfirmTelegramAuthRequest {
   int64  telegram_id = 3;
   string first_name  = 4;
   string last_name   = 5;
-  string username     = 6;
+  string username    = 6;
   string photo_url   = 7;
 }
 
 message ConfirmTelegramAuthResponse {
   OperationStatus status = 1;
-  string code   = 2;
+  string code           = 2;
 }

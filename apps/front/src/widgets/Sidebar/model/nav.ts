@@ -54,14 +54,9 @@ export const NAV_GROUPS: NavGroup[] = [
         path: '/inbox',
         badgeKey: 'inboxUnread',
       },
-      {
-        id: 'challenges',
-        labelKey: 'sidebar.nav.challenges',
-        hintKey: 'sidebar.hint.challenges',
-        icon: 'challenges',
-        path: '/challenges',
-        badgeKey: 'incomingChallenges',
-      },
+      // Challenges used to live here; the feature is reachable via the
+      // Herald's Desk bell (duel_challenge notifications) and the Inbox
+      // tab. Having a dedicated sidebar entry duplicated that surface.
     ],
   },
   {

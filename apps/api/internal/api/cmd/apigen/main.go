@@ -54,7 +54,13 @@ func discoverServices(root string) ([]service, error) {
 		if err != nil {
 			return err
 		}
-		if d.IsDir() || filepath.Ext(path) != ".proto" {
+		if d.IsDir() {
+			if path != root && strings.Contains(path, string(filepath.Separator)+"adapter"+string(filepath.Separator)) {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if filepath.Ext(path) != ".proto" || strings.Contains(path, string(filepath.Separator)+"adapter"+string(filepath.Separator)) {
 			return nil
 		}
 

@@ -1,5 +1,4 @@
 export { NotificationBell } from './ui/NotificationBell'
-export { TweaksPanel } from './ui/TweaksPanel'
 export { CheckoutModal, type CheckoutItem } from './ui/CheckoutModal'
 export { InventoryModal } from './ui/InventoryModal'
 export { NotificationsPanel } from './ui/NotificationsPanel'
