@@ -31,12 +31,12 @@ import (
 // pressure before adding anything here.
 var publicOperations = map[string]struct{}{
 	// ── Auth flow (can't require auth before you log in) ──
-	profilev1.OperationProfileServiceStartYandexAuth:             {},
-	profilev1.OperationProfileServiceYandexAuth:                  {},
-	profilev1.OperationProfileServiceTelegramAuth:                {},
-	profilev1.OperationProfileServiceCreateTelegramAuthChallenge: {},
+	profilev1.OperationProfileServiceStartYandexAuth:                      {},
+	profilev1.OperationProfileServiceYandexAuth:                           {},
+	profilev1.OperationProfileServiceTelegramAuth:                         {},
+	profilev1.OperationProfileServiceCreateTelegramAuthChallenge:          {},
 	authcallbackv1.AuthCallbackService_ConfirmTelegramAuth_FullMethodName: {},
-	profilev1.OperationProfileServiceCompleteRegistration:        {},
+	profilev1.OperationProfileServiceCompleteRegistration:                 {},
 
 	// ── Collaborative code editor (public sandboxing is the product) ──
 	codeeditorv1.OperationCodeEditorServiceCreateRoom:           {},

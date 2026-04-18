@@ -35,9 +35,7 @@ const ArenaHubPage = lazy(() =>
 const SkillsPage = lazy(() =>
   import('@/pages/SkillsPage/ui/SkillsPage').then((m) => ({ default: m.SkillsPage })),
 )
-const TrainingPage = lazy(() =>
-  import('@/pages/TrainingPage/ui/TrainingPage').then((m) => ({ default: m.TrainingPage })),
-)
+// /training root now redirects to /atlas; TrainingPage import removed.
 const TrainingTaskPage = lazy(() =>
   import('@/pages/TrainingTaskPage/ui/TrainingTaskPage').then((m) => ({
     default: m.TrainingTaskPage,
@@ -281,14 +279,17 @@ export const RouterProvider: React.FC = () => {
                 )
               }
             />
+            {/* Atlas = merged skill tree (was /skills + /training root).
+                 Keep old paths as redirects so bookmarks survive. Training
+                 sub-routes (daily, speed-run, task/:id, weekly-boss,
+                 blind-review) stay as-is — they're the actual playable
+                 screens, not the map. */}
             <Route
-              path="/skills"
+              path="/atlas"
               element={gate ? <Navigate to="/login" replace /> : <SkillsPage />}
             />
-            <Route
-              path="/training"
-              element={gate ? <Navigate to="/login" replace /> : <TrainingPage />}
-            />
+            <Route path="/skills" element={<Navigate to="/atlas" replace />} />
+            <Route path="/training" element={<Navigate to="/atlas" replace />} />
             <Route
               path="/training/task/:taskId"
               element={gate ? <Navigate to="/login" replace /> : <TrainingTaskPage />}

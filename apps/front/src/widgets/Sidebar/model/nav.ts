@@ -39,8 +39,10 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     labelKey: 'sidebar.group.practice',
     items: [
-      { id: 'training', labelKey: 'sidebar.nav.training', hintKey: 'sidebar.hint.training', icon: 'training', path: '/training' },
-      { id: 'skills', labelKey: 'sidebar.nav.skills', hintKey: 'sidebar.hint.skills', icon: 'skills', path: '/skills' },
+      // Atlas is the merged skill-tree (ex-/training + ex-/skills). The
+      // two used to be separate sidebar entries, which meant two near-
+      // identical node graphs competing for attention.
+      { id: 'atlas', labelKey: 'sidebar.nav.atlas', hintKey: 'sidebar.hint.atlas', icon: 'skills', path: '/atlas' },
       { id: 'coderooms', labelKey: 'sidebar.nav.coderooms', hintKey: 'sidebar.hint.coderooms', icon: 'coderoom', path: '/practice/code-rooms' },
       { id: 'interview', labelKey: 'sidebar.nav.interview', hintKey: 'sidebar.hint.interview', icon: 'interview', path: '/interview' },
       { id: 'leaderboards', labelKey: 'sidebar.nav.leaderboards', hintKey: 'sidebar.hint.leaderboards', icon: 'leaderboard', path: '/leaderboards' },
