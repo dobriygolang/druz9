@@ -107,7 +107,10 @@ func RequireAuth(authorizer ProfileAuthorizer, cookies SessionCookieManager, sho
 
 			enriched, err := authenticateFromToken(ctx, authorizer, cookies)
 			if err != nil {
-				if stdErrors.Is(err, profileerrors.ErrUnauthorized) {
+				// Missing cookie / missing Bearer token is "not signed in",
+				// not an internal error — map it to 401 so the client
+				// redirects to /login instead of showing a red toast.
+				if stdErrors.Is(err, profileerrors.ErrUnauthorized) || stdErrors.Is(err, http.ErrNoCookie) {
 					return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
 				}
 				return nil, err
