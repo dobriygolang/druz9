@@ -2634,6 +2634,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.ProfileResponse'
+    /api/v1/profile/wallet:
+        get:
+            tags:
+                - ProfileService
+            operationId: ProfileService_GetWallet
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.GetWalletResponse'
     /api/v1/profile/{userId}:
         get:
             tags:
@@ -6484,6 +6496,18 @@ components:
                     type: integer
                     format: int32
                 activeDays:
+                    type: integer
+                    format: int32
+        profile.v1.GetWalletResponse:
+            type: object
+            properties:
+                gold:
+                    type: integer
+                    format: int32
+                gems:
+                    type: integer
+                    format: int32
+                shards:
                     type: integer
                     format: int32
         profile.v1.ListProfileAchievementsResponse:

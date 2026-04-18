@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Hero, Torch, SlimePet, RavenPet, SpiritOrb, Fireflies, PixelCoin } from '@/shared/ui/sprites'
 import { RpgButton } from '@/shared/ui/pixel'
 import { NotificationBell } from '@/widgets/Overlays'
-import { useGameUser, useTweaks } from '@/shared/lib/gameState'
+import { useGameUser, useTweaks, useLiveStats } from '@/shared/lib/gameState'
 import { useAuth } from '@/app/providers/AuthProvider'
 
 const SKY: Record<string, string> = {
@@ -26,8 +26,13 @@ export function HeroStrip({
   // (name / avatar) comes from useAuth and always matches the logged-in
   // account.
   const user = useGameUser()
+  const live = useLiveStats()
   const { user: authUser } = useAuth()
-  const displayName = authUser?.username || user.name
+  const displayName =
+    [authUser?.firstName, authUser?.lastName].filter(Boolean).join(' ').trim() ||
+    authUser?.username ||
+    authUser?.telegramUsername ||
+    user.name
   const [tweaks] = useTweaks()
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
@@ -201,7 +206,7 @@ export function HeroStrip({
                 className="font-silkscreen uppercase"
                 style={{ color: 'var(--ember-3)', fontSize: 11, letterSpacing: '0.08em' }}
               >
-                {t('heroStrip.lvl')} {user.level}
+                {t('heroStrip.lvl')} {live.level}
               </span>
               <span
                 className="font-silkscreen uppercase"
@@ -211,15 +216,9 @@ export function HeroStrip({
               </span>
             </div>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <span className="rpg-stat-chip">{t('heroStrip.streak', { days: user.streak })}</span>
+              <span className="rpg-stat-chip">{t('heroStrip.streak', { days: live.streak })}</span>
               <span className="rpg-stat-chip">
-                ★ {user.achievements}/{user.achievementsMax}
-              </span>
-              <span className="rpg-stat-chip">
-                {t('heroStrip.duelRecord', { won: user.duelsWon, lost: user.duelsLost })}
-              </span>
-              <span className="rpg-stat-chip" style={{ background: 'rgba(61,97,73,0.55)' }}>
-                {user.guild}
+                ★ {live.achievementsEarned}
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
@@ -230,13 +229,13 @@ export function HeroStrip({
                 {t('heroStrip.xp')}
               </span>
               <div className="rpg-bar" style={{ flex: 1, maxWidth: 280 }}>
-                <div className="rpg-bar__fill" style={{ width: `${user.xpPct}%` }} />
+                <div className="rpg-bar__fill" style={{ width: `${live.xpPct}%` }} />
               </div>
               <span
                 className="font-silkscreen uppercase"
                 style={{ color: 'var(--parch-0)', fontSize: 11, letterSpacing: '0.08em' }}
               >
-                {user.xp}/{user.xpMax}
+                {live.xp} XP
               </span>
             </div>
           </div>
@@ -271,7 +270,7 @@ export function HeroStrip({
                   fontSize: 18,
                 }}
               >
-                {user.gold.toLocaleString()}
+                {live.gold.toLocaleString()}
               </span>
             </div>
           </div>
@@ -299,7 +298,7 @@ export function HeroStrip({
                   fontSize: 18,
                 }}
               >
-                {user.gems}
+                {live.gems}
               </span>
             </div>
           </div>

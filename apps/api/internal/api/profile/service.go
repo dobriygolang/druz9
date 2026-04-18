@@ -13,12 +13,13 @@ type Implementation struct {
 	service      Service
 	cookie       SessionCookieManager
 	progressRepo ProgressRepository
+	walletRepo   WalletRepository
 	notif        notif.Sender
 }
 
 // New returns new instance of Implementation.
-func New(service Service, cookie SessionCookieManager, progressRepo ProgressRepository, notificationSender notif.Sender) *Implementation {
-	return &Implementation{service: service, cookie: cookie, progressRepo: progressRepo, notif: notificationSender}
+func New(service Service, cookie SessionCookieManager, progressRepo ProgressRepository, walletRepo WalletRepository, notificationSender notif.Sender) *Implementation {
+	return &Implementation{service: service, cookie: cookie, progressRepo: progressRepo, walletRepo: walletRepo, notif: notificationSender}
 }
 
 // GetDescription returns grpc service description.

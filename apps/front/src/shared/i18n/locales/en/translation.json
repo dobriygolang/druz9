@@ -1472,9 +1472,10 @@
   "hub.noDailyMissionsBody": "The mission service returned no active pacts for today.",
 
   "profile.eyebrow": "Hero Chamber · your sanctum",
-  "profile.eyebrowVisitor": "Visitor view · Thornmoss's chamber",
-  "profile.title": "Thornmoss",
-  "profile.titleVisitor": "Thornmoss · mossveil ⚑",
+  "profile.eyebrowVisitor": "Visitor view · {{name}}'s chamber",
+  "profile.title": "Hero",
+  "profile.titleVisitor": "Visitor",
+  "profile.visitorBadge": "visiting",
   "profile.subtitle": "Your private chamber. Every trophy, aura and item is something you earned in druz9.",
   "profile.subtitleVisitor": "You are viewing another hero. Gestures: gift, challenge, follow.",
   "profile.exitVisitor": "Exit visitor view",

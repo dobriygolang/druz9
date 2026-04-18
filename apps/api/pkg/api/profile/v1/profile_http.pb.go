@@ -27,6 +27,7 @@ const OperationProfileServiceGetProfileByID = "/profile.v1.ProfileService/GetPro
 const OperationProfileServiceGetProfileFeed = "/profile.v1.ProfileService/GetProfileFeed"
 const OperationProfileServiceGetProfileProgress = "/profile.v1.ProfileService/GetProfileProgress"
 const OperationProfileServiceGetReadiness = "/profile.v1.ProfileService/GetReadiness"
+const OperationProfileServiceGetWallet = "/profile.v1.ProfileService/GetWallet"
 const OperationProfileServiceListProfileAchievements = "/profile.v1.ProfileService/ListProfileAchievements"
 const OperationProfileServiceListProfileActivity = "/profile.v1.ProfileService/ListProfileActivity"
 const OperationProfileServiceLogout = "/profile.v1.ProfileService/Logout"
@@ -46,6 +47,7 @@ type ProfileServiceHTTPServer interface {
 	GetProfileFeed(context.Context, *GetProfileFeedRequest) (*GetProfileFeedResponse, error)
 	GetProfileProgress(context.Context, *GetProfileProgressRequest) (*ProfileProgressResponse, error)
 	GetReadiness(context.Context, *GetReadinessRequest) (*GetReadinessResponse, error)
+	GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error)
 	ListProfileAchievements(context.Context, *ListProfileAchievementsRequest) (*ListProfileAchievementsResponse, error)
 	ListProfileActivity(context.Context, *ListProfileActivityRequest) (*ListProfileActivityResponse, error)
 	Logout(context.Context, *LogoutRequest) (*ProfileStatusResponse, error)
@@ -76,6 +78,7 @@ func RegisterProfileServiceHTTPServer(s *http.Server, srv ProfileServiceHTTPServ
 	r.GET("/api/v1/profile/{user_id}/feed", _ProfileService_GetProfileFeed0_HTTP_Handler(srv))
 	r.GET("/api/v1/profile/{user_id}/achievements", _ProfileService_ListProfileAchievements0_HTTP_Handler(srv))
 	r.GET("/api/v1/profile/{user_id}/activity", _ProfileService_ListProfileActivity0_HTTP_Handler(srv))
+	r.GET("/api/v1/profile/wallet", _ProfileService_GetWallet0_HTTP_Handler(srv))
 }
 
 func _ProfileService_CreateTelegramAuthChallenge0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
@@ -443,6 +446,25 @@ func _ProfileService_ListProfileActivity0_HTTP_Handler(srv ProfileServiceHTTPSer
 	}
 }
 
+func _ProfileService_GetWallet0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetWalletRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceGetWallet)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetWallet(ctx, req.(*GetWalletRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetWalletResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ProfileServiceHTTPClient interface {
 	BindTelegram(ctx context.Context, req *BindTelegramRequest, opts ...http.CallOption) (rsp *ProfileStatusResponse, err error)
 	CompleteRegistration(ctx context.Context, req *CompleteRegistrationRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
@@ -452,6 +474,7 @@ type ProfileServiceHTTPClient interface {
 	GetProfileFeed(ctx context.Context, req *GetProfileFeedRequest, opts ...http.CallOption) (rsp *GetProfileFeedResponse, err error)
 	GetProfileProgress(ctx context.Context, req *GetProfileProgressRequest, opts ...http.CallOption) (rsp *ProfileProgressResponse, err error)
 	GetReadiness(ctx context.Context, req *GetReadinessRequest, opts ...http.CallOption) (rsp *GetReadinessResponse, err error)
+	GetWallet(ctx context.Context, req *GetWalletRequest, opts ...http.CallOption) (rsp *GetWalletResponse, err error)
 	ListProfileAchievements(ctx context.Context, req *ListProfileAchievementsRequest, opts ...http.CallOption) (rsp *ListProfileAchievementsResponse, err error)
 	ListProfileActivity(ctx context.Context, req *ListProfileActivityRequest, opts ...http.CallOption) (rsp *ListProfileActivityResponse, err error)
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *ProfileStatusResponse, err error)
@@ -567,6 +590,19 @@ func (c *ProfileServiceHTTPClientImpl) GetReadiness(ctx context.Context, in *Get
 	pattern := "/api/v1/profile/{user_id}/readiness"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationProfileServiceGetReadiness))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ProfileServiceHTTPClientImpl) GetWallet(ctx context.Context, in *GetWalletRequest, opts ...http.CallOption) (*GetWalletResponse, error) {
+	var out GetWalletResponse
+	pattern := "/api/v1/profile/wallet"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationProfileServiceGetWallet))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

@@ -36,6 +36,7 @@ const (
 	ProfileService_GetProfileFeed_FullMethodName              = "/profile.v1.ProfileService/GetProfileFeed"
 	ProfileService_ListProfileAchievements_FullMethodName     = "/profile.v1.ProfileService/ListProfileAchievements"
 	ProfileService_ListProfileActivity_FullMethodName         = "/profile.v1.ProfileService/ListProfileActivity"
+	ProfileService_GetWallet_FullMethodName                   = "/profile.v1.ProfileService/GetWallet"
 )
 
 // ProfileServiceClient is the client API for ProfileService service.
@@ -59,6 +60,7 @@ type ProfileServiceClient interface {
 	GetProfileFeed(ctx context.Context, in *GetProfileFeedRequest, opts ...grpc.CallOption) (*GetProfileFeedResponse, error)
 	ListProfileAchievements(ctx context.Context, in *ListProfileAchievementsRequest, opts ...grpc.CallOption) (*ListProfileAchievementsResponse, error)
 	ListProfileActivity(ctx context.Context, in *ListProfileActivityRequest, opts ...grpc.CallOption) (*ListProfileActivityResponse, error)
+	GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error)
 }
 
 type profileServiceClient struct {
@@ -239,6 +241,16 @@ func (c *profileServiceClient) ListProfileActivity(ctx context.Context, in *List
 	return out, nil
 }
 
+func (c *profileServiceClient) GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetWalletResponse)
+	err := c.cc.Invoke(ctx, ProfileService_GetWallet_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProfileServiceServer is the server API for ProfileService service.
 // All implementations must embed UnimplementedProfileServiceServer
 // for forward compatibility.
@@ -260,6 +272,7 @@ type ProfileServiceServer interface {
 	GetProfileFeed(context.Context, *GetProfileFeedRequest) (*GetProfileFeedResponse, error)
 	ListProfileAchievements(context.Context, *ListProfileAchievementsRequest) (*ListProfileAchievementsResponse, error)
 	ListProfileActivity(context.Context, *ListProfileActivityRequest) (*ListProfileActivityResponse, error)
+	GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error)
 	mustEmbedUnimplementedProfileServiceServer()
 }
 
@@ -320,6 +333,9 @@ func (UnimplementedProfileServiceServer) ListProfileAchievements(context.Context
 }
 func (UnimplementedProfileServiceServer) ListProfileActivity(context.Context, *ListProfileActivityRequest) (*ListProfileActivityResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListProfileActivity not implemented")
+}
+func (UnimplementedProfileServiceServer) GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetWallet not implemented")
 }
 func (UnimplementedProfileServiceServer) mustEmbedUnimplementedProfileServiceServer() {}
 func (UnimplementedProfileServiceServer) testEmbeddedByValue()                        {}
@@ -648,6 +664,24 @@ func _ProfileService_ListProfileActivity_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProfileService_GetWallet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWalletRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).GetWallet(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfileService_GetWallet_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).GetWallet(ctx, req.(*GetWalletRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProfileService_ServiceDesc is the grpc.ServiceDesc for ProfileService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -722,6 +756,10 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListProfileActivity",
 			Handler:    _ProfileService_ListProfileActivity_Handler,
+		},
+		{
+			MethodName: "GetWallet",
+			Handler:    _ProfileService_GetWallet_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

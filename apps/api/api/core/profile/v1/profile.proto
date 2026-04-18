@@ -100,6 +100,10 @@ service ProfileService {
   rpc ListProfileActivity(ListProfileActivityRequest) returns (ListProfileActivityResponse) {
     option (google.api.http) = { get: "/api/v1/profile/{user_id}/activity" };
   }
+
+  rpc GetWallet(GetWalletRequest) returns (GetWalletResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/wallet" };
+  }
 }
 
 enum UserGoalKind {
@@ -411,6 +415,16 @@ message ListProfileActivityRequest {
 
 message ListProfileActivityResponse {
   repeated ProfileActivityEntry entries = 1;
+}
+
+// ── Wallet balance ─────────────────────────────────────────────────────────
+
+message GetWalletRequest {}
+
+message GetWalletResponse {
+  int32 gold   = 1;
+  int32 gems   = 2;
+  int32 shards = 3;
 }
 
 // ── Domain entities ────────────────────────────────────────────────────────

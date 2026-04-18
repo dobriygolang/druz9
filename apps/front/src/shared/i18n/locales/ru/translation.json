@@ -1476,9 +1476,10 @@
   "hub.noDailyMissionsBody": "Сервис миссий не вернул активные пакты на сегодня.",
 
   "profile.eyebrow": "Покои героя · твоё святилище",
-  "profile.eyebrowVisitor": "Взгляд гостя · покои Thornmoss",
-  "profile.title": "Thornmoss",
-  "profile.titleVisitor": "Thornmoss · mossveil ⚑",
+  "profile.eyebrowVisitor": "Взгляд гостя · покои {{name}}",
+  "profile.title": "Герой",
+  "profile.titleVisitor": "Гость",
+  "profile.visitorBadge": "в гостях",
   "profile.subtitle": "Твои личные покои. Каждый трофей, аура и предмет — заслуга в druz9.",
   "profile.subtitleVisitor": "Ты смотришь на другого героя. Жесты: подарок, вызов, подписка.",
   "profile.exitVisitor": "Выйти из режима гостя",

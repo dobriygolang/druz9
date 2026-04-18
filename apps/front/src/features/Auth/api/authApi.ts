@@ -282,6 +282,14 @@ export const authApi = {
   updatePinnedAchievements: async (userId: string, pinnedAchievements: string[]): Promise<void> => {
     await apiClient.patch(`/api/v1/profile/${userId}`, { pinnedAchievements })
   },
+  getWallet: async (): Promise<{ gold: number; gems: number; shards: number }> => {
+    const r = await apiClient.get<{ gold?: number; gems?: number; shards?: number }>('/api/v1/profile/wallet')
+    return {
+      gold: r.data.gold ?? 0,
+      gems: r.data.gems ?? 0,
+      shards: r.data.shards ?? 0,
+    }
+  },
   logout: async () => {
     await apiClient.post('/api/v1/profile/auth/logout', {})
     profileByIdCache.clear()

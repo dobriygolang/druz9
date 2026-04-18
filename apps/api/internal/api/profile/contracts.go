@@ -37,3 +37,9 @@ type ProgressRepository interface {
 	SaveUserGoal(ctx context.Context, userID uuid.UUID, goal *model.UserGoal) error
 	GetProfileFeed(ctx context.Context, userID uuid.UUID, limit int) ([]*model.FeedItem, error)
 }
+
+// WalletRepository returns the current balance for a user, auto-creating
+// a zero-balance row on first access.
+type WalletRepository interface {
+	GetOrCreate(ctx context.Context, userID uuid.UUID) (*model.WalletBalance, error)
+}

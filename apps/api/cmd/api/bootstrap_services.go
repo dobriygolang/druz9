@@ -271,7 +271,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		aiReviewer:              aiReviewService,
 
 		adminService:            adminservice.New(adminServiceDomain, bootstrap.rtcManager, storage.profileRepo, profileServiceDomain),
-		profileService:          profileservice.New(profileServiceDomain, cookies, profileservice.NewCachedProgressRepository(storage.profileRepo), notifSender),
+		profileService:          profileservice.New(profileServiceDomain, cookies, profileservice.NewCachedProgressRepository(storage.profileRepo), storage.walletRepo, notifSender),
 		geoService:              geoservice.New(geoServiceDomain),
 		hubService:              hubservice.New(storage.profileRepo, missionServiceDomain, eventServiceDomain, arenaServiceDomain, guildServiceDomain),
 		guildService:            guildservice.New(guildServiceDomain, eventServiceDomain, notifSender),

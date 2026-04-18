@@ -87,7 +87,9 @@ export function ProfilePage() {
     })
   }
 
-  const title = visitorMode ? t('profile.titleVisitor') : t('profile.title')
+  const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim()
+  const displayName = fullName || user?.username || user?.telegramUsername || t('profile.title')
+  const title = visitorMode ? `${displayName} · ${t('profile.visitorBadge', { defaultValue: 'visiting' })}` : displayName
   const subtitle = visitorMode
     ? t('profile.subtitleVisitor')
     : t('profile.subtitle')
@@ -97,7 +99,7 @@ export function ProfilePage() {
       <PageHeader
         eyebrow={
           visitorMode
-            ? t('profile.eyebrowVisitor')
+            ? t('profile.eyebrowVisitor', { name: displayName })
             : t('profile.eyebrow')
         }
         title={title}
