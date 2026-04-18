@@ -95,7 +95,7 @@ func (r *Repo) ListSeasonXPLeaderboard(ctx context.Context, limit int32) ([]*mod
                COALESCE(u.avatar_url, ''),
                COALESCE(g.name, '') AS guild_name,
                COALESCE(usp.xp, 0) AS xp,
-               (COALESCE(usp.xp, 0) / NULLIF(sp.xp_per_tier, 0))::INT AS current_tier,
+               COALESCE((COALESCE(usp.xp, 0) / NULLIF(sp.xp_per_tier, 0))::INT, 0) AS current_tier,
                0 AS trophies
         FROM user_season_pass_progress usp
         JOIN season_passes sp ON sp.id = usp.season_pass_id AND sp.starts_at <= NOW() AND sp.ends_at > NOW()

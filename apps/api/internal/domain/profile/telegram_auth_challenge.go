@@ -38,7 +38,7 @@ const telegramLoginCodeLength = 6
 
 // ConfirmTelegramAuth stores Telegram user data for the one-time challenge and returns a one-time website code.
 func (s *Service) ConfirmTelegramAuth(_ context.Context, botToken, challengeToken string, payload model.TelegramAuthPayload) (string, error) {
-	if !s.settings.DevBypass && strings.TrimSpace(botToken) != s.settings.BotToken {
+	if !s.settings.DevBypass && strings.TrimSpace(botToken) != strings.TrimSpace(s.settings.BotToken) {
 		return "", profileerrors.ErrUnauthorized
 	}
 	if payload.ID == 0 {

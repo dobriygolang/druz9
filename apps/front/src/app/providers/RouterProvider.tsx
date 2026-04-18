@@ -344,7 +344,6 @@ export const RouterProvider: React.FC = () => {
 
             {/* Preserved code-editor-logic routes (UI restyle pending) */}
             <Route path="/practice/code-rooms" element={gate ? <Navigate to="/login" replace /> : <CodeRoomsIndexPage />} />
-            <Route path="/code-rooms/:roomId" element={<CodeRoomPage />} />
             <Route
               path="/training/daily"
               element={gate ? <Navigate to="/login" replace /> : <DailyChallengePage />}
@@ -362,6 +361,9 @@ export const RouterProvider: React.FC = () => {
               element={gate ? <Navigate to="/login" replace /> : <BlindReviewPage />}
             />
           </Route>
+
+          {/* Full-screen code room (no sidebar/header — matches code-interview layout) */}
+          <Route path="/code-rooms/:roomId" element={<CodeRoomPage />} />
 
           {/* Admin (legacy, not restyled — deliberately) */}
           <Route element={<AdminLayout />}>

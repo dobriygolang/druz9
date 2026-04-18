@@ -292,10 +292,10 @@ func overrideSecretConfigFromEnv(cfg *Bootstrap) {
 		cfg.Data.Database.Source = value
 	}
 	if value, ok := lookupEnvValue("TELEGRAM_BOT_TOKEN"); ok {
-		cfg.External.Telegram.BotToken = value
+		cfg.External.Telegram.BotToken = strings.TrimSpace(value)
 	}
 	if value, ok := lookupEnvValue("TELEGRAM_BOT_USERNAME"); ok {
-		cfg.External.Telegram.BotUsername = strings.TrimPrefix(value, "@")
+		cfg.External.Telegram.BotUsername = strings.TrimPrefix(strings.TrimSpace(value), "@")
 	}
 	if value, ok := lookupEnvValue("YANDEX_OAUTH_CLIENT_ID"); ok {
 		cfg.External.Yandex.ClientID = value

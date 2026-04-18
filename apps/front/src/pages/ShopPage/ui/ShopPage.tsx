@@ -162,7 +162,7 @@ export function ShopPage() {
         }
       />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr 340px', gap: 18 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '220px minmax(0, 1fr) 340px', gap: 18 }}>
         {/* Categories */}
         <Panel variant="recessed" style={{ padding: 10 }}>
           {categories.length === 0 && (
@@ -236,7 +236,7 @@ export function ShopPage() {
               </div>
             </Panel>
           )}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 12 }}>
             {items.map((it) => {
               const owned = ownedIds.has(it.id)
               const isSel = it.id === selectedId

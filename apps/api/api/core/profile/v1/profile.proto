@@ -92,6 +92,14 @@ service ProfileService {
   rpc GetProfileFeed(GetProfileFeedRequest) returns (GetProfileFeedResponse) {
     option (google.api.http) = { get: "/api/v1/profile/{user_id}/feed" };
   }
+
+  rpc ListProfileAchievements(ListProfileAchievementsRequest) returns (ListProfileAchievementsResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/{user_id}/achievements" };
+  }
+
+  rpc ListProfileActivity(ListProfileActivityRequest) returns (ListProfileActivityResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/{user_id}/activity" };
+  }
 }
 
 enum UserGoalKind {
@@ -362,6 +370,47 @@ message GetProfileFeedRequest {
 
 message GetProfileFeedResponse {
   repeated FeedItem items = 1;
+}
+
+// ── Achievements ───────────────────────────────────────────────────────────
+
+message ProfileAchievement {
+  string                    id          = 1;
+  string                    title       = 2;
+  string                    description = 3;
+  // rarity: common | rare | epic | legendary
+  string                    rarity      = 4;
+  google.protobuf.Timestamp earned_at   = 5;
+  // progress: 0..100. 100 means earned.
+  int32                     progress    = 6;
+}
+
+message ListProfileAchievementsRequest {
+  string user_id = 1;
+}
+
+message ListProfileAchievementsResponse {
+  repeated ProfileAchievement achievements = 1;
+}
+
+// ── Activity feed (broader than FeedItem: includes unlocks, wins, etc.) ────
+
+message ProfileActivityEntry {
+  string                    id       = 1;
+  // kind: mock_stage | practice | duel_win | duel_loss | achievement | level_up | pact_done
+  string                    kind     = 2;
+  string                    title    = 3;
+  string                    subtitle = 4;
+  google.protobuf.Timestamp at       = 5;
+}
+
+message ListProfileActivityRequest {
+  string user_id = 1;
+  int32  limit   = 2;
+}
+
+message ListProfileActivityResponse {
+  repeated ProfileActivityEntry entries = 1;
 }
 
 // ── Domain entities ────────────────────────────────────────────────────────

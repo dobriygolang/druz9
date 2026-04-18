@@ -342,6 +342,25 @@ func TestTelegramAuthChallenge(t *testing.T) {
 		}
 	})
 
+	t.Run("confirms challenge when configured bot secret has trailing whitespace", func(t *testing.T) {
+		t.Parallel()
+
+		svc := NewProfileService(Config{
+			Settings: Settings{
+				BotToken:           "bot-secret \n",
+				TelegramAuthMaxAge: 5 * time.Minute,
+			},
+		})
+
+		code, err := svc.ConfirmTelegramAuth(context.Background(), "bot-secret", "", model.TelegramAuthPayload{ID: 123})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(code) != telegramLoginCodeLength {
+			t.Fatalf("expected %d-digit code, got %q", telegramLoginCodeLength, code)
+		}
+	})
+
 	t.Run("rejects confirm with wrong bot secret", func(t *testing.T) {
 		t.Parallel()
 

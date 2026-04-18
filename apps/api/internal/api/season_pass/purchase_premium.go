@@ -5,6 +5,7 @@ import (
 	goerr "errors"
 
 	"github.com/go-kratos/kratos/v2/errors"
+	klog "github.com/go-kratos/kratos/v2/log"
 
 	"api/internal/apihelpers"
 	seasonpassdomain "api/internal/domain/season_pass"
@@ -26,6 +27,7 @@ func (i *Implementation) PurchasePremium(ctx context.Context, _ *v1.PurchasePrem
 		case goerr.Is(err, seasonpassdomain.ErrInsufficientGems):
 			return nil, errors.BadRequest("INSUFFICIENT_GEMS", "not enough gems")
 		default:
+			klog.Errorf("season_pass: purchase premium user=%s: %v", user.ID, err)
 			return nil, errors.InternalServer("INTERNAL", "failed to purchase premium")
 		}
 	}

@@ -2652,6 +2652,47 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.ProfileResponse'
+    /api/v1/profile/{userId}/achievements:
+        get:
+            tags:
+                - ProfileService
+            operationId: ProfileService_ListProfileAchievements
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.ListProfileAchievementsResponse'
+    /api/v1/profile/{userId}/activity:
+        get:
+            tags:
+                - ProfileService
+            operationId: ProfileService_ListProfileActivity
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.ListProfileActivityResponse'
     /api/v1/profile/{userId}/feed:
         get:
             tags:
@@ -6445,6 +6486,20 @@ components:
                 activeDays:
                     type: integer
                     format: int32
+        profile.v1.ListProfileAchievementsResponse:
+            type: object
+            properties:
+                achievements:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/profile.v1.ProfileAchievement'
+        profile.v1.ListProfileActivityResponse:
+            type: object
+            properties:
+                entries:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/profile.v1.ProfileActivityEntry'
         profile.v1.LogoutRequest:
             type: object
             properties: {}
@@ -6465,6 +6520,40 @@ components:
                     format: int32
                 skillKey:
                     type: string
+        profile.v1.ProfileAchievement:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                description:
+                    type: string
+                rarity:
+                    type: string
+                    description: 'rarity: common | rare | epic | legendary'
+                earnedAt:
+                    type: string
+                    format: date-time
+                progress:
+                    type: integer
+                    description: 'progress: 0..100. 100 means earned.'
+                    format: int32
+        profile.v1.ProfileActivityEntry:
+            type: object
+            properties:
+                id:
+                    type: string
+                kind:
+                    type: string
+                    description: 'kind: mock_stage | practice | duel_win | duel_loss | achievement | level_up | pact_done'
+                title:
+                    type: string
+                subtitle:
+                    type: string
+                at:
+                    type: string
+                    format: date-time
         profile.v1.ProfileCheckpointProgress:
             type: object
             properties:

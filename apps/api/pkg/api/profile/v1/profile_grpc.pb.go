@@ -34,6 +34,8 @@ const (
 	ProfileService_SetUserGoal_FullMethodName                 = "/profile.v1.ProfileService/SetUserGoal"
 	ProfileService_GetReadiness_FullMethodName                = "/profile.v1.ProfileService/GetReadiness"
 	ProfileService_GetProfileFeed_FullMethodName              = "/profile.v1.ProfileService/GetProfileFeed"
+	ProfileService_ListProfileAchievements_FullMethodName     = "/profile.v1.ProfileService/ListProfileAchievements"
+	ProfileService_ListProfileActivity_FullMethodName         = "/profile.v1.ProfileService/ListProfileActivity"
 )
 
 // ProfileServiceClient is the client API for ProfileService service.
@@ -55,6 +57,8 @@ type ProfileServiceClient interface {
 	SetUserGoal(ctx context.Context, in *SetUserGoalRequest, opts ...grpc.CallOption) (*SetUserGoalResponse, error)
 	GetReadiness(ctx context.Context, in *GetReadinessRequest, opts ...grpc.CallOption) (*GetReadinessResponse, error)
 	GetProfileFeed(ctx context.Context, in *GetProfileFeedRequest, opts ...grpc.CallOption) (*GetProfileFeedResponse, error)
+	ListProfileAchievements(ctx context.Context, in *ListProfileAchievementsRequest, opts ...grpc.CallOption) (*ListProfileAchievementsResponse, error)
+	ListProfileActivity(ctx context.Context, in *ListProfileActivityRequest, opts ...grpc.CallOption) (*ListProfileActivityResponse, error)
 }
 
 type profileServiceClient struct {
@@ -215,6 +219,26 @@ func (c *profileServiceClient) GetProfileFeed(ctx context.Context, in *GetProfil
 	return out, nil
 }
 
+func (c *profileServiceClient) ListProfileAchievements(ctx context.Context, in *ListProfileAchievementsRequest, opts ...grpc.CallOption) (*ListProfileAchievementsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListProfileAchievementsResponse)
+	err := c.cc.Invoke(ctx, ProfileService_ListProfileAchievements_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *profileServiceClient) ListProfileActivity(ctx context.Context, in *ListProfileActivityRequest, opts ...grpc.CallOption) (*ListProfileActivityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListProfileActivityResponse)
+	err := c.cc.Invoke(ctx, ProfileService_ListProfileActivity_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProfileServiceServer is the server API for ProfileService service.
 // All implementations must embed UnimplementedProfileServiceServer
 // for forward compatibility.
@@ -234,6 +258,8 @@ type ProfileServiceServer interface {
 	SetUserGoal(context.Context, *SetUserGoalRequest) (*SetUserGoalResponse, error)
 	GetReadiness(context.Context, *GetReadinessRequest) (*GetReadinessResponse, error)
 	GetProfileFeed(context.Context, *GetProfileFeedRequest) (*GetProfileFeedResponse, error)
+	ListProfileAchievements(context.Context, *ListProfileAchievementsRequest) (*ListProfileAchievementsResponse, error)
+	ListProfileActivity(context.Context, *ListProfileActivityRequest) (*ListProfileActivityResponse, error)
 	mustEmbedUnimplementedProfileServiceServer()
 }
 
@@ -288,6 +314,12 @@ func (UnimplementedProfileServiceServer) GetReadiness(context.Context, *GetReadi
 }
 func (UnimplementedProfileServiceServer) GetProfileFeed(context.Context, *GetProfileFeedRequest) (*GetProfileFeedResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetProfileFeed not implemented")
+}
+func (UnimplementedProfileServiceServer) ListProfileAchievements(context.Context, *ListProfileAchievementsRequest) (*ListProfileAchievementsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListProfileAchievements not implemented")
+}
+func (UnimplementedProfileServiceServer) ListProfileActivity(context.Context, *ListProfileActivityRequest) (*ListProfileActivityResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListProfileActivity not implemented")
 }
 func (UnimplementedProfileServiceServer) mustEmbedUnimplementedProfileServiceServer() {}
 func (UnimplementedProfileServiceServer) testEmbeddedByValue()                        {}
@@ -580,6 +612,42 @@ func _ProfileService_GetProfileFeed_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProfileService_ListProfileAchievements_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListProfileAchievementsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).ListProfileAchievements(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfileService_ListProfileAchievements_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).ListProfileAchievements(ctx, req.(*ListProfileAchievementsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProfileService_ListProfileActivity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListProfileActivityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).ListProfileActivity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfileService_ListProfileActivity_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).ListProfileActivity(ctx, req.(*ListProfileActivityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProfileService_ServiceDesc is the grpc.ServiceDesc for ProfileService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -646,6 +714,14 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetProfileFeed",
 			Handler:    _ProfileService_GetProfileFeed_Handler,
+		},
+		{
+			MethodName: "ListProfileAchievements",
+			Handler:    _ProfileService_ListProfileAchievements_Handler,
+		},
+		{
+			MethodName: "ListProfileActivity",
+			Handler:    _ProfileService_ListProfileActivity_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

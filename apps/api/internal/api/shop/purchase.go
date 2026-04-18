@@ -5,6 +5,7 @@ import (
 	goerr "errors"
 
 	"github.com/go-kratos/kratos/v2/errors"
+	klog "github.com/go-kratos/kratos/v2/log"
 
 	"api/internal/apihelpers"
 	shopdomain "api/internal/domain/shop"
@@ -21,6 +22,7 @@ func (i *Implementation) Purchase(ctx context.Context, req *v1.PurchaseRequest) 
 		if goerr.Is(err, shopdomain.ErrItemNotFound) {
 			return nil, errors.NotFound("ITEM_NOT_FOUND", "item not found")
 		}
+		klog.Errorf("shop: resolve item ref=%q user=%s: %v", req.GetItemId(), user.ID, err)
 		return nil, errors.InternalServer("INTERNAL", "failed to resolve item")
 	}
 	outcome, err := i.service.Purchase(ctx, user.ID, itemID)
@@ -39,6 +41,7 @@ func (i *Implementation) Purchase(ctx context.Context, req *v1.PurchaseRequest) 
 		case goerr.Is(err, shopdomain.ErrNotForSale):
 			return nil, errors.BadRequest("NOT_FOR_SALE", "item is obtained via events, not purchase")
 		default:
+			klog.Errorf("shop: purchase item=%s user=%s: %v", itemID, user.ID, err)
 			return nil, errors.InternalServer("INTERNAL", "failed to complete purchase")
 		}
 	}

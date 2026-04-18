@@ -7,6 +7,7 @@ import (
 	v1 "api/pkg/api/arena/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
+	klog "github.com/go-kratos/kratos/v2/log"
 )
 
 // Pure protobuf-mapping handlers for the guild + season-XP leaderboards.
@@ -18,6 +19,7 @@ import (
 func (i *Implementation) GuildsLeaderboard(ctx context.Context, req *v1.GuildsLeaderboardRequest) (*v1.GuildsLeaderboardResponse, error) {
 	entries, err := i.service.GetGuildLeaderboard(ctx, req.GetLimit())
 	if err != nil {
+		klog.Errorf("arena: guild leaderboard: %v", err)
 		return nil, errors.InternalServer("INTERNAL", "failed to load guild leaderboard")
 	}
 	out := make([]*v1.GuildLeaderboardEntry, 0, len(entries))
@@ -30,6 +32,7 @@ func (i *Implementation) GuildsLeaderboard(ctx context.Context, req *v1.GuildsLe
 func (i *Implementation) SeasonXPLeaderboard(ctx context.Context, req *v1.SeasonXPLeaderboardRequest) (*v1.SeasonXPLeaderboardResponse, error) {
 	entries, season, err := i.service.GetSeasonXPLeaderboard(ctx, req.GetLimit())
 	if err != nil {
+		klog.Errorf("arena: season xp leaderboard: %v", err)
 		return nil, errors.InternalServer("INTERNAL", "failed to load season XP leaderboard")
 	}
 	out := make([]*v1.SeasonXPEntry, 0, len(entries))

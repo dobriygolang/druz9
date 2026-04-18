@@ -27,6 +27,8 @@ const OperationProfileServiceGetProfileByID = "/profile.v1.ProfileService/GetPro
 const OperationProfileServiceGetProfileFeed = "/profile.v1.ProfileService/GetProfileFeed"
 const OperationProfileServiceGetProfileProgress = "/profile.v1.ProfileService/GetProfileProgress"
 const OperationProfileServiceGetReadiness = "/profile.v1.ProfileService/GetReadiness"
+const OperationProfileServiceListProfileAchievements = "/profile.v1.ProfileService/ListProfileAchievements"
+const OperationProfileServiceListProfileActivity = "/profile.v1.ProfileService/ListProfileActivity"
 const OperationProfileServiceLogout = "/profile.v1.ProfileService/Logout"
 const OperationProfileServiceSetUserGoal = "/profile.v1.ProfileService/SetUserGoal"
 const OperationProfileServiceStartYandexAuth = "/profile.v1.ProfileService/StartYandexAuth"
@@ -44,6 +46,8 @@ type ProfileServiceHTTPServer interface {
 	GetProfileFeed(context.Context, *GetProfileFeedRequest) (*GetProfileFeedResponse, error)
 	GetProfileProgress(context.Context, *GetProfileProgressRequest) (*ProfileProgressResponse, error)
 	GetReadiness(context.Context, *GetReadinessRequest) (*GetReadinessResponse, error)
+	ListProfileAchievements(context.Context, *ListProfileAchievementsRequest) (*ListProfileAchievementsResponse, error)
+	ListProfileActivity(context.Context, *ListProfileActivityRequest) (*ListProfileActivityResponse, error)
 	Logout(context.Context, *LogoutRequest) (*ProfileStatusResponse, error)
 	SetUserGoal(context.Context, *SetUserGoalRequest) (*SetUserGoalResponse, error)
 	StartYandexAuth(context.Context, *StartYandexAuthRequest) (*StartYandexAuthResponse, error)
@@ -70,6 +74,8 @@ func RegisterProfileServiceHTTPServer(s *http.Server, srv ProfileServiceHTTPServ
 	r.POST("/api/v1/profile/goal", _ProfileService_SetUserGoal0_HTTP_Handler(srv))
 	r.GET("/api/v1/profile/{user_id}/readiness", _ProfileService_GetReadiness0_HTTP_Handler(srv))
 	r.GET("/api/v1/profile/{user_id}/feed", _ProfileService_GetProfileFeed0_HTTP_Handler(srv))
+	r.GET("/api/v1/profile/{user_id}/achievements", _ProfileService_ListProfileAchievements0_HTTP_Handler(srv))
+	r.GET("/api/v1/profile/{user_id}/activity", _ProfileService_ListProfileActivity0_HTTP_Handler(srv))
 }
 
 func _ProfileService_CreateTelegramAuthChallenge0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
@@ -393,6 +399,50 @@ func _ProfileService_GetProfileFeed0_HTTP_Handler(srv ProfileServiceHTTPServer) 
 	}
 }
 
+func _ProfileService_ListProfileAchievements0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListProfileAchievementsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceListProfileAchievements)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListProfileAchievements(ctx, req.(*ListProfileAchievementsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListProfileAchievementsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ProfileService_ListProfileActivity0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListProfileActivityRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceListProfileActivity)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListProfileActivity(ctx, req.(*ListProfileActivityRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListProfileActivityResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ProfileServiceHTTPClient interface {
 	BindTelegram(ctx context.Context, req *BindTelegramRequest, opts ...http.CallOption) (rsp *ProfileStatusResponse, err error)
 	CompleteRegistration(ctx context.Context, req *CompleteRegistrationRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
@@ -402,6 +452,8 @@ type ProfileServiceHTTPClient interface {
 	GetProfileFeed(ctx context.Context, req *GetProfileFeedRequest, opts ...http.CallOption) (rsp *GetProfileFeedResponse, err error)
 	GetProfileProgress(ctx context.Context, req *GetProfileProgressRequest, opts ...http.CallOption) (rsp *ProfileProgressResponse, err error)
 	GetReadiness(ctx context.Context, req *GetReadinessRequest, opts ...http.CallOption) (rsp *GetReadinessResponse, err error)
+	ListProfileAchievements(ctx context.Context, req *ListProfileAchievementsRequest, opts ...http.CallOption) (rsp *ListProfileAchievementsResponse, err error)
+	ListProfileActivity(ctx context.Context, req *ListProfileActivityRequest, opts ...http.CallOption) (rsp *ListProfileActivityResponse, err error)
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *ProfileStatusResponse, err error)
 	SetUserGoal(ctx context.Context, req *SetUserGoalRequest, opts ...http.CallOption) (rsp *SetUserGoalResponse, err error)
 	StartYandexAuth(ctx context.Context, req *StartYandexAuthRequest, opts ...http.CallOption) (rsp *StartYandexAuthResponse, err error)
@@ -515,6 +567,32 @@ func (c *ProfileServiceHTTPClientImpl) GetReadiness(ctx context.Context, in *Get
 	pattern := "/api/v1/profile/{user_id}/readiness"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationProfileServiceGetReadiness))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ProfileServiceHTTPClientImpl) ListProfileAchievements(ctx context.Context, in *ListProfileAchievementsRequest, opts ...http.CallOption) (*ListProfileAchievementsResponse, error) {
+	var out ListProfileAchievementsResponse
+	pattern := "/api/v1/profile/{user_id}/achievements"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationProfileServiceListProfileAchievements))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ProfileServiceHTTPClientImpl) ListProfileActivity(ctx context.Context, in *ListProfileActivityRequest, opts ...http.CallOption) (*ListProfileActivityResponse, error) {
+	var out ListProfileActivityResponse
+	pattern := "/api/v1/profile/{user_id}/activity"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationProfileServiceListProfileActivity))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

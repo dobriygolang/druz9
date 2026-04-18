@@ -5,6 +5,7 @@ import (
 	goerr "errors"
 
 	"github.com/go-kratos/kratos/v2/errors"
+	klog "github.com/go-kratos/kratos/v2/log"
 
 	"api/internal/apihelpers"
 	socialdomain "api/internal/domain/social"
@@ -18,6 +19,7 @@ func (i *Implementation) ListFriends(ctx context.Context, req *v1.ListFriendsReq
 	}
 	result, err := i.service.ListFriends(ctx, user.ID, req.GetLimit(), req.GetOffset())
 	if err != nil {
+		klog.Errorf("social: list friends user=%s: %v", user.ID, err)
 		return nil, errors.InternalServer("INTERNAL", "failed to list friends")
 	}
 	out := make([]*v1.Friend, 0, len(result.Friends))
@@ -40,6 +42,7 @@ func (i *Implementation) RemoveFriend(ctx context.Context, req *v1.RemoveFriendR
 		if goerr.Is(err, socialdomain.ErrNotFriends) {
 			return nil, errors.NotFound("NOT_FRIENDS", "no friendship to remove")
 		}
+		klog.Errorf("social: remove friend user=%s other=%s: %v", user.ID, other, err)
 		return nil, errors.InternalServer("INTERNAL", "failed to remove friend")
 	}
 	return &v1.RemoveFriendResponse{Ok: true}, nil

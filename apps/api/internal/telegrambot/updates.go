@@ -42,7 +42,16 @@ func (s *Service) handleUpdate(ctx context.Context, update telegramUpdate) {
 		PhotoURL:  s.getUserPhotoURL(ctx, update.Message.From.ID),
 	})
 	if err != nil {
-		klog.Errorf("telegram bot confirm auth error: %v", err)
+		klog.Errorf(
+			"telegram bot confirm auth error: err=%v chat_id=%d telegram_user_id=%d username=%q command=%q token_present=%t token_len=%d",
+			err,
+			update.Message.Chat.ID,
+			update.Message.From.ID,
+			update.Message.From.Username,
+			command,
+			strings.TrimSpace(token) != "",
+			len(strings.TrimSpace(token)),
+		)
 		s.sendMessage(ctx, update.Message.Chat.ID, "Не удалось подтвердить вход. Вернись в приложение и попробуй ещё раз.")
 		return
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/go-kratos/kratos/v2/errors"
+	klog "github.com/go-kratos/kratos/v2/log"
 
 	"api/internal/apihelpers"
 	v1 "api/pkg/api/shop/v1"
@@ -16,6 +17,7 @@ func (i *Implementation) GetInventory(ctx context.Context, _ *v1.GetInventoryReq
 	}
 	rows, err := i.service.GetInventory(ctx, user.ID)
 	if err != nil {
+		klog.Errorf("shop: get inventory for user=%s: %v", user.ID, err)
 		return nil, errors.InternalServer("INTERNAL", "failed to load inventory")
 	}
 	out := make([]*v1.OwnedItem, 0, len(rows))
