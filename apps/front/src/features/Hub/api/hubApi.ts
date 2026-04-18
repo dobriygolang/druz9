@@ -50,6 +50,12 @@ export interface HubOverview {
     priceLabel?: string
     actionUrl?: string
   }>
+  activeSeason: {
+    number: number
+    title: string
+    roman: string
+    daysLeftLabel: string
+  } | null
 }
 
 type RawHubOverview = Partial<HubOverview>
@@ -113,6 +119,14 @@ function normalizeHubOverview(data: RawHubOverview): HubOverview {
       priceLabel: item.priceLabel,
       actionUrl: item.actionUrl,
     })),
+    activeSeason: data.activeSeason && (data.activeSeason.number ?? 0) > 0
+      ? {
+          number: data.activeSeason.number ?? 0,
+          title: data.activeSeason.title ?? '',
+          roman: data.activeSeason.roman ?? '',
+          daysLeftLabel: data.activeSeason.daysLeftLabel ?? '',
+        }
+      : null,
   }
 }
 

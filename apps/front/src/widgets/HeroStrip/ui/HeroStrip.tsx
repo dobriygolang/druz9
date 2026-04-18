@@ -4,6 +4,7 @@ import { Hero, Torch, SlimePet, RavenPet, SpiritOrb, Fireflies, PixelCoin } from
 import { RpgButton } from '@/shared/ui/pixel'
 import { NotificationBell } from '@/widgets/Overlays'
 import { useGameUser, useTweaks, useLiveStats } from '@/shared/lib/gameState'
+import { useActiveSeason } from '@/features/Hub/api/useActiveSeason'
 import { useAuth } from '@/app/providers/AuthProvider'
 
 const SKY: Record<string, string> = {
@@ -27,6 +28,7 @@ export function HeroStrip({
   // account.
   const user = useGameUser()
   const live = useLiveStats()
+  const season = useActiveSeason()
   const { user: authUser } = useAuth()
   const displayName =
     [authUser?.firstName, authUser?.lastName].filter(Boolean).join(' ').trim() ||
@@ -145,7 +147,13 @@ export function HeroStrip({
                 className="font-silkscreen uppercase"
                 style={{ color: 'var(--parch-2)', fontSize: 9, letterSpacing: '0.08em' }}
               >
-                {t('heroStrip.seasonTag')}
+                {season
+                  ? t('heroStrip.seasonTagLive', {
+                      roman: season.roman,
+                      title: season.title,
+                      defaultValue: `season ${season.roman} · ${season.title}`,
+                    })
+                  : t('heroStrip.seasonTagIdle', { defaultValue: 'off-season' })}
               </div>
             </div>
           </div>

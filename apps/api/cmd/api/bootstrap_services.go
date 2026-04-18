@@ -273,7 +273,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		adminService:            adminservice.New(adminServiceDomain, bootstrap.rtcManager, storage.profileRepo, profileServiceDomain),
 		profileService:          profileservice.New(profileServiceDomain, cookies, profileservice.NewCachedProgressRepository(storage.profileRepo), storage.walletRepo, notifSender),
 		geoService:              geoservice.New(geoServiceDomain),
-		hubService:              hubservice.New(storage.profileRepo, missionServiceDomain, eventServiceDomain, arenaServiceDomain, guildServiceDomain),
+		hubService:              hubservice.New(storage.profileRepo, missionServiceDomain, eventServiceDomain, arenaServiceDomain, guildServiceDomain, seasonPassDomain),
 		guildService:            guildservice.New(guildServiceDomain, eventServiceDomain, notifSender),
 		eventService:            eventservice.New(eventServiceDomain),
 		podcastService:          podcastservice.New(podcastServiceDomain),

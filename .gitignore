@@ -39,3 +39,5 @@ apps/notification-service/*.out
 apps/notification-service/*.test
 apps/notification-service/*.prof
 .claude
+# Local go build cache
+.cache/

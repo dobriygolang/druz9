@@ -2,6 +2,7 @@ package hub
 
 import (
 	"context"
+	"time"
 
 	"api/internal/model"
 	v1 "api/pkg/api/hub/v1"
@@ -33,12 +34,20 @@ type GuildService interface {
 	ListGuildMembers(ctx context.Context, guildID uuid.UUID, limit int32) ([]*model.GuildMemberProfile, error)
 }
 
+// SeasonService is the minimal slice of the season-pass domain the hub
+// needs — only "what season is live right now". Keeps the hub decoupled
+// from ladder/progress logic.
+type SeasonService interface {
+	GetActivePass(ctx context.Context, at time.Time) (*model.SeasonPass, error)
+}
+
 type Service struct {
 	profiles ProfileRepository
 	missions MissionService
 	events   EventService
 	arena    ArenaService
-	guilds  GuildService
+	guilds   GuildService
+	seasons  SeasonService
 }
 
 // Implementation of hub service.
@@ -54,6 +63,7 @@ func New(
 	events EventService,
 	arena ArenaService,
 	guilds GuildService,
+	seasons SeasonService,
 ) *Implementation {
 	return &Implementation{
 		service: &Service{
@@ -61,7 +71,8 @@ func New(
 			missions: missions,
 			events:   events,
 			arena:    arena,
-			guilds:  guilds,
+			guilds:   guilds,
+			seasons:  seasons,
 		},
 	}
 }

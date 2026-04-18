@@ -1,4 +1,6 @@
--- Season III "The Ember Pact": the default/active pass used by the UI.
+-- Season I "The Ember Pact": the default/active pass used by the UI.
+-- (File name kept as *_s3.sql for historical reasons — see migration
+--  00010 which also renumbered an already-deployed Season III row to I.)
 -- Idempotent: guarded by unique(season_number).
 
 INSERT INTO season_passes (
@@ -6,10 +8,10 @@ INSERT INTO season_passes (
     max_tier, xp_per_tier, premium_price_gems
 )
 VALUES (
-    '00000000-0000-0000-0000-00000000ce03'::UUID,  -- stable id: "ce03" = ChaptEr 03
-    3, 'The Ember Pact', 'Chapter III · season of fire',
-    NOW() - INTERVAL '10 days',
-    NOW() + INTERVAL '30 days',
+    '00000000-0000-0000-0000-00000000ce03'::UUID,  -- stable id: reused across seed + migration
+    1, 'The Ember Pact', 'Chapter I · the founding season',
+    NOW(),
+    NOW() + INTERVAL '60 days',
     40, 500, 400
 )
 ON CONFLICT (season_number) DO NOTHING;
@@ -25,7 +27,7 @@ DECLARE
     free_kind SMALLINT; free_amt INT; free_lbl TEXT;
     prem_kind SMALLINT; prem_amt INT; prem_lbl TEXT;
 BEGIN
-    SELECT id INTO pass_id FROM season_passes WHERE season_number = 3;
+    SELECT id INTO pass_id FROM season_passes WHERE season_number = 1;
     IF pass_id IS NULL THEN
         RETURN;
     END IF;

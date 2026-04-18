@@ -67,6 +67,7 @@ type GetOverviewResponse struct {
 	Events        []*HubEvent            `protobuf:"bytes,5,rep,name=events,proto3" json:"events,omitempty"`
 	Guild         *HubGuild              `protobuf:"bytes,6,opt,name=guild,proto3" json:"guild,omitempty"`
 	MerchantPicks []*HubMerchantPick     `protobuf:"bytes,7,rep,name=merchant_picks,json=merchantPicks,proto3" json:"merchant_picks,omitempty"`
+	ActiveSeason  *HubSeason             `protobuf:"bytes,8,opt,name=active_season,json=activeSeason,proto3" json:"active_season,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -150,6 +151,86 @@ func (x *GetOverviewResponse) GetMerchantPicks() []*HubMerchantPick {
 	return nil
 }
 
+func (x *GetOverviewResponse) GetActiveSeason() *HubSeason {
+	if x != nil {
+		return x.ActiveSeason
+	}
+	return nil
+}
+
+// HubSeason describes the currently-live season pass (number, title and
+// a short "days left" label). `number == 0` means no active season.
+type HubSeason struct {
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Number int32                  `protobuf:"varint,1,opt,name=number,proto3" json:"number,omitempty"`
+	Title  string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	// Roman numeral ("I", "II", "III"…) — ready for display.
+	Roman string `protobuf:"bytes,3,opt,name=roman,proto3" json:"roman,omitempty"`
+	// Short human label e.g. "19 дн. осталось" — server-localised eventually;
+	// for now just "N days left" so client can choose to replace it.
+	DaysLeftLabel string `protobuf:"bytes,4,opt,name=days_left_label,json=daysLeftLabel,proto3" json:"days_left_label,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HubSeason) Reset() {
+	*x = HubSeason{}
+	mi := &file_core_hub_v1_hub_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HubSeason) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HubSeason) ProtoMessage() {}
+
+func (x *HubSeason) ProtoReflect() protoreflect.Message {
+	mi := &file_core_hub_v1_hub_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HubSeason.ProtoReflect.Descriptor instead.
+func (*HubSeason) Descriptor() ([]byte, []int) {
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *HubSeason) GetNumber() int32 {
+	if x != nil {
+		return x.Number
+	}
+	return 0
+}
+
+func (x *HubSeason) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *HubSeason) GetRoman() string {
+	if x != nil {
+		return x.Roman
+	}
+	return ""
+}
+
+func (x *HubSeason) GetDaysLeftLabel() string {
+	if x != nil {
+		return x.DaysLeftLabel
+	}
+	return ""
+}
+
 type HubPlayer struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -164,7 +245,7 @@ type HubPlayer struct {
 
 func (x *HubPlayer) Reset() {
 	*x = HubPlayer{}
-	mi := &file_core_hub_v1_hub_proto_msgTypes[2]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -176,7 +257,7 @@ func (x *HubPlayer) String() string {
 func (*HubPlayer) ProtoMessage() {}
 
 func (x *HubPlayer) ProtoReflect() protoreflect.Message {
-	mi := &file_core_hub_v1_hub_proto_msgTypes[2]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -189,7 +270,7 @@ func (x *HubPlayer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubPlayer.ProtoReflect.Descriptor instead.
 func (*HubPlayer) Descriptor() ([]byte, []int) {
-	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{2}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *HubPlayer) GetId() string {
@@ -244,7 +325,7 @@ type HubAchievements struct {
 
 func (x *HubAchievements) Reset() {
 	*x = HubAchievements{}
-	mi := &file_core_hub_v1_hub_proto_msgTypes[3]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -256,7 +337,7 @@ func (x *HubAchievements) String() string {
 func (*HubAchievements) ProtoMessage() {}
 
 func (x *HubAchievements) ProtoReflect() protoreflect.Message {
-	mi := &file_core_hub_v1_hub_proto_msgTypes[3]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -269,7 +350,7 @@ func (x *HubAchievements) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubAchievements.ProtoReflect.Descriptor instead.
 func (*HubAchievements) Descriptor() ([]byte, []int) {
-	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{3}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *HubAchievements) GetUnlocked() int32 {
@@ -303,7 +384,7 @@ type HubDailyMission struct {
 
 func (x *HubDailyMission) Reset() {
 	*x = HubDailyMission{}
-	mi := &file_core_hub_v1_hub_proto_msgTypes[4]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -315,7 +396,7 @@ func (x *HubDailyMission) String() string {
 func (*HubDailyMission) ProtoMessage() {}
 
 func (x *HubDailyMission) ProtoReflect() protoreflect.Message {
-	mi := &file_core_hub_v1_hub_proto_msgTypes[4]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -328,7 +409,7 @@ func (x *HubDailyMission) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubDailyMission.ProtoReflect.Descriptor instead.
 func (*HubDailyMission) Descriptor() ([]byte, []int) {
-	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{4}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *HubDailyMission) GetKey() string {
@@ -407,7 +488,7 @@ type HubQuest struct {
 
 func (x *HubQuest) Reset() {
 	*x = HubQuest{}
-	mi := &file_core_hub_v1_hub_proto_msgTypes[5]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -419,7 +500,7 @@ func (x *HubQuest) String() string {
 func (*HubQuest) ProtoMessage() {}
 
 func (x *HubQuest) ProtoReflect() protoreflect.Message {
-	mi := &file_core_hub_v1_hub_proto_msgTypes[5]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -432,7 +513,7 @@ func (x *HubQuest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubQuest.ProtoReflect.Descriptor instead.
 func (*HubQuest) Descriptor() ([]byte, []int) {
-	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{5}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *HubQuest) GetTitle() string {
@@ -479,7 +560,7 @@ type HubArena struct {
 
 func (x *HubArena) Reset() {
 	*x = HubArena{}
-	mi := &file_core_hub_v1_hub_proto_msgTypes[6]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -491,7 +572,7 @@ func (x *HubArena) String() string {
 func (*HubArena) ProtoMessage() {}
 
 func (x *HubArena) ProtoReflect() protoreflect.Message {
-	mi := &file_core_hub_v1_hub_proto_msgTypes[6]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -504,7 +585,7 @@ func (x *HubArena) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubArena.ProtoReflect.Descriptor instead.
 func (*HubArena) Descriptor() ([]byte, []int) {
-	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{6}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *HubArena) GetItems() []*HubArenaItem {
@@ -525,7 +606,7 @@ type HubArenaItem struct {
 
 func (x *HubArenaItem) Reset() {
 	*x = HubArenaItem{}
-	mi := &file_core_hub_v1_hub_proto_msgTypes[7]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -537,7 +618,7 @@ func (x *HubArenaItem) String() string {
 func (*HubArenaItem) ProtoMessage() {}
 
 func (x *HubArenaItem) ProtoReflect() protoreflect.Message {
-	mi := &file_core_hub_v1_hub_proto_msgTypes[7]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -550,7 +631,7 @@ func (x *HubArenaItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubArenaItem.ProtoReflect.Descriptor instead.
 func (*HubArenaItem) Descriptor() ([]byte, []int) {
-	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{7}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *HubArenaItem) GetLabel() string {
@@ -587,7 +668,7 @@ type HubEvent struct {
 
 func (x *HubEvent) Reset() {
 	*x = HubEvent{}
-	mi := &file_core_hub_v1_hub_proto_msgTypes[8]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -599,7 +680,7 @@ func (x *HubEvent) String() string {
 func (*HubEvent) ProtoMessage() {}
 
 func (x *HubEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_core_hub_v1_hub_proto_msgTypes[8]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -612,7 +693,7 @@ func (x *HubEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubEvent.ProtoReflect.Descriptor instead.
 func (*HubEvent) Descriptor() ([]byte, []int) {
-	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{8}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *HubEvent) GetId() string {
@@ -662,7 +743,7 @@ type HubGuild struct {
 
 func (x *HubGuild) Reset() {
 	*x = HubGuild{}
-	mi := &file_core_hub_v1_hub_proto_msgTypes[9]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -674,7 +755,7 @@ func (x *HubGuild) String() string {
 func (*HubGuild) ProtoMessage() {}
 
 func (x *HubGuild) ProtoReflect() protoreflect.Message {
-	mi := &file_core_hub_v1_hub_proto_msgTypes[9]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -687,7 +768,7 @@ func (x *HubGuild) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubGuild.ProtoReflect.Descriptor instead.
 func (*HubGuild) Descriptor() ([]byte, []int) {
-	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{9}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *HubGuild) GetId() string {
@@ -731,7 +812,7 @@ type HubMerchantPick struct {
 
 func (x *HubMerchantPick) Reset() {
 	*x = HubMerchantPick{}
-	mi := &file_core_hub_v1_hub_proto_msgTypes[10]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -743,7 +824,7 @@ func (x *HubMerchantPick) String() string {
 func (*HubMerchantPick) ProtoMessage() {}
 
 func (x *HubMerchantPick) ProtoReflect() protoreflect.Message {
-	mi := &file_core_hub_v1_hub_proto_msgTypes[10]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -756,7 +837,7 @@ func (x *HubMerchantPick) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubMerchantPick.ProtoReflect.Descriptor instead.
 func (*HubMerchantPick) Descriptor() ([]byte, []int) {
-	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{10}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *HubMerchantPick) GetId() string {
@@ -799,7 +880,7 @@ var File_core_hub_v1_hub_proto protoreflect.FileDescriptor
 const file_core_hub_v1_hub_proto_rawDesc = "" +
 	"\n" +
 	"\x15core/hub/v1/hub.proto\x12\x06hub.v1\x1a\x1cgoogle/api/annotations.proto\"\x14\n" +
-	"\x12GetOverviewRequest\"\xe2\x02\n" +
+	"\x12GetOverviewRequest\"\x9a\x03\n" +
 	"\x13GetOverviewResponse\x12)\n" +
 	"\x06player\x18\x01 \x01(\v2\x11.hub.v1.HubPlayerR\x06player\x12>\n" +
 	"\x0edaily_missions\x18\x02 \x03(\v2\x17.hub.v1.HubDailyMissionR\rdailyMissions\x12&\n" +
@@ -807,7 +888,13 @@ const file_core_hub_v1_hub_proto_rawDesc = "" +
 	"\x05arena\x18\x04 \x01(\v2\x10.hub.v1.HubArenaR\x05arena\x12(\n" +
 	"\x06events\x18\x05 \x03(\v2\x10.hub.v1.HubEventR\x06events\x12&\n" +
 	"\x05guild\x18\x06 \x01(\v2\x10.hub.v1.HubGuildR\x05guild\x12>\n" +
-	"\x0emerchant_picks\x18\a \x03(\v2\x17.hub.v1.HubMerchantPickR\rmerchantPicks\"\xd3\x01\n" +
+	"\x0emerchant_picks\x18\a \x03(\v2\x17.hub.v1.HubMerchantPickR\rmerchantPicks\x126\n" +
+	"\ractive_season\x18\b \x01(\v2\x11.hub.v1.HubSeasonR\factiveSeason\"w\n" +
+	"\tHubSeason\x12\x16\n" +
+	"\x06number\x18\x01 \x01(\x05R\x06number\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12\x14\n" +
+	"\x05roman\x18\x03 \x01(\tR\x05roman\x12&\n" +
+	"\x0fdays_left_label\x18\x04 \x01(\tR\rdaysLeftLabel\"\xd3\x01\n" +
 	"\tHubPlayer\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12!\n" +
 	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x14\n" +
@@ -882,37 +969,39 @@ func file_core_hub_v1_hub_proto_rawDescGZIP() []byte {
 	return file_core_hub_v1_hub_proto_rawDescData
 }
 
-var file_core_hub_v1_hub_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_core_hub_v1_hub_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_core_hub_v1_hub_proto_goTypes = []any{
 	(*GetOverviewRequest)(nil),  // 0: hub.v1.GetOverviewRequest
 	(*GetOverviewResponse)(nil), // 1: hub.v1.GetOverviewResponse
-	(*HubPlayer)(nil),           // 2: hub.v1.HubPlayer
-	(*HubAchievements)(nil),     // 3: hub.v1.HubAchievements
-	(*HubDailyMission)(nil),     // 4: hub.v1.HubDailyMission
-	(*HubQuest)(nil),            // 5: hub.v1.HubQuest
-	(*HubArena)(nil),            // 6: hub.v1.HubArena
-	(*HubArenaItem)(nil),        // 7: hub.v1.HubArenaItem
-	(*HubEvent)(nil),            // 8: hub.v1.HubEvent
-	(*HubGuild)(nil),            // 9: hub.v1.HubGuild
-	(*HubMerchantPick)(nil),     // 10: hub.v1.HubMerchantPick
+	(*HubSeason)(nil),           // 2: hub.v1.HubSeason
+	(*HubPlayer)(nil),           // 3: hub.v1.HubPlayer
+	(*HubAchievements)(nil),     // 4: hub.v1.HubAchievements
+	(*HubDailyMission)(nil),     // 5: hub.v1.HubDailyMission
+	(*HubQuest)(nil),            // 6: hub.v1.HubQuest
+	(*HubArena)(nil),            // 7: hub.v1.HubArena
+	(*HubArenaItem)(nil),        // 8: hub.v1.HubArenaItem
+	(*HubEvent)(nil),            // 9: hub.v1.HubEvent
+	(*HubGuild)(nil),            // 10: hub.v1.HubGuild
+	(*HubMerchantPick)(nil),     // 11: hub.v1.HubMerchantPick
 }
 var file_core_hub_v1_hub_proto_depIdxs = []int32{
-	2,  // 0: hub.v1.GetOverviewResponse.player:type_name -> hub.v1.HubPlayer
-	4,  // 1: hub.v1.GetOverviewResponse.daily_missions:type_name -> hub.v1.HubDailyMission
-	5,  // 2: hub.v1.GetOverviewResponse.quest:type_name -> hub.v1.HubQuest
-	6,  // 3: hub.v1.GetOverviewResponse.arena:type_name -> hub.v1.HubArena
-	8,  // 4: hub.v1.GetOverviewResponse.events:type_name -> hub.v1.HubEvent
-	9,  // 5: hub.v1.GetOverviewResponse.guild:type_name -> hub.v1.HubGuild
-	10, // 6: hub.v1.GetOverviewResponse.merchant_picks:type_name -> hub.v1.HubMerchantPick
-	3,  // 7: hub.v1.HubPlayer.achievements:type_name -> hub.v1.HubAchievements
-	7,  // 8: hub.v1.HubArena.items:type_name -> hub.v1.HubArenaItem
-	0,  // 9: hub.v1.HubService.GetOverview:input_type -> hub.v1.GetOverviewRequest
-	1,  // 10: hub.v1.HubService.GetOverview:output_type -> hub.v1.GetOverviewResponse
-	10, // [10:11] is the sub-list for method output_type
-	9,  // [9:10] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	3,  // 0: hub.v1.GetOverviewResponse.player:type_name -> hub.v1.HubPlayer
+	5,  // 1: hub.v1.GetOverviewResponse.daily_missions:type_name -> hub.v1.HubDailyMission
+	6,  // 2: hub.v1.GetOverviewResponse.quest:type_name -> hub.v1.HubQuest
+	7,  // 3: hub.v1.GetOverviewResponse.arena:type_name -> hub.v1.HubArena
+	9,  // 4: hub.v1.GetOverviewResponse.events:type_name -> hub.v1.HubEvent
+	10, // 5: hub.v1.GetOverviewResponse.guild:type_name -> hub.v1.HubGuild
+	11, // 6: hub.v1.GetOverviewResponse.merchant_picks:type_name -> hub.v1.HubMerchantPick
+	2,  // 7: hub.v1.GetOverviewResponse.active_season:type_name -> hub.v1.HubSeason
+	4,  // 8: hub.v1.HubPlayer.achievements:type_name -> hub.v1.HubAchievements
+	8,  // 9: hub.v1.HubArena.items:type_name -> hub.v1.HubArenaItem
+	0,  // 10: hub.v1.HubService.GetOverview:input_type -> hub.v1.GetOverviewRequest
+	1,  // 11: hub.v1.HubService.GetOverview:output_type -> hub.v1.GetOverviewResponse
+	11, // [11:12] is the sub-list for method output_type
+	10, // [10:11] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_core_hub_v1_hub_proto_init() }
@@ -926,7 +1015,7 @@ func file_core_hub_v1_hub_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_core_hub_v1_hub_proto_rawDesc), len(file_core_hub_v1_hub_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

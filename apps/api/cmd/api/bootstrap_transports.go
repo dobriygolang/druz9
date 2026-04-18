@@ -1,19 +1,20 @@
 package main
 
 import (
-	"api/internal/closer"
 	interviewlive "api/internal/api/interview_live"
+	profileservice "api/internal/api/profile"
+	"api/internal/closer"
 	server "api/internal/server"
 	"api/internal/server/wshandler"
 	adminv1 "api/pkg/api/admin/v1"
 	arenav1 "api/pkg/api/arena/v1"
 	challengev1 "api/pkg/api/challenge/v1"
-	guildv1 "api/pkg/api/guild/v1"
 	codeeditorv1 "api/pkg/api/code_editor/v1"
-	eventv1 "api/pkg/api/event/v1"
-	geov1 "api/pkg/api/geo/v1"
 	duelreplayv1 "api/pkg/api/duel_replay/v1"
+	eventv1 "api/pkg/api/event/v1"
 	friendchallengev1 "api/pkg/api/friend_challenge/v1"
+	geov1 "api/pkg/api/geo/v1"
+	guildv1 "api/pkg/api/guild/v1"
 	hubv1 "api/pkg/api/hub/v1"
 	inboxv1 "api/pkg/api/inbox/v1"
 	interviewprepv1 "api/pkg/api/interview_prep/v1"
@@ -24,9 +25,9 @@ import (
 	referralv1 "api/pkg/api/referral/v1"
 	seasonpassv1 "api/pkg/api/season_pass/v1"
 	shopv1 "api/pkg/api/shop/v1"
+	skillsv1 "api/pkg/api/skills/v1"
 	socialv1 "api/pkg/api/social/v1"
 	streakv1 "api/pkg/api/streak/v1"
-	skillsv1 "api/pkg/api/skills/v1"
 	trainingv1 "api/pkg/api/training/v1"
 
 	"net/http"
@@ -144,7 +145,7 @@ func registerManualHTTPRoutes(
 
 func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.Server, services *serviceContext) {
 	profilev1.RegisterProfileServiceHTTPServer(httpServer, services.profileService)
-	profilev1.RegisterProfileServiceServer(grpcServer, services.profileService)
+	profileservice.RegisterCompatProfileServiceServer(grpcServer, services.profileService)
 
 	adminv1.RegisterAdminServiceHTTPServer(httpServer, services.adminService)
 	adminv1.RegisterAdminServiceServer(grpcServer, services.adminService)

@@ -85,6 +85,13 @@ var (
 	ErrInvalidTrack      = errors.New("season_pass: invalid track")
 )
 
+// GetActivePass returns just the currently-live pass (or nil) — a thin
+// accessor for callers that only need "what season is it" without the
+// user-specific ladder/progress join.
+func (s *Service) GetActivePass(ctx context.Context, at time.Time) (*model.SeasonPass, error) {
+	return s.repo.GetActive(ctx, at)
+}
+
 // GetActive returns the active pass + ladder + user's progress.
 func (s *Service) GetActive(ctx context.Context, userID uuid.UUID) (*model.SeasonPassSnapshot, error) {
 	pass, err := s.repo.GetActive(ctx, s.clock.Now())

@@ -6,6 +6,7 @@ import { Sword, Banner, Hero } from '@/shared/ui/sprites'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { arenaApi, type ArenaLeaderboardEntry, type ArenaStats } from '@/features/Arena/api/arenaApi'
 import { duelReplayApi, type ReplaySummary } from '@/features/DuelReplay'
+import { useActiveSeason } from '@/features/Hub/api/useActiveSeason'
 
 // Team slots are a pure UI concept for now: the authenticated user + one
 // invite placeholder. Wire to a real team API when available.
@@ -43,11 +44,13 @@ export function ArenaHubPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { user } = useAuth()
+  const season = useActiveSeason()
   const [matchmaking, setMatchmaking] = useState(false)
   const [teamMatchmaking, setTeamMatchmaking] = useState(false)
 
   // Live data from API.
   const [ladder, setLadder] = useState<ArenaLeaderboardEntry[]>([])
+  const [ladderLoaded, setLadderLoaded] = useState(false)
   const [recent, setRecent] = useState<ReplaySummary[]>([])
   const [stats, setStats] = useState<ArenaStats | null>(null)
 
@@ -57,6 +60,7 @@ export function ArenaHubPage() {
       .getLeaderboard(5)
       .then((list) => { if (!cancelled) setLadder(list) })
       .catch(() => {})
+      .finally(() => { if (!cancelled) setLadderLoaded(true) })
     duelReplayApi
       .listMine({ limit: 5 })
       .then((r) => { if (!cancelled) setRecent(r.replays) })
@@ -94,12 +98,12 @@ export function ArenaHubPage() {
   ]
   const startTeamQueue = () => {
     setTeamMatchmaking(true)
-    setTimeout(() => { setTeamMatchmaking(false); navigate('/duel') }, 3000)
+    setTimeout(() => { setTeamMatchmaking(false); navigate('/duel?mode=team2v2') }, 3000)
   }
 
   const enterDuel = () => {
     setMatchmaking(true)
-    setTimeout(() => navigate('/duel'), 2200)
+    setTimeout(() => navigate('/duel?mode=ranked'), 2200)
   }
 
   return (
@@ -126,7 +130,9 @@ export function ArenaHubPage() {
         subtitle={t('arenaHub.subtitle')}
         right={
           <div style={{ display: 'flex', gap: 8 }}>
-            <RpgButton size="sm">{t('arenaHub.matchHistory')}</RpgButton>
+            <RpgButton size="sm" onClick={() => navigate('/duel/replay')}>
+              {t('arenaHub.matchHistory')}
+            </RpgButton>
             <RpgButton size="sm" variant="primary" onClick={enterDuel}>
               {t('arenaHub.findDuel')}
             </RpgButton>
@@ -159,7 +165,9 @@ export function ArenaHubPage() {
                 className="font-silkscreen uppercase"
                 style={{ color: 'var(--parch-2)', fontSize: 10, letterSpacing: '0.08em', opacity: 0.7 }}
               >
-                {t('arenaHub.seasonInfo')}
+                {season
+                  ? `${t('arenaHub.season', { defaultValue: 'season' })} ${season.roman} · ${season.daysLeftLabel}`
+                  : t('arenaHub.offSeason', { defaultValue: 'off-season' })}
               </span>
             </div>
           </div>
@@ -197,7 +205,7 @@ export function ArenaHubPage() {
             <div style={{ height: 0, borderTop: '2px dashed rgba(246,234,208,0.2)', margin: '12px 0' }} />
             {ladder.length === 0 && (
               <div style={{ color: 'var(--parch-2)', opacity: 0.6, fontSize: 12, padding: '8px 0', textAlign: 'center' }}>
-                loading ladder…
+                {ladderLoaded ? t('arenaHub.ladderEmpty', { defaultValue: 'ladder is empty — be the first to climb' }) : t('arenaHub.ladderLoading', { defaultValue: 'loading ladder…' })}
               </div>
             )}
             {ladder.map((p, i) => {
@@ -563,7 +571,9 @@ export function ArenaHubPage() {
           >
             {teamMatchmaking ? t('arenaHub.team.queuing') : t('arenaHub.team.startQueue')}
           </RpgButton>
-          <RpgButton size="sm" variant="ghost">{t('arenaHub.team.inviteFromFriends')}</RpgButton>
+          <RpgButton size="sm" variant="ghost" onClick={() => navigate('/inbox?tab=friends')}>
+            {t('arenaHub.team.inviteFromFriends')}
+          </RpgButton>
           <span className="font-silkscreen uppercase" style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em', marginLeft: 'auto' }}>
             {t('arenaHub.team.avgElo', { elo: Math.round(
               teamSlots.filter(m => (m.elo ?? 0) > 0).reduce((s, m) => s + (m.elo ?? 0), 0) /

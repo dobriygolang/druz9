@@ -4,6 +4,8 @@ import { NavIcon } from '@/shared/ui/sprites'
 import { Bar } from '@/shared/ui/pixel'
 import { NAV_GROUPS, type NavItem } from '../model/nav'
 import { useSidebarBadges } from '../model/badges'
+import { useApi } from '@/shared/hooks/useApi'
+import { hubApi } from '@/features/Hub/api/hubApi'
 
 interface SidebarProps {
   open?: boolean
@@ -14,6 +16,14 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const { pathname } = useLocation()
   const { t } = useTranslation()
   const badges = useSidebarBadges()
+  const { data: overview } = useApi(() => hubApi.getOverview(), [])
+  // Today's pact = first incomplete daily mission, or the final one once
+  // all are done so the card still says something cheerful.
+  const missions = overview?.dailyMissions ?? []
+  const todaysPact = missions.find((m) => !m.completed) ?? missions[missions.length - 1] ?? null
+  const pactPct = todaysPact && todaysPact.target > 0
+    ? Math.round((todaysPact.current / todaysPact.target) * 100)
+    : 0
 
   return (
     <>
@@ -52,27 +62,30 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           </div>
         ))}
 
-        <div
-          className="rpg-sidenav__pact"
-          style={{ marginTop: 20, padding: '12px 10px', border: '3px dashed var(--ink-3)' }}
-        >
+        {todaysPact && (
           <div
-            className="font-silkscreen uppercase"
-            style={{ fontSize: 9, marginBottom: 6, color: 'var(--ink-2)', letterSpacing: '0.1em' }}
+            className="rpg-sidenav__pact"
+            style={{ marginTop: 20, padding: '12px 10px', border: '3px dashed var(--ink-3)' }}
           >
-            {t('sidebar.todaysPact')}
+            <div
+              className="font-silkscreen uppercase"
+              style={{ fontSize: 9, marginBottom: 6, color: 'var(--ink-2)', letterSpacing: '0.1em' }}
+            >
+              {t('sidebar.todaysPact')}
+            </div>
+            <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13, marginBottom: 8 }}>
+              {todaysPact.title}
+            </div>
+            <Bar value={pactPct} />
+            <div
+              className="font-silkscreen uppercase"
+              style={{ fontSize: 9, marginTop: 6, color: 'var(--ink-2)', letterSpacing: '0.1em' }}
+            >
+              {todaysPact.current} / {todaysPact.target}
+              {todaysPact.rewardLabel ? ` · ${todaysPact.rewardLabel}` : ''}
+            </div>
           </div>
-          <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13, marginBottom: 8 }}>
-            {t('sidebar.solveTasks')}
-          </div>
-          <Bar value={66} />
-          <div
-            className="font-silkscreen uppercase"
-            style={{ fontSize: 9, marginTop: 6, color: 'var(--ink-2)', letterSpacing: '0.1em' }}
-          >
-            2 / 3 · +120 ✦
-          </div>
-        </div>
+        )}
       </nav>
     </>
   )

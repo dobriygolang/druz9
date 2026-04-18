@@ -24,6 +24,19 @@ message GetOverviewResponse {
   repeated HubEvent events = 5;
   HubGuild guild = 6;
   repeated HubMerchantPick merchant_picks = 7;
+  HubSeason active_season = 8;
+}
+
+// HubSeason describes the currently-live season pass (number, title and
+// a short "days left" label). `number == 0` means no active season.
+message HubSeason {
+  int32  number     = 1;
+  string title      = 2;
+  // Roman numeral ("I", "II", "III"…) — ready for display.
+  string roman      = 3;
+  // Short human label e.g. "19 дн. осталось" — server-localised eventually;
+  // for now just "N days left" so client can choose to replace it.
+  string days_left_label = 4;
 }
 
 message HubPlayer {

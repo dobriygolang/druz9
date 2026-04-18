@@ -5146,6 +5146,8 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/hub.v1.HubMerchantPick'
+                activeSeason:
+                    $ref: '#/components/schemas/hub.v1.HubSeason'
         hub.v1.HubAchievements:
             type: object
             properties:
@@ -5263,6 +5265,25 @@ components:
                     type: string
                 actionLabel:
                     type: string
+        hub.v1.HubSeason:
+            type: object
+            properties:
+                number:
+                    type: integer
+                    format: int32
+                title:
+                    type: string
+                roman:
+                    type: string
+                    description: Roman numeral ("I", "II", "III"…) — ready for display.
+                daysLeftLabel:
+                    type: string
+                    description: |-
+                        Short human label e.g. "19 дн. осталось" — server-localised eventually;
+                         for now just "N days left" so client can choose to replace it.
+            description: |-
+                HubSeason describes the currently-live season pass (number, title and
+                 a short "days left" label). `number == 0` means no active season.
         inbox.v1.GetThreadResponse:
             type: object
             properties:

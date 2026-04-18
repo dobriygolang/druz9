@@ -1,28 +1,79 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Panel, RpgButton, Bar, Badge, PageHeader } from '@/shared/ui/pixel'
 import { Hero, Torch, Statue, Fireflies, Banner, SpiritOrb } from '@/shared/ui/sprites'
 import { useGameUser } from '@/shared/lib/gameState'
 import { useApi } from '@/shared/hooks/useApi'
+import { useAuth } from '@/app/providers/AuthProvider'
+import { authApi } from '@/features/Auth/api/authApi'
+import type { ProfileProgress } from '@/entities/User/model/types'
 import { hubApi, type HubOverview } from '@/features/Hub/api/hubApi'
 import { DemoFlowOverlay } from '@/widgets/Overlays'
 
-const JOURNEY_NODES = [
+// Fallback nodes used pre-auth or when progress endpoint is offline.
+// In normal operation `buildJourneyNodes()` derives them from real
+// competencies so the path reflects actual progress.
+const FALLBACK_JOURNEY_NODES = [
   { x: 20, y: 110, label: 'start', on: true, cur: false },
-  { x: 120, y: 72, label: 'arrays', on: true, cur: false },
-  { x: 220, y: 88, label: 'trees', on: true, cur: false },
-  { x: 320, y: 60, label: 'graphs', on: true, cur: true },
+  { x: 120, y: 72, label: 'arrays', on: false, cur: false },
+  { x: 220, y: 88, label: 'trees', on: false, cur: false },
+  { x: 320, y: 60, label: 'graphs', on: false, cur: false },
   { x: 420, y: 48, label: 'dp', on: false, cur: false },
   { x: 500, y: 30, label: 'systems', on: false, cur: false },
 ]
+
+const NODE_COORDS = [
+  { x: 20, y: 110 },
+  { x: 120, y: 72 },
+  { x: 220, y: 88 },
+  { x: 320, y: 60 },
+  { x: 420, y: 48 },
+  { x: 500, y: 30 },
+]
+
+function buildJourneyNodes(progress: ProfileProgress | null) {
+  if (!progress) return FALLBACK_JOURNEY_NODES
+  const comps = progress.competencies ?? []
+  if (comps.length === 0) return FALLBACK_JOURNEY_NODES
+  // Show up to 6 competencies ordered by score descending. Nodes with
+  // score >= 40 are "on"; the first one below threshold is "current".
+  const ordered = [...comps].sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).slice(0, 6)
+  let currentMarked = false
+  return ordered.map((c, idx) => {
+    const coord = NODE_COORDS[idx] ?? NODE_COORDS[NODE_COORDS.length - 1]
+    const score = c.score ?? 0
+    const on = score >= 40
+    const cur = !on && !currentMarked
+    if (cur) currentMarked = true
+    return {
+      x: coord.x,
+      y: coord.y,
+      label: (c.label || c.key || '').slice(0, 10) || `skill-${idx}`,
+      on,
+      cur,
+    }
+  })
+}
 
 export function HubPage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const localUser = useGameUser()
+  const { user: authUser } = useAuth()
   const [demoOpen, setDemoOpen] = useState(false)
   const { data, loading, error, refetch } = useApi(() => hubApi.getOverview(), [])
+
+  const [progress, setProgress] = useState<ProfileProgress | null>(null)
+  useEffect(() => {
+    if (!authUser?.id) return
+    let cancelled = false
+    authApi.getProfileProgress(authUser.id).then((p) => {
+      if (!cancelled) setProgress(p)
+    }).catch(() => {})
+    return () => { cancelled = true }
+  }, [authUser?.id])
+  const journeyNodes = useMemo(() => buildJourneyNodes(progress), [progress])
 
   if (loading && !data) {
     return (
@@ -404,8 +455,8 @@ export function HubPage() {
               strokeWidth="3"
               strokeDasharray="6 4"
             />
-            {JOURNEY_NODES.map((n) => (
-              <g key={n.label}>
+            {journeyNodes.map((n, idx) => (
+              <g key={`${n.label}-${idx}`}>
                 <rect
                   x={n.x - 10}
                   y={n.y - 10}
@@ -423,7 +474,7 @@ export function HubPage() {
                   fontSize="10"
                   fill="#3b2a1a"
                 >
-                  {t(`hub.node.${n.label}`)}
+                  {t(`hub.node.${n.label}`, { defaultValue: n.label })}
                 </text>
               </g>
             ))}
