@@ -151,9 +151,9 @@ export function InterviewHubPage() {
                 >
                   <span>{m.name}</span>
                   {isFree ? (
-                    <Badge variant="success" style={{ fontSize: 9 }}>Free</Badge>
+                    <Badge variant="moss" style={{ fontSize: 9 }}>Free</Badge>
                   ) : (
-                    <Badge variant="warning" style={{ fontSize: 9 }}>✦ Premium</Badge>
+                    <Badge variant="ember" style={{ fontSize: 9 }}>✦ Premium</Badge>
                   )}
                 </button>
               )

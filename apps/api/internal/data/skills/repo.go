@@ -3,6 +3,7 @@ package skills
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -43,7 +44,10 @@ func (r *Repo) GetPoints(ctx context.Context, userID uuid.UUID) (SkillPoints, er
 	if errors.Is(err, pgx.ErrNoRows) {
 		return SkillPoints{UserID: userID}, nil
 	}
-	return sp, err
+	if err != nil {
+		return sp, fmt.Errorf("scan points: %w", err)
+	}
+	return sp, nil
 }
 
 func (r *Repo) AddEarnedPoints(ctx context.Context, userID uuid.UUID, delta int32) error {
@@ -54,7 +58,10 @@ func (r *Repo) AddEarnedPoints(ctx context.Context, userID uuid.UUID, delta int3
 		  SET earned = user_skill_points.earned + $2,
 		      updated_at = NOW()
 	`, userID, delta)
-	return err
+	if err != nil {
+		return fmt.Errorf("exec add points: %w", err)
+	}
+	return nil
 }
 
 func (r *Repo) ListAllocations(ctx context.Context, userID uuid.UUID) ([]SkillAllocation, error) {
@@ -65,7 +72,7 @@ func (r *Repo) ListAllocations(ctx context.Context, userID uuid.UUID) ([]SkillAl
 		ORDER BY allocated_at ASC
 	`, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("query allocations: %w", err)
 	}
 	defer rows.Close()
 
@@ -73,11 +80,14 @@ func (r *Repo) ListAllocations(ctx context.Context, userID uuid.UUID) ([]SkillAl
 	for rows.Next() {
 		var a SkillAllocation
 		if err := rows.Scan(&a.UserID, &a.SkillID, &a.AllocatedAt); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("scan allocation: %w", err)
 		}
 		out = append(out, a)
 	}
-	return out, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+	return out, nil
 }
 
 func (r *Repo) HasAllocation(ctx context.Context, userID uuid.UUID, skillID string) (bool, error) {
@@ -88,14 +98,17 @@ func (r *Repo) HasAllocation(ctx context.Context, userID uuid.UUID, skillID stri
 			WHERE user_id = $1 AND skill_id = $2
 		)
 	`, userID, skillID).Scan(&exists)
-	return exists, err
+	if err != nil {
+		return false, fmt.Errorf("scan allocation exists: %w", err)
+	}
+	return exists, nil
 }
 
 // Allocate inserts the allocation and increments spent counter atomically.
 func (r *Repo) Allocate(ctx context.Context, userID uuid.UUID, skillID string) error {
 	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
-		return err
+		return fmt.Errorf("begin tx: %w", err)
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
 
@@ -103,7 +116,7 @@ func (r *Repo) Allocate(ctx context.Context, userID uuid.UUID, skillID string) e
 		INSERT INTO user_skill_allocations (user_id, skill_id, allocated_at)
 		VALUES ($1, $2, NOW())
 	`, userID, skillID); err != nil {
-		return err
+		return fmt.Errorf("exec insert allocation: %w", err)
 	}
 
 	if _, err := tx.Exec(ctx, `
@@ -113,17 +126,20 @@ func (r *Repo) Allocate(ctx context.Context, userID uuid.UUID, skillID string) e
 		  SET spent = user_skill_points.spent + 1,
 		      updated_at = NOW()
 	`, userID); err != nil {
-		return err
+		return fmt.Errorf("exec update points: %w", err)
 	}
 
-	return tx.Commit(ctx)
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("commit tx: %w", err)
+	}
+	return nil
 }
 
 // Refund removes the allocation and decrements spent counter atomically.
 func (r *Repo) Refund(ctx context.Context, userID uuid.UUID, skillID string) error {
 	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
-		return err
+		return fmt.Errorf("begin tx: %w", err)
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
 
@@ -133,7 +149,7 @@ func (r *Repo) Refund(ctx context.Context, userID uuid.UUID, skillID string) err
 		WHERE user_id = $1 AND skill_id = $2
 		RETURNING 1
 	`, userID, skillID).Scan(&deleted); err != nil {
-		return err
+		return fmt.Errorf("scan deleted: %w", err)
 	}
 
 	if _, err := tx.Exec(ctx, `
@@ -141,8 +157,11 @@ func (r *Repo) Refund(ctx context.Context, userID uuid.UUID, skillID string) err
 		SET spent = GREATEST(0, spent - 1), updated_at = NOW()
 		WHERE user_id = $1
 	`, userID); err != nil {
-		return err
+		return fmt.Errorf("exec update points: %w", err)
 	}
 
-	return tx.Commit(ctx)
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("commit tx: %w", err)
+	}
+	return nil
 }

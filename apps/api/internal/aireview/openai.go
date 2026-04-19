@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -43,25 +44,25 @@ func (o *openAICompatibleReviewer) call(ctx context.Context, model string, conte
 
 	body, err := json.Marshal(payload)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("marshal request: %w", err)
 	}
 
 	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, baseURL+"/chat/completions", bytes.NewReader(body))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("create request: %w", err)
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
 	httpReq.Header.Set("Authorization", "Bearer "+o.apiKey)
 
 	resp, err := o.client.Do(httpReq)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("do request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("read response: %w", err)
 	}
 	if resp.StatusCode >= 400 {
 		return "", mapProviderError(resp.StatusCode, respBody)
@@ -75,7 +76,7 @@ func (o *openAICompatibleReviewer) call(ctx context.Context, model string, conte
 		} `json:"choices"`
 	}
 	if err := json.Unmarshal(respBody, &parsed); err != nil {
-		return "", err
+		return "", fmt.Errorf("unmarshal response: %w", err)
 	}
 	if len(parsed.Choices) == 0 || strings.TrimSpace(parsed.Choices[0].Message.Content) == "" {
 		return "", ErrInvalidResponse
@@ -164,25 +165,25 @@ func (o *openAICompatibleReviewer) Chat(ctx context.Context, req LiveChatRequest
 	}
 	body, err := json.Marshal(payload)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("marshal request: %w", err)
 	}
 
 	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, baseURL+"/chat/completions", bytes.NewReader(body))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("create request: %w", err)
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
 	httpReq.Header.Set("Authorization", "Bearer "+o.apiKey)
 
 	resp, err := o.client.Do(httpReq)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("do request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("read response: %w", err)
 	}
 	if resp.StatusCode >= 400 {
 		return "", mapProviderError(resp.StatusCode, respBody)
@@ -196,7 +197,7 @@ func (o *openAICompatibleReviewer) Chat(ctx context.Context, req LiveChatRequest
 		} `json:"choices"`
 	}
 	if err := json.Unmarshal(respBody, &parsed); err != nil {
-		return "", err
+		return "", fmt.Errorf("unmarshal response: %w", err)
 	}
 	if len(parsed.Choices) == 0 || strings.TrimSpace(parsed.Choices[0].Message.Content) == "" {
 		return "", ErrInvalidResponse

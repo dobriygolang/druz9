@@ -40,25 +40,25 @@ func (g *geminiReviewer) call(ctx context.Context, model string, parts []map[str
 
 	body, err := json.Marshal(payload)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("marshal request: %w", err)
 	}
 
 	url := fmt.Sprintf("%s/v1beta/models/%s:generateContent?key=%s", baseURL, model, g.apiKey)
 	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("create request: %w", err)
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
 
 	resp, err := g.client.Do(httpReq)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("do request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("read response: %w", err)
 	}
 	if resp.StatusCode >= 400 {
 		return "", mapProviderError(resp.StatusCode, respBody)
@@ -74,7 +74,7 @@ func (g *geminiReviewer) call(ctx context.Context, model string, parts []map[str
 		} `json:"candidates"`
 	}
 	if err := json.Unmarshal(respBody, &parsed); err != nil {
-		return "", err
+		return "", fmt.Errorf("unmarshal response: %w", err)
 	}
 	if len(parsed.Candidates) == 0 || len(parsed.Candidates[0].Content.Parts) == 0 {
 		return "", ErrInvalidResponse
@@ -174,25 +174,25 @@ func (g *geminiReviewer) Chat(ctx context.Context, req LiveChatRequest) (string,
 
 	body, err := json.Marshal(payload)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("marshal request: %w", err)
 	}
 
 	url := fmt.Sprintf("%s/v1beta/models/%s:generateContent?key=%s", baseURL, modelName, g.apiKey)
 	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("create request: %w", err)
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
 
 	resp, err := g.client.Do(httpReq)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("do request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("read response: %w", err)
 	}
 	if resp.StatusCode >= 400 {
 		return "", mapProviderError(resp.StatusCode, respBody)
@@ -208,7 +208,7 @@ func (g *geminiReviewer) Chat(ctx context.Context, req LiveChatRequest) (string,
 		} `json:"candidates"`
 	}
 	if err := json.Unmarshal(respBody, &parsed); err != nil {
-		return "", err
+		return "", fmt.Errorf("unmarshal response: %w", err)
 	}
 	if len(parsed.Candidates) == 0 || len(parsed.Candidates[0].Content.Parts) == 0 {
 		return "", ErrInvalidResponse

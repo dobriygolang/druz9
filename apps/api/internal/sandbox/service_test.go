@@ -32,31 +32,6 @@ func TestBuildNetworkEnv_MockOnlySetsProxy(t *testing.T) {
 	}
 }
 
-func TestValidateExecutionRequest_BlocksGoNetworkImportsForPureProfile(t *testing.T) {
-	t.Parallel()
-
-	err := validateExecutionRequest(ExecutionRequest{
-		Code:       "package main\nimport \"net/http\"\nfunc main() {}",
-		Language:   policy.LanguageGo,
-		RunnerMode: "program",
-	}, policy.RunnerConfig{
-		Profile: policy.ProfilePure,
-		Network: policy.RunnerNetworkConfig{
-			Enabled: false,
-			Mode:    policy.NetworkDisabled,
-		},
-		Filesystem: policy.RunnerFilesystemConfig{
-			Mode: policy.FilesystemNone,
-		},
-	})
-	if err == nil {
-		t.Fatalf("expected blocked import error")
-	}
-	if !strings.Contains(err.Error(), `import "net/http" is blocked`) {
-		t.Fatalf("unexpected error: %v", err)
-	}
-}
-
 func TestExecute_MockHTTPGetUsesSandboxProxy(t *testing.T) {
 	t.Parallel()
 

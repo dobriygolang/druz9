@@ -35,7 +35,9 @@ func NewGRPCAdapter(addr string) (*GRPCAdapter, error) {
 // Close closes the underlying gRPC connection.
 func (a *GRPCAdapter) Close() error {
 	if a.conn != nil {
-		return a.conn.Close()
+		if err := a.conn.Close(); err != nil {
+			return fmt.Errorf("close connection: %w", err)
+		}
 	}
 	return nil
 }
@@ -113,7 +115,7 @@ func (a *GRPCAdapter) LinkTelegram(ctx context.Context, userID string, telegramI
 func (a *GRPCAdapter) GetNotificationSettings(ctx context.Context, userID string) (*Settings, error) {
 	resp, err := a.client.GetSettings(ctx, &v1.GetSettingsRequest{UserId: userID})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get settings: %w", err)
 	}
 	return &Settings{
 		DuelsEnabled:          resp.GetDuelsEnabled(),
@@ -135,7 +137,10 @@ func (a *GRPCAdapter) UpdateNotificationSettings(ctx context.Context, userID str
 	req.GuildsEnabled = upd.GuildsEnabled
 	req.DailyChallengeEnabled = upd.DailyChallengeEnabled
 	_, err := a.client.UpdateSettings(ctx, req)
-	return err
+	if err != nil {
+		return fmt.Errorf("update settings: %w", err)
+	}
+	return nil
 }
 
 // buildPayload copies well-known deep-link keys from the legacy

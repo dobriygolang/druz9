@@ -45,7 +45,10 @@ func (r *Repo) ListActive(ctx context.Context) ([]*Row, error) {
 		}
 		out = append(out, m)
 	}
-	return out, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+	return out, nil
 }
 
 func (r *Repo) List(ctx context.Context) ([]*Row, error) {
@@ -66,7 +69,10 @@ func (r *Repo) List(ctx context.Context) ([]*Row, error) {
 		}
 		out = append(out, m)
 	}
-	return out, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+	return out, nil
 }
 
 func (r *Repo) Create(ctx context.Context, m *Row) (*Row, error) {

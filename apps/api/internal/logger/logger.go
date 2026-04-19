@@ -18,7 +18,7 @@ func New() (*Logger, error) {
 	cfg.OutputPaths = []string{"stdout"}
 	base, err := cfg.Build()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("build logger: %w", err)
 	}
 	return &Logger{Logger: base}, nil
 }
@@ -28,7 +28,10 @@ func (l *Logger) FatalKV(_ context.Context, msg string, fields ...zap.Field) {
 }
 
 func (l *Logger) Sync() error {
-	return l.Logger.Sync()
+	if err := l.Logger.Sync(); err != nil {
+		return fmt.Errorf("sync logger: %w", err)
+	}
+	return nil
 }
 
 // Log implements Kratos log.Logger interface

@@ -52,7 +52,7 @@ func discoverServices(root string) ([]service, error) {
 
 	err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
 		if err != nil {
-			return err
+			return fmt.Errorf("walk dir: %w", err)
 		}
 		if d.IsDir() {
 			if path != root && strings.Contains(path, string(filepath.Separator)+"adapter"+string(filepath.Separator)) {
@@ -83,7 +83,7 @@ func discoverServices(root string) ([]service, error) {
 func parseProto(path string) ([]service, bool, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, false, err
+		return nil, false, fmt.Errorf("open file: %w", err)
 	}
 	defer file.Close()
 
@@ -140,7 +140,7 @@ func parseProto(path string) ([]service, bool, error) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, false, err
+		return nil, false, fmt.Errorf("scanner error: %w", err)
 	}
 
 	return services, len(services) > 0, nil
@@ -149,7 +149,7 @@ func parseProto(path string) ([]service, bool, error) {
 func generateService(outputRoot string, svc service) error {
 	dir := filepath.Join(outputRoot, svc.Domain)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
-		return err
+		return fmt.Errorf("create dir: %w", err)
 	}
 
 	serviceFile := filepath.Join(dir, "service.go")
@@ -159,7 +159,7 @@ func generateService(outputRoot string, svc service) error {
 			return renderErr
 		}
 		if writeErr := os.WriteFile(serviceFile, content, 0o600); writeErr != nil {
-			return writeErr
+			return fmt.Errorf("write file: %w", writeErr)
 		}
 	}
 
@@ -182,13 +182,13 @@ func generateService(outputRoot string, svc service) error {
 			return renderErr
 		}
 		if writeErr := os.WriteFile(methodFile, content, 0o600); writeErr != nil {
-			return writeErr
+			return fmt.Errorf("write file: %w", writeErr)
 		}
 	}
 
 	generatedFile := filepath.Join(dir, "zz_generated_methods.go")
 	if err := os.Remove(generatedFile); err != nil && !os.IsNotExist(err) {
-		return err
+		return fmt.Errorf("remove file: %w", err)
 	}
 
 	return nil
@@ -197,7 +197,7 @@ func generateService(outputRoot string, svc service) error {
 func discoverExistingMethods(dir string) (map[string]struct{}, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("read dir: %w", err)
 	}
 
 	methods := make(map[string]struct{})
@@ -208,7 +208,7 @@ func discoverExistingMethods(dir string) (map[string]struct{}, error) {
 
 		content, err := os.ReadFile(filepath.Join(dir, entry.Name()))
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("read file: %w", err)
 		}
 		matches := handlerPattern.FindAllStringSubmatch(string(content), -1)
 		for _, match := range matches {
@@ -243,7 +243,11 @@ func renderServiceFile(svc service) ([]byte, error) {
 	fmt.Fprintf(&buf, "func (i *Implementation) GetDescription() grpc.ServiceDesc {\n")
 	fmt.Fprintf(&buf, "\treturn v1.%s_ServiceDesc\n", svc.Name)
 	fmt.Fprintf(&buf, "}\n")
-	return format.Source(buf.Bytes())
+	formatted, err := format.Source(buf.Bytes())
+	if err != nil {
+		return nil, fmt.Errorf("format source: %w", err)
+	}
+	return formatted, nil
 }
 
 func renderMethodFile(svc service, m method) ([]byte, error) {
@@ -259,7 +263,11 @@ func renderMethodFile(svc service, m method) ([]byte, error) {
 	fmt.Fprintf(&buf, "\t_ = req\n")
 	fmt.Fprintf(&buf, "\tpanic(\"TODO: implement %s\")\n", m.Name)
 	fmt.Fprintf(&buf, "}\n")
-	return format.Source(buf.Bytes())
+	formatted, err := format.Source(buf.Bytes())
+	if err != nil {
+		return nil, fmt.Errorf("format source: %w", err)
+	}
+	return formatted, nil
 }
 
 func toSnakeCase(value string) string {

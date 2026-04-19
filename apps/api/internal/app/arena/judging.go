@@ -2,6 +2,7 @@ package arena
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -35,10 +36,13 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 		return nil, nil, domain.ErrTaskNotFound
 	}
 	if err := s.repo.SavePlayerCode(ctx, matchID, user.ID, code); err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("save player code: %w", err)
 	}
 
 	judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, task, code)
+	if err != nil {
+		return nil, nil, fmt.Errorf("evaluate code: %w", err)
+	}
 	if err != nil {
 		return nil, nil, err
 	}
@@ -63,20 +67,20 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 		freezeUntil := time.Now().Add(time.Duration(freezePenaltySeconds) * time.Second)
 		submission.FreezeUntil = &freezeUntil
 		if err := s.repo.SetPlayerFreeze(ctx, matchID, user.ID, &freezeUntil); err != nil {
-			return nil, nil, err
+			return nil, nil, fmt.Errorf("set player freeze: %w", err)
 		}
 	} else {
 		if err := s.repo.SetPlayerFreeze(ctx, matchID, user.ID, nil); err != nil {
-			return nil, nil, err
+			return nil, nil, fmt.Errorf("set player freeze: %w", err)
 		}
 		if err := s.repo.SetPlayerAccepted(ctx, matchID, user.ID, submission.SubmittedAt, submission.RuntimeMs); err != nil {
-			return nil, nil, err
+			return nil, nil, fmt.Errorf("set player accepted: %w", err)
 		}
 	}
 
 	created, err := s.repo.CreateSubmission(ctx, submission)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("create submission: %w", err)
 	}
 
 	match, err = s.GetMatch(ctx, matchID)
