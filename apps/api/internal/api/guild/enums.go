@@ -2,13 +2,19 @@ package guild
 
 import v1 "api/pkg/api/guild/v1"
 
+const (
+	roleCreator = "creator"
+	roleOfficer = "officer"
+	roleMember  = "member"
+)
+
 func mapGuildMemberRole(role string) v1.GuildMemberRole {
 	switch role {
-	case "creator":
+	case roleCreator:
 		return v1.GuildMemberRole_GUILD_MEMBER_ROLE_CREATOR
-	case "officer":
+	case roleOfficer:
 		return v1.GuildMemberRole_GUILD_MEMBER_ROLE_OFFICER
-	case "member":
+	case roleMember:
 		return v1.GuildMemberRole_GUILD_MEMBER_ROLE_MEMBER
 	default:
 		return v1.GuildMemberRole_GUILD_MEMBER_ROLE_UNSPECIFIED

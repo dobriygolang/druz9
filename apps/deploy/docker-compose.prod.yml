@@ -283,6 +283,7 @@ services:
       S3_SECRET_KEY_FILE: /run/secrets/s3_secret_key
       S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-}
       AI_REVIEW_API_KEY_FILE: /run/secrets/ai_review_api_key
+      AI_MENTOR_KEY_KMS: ${AI_MENTOR_KEY_KMS}
       AI_MENTOR_KEY_KMS_FILE: /run/secrets/ai_mentor_key_kms
       YANDEX_OAUTH_CLIENT_SECRET: ${YANDEX_OAUTH_CLIENT_SECRET}
       SANDBOX_MODE: remote

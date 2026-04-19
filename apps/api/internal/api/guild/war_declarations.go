@@ -34,7 +34,7 @@ func (i *Implementation) SendChallenge(ctx kratoshttp.Context) error {
 	user, err := apihelpers.RequireUser(stdCtx)
 	if err != nil {
 		writeWarErr(ctx, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
-		return nil //nolint:nilerr
+		return nil //nolint:nilerr // error written to response
 	}
 	if i.warRepo == nil {
 		writeWarErr(ctx, http.StatusServiceUnavailable, "UNAVAILABLE", "war storage unavailable")
@@ -46,22 +46,22 @@ func (i *Implementation) SendChallenge(ctx kratoshttp.Context) error {
 	}
 	if err := json.NewDecoder(ctx.Request().Body).Decode(&body); err != nil || body.ToGuildID == "" {
 		writeWarErr(ctx, http.StatusBadRequest, "BAD_REQUEST", "toGuildId required")
-		return nil //nolint:nilerr
+		return nil //nolint:nilerr // error written to response
 	}
 	toID, err := uuid.Parse(body.ToGuildID)
 	if err != nil {
 		writeWarErr(ctx, http.StatusBadRequest, "BAD_REQUEST", "invalid toGuildId")
-		return nil //nolint:nilerr
+		return nil //nolint:nilerr // error written to response
 	}
 
 	ours, errGuild := i.myGuild(stdCtx, user.ID)
 	if errGuild != nil || ours == nil {
 		writeWarErr(ctx, http.StatusConflict, "NO_GUILD", "join a guild before declaring war")
-		return nil //nolint:nilerr
+		return nil //nolint:nilerr // error written to response
 	}
 	if ours.ID == toID {
 		writeWarErr(ctx, http.StatusBadRequest, "SAME_GUILD", "cannot challenge your own guild")
-		return nil //nolint:nilerr
+		return nil //nolint:nilerr // error written to response
 	}
 
 	challenge, err := i.warRepo.SendChallenge(stdCtx, ours.ID, ours.Name, toID)
@@ -84,7 +84,7 @@ func (i *Implementation) ListIncomingChallenges(ctx kratoshttp.Context) error {
 	user, err := apihelpers.RequireUser(stdCtx)
 	if err != nil {
 		writeWarErr(ctx, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
-		return nil //nolint:nilerr
+		return nil //nolint:nilerr // error written to response
 	}
 	if i.warRepo == nil {
 		writeJSON(ctx, http.StatusOK, map[string]any{"challenges": []any{}})

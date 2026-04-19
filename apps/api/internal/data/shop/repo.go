@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	errEmptySlot     = errors.New("set equipped: empty slot")
-	ErrItemNotFound  = errors.New("shop: item not found")
+	ErrEmptySlot    = errors.New("set equipped: empty slot")
+	ErrItemNotFound = errors.New("shop: item not found")
 )
 
 type Repo struct {
@@ -236,7 +236,7 @@ func (r *Repo) SetEquippedForSlot(
 	ctx context.Context, userID uuid.UUID, slot string, equipItemID uuid.UUID,
 ) ([]*model.ShopOwnedItem, error) {
 	if slot == "" {
-		return nil, errEmptySlot
+		return nil, ErrEmptySlot
 	}
 	tx, err := r.data.DB.Begin(ctx)
 	if err != nil {
