@@ -44,7 +44,7 @@ type mockQuestionTemplate struct {
 
 func (s *Service) StartMockSession(ctx context.Context, user *model.User, companyTag, programSlug string) (*model.InterviewPrepMockSession, error) {
 	if err := ensureTrusted(user); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ensure trusted: %w", err)
 	}
 
 	normalizedCompany := strings.TrimSpace(strings.ToLower(companyTag))
@@ -56,7 +56,7 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 
 	existing, err := s.repo.GetActiveMockSessionByUserAndCompany(ctx, user.ID, resumeKey)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get active mock session: %w", err)
 	}
 	if existing != nil {
 		return s.GetMockSession(ctx, user, existing.ID)
@@ -64,7 +64,7 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 
 	anyActive, err := s.repo.GetAnyActiveMockSessionByUser(ctx, user.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get any active mock session: %w", err)
 	}
 	if anyActive != nil {
 		return nil, ErrAnotherMockSessionActive
@@ -72,7 +72,7 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 
 	blueprint, err := s.repo.ResolveMockBlueprint(ctx, normalizedCompany, normalizedProgram)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("resolve mock blueprint: %w", err)
 	}
 	if blueprint == nil {
 		return nil, ErrMockTaskPoolIncomplete
@@ -84,7 +84,7 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 
 	rounds, err := s.repo.ListBlueprintRounds(ctx, blueprint.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list blueprint rounds: %w", err)
 	}
 	if len(rounds) == 0 {
 		return nil, ErrMockTaskPoolIncomplete

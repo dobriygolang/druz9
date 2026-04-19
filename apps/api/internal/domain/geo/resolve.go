@@ -2,6 +2,7 @@ package geo
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	geoerrors "api/internal/errors/geo"
@@ -24,7 +25,7 @@ func (s *Service) Resolve(
 
 	candidates, err := s.resolver.Resolve(ctx, normalized, 5)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("resolve: %w", err)
 	}
 	if len(candidates) == 0 {
 		return nil, geoerrors.ErrNoCandidates

@@ -2,6 +2,7 @@ package notification
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	klog "github.com/go-kratos/kratos/v2/log"
@@ -20,7 +21,7 @@ import (
 // device".
 func (i *SettingsImplementation) AdminBroadcast(ctx context.Context, req *v1.AdminBroadcastRequest) (*v1.AdminBroadcastResponse, error) {
 	if _, err := apihelpers.RequireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require admin: %w", err)
 	}
 	if req.GetTitle() == "" || req.GetBody() == "" {
 		return nil, errors.BadRequest("INVALID_BROADCAST", "title and body are required")

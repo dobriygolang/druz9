@@ -9,6 +9,17 @@ const resources = {
   en: { translation: en },
 } as const
 
+// Single source of truth for the language selector in /settings.
+// Adding a new language: drop a `<code>/translation.json` next to the
+// existing ones and add an entry here. Keep the order — the picker
+// renders top-to-bottom-left-to-right.
+export const SUPPORTED_LANGUAGES = [
+  { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+  { code: 'en', name: 'English', flag: '🇬🇧' },
+] as const
+
+export type SupportedLanguageCode = (typeof SUPPORTED_LANGUAGES)[number]['code']
+
 void i18n
   .use(LanguageDetector)
   .use(initReactI18next)

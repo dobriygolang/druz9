@@ -328,7 +328,7 @@ func scanTaskWithPool(s scanner, poolID *uuid.UUID) (*model.InterviewPrepTask, e
 		&item.UpdatedAt,
 		poolID,
 	); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan mock session task: %w", err)
 	}
 	item.PrepType = model.InterviewPrepTypeFromRoundType(roundType)
 	return &item, nil

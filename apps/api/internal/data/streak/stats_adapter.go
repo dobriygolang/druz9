@@ -2,6 +2,7 @@ package streak
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -24,7 +25,7 @@ var _ streakdomain.StreakStatsProvider = (*StatsAdapter)(nil)
 func (a *StatsAdapter) GetStreakStats(ctx context.Context, userID uuid.UUID) (streakdomain.StreakStats, error) {
 	current, longest, lastActive, err := a.profileRepo.GetStreakStats(ctx, userID, time.Now().UTC())
 	if err != nil {
-		return streakdomain.StreakStats{}, err
+		return streakdomain.StreakStats{}, fmt.Errorf("get streak stats: %w", err)
 	}
 	return streakdomain.StreakStats{
 		CurrentDays:  current,

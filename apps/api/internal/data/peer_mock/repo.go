@@ -292,7 +292,10 @@ func (r *Repo) ListBookings(ctx context.Context, userID uuid.UUID, asInterviewer
 		}
 		out = append(out, &b)
 	}
-	return out, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate slots: %w", err)
+	}
+	return out, nil
 }
 
 func (r *Repo) CancelBooking(ctx context.Context, bookingID, actorID uuid.UUID) (*model.MockBooking, bool /*isBooker*/, error) {
@@ -343,7 +346,7 @@ func (r *Repo) CancelBooking(ctx context.Context, bookingID, actorID uuid.UUID) 
 		return nil, isBooker, fmt.Errorf("cancel slot: %w", err)
 	}
 	if err := tx.Commit(ctx); err != nil {
-		return nil, isBooker, fmt.Errorf("commit: %w", err)
+		return nil, isBooker, fmt.Errorf("commit tx: %w", err)
 	}
 	b, err := r.GetBooking(ctx, bookingID, actorID)
 	return b, isBooker, err
@@ -377,7 +380,7 @@ func (r *Repo) GetReviewForBooking(ctx context.Context, bookingID, interviewerID
     `, bookingID, interviewerID).Scan(&rating, &notes)
 	if err != nil {
 		// Caller handles pgx.ErrNoRows as "no review yet".
-		return 0, "", err
+		return 0, "", fmt.Errorf("get review for booking: %w", err)
 	}
 	return rating, notes, nil
 }
@@ -403,7 +406,7 @@ func (r *Repo) GetCoachReport(ctx context.Context, bookingID uuid.UUID) (*CoachR
     `, bookingID).Scan(&row.Strengths, &row.AreasToRevisit, &row.RecommendedFocus,
 		&row.FillerWordHits, &row.OverallScore, &row.GeneratedAt)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get coach report: %w", err)
 	}
 	return &row, nil
 }
@@ -477,7 +480,10 @@ func (r *Repo) ApplyPenalty(ctx context.Context, userID uuid.UUID, scoreDelta in
 	if _, err := tx.Exec(ctx, query, userID, scoreDelta, int64(ban.Seconds())); err != nil {
 		return fmt.Errorf("apply penalty: %w", err)
 	}
-	return tx.Commit(ctx)
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("commit tx: %w", err)
+	}
+	return nil
 }
 
 // ── helpers ───────────────────────────────────────────────────────────
@@ -497,5 +503,8 @@ func scanSlots(rows pgx.Rows) ([]*model.MockSlot, error) {
 		s.Status = model.SlotStatus(status)
 		out = append(out, &s)
 	}
-	return out, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate slots: %w", err)
+	}
+	return out, nil
 }

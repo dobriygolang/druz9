@@ -2,6 +2,7 @@ package guild
 
 import (
 	"context"
+	"fmt"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -14,5 +15,9 @@ func (s *Service) CreateGuild(ctx context.Context, creatorID uuid.UUID, name, de
 	if name == "" {
 		return nil, kratoserrors.BadRequest("INVALID_PAYLOAD", "name is required")
 	}
-	return s.repo.CreateGuild(ctx, creatorID, name, description, tags, isPublic)
+	guild, err := s.repo.CreateGuild(ctx, creatorID, name, description, tags, isPublic)
+	if err != nil {
+		return nil, fmt.Errorf("create guild: %w", err)
+	}
+	return guild, nil
 }

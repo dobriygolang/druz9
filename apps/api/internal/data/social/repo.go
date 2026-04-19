@@ -137,7 +137,10 @@ func (r *Repo) GetPendingRequestsByUser(ctx context.Context, userID uuid.UUID) (
 			out.Outgoing = append(out.Outgoing, req)
 		}
 	}
-	return out, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate friend requests: %w", err)
+	}
+	return out, nil
 }
 
 func (r *Repo) GetRequestByID(ctx context.Context, id uuid.UUID) (*model.FriendRequest, error) {
@@ -260,7 +263,7 @@ func scanRequest(s scanner) (*model.FriendRequest, error) {
 	var status int16
 	err := s.Scan(&req.ID, &req.FromUserID, &req.FromUsername, &req.ToUserID, &req.Message, &status, &req.CreatedAt)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan friend request: %w", err)
 	}
 	req.Status = model.FriendRequestStatus(status)
 	return &req, nil

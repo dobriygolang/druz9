@@ -92,5 +92,8 @@ func (r *Repo) ListWorldPins(ctx context.Context) ([]*model.WorldPin, error) {
 		p.Kind = model.WorldPinKind(kind)
 		pins = append(pins, p)
 	}
-	return pins, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate world pins: %w", err)
+	}
+	return pins, nil
 }

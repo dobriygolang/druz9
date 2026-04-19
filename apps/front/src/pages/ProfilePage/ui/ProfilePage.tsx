@@ -27,6 +27,7 @@ import { shopApi } from '@/features/Shop/api/shopApi'
 import { ItemCategory, type OwnedItem, rarityLabel } from '@/features/Shop/model/types'
 import { InventoryModal } from '@/features/Shop/ui/InventoryModal'
 import type { ProfileProgress } from '@/entities/User/model/types'
+import { SceneViewer } from '@/features/Scene/ui/SceneViewer'
 
 export function ProfilePage() {
   const { t } = useTranslation()
@@ -281,6 +282,21 @@ export function ProfilePage() {
           )}
         </RoomScene>
       </Panel>
+
+      {/* ADR-003: persisted Hero Room layout. Empty for new users until
+          the SceneEditor (drag-and-drop) ships. Visible to anyone, edit
+          gated to the owner via canEdit on the response. */}
+      {user?.id && (
+        <Panel nailed style={{ padding: 12, marginBottom: 18 }}>
+          <div
+            className="font-silkscreen uppercase"
+            style={{ fontSize: 10, letterSpacing: '0.1em', color: 'var(--ember-1)', marginBottom: 8 }}
+          >
+            {t('profile.savedScene', { defaultValue: 'твоя сцена' })}
+          </div>
+          <SceneViewer scope="user_room" ownerId={user.id} maxHeight={360} />
+        </Panel>
+      )}
 
       {/* Edit catalog */}
       {editRoom && (

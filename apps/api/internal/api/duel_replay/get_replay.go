@@ -2,6 +2,7 @@ package duel_replay
 
 import (
 	"context"
+	"fmt"
 	goerr "errors"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -14,11 +15,11 @@ import (
 func (i *Implementation) GetReplay(ctx context.Context, req *v1.GetReplayRequest) (*v1.GetReplayResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	id, parseErr := apihelpers.ParseUUID(req.GetReplayId(), "INVALID_REPLAY_ID", "replay_id")
 	if parseErr != nil {
-		return nil, parseErr
+		return nil, fmt.Errorf("parse replay id: %w", parseErr)
 	}
 	viewer := user.ID
 	result, err := i.service.GetReplay(ctx, id, &viewer)
@@ -29,7 +30,7 @@ func (i *Implementation) GetReplay(ctx context.Context, req *v1.GetReplayRequest
 		case goerr.Is(err, duelreplaydomain.ErrNotParticipant):
 			return nil, errors.Forbidden("NOT_PARTICIPANT", "you were not part of this duel")
 		default:
-			return nil, errors.InternalServer("INTERNAL", "failed to load replay")
+			return nil, fmt.Errorf("get replay: %w", err)
 		}
 	}
 

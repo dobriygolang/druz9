@@ -2,6 +2,7 @@ package duel_replay
 
 import (
 	"context"
+	"fmt"
 	goerr "errors"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -15,11 +16,11 @@ import (
 func (i *Implementation) RecordEvent(ctx context.Context, req *v1.RecordEventRequest) (*v1.RecordEventResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	replayID, parseErr := apihelpers.ParseUUID(req.GetReplayId(), "INVALID_REPLAY_ID", "replay_id")
 	if parseErr != nil {
-		return nil, parseErr
+		return nil, fmt.Errorf("parse replay id: %w", parseErr)
 	}
 	var linesCount *int32
 	if req.GetLinesCount() != 0 {
@@ -45,7 +46,7 @@ func (i *Implementation) RecordEvent(ctx context.Context, req *v1.RecordEventReq
 		case goerr.Is(err, duelreplaydomain.ErrLabelTooLong):
 			return nil, errors.BadRequest("LABEL_TOO_LONG", "label exceeds 200 characters")
 		default:
-			return nil, errors.InternalServer("INTERNAL", "failed to record event")
+			return nil, fmt.Errorf("record event: %w", err)
 		}
 	}
 	return &v1.RecordEventResponse{Event: mapEvent(ev)}, nil

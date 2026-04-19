@@ -25,6 +25,7 @@ import (
 	podcastdata "api/internal/data/podcast"
 	profiledata "api/internal/data/profile"
 	referraldata "api/internal/data/referral"
+	scenedata "api/internal/data/scene"
 	seasonpassdata "api/internal/data/season_pass"
 	shopdata "api/internal/data/shop"
 	skillsdata "api/internal/data/skills"
@@ -64,6 +65,7 @@ type storageContext struct {
 	streakRepo           *streakdata.Repo
 	streakStats          *streakdata.StatsAdapter
 	shopRepo             *shopdata.Repo
+	sceneRepo            *scenedata.Repo
 	socialRepo           *socialdata.Repo
 	socialUsers          *socialdata.UserLookupAdapter
 	walletRepo           *walletdata.Repo
@@ -132,6 +134,7 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 		streakRepo:           streakdata.NewRepo(store, bootstrap.kratosLogger),
 		streakStats:          streakdata.NewStatsAdapter(profiledata.NewRepo(store, bootstrap.kratosLogger)),
 		shopRepo:             shopdata.NewRepo(store, bootstrap.kratosLogger),
+		sceneRepo:            scenedata.NewRepo(store, bootstrap.kratosLogger),
 		socialRepo:           socialdata.NewRepo(store, bootstrap.kratosLogger),
 		socialUsers: socialdata.NewUserLookupAdapter(func(ctx context.Context, username string) (uuid.UUID, string, error) {
 			pr := profiledata.NewRepo(store, bootstrap.kratosLogger)

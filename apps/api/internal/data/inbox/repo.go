@@ -120,7 +120,10 @@ func (r *Repo) ListMessages(ctx context.Context, threadID uuid.UUID) ([]*model.I
 		m.SenderID = senderID
 		messages = append(messages, &m)
 	}
-	return messages, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate messages: %w", err)
+	}
+	return messages, nil
 }
 
 // InsertMessage persists a new message. Caller is responsible for also
@@ -211,7 +214,7 @@ func scanThread(s scanner) (*model.InboxThread, error) {
 		&t.UnreadCount, &t.LastMessageAt, &externalID, &t.Interactive, &t.CreatedAt,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan thread: %w", err)
 	}
 	t.ExternalID = externalID
 	return &t, nil

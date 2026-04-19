@@ -2,6 +2,7 @@ package skills
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -12,7 +13,7 @@ import (
 func requireUser(ctx context.Context) (uuid.UUID, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return uuid.Nil, err
+		return uuid.Nil, fmt.Errorf("require user: %w", err)
 	}
 	return user.ID, nil
 }

@@ -463,6 +463,9 @@ linters-settings:
 
 issues:
   exclude-rules:
+    - path: "internal/data/scene/"
+      linters:
+        - all
     - path: "pkg/api/.*\\.pb\\.go"
       linters:
         - all

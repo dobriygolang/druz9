@@ -2,6 +2,7 @@ package geo
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"api/internal/cache"
@@ -47,5 +48,9 @@ func NewService(c Config) *Service {
 // WorldPins proxies to the resolver. Kept as a domain method so callers
 // depend on geodomain.Service (not directly on the data layer).
 func (s *Service) WorldPins(ctx context.Context) ([]*model.WorldPin, error) {
-	return s.resolver.ListWorldPins(ctx)
+	pins, err := s.resolver.ListWorldPins(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("list world pins: %w", err)
+	}
+	return pins, nil
 }

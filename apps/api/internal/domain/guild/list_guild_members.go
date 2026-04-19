@@ -2,6 +2,7 @@ package guild
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -10,5 +11,9 @@ import (
 
 // ListGuildMembers returns member profiles for a guild.
 func (s *Service) ListGuildMembers(ctx context.Context, guildID uuid.UUID, limit int32) ([]*model.GuildMemberProfile, error) {
-	return s.repo.ListGuildMembers(ctx, guildID, limit)
+	members, err := s.repo.ListGuildMembers(ctx, guildID, limit)
+	if err != nil {
+		return nil, fmt.Errorf("list guild members: %w", err)
+	}
+	return members, nil
 }

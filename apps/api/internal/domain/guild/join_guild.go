@@ -2,6 +2,7 @@ package guild
 
 import (
 	"context"
+	"fmt"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -11,10 +12,13 @@ import (
 func (s *Service) JoinGuild(ctx context.Context, guildID, userID uuid.UUID) error {
 	guild, err := s.repo.GetGuild(ctx, guildID)
 	if err != nil {
-		return err
+		return fmt.Errorf("get guild: %w", err)
 	}
 	if !guild.IsPublic {
 		return kratoserrors.Forbidden("GUILD_PRIVATE", "guild is private, joining requires an invite from the creator")
 	}
-	return s.repo.JoinGuild(ctx, guildID, userID)
+	if err := s.repo.JoinGuild(ctx, guildID, userID); err != nil {
+		return fmt.Errorf("join guild: %w", err)
+	}
+	return nil
 }

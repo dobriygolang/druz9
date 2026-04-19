@@ -53,5 +53,8 @@ func (r *Repo) SearchUsers(ctx context.Context, viewerID uuid.UUID, query string
 		}
 		hits = append(hits, h)
 	}
-	return hits, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate search results: %w", err)
+	}
+	return hits, nil
 }

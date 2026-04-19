@@ -69,7 +69,10 @@ func (r *Repo) ListEvents(ctx context.Context, replayID uuid.UUID) ([]*model.Due
 		ev.LinesCount = linesCount
 		events = append(events, &ev)
 	}
-	return events, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate events: %w", err)
+	}
+	return events, nil
 }
 
 func (r *Repo) ListForUser(ctx context.Context, userID uuid.UUID, limit, offset int32) ([]*model.DuelReplaySummary, int32, error) {
@@ -149,7 +152,7 @@ func scanSummary(s scanner) (*model.DuelReplaySummary, error) {
 		&winner, &r.CompletedAt, &r.CreatedAt,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan summary: %w", err)
 	}
 	r.SourceKind = model.ReplaySourceKind(sourceKind)
 	r.TaskDifficulty = int32(difficulty)

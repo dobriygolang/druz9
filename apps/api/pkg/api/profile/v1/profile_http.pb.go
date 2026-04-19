@@ -27,6 +27,7 @@ const OperationProfileServiceGetProfileByID = "/profile.v1.ProfileService/GetPro
 const OperationProfileServiceGetProfileFeed = "/profile.v1.ProfileService/GetProfileFeed"
 const OperationProfileServiceGetProfileProgress = "/profile.v1.ProfileService/GetProfileProgress"
 const OperationProfileServiceGetReadiness = "/profile.v1.ProfileService/GetReadiness"
+const OperationProfileServiceGetUserPreferences = "/profile.v1.ProfileService/GetUserPreferences"
 const OperationProfileServiceGetWallet = "/profile.v1.ProfileService/GetWallet"
 const OperationProfileServiceListProfileAchievements = "/profile.v1.ProfileService/ListProfileAchievements"
 const OperationProfileServiceListProfileActivity = "/profile.v1.ProfileService/ListProfileActivity"
@@ -36,6 +37,7 @@ const OperationProfileServiceStartYandexAuth = "/profile.v1.ProfileService/Start
 const OperationProfileServiceTelegramAuth = "/profile.v1.ProfileService/TelegramAuth"
 const OperationProfileServiceUpdateLocation = "/profile.v1.ProfileService/UpdateLocation"
 const OperationProfileServiceUpdateProfile = "/profile.v1.ProfileService/UpdateProfile"
+const OperationProfileServiceUpdateUserPreferences = "/profile.v1.ProfileService/UpdateUserPreferences"
 const OperationProfileServiceYandexAuth = "/profile.v1.ProfileService/YandexAuth"
 
 type ProfileServiceHTTPServer interface {
@@ -47,6 +49,9 @@ type ProfileServiceHTTPServer interface {
 	GetProfileFeed(context.Context, *GetProfileFeedRequest) (*GetProfileFeedResponse, error)
 	GetProfileProgress(context.Context, *GetProfileProgressRequest) (*ProfileProgressResponse, error)
 	GetReadiness(context.Context, *GetReadinessRequest) (*GetReadinessResponse, error)
+	// GetUserPreferences ADR-005 — User UI preferences (layout density, etc.). Separate from
+	// notification settings (which live in notification.proto).
+	GetUserPreferences(context.Context, *GetUserPreferencesRequest) (*UserPreferences, error)
 	GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error)
 	ListProfileAchievements(context.Context, *ListProfileAchievementsRequest) (*ListProfileAchievementsResponse, error)
 	ListProfileActivity(context.Context, *ListProfileActivityRequest) (*ListProfileActivityResponse, error)
@@ -56,6 +61,7 @@ type ProfileServiceHTTPServer interface {
 	TelegramAuth(context.Context, *TelegramAuthRequest) (*ProfileResponse, error)
 	UpdateLocation(context.Context, *UpdateLocationRequest) (*ProfileResponse, error)
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*ProfileResponse, error)
+	UpdateUserPreferences(context.Context, *UpdateUserPreferencesRequest) (*UserPreferences, error)
 	YandexAuth(context.Context, *YandexAuthRequest) (*ProfileResponse, error)
 }
 
@@ -78,6 +84,8 @@ func RegisterProfileServiceHTTPServer(s *http.Server, srv ProfileServiceHTTPServ
 	r.GET("/api/v1/profile/{user_id}/feed", _ProfileService_GetProfileFeed0_HTTP_Handler(srv))
 	r.GET("/api/v1/profile/{user_id}/achievements", _ProfileService_ListProfileAchievements0_HTTP_Handler(srv))
 	r.GET("/api/v1/profile/{user_id}/activity", _ProfileService_ListProfileActivity0_HTTP_Handler(srv))
+	r.GET("/api/v1/profile/preferences", _ProfileService_GetUserPreferences0_HTTP_Handler(srv))
+	r.POST("/api/v1/profile/preferences", _ProfileService_UpdateUserPreferences0_HTTP_Handler(srv))
 	r.GET("/api/v1/wallet", _ProfileService_GetWallet0_HTTP_Handler(srv))
 }
 
@@ -446,6 +454,47 @@ func _ProfileService_ListProfileActivity0_HTTP_Handler(srv ProfileServiceHTTPSer
 	}
 }
 
+func _ProfileService_GetUserPreferences0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetUserPreferencesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceGetUserPreferences)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetUserPreferences(ctx, req.(*GetUserPreferencesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UserPreferences)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ProfileService_UpdateUserPreferences0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateUserPreferencesRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceUpdateUserPreferences)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateUserPreferences(ctx, req.(*UpdateUserPreferencesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UserPreferences)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _ProfileService_GetWallet0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in GetWalletRequest
@@ -474,6 +523,9 @@ type ProfileServiceHTTPClient interface {
 	GetProfileFeed(ctx context.Context, req *GetProfileFeedRequest, opts ...http.CallOption) (rsp *GetProfileFeedResponse, err error)
 	GetProfileProgress(ctx context.Context, req *GetProfileProgressRequest, opts ...http.CallOption) (rsp *ProfileProgressResponse, err error)
 	GetReadiness(ctx context.Context, req *GetReadinessRequest, opts ...http.CallOption) (rsp *GetReadinessResponse, err error)
+	// GetUserPreferences ADR-005 — User UI preferences (layout density, etc.). Separate from
+	// notification settings (which live in notification.proto).
+	GetUserPreferences(ctx context.Context, req *GetUserPreferencesRequest, opts ...http.CallOption) (rsp *UserPreferences, err error)
 	GetWallet(ctx context.Context, req *GetWalletRequest, opts ...http.CallOption) (rsp *GetWalletResponse, err error)
 	ListProfileAchievements(ctx context.Context, req *ListProfileAchievementsRequest, opts ...http.CallOption) (rsp *ListProfileAchievementsResponse, err error)
 	ListProfileActivity(ctx context.Context, req *ListProfileActivityRequest, opts ...http.CallOption) (rsp *ListProfileActivityResponse, err error)
@@ -483,6 +535,7 @@ type ProfileServiceHTTPClient interface {
 	TelegramAuth(ctx context.Context, req *TelegramAuthRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	UpdateLocation(ctx context.Context, req *UpdateLocationRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	UpdateProfile(ctx context.Context, req *UpdateProfileRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
+	UpdateUserPreferences(ctx context.Context, req *UpdateUserPreferencesRequest, opts ...http.CallOption) (rsp *UserPreferences, err error)
 	YandexAuth(ctx context.Context, req *YandexAuthRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 }
 
@@ -590,6 +643,21 @@ func (c *ProfileServiceHTTPClientImpl) GetReadiness(ctx context.Context, in *Get
 	pattern := "/api/v1/profile/{user_id}/readiness"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationProfileServiceGetReadiness))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// GetUserPreferences ADR-005 — User UI preferences (layout density, etc.). Separate from
+// notification settings (which live in notification.proto).
+func (c *ProfileServiceHTTPClientImpl) GetUserPreferences(ctx context.Context, in *GetUserPreferencesRequest, opts ...http.CallOption) (*UserPreferences, error) {
+	var out UserPreferences
+	pattern := "/api/v1/profile/preferences"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationProfileServiceGetUserPreferences))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -707,6 +775,19 @@ func (c *ProfileServiceHTTPClientImpl) UpdateProfile(ctx context.Context, in *Up
 	pattern := "/api/v1/profile/update"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationProfileServiceUpdateProfile))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ProfileServiceHTTPClientImpl) UpdateUserPreferences(ctx context.Context, in *UpdateUserPreferencesRequest, opts ...http.CallOption) (*UserPreferences, error) {
+	var out UserPreferences
+	pattern := "/api/v1/profile/preferences"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationProfileServiceUpdateUserPreferences))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

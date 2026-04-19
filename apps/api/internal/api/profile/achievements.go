@@ -143,6 +143,7 @@ func (i *Implementation) ListProfileAchievements(ctx context.Context, req *v1.Li
 		LastActivityAt:        progress.Overview.LastActivityAt,
 	}
 
+	pinnedOnly := req.GetPinnedOnly()
 	out := make([]*v1.ProfileAchievement, 0, len(achievementCatalog))
 	for _, def := range achievementCatalog {
 		current, target := def.progressFn(ov)
@@ -151,7 +152,8 @@ func (i *Implementation) ListProfileAchievements(ctx context.Context, req *v1.Li
 		}
 		pct := int32(0)
 		var earnedAt *timestamppb.Timestamp
-		if current >= target {
+		earned := current >= target
+		if earned {
 			pct = 100
 			if ov.LastActivityAt != nil {
 				earnedAt = timestamppb.New(*ov.LastActivityAt)
@@ -162,6 +164,12 @@ func (i *Implementation) ListProfileAchievements(ctx context.Context, req *v1.Li
 				pct = 99
 			}
 		}
+		// pinned_only filter: hide everything that hasn't been earned yet.
+		// Until we add a real `pinned_achievements[]` column on users, "pinned"
+		// means "earned and worth showing on the profile card".
+		if pinnedOnly && !earned {
+			continue
+		}
 		out = append(out, &v1.ProfileAchievement{
 			Id:          def.id,
 			Title:       def.title,
@@ -169,6 +177,7 @@ func (i *Implementation) ListProfileAchievements(ctx context.Context, req *v1.Li
 			Rarity:      def.rarity,
 			EarnedAt:    earnedAt,
 			Progress:    pct,
+			Pinned:      earned,
 		})
 	}
 

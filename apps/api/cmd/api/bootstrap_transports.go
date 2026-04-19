@@ -32,6 +32,7 @@ import (
 	podcastv1 "api/pkg/api/podcast/v1"
 	profilev1 "api/pkg/api/profile/v1"
 	referralv1 "api/pkg/api/referral/v1"
+	scenev1 "api/pkg/api/scene/v1"
 	seasonpassv1 "api/pkg/api/season_pass/v1"
 	shopv1 "api/pkg/api/shop/v1"
 	skillsv1 "api/pkg/api/skills/v1"
@@ -171,6 +172,9 @@ func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.S
 
 	guildv1.RegisterGuildServiceHTTPServer(httpServer, services.guildService)
 	guildv1.RegisterGuildServiceServer(grpcServer, services.guildService)
+
+	scenev1.RegisterSceneServiceHTTPServer(httpServer, services.sceneService)
+	scenev1.RegisterSceneServiceServer(grpcServer, services.sceneService)
 
 	eventv1.RegisterEventServiceHTTPServer(httpServer, services.eventService)
 	eventv1.RegisterEventServiceServer(grpcServer, services.eventService)

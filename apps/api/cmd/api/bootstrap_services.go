@@ -23,6 +23,7 @@ import (
 	podcastservice "api/internal/api/podcast"
 	profileservice "api/internal/api/profile"
 	referralservice "api/internal/api/referral"
+	sceneservice "api/internal/api/scene"
 	seasonpassservice "api/internal/api/season_pass"
 	shopservice "api/internal/api/shop"
 	skillsservice "api/internal/api/skills"
@@ -96,6 +97,7 @@ type serviceContext struct {
 	seasonPassService      *seasonpassservice.Implementation
 	streakService          *streakservice.Implementation
 	shopService            *shopservice.Implementation
+	sceneService           *sceneservice.Implementation
 	socialService          *socialservice.Implementation
 	peerMockService        *peermockservice.Implementation
 	aiMentorService        *adminservice.AIMentorImpl
@@ -297,6 +299,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		seasonPassService:      seasonpassservice.New(seasonPassDomain),
 		streakService:          streakservice.New(streakDomain),
 		shopService:            shopservice.New(shopDomain),
+		sceneService:           sceneservice.New(storage.sceneRepo, storage.guildRepo),
 		socialService:          socialservice.New(socialDomain),
 		peerMockService:        peermockservice.New(storage.peerMockRepo),
 		aiMentorService:        adminservice.NewAIMentorImpl(storage.aiMentorRepo),

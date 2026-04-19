@@ -14,6 +14,7 @@ import {
 } from '@/shared/ui/sprites'
 import { guildApi, type GuildMember } from '@/features/Guild/api/guildApi'
 import type { Guild } from '@/entities/Guild/model/types'
+import { SceneViewer } from '@/features/Scene/ui/SceneViewer'
 
 type HallTheme = 'moss' | 'ember' | 'stone'
 
@@ -313,6 +314,20 @@ export function GuildPage() {
           </div>
         </div>
       </Panel>
+
+      {/* ADR-003: persisted Guild Hall layout. Officers/creator can edit
+          via the (forthcoming) SceneEditor; members see the read-only view. */}
+      {guild?.id && (
+        <Panel nailed style={{ padding: 12, marginBottom: 18 }}>
+          <div
+            className="font-silkscreen uppercase"
+            style={{ fontSize: 10, letterSpacing: '0.1em', color: 'var(--ember-1)', marginBottom: 8 }}
+          >
+            {t('guild.page.savedHall', { defaultValue: 'зал гильдии' })}
+          </div>
+          <SceneViewer scope="guild_hall" ownerId={guild.id} maxHeight={360} />
+        </Panel>
+      )}
 
       <div className="rpg-grid-2col rpg-guild-grid" style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 18 }}>
         {/* Left: campaign + members */}

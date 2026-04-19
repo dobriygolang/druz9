@@ -255,7 +255,11 @@ func (s *Service) Equip(
 	if unequip {
 		target = uuid.Nil
 	}
-	return s.repo.SetEquippedForSlot(ctx, userID, item.Slot, target)
+	result, err := s.repo.SetEquippedForSlot(ctx, userID, item.Slot, target)
+	if err != nil {
+		return nil, fmt.Errorf("set equipped for slot: %w", err)
+	}
+	return result, nil
 }
 
 // AdminListItems mirrors ListItems but surfaces inactive rows too.

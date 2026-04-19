@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { i18n, SUPPORTED_LANGUAGES } from '@/shared/i18n'
 import { Panel, PageHeader } from '@/shared/ui/pixel'
 import { Hero } from '@/shared/ui/sprites'
 import { notificationApi, type NotificationSettings } from '@/features/Notification/api/notificationApi'
@@ -307,20 +308,18 @@ function SettingsNotifs() {
 // They'll come back when each ships on top of a real UserPreferences RPC.
 
 /* ---- Language ---- */
-const LANGS = [
-  { code: 'ru', name: 'Русский',    flag: '🇷🇺', active: true },
-  { code: 'en', name: 'English',    flag: '🇬🇧', active: false },
-  { code: 'de', name: 'Deutsch',    flag: '🇩🇪', active: false },
-  { code: 'fr', name: 'Français',   flag: '🇫🇷', active: false },
-  { code: 'es', name: 'Español',    flag: '🇪🇸', active: false },
-  { code: 'zh', name: '中文',       flag: '🇨🇳', active: false },
-  { code: 'ja', name: '日本語',     flag: '🇯🇵', active: false },
-  { code: 'pt', name: 'Português',  flag: '🇧🇷', active: false },
-]
+// Languages come from /shared/i18n SUPPORTED_LANGUAGES — adding a code that
+// has no translation file made the UI render empty strings. The picker now
+// shows only languages we actually ship.
 
 function SettingsLanguage() {
-  const { t } = useTranslation()
-  const [lang, setLang] = useState('ru')
+  const { t, i18n: i18nInst } = useTranslation()
+  const [lang, setLang] = useState<string>(i18nInst.resolvedLanguage ?? 'ru')
+
+  const onPick = (code: string) => {
+    setLang(code)
+    void i18n.changeLanguage(code)
+  }
   return (
     <>
       <h3 className="font-display" style={{ fontSize: 17, marginBottom: 4 }}>{t('settings.lang.title')}</h3>
@@ -328,10 +327,10 @@ function SettingsLanguage() {
         {t('settings.lang.uiHint')}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 20 }}>
-        {LANGS.map((l) => (
+        {SUPPORTED_LANGUAGES.map((l) => (
           <div
             key={l.code}
-            onClick={() => setLang(l.code)}
+            onClick={() => onPick(l.code)}
             style={{
               padding: '12px 14px',
               border: '3px solid',

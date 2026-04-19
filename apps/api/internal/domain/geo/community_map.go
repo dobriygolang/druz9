@@ -2,6 +2,7 @@ package geo
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	geoerrors "api/internal/errors/geo"
@@ -29,7 +30,7 @@ func (s *Service) CommunityMap(
 
 	points, err := s.resolver.ListCommunityPoints(ctx, currentUserID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list community points: %w", err)
 	}
 
 	// Cache the result

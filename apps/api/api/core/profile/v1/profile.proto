@@ -101,6 +101,18 @@ service ProfileService {
     option (google.api.http) = { get: "/api/v1/profile/{user_id}/activity" };
   }
 
+  // ADR-005 — User UI preferences (layout density, etc.). Separate from
+  // notification settings (which live in notification.proto).
+  rpc GetUserPreferences(GetUserPreferencesRequest) returns (UserPreferences) {
+    option (google.api.http) = { get: "/api/v1/profile/preferences" };
+  }
+  rpc UpdateUserPreferences(UpdateUserPreferencesRequest) returns (UserPreferences) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/preferences"
+      body: "*"
+    };
+  }
+
   rpc GetWallet(GetWalletRequest) returns (GetWalletResponse) {
     // NB: /api/v1/profile/wallet would collide with the path pattern
     // /api/v1/profile/{user_id} (grpc-gateway routes "wallet" as a
@@ -391,10 +403,16 @@ message ProfileAchievement {
   google.protobuf.Timestamp earned_at   = 5;
   // progress: 0..100. 100 means earned.
   int32                     progress    = 6;
+  // True if this achievement is in the user's pinned set (User.pinned_achievements).
+  // Frontend uses this to render the badge as featured on the profile card.
+  bool                      pinned      = 7;
 }
 
 message ListProfileAchievementsRequest {
   string user_id = 1;
+  // When true, only achievements that are both earned (progress=100) AND
+  // in the user's pinned set are returned. Used by the profile card.
+  bool pinned_only = 2;
 }
 
 message ListProfileAchievementsResponse {
@@ -422,6 +440,32 @@ message ListProfileActivityResponse {
 }
 
 // ── Wallet balance ─────────────────────────────────────────────────────────
+
+// ── User preferences (ADR-005) ─────────────────────────────────────────────
+//
+// LayoutDensity controls overall UI compactness. "comfortable" is the
+// default; "compact" reduces paddings/gaps for power users on small
+// screens. Persisted per-user so it carries across devices.
+enum LayoutDensity {
+  LAYOUT_DENSITY_UNSPECIFIED = 0;
+  LAYOUT_DENSITY_COMFORTABLE = 1;
+  LAYOUT_DENSITY_COMPACT = 2;
+}
+
+message UserPreferences {
+  LayoutDensity layout_density = 1;
+  // Locale code as stored on the server (e.g. "ru", "en"). The client may
+  // override via localStorage, but the server-saved value is the source of
+  // truth on first load on a new device.
+  string locale = 2;
+}
+
+message GetUserPreferencesRequest {}
+
+message UpdateUserPreferencesRequest {
+  LayoutDensity layout_density = 1;
+  string locale = 2;
+}
 
 message GetWalletRequest {}
 

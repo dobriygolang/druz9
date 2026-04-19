@@ -73,14 +73,21 @@ const SCENARIOS: Record<string, ScenarioBriefing> = {
 export function InterviewLiveSessionPage() {
   const { sessionId = 'new' } = useParams()
   const navigate = useNavigate()
+  // Solo-practice entry: /interview/live/new?mode=solo&focus=algorithms.
+  // We honour `focus` for the scenario topic; `mode` itself is purely a
+  // UI marker today (no separate backend session yet — see ADR-001).
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
+  const soloFocus = searchParams?.get('focus') ?? null
+  const soloMode = searchParams?.get('mode') === 'solo'
   const { toast } = usePixelToast()
   const { t } = useTranslation()
 
   const mentor = MENTOR_NAME_BY_ID[sessionId] ?? MENTOR_NAME_BY_ID.new
+  const focusLabel = soloFocus ? soloFocus.charAt(0).toUpperCase() + soloFocus.slice(1) : null
   const scenario = {
     ...SCENARIOS.default,
-    title: t('interviewLive.scenario.title'),
-    topic: t('interviewLive.scenario.topic'),
+    title: soloMode && focusLabel ? `Solo · ${focusLabel}` : t('interviewLive.scenario.title'),
+    topic: soloMode && focusLabel ? focusLabel : t('interviewLive.scenario.topic'),
     duration: t('interviewLive.scenario.duration'),
     intro: t('interviewLive.scenario.intro'),
     starterQuestion: t('interviewLive.scenario.question'),
@@ -178,9 +185,17 @@ Guidelines:
     try {
       const reply = await callMentor(snapshot, text, currentCode)
       setMessages((m) => [...m, { id: nextId.current++, speaker: 'mentor', text: reply, timeAt: `${mm}:${ss}` }])
-    } catch {
+    } catch (err) {
+      // Stay on the page on any failure — previously a 401/5xx triggered the
+      // global redirect and silently lost the user's draft. Now we surface
+      // the issue inline as a mentor message so the candidate can retry.
+      const reason = (err as { response?: { status?: number } })?.response?.status === 401
+        ? '⚠️ Сессия истекла. Обнови страницу и войди заново — твой код останется в редакторе.'
+        : null
       const used = snapshot.filter((x) => x.speaker === 'mentor').length - 3
-      const fallback = scenario.followUps[used % scenario.followUps.length] ?? t('interviewLive.followUps.constraints')
+      const fallback = reason
+        ?? scenario.followUps[used % scenario.followUps.length]
+        ?? t('interviewLive.followUps.constraints')
       setMessages((m) => [...m, { id: nextId.current++, speaker: 'mentor', text: fallback, timeAt: `${mm}:${ss}` }])
     } finally {
       setMentorTyping(false)

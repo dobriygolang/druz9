@@ -3475,6 +3475,38 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.ProfileResponse'
+    /api/v1/profile/preferences:
+        get:
+            tags:
+                - ProfileService
+            description: |-
+                ADR-005 — User UI preferences (layout density, etc.). Separate from
+                 notification settings (which live in notification.proto).
+            operationId: ProfileService_GetUserPreferences
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.UserPreferences'
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_UpdateUserPreferences
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/profile.v1.UpdateUserPreferencesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.UserPreferences'
     /api/v1/profile/update:
         post:
             tags:
@@ -3522,6 +3554,13 @@ paths:
                   required: true
                   schema:
                     type: string
+                - name: pinnedOnly
+                  in: query
+                  description: |-
+                    When true, only achievements that are both earned (progress=100) AND
+                     in the user's pinned set are returned. Used by the profile card.
+                  schema:
+                    type: boolean
             responses:
                 "200":
                     description: OK
@@ -8223,6 +8262,11 @@ components:
                     type: integer
                     description: 'progress: 0..100. 100 means earned.'
                     format: int32
+                pinned:
+                    type: boolean
+                    description: |-
+                        True if this achievement is in the user's pinned set (User.pinned_achievements).
+                         Frontend uses this to render the badge as featured on the profile card.
         profile.v1.ProfileActivityEntry:
             type: object
             properties:
@@ -8483,6 +8527,14 @@ components:
             properties:
                 currentWorkplace:
                     type: string
+        profile.v1.UpdateUserPreferencesRequest:
+            type: object
+            properties:
+                layoutDensity:
+                    type: integer
+                    format: enum
+                locale:
+                    type: string
         profile.v1.User:
             type: object
             properties:
@@ -8536,6 +8588,18 @@ components:
                     format: enum
                 company:
                     type: string
+        profile.v1.UserPreferences:
+            type: object
+            properties:
+                layoutDensity:
+                    type: integer
+                    format: enum
+                locale:
+                    type: string
+                    description: |-
+                        Locale code as stored on the server (e.g. "ru", "en"). The client may
+                         override via localStorage, but the server-saved value is the source of
+                         truth on first load on a new device.
         referral.v1.CreateReferralRequest:
             type: object
             properties:

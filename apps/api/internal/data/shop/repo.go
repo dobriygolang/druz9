@@ -367,7 +367,7 @@ func scanItem(s scanner) (*model.ShopItem, error) {
 		&it.Price, &it.IconRef, &it.AccentColor, &it.IsActive, &it.IsSeasonal, &it.RotatesAt, &it.CreatedAt, &it.Slot,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan item: %w", err)
 	}
 	it.Category = model.ItemCategory(category)
 	it.Rarity = model.ItemRarity(rarity)

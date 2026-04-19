@@ -43,7 +43,7 @@ func (s *Service) CreateChallenge(
 	startsAt := now
 	endsAt := now.AddDate(0, 0, 7)
 
-	return s.repo.CreateGuildChallenge(ctx, model.CreateGuildChallengeRequest{
+	challenge, err := s.repo.CreateGuildChallenge(ctx, model.CreateGuildChallengeRequest{
 		GuildID:     guildID,
 		TemplateKey: templateKey,
 		TargetValue: targetValue,
@@ -51,4 +51,8 @@ func (s *Service) CreateChallenge(
 		EndsAt:      endsAt,
 		CreatedBy:   userID,
 	})
+	if err != nil {
+		return nil, fmt.Errorf("create guild challenge: %w", err)
+	}
+	return challenge, nil
 }

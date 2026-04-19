@@ -71,7 +71,15 @@ function extractErrorMessage(err: AxiosError): { title: string; body?: string } 
 // one). Without this guard, the initial page-load probe would bounce
 // every anonymous visitor to /login before they've even seen the
 // hub/landing page.
-const AUTH_PROBE_URLS = ['/api/v1/profile/auth/me', '/api/v1/profile/me']
+// AUTH_PROBE_URLS suppresses the global "401 → /login" redirect for routes
+// that legitimately fire while the user is mid-task. The chat endpoint
+// belongs here because its 401 path was eating drafts: a single expired
+// cookie kicked the user out of /interview/live mid-message.
+const AUTH_PROBE_URLS = [
+  '/api/v1/profile/auth/me',
+  '/api/v1/profile/me',
+  '/api/v1/interview/live/chat',
+]
 
 function isAuthProbe(url: string | undefined): boolean {
   if (!url) return false

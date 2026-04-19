@@ -3,6 +3,7 @@ package skills
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -57,11 +58,11 @@ func (i *Implementation) GetDescription() grpc.ServiceDesc {
 func (s *liveService) GetSkillTree(ctx context.Context, userID uuid.UUID) (*v1.GetSkillTreeResponse, error) {
 	allocs, err := s.repo.ListAllocations(ctx, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list allocations: %w", err)
 	}
 	pts, err := s.repo.GetPoints(ctx, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get points: %w", err)
 	}
 
 	allocated := make(map[string]struct{}, len(allocs))
@@ -89,7 +90,7 @@ func (s *liveService) GetSkillTree(ctx context.Context, userID uuid.UUID) (*v1.G
 func (s *liveService) GetSkillPoints(ctx context.Context, userID uuid.UUID) (*v1.GetSkillPointsResponse, error) {
 	pts, err := s.repo.GetPoints(ctx, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get points: %w", err)
 	}
 	available := pts.Earned - pts.Spent
 	if available < 0 {
@@ -110,7 +111,7 @@ func (s *liveService) AllocateSkill(ctx context.Context, userID uuid.UUID, skill
 
 	pts, err := s.repo.GetPoints(ctx, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get points: %w", err)
 	}
 	available := pts.Earned - pts.Spent
 	if available <= 0 {
@@ -121,7 +122,7 @@ func (s *liveService) AllocateSkill(ctx context.Context, userID uuid.UUID, skill
 	for _, prereq := range def.Prereq {
 		has, err := s.repo.HasAllocation(ctx, userID, prereq)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("has allocation: %w", err)
 		}
 		if !has {
 			return &v1.AllocateSkillResponse{Success: false, ErrorMessage: "prerequisite not allocated: " + prereq}, nil
@@ -130,19 +131,19 @@ func (s *liveService) AllocateSkill(ctx context.Context, userID uuid.UUID, skill
 
 	already, err := s.repo.HasAllocation(ctx, userID, skillID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("has allocation: %w", err)
 	}
 	if already {
 		return &v1.AllocateSkillResponse{Success: false, ErrorMessage: "skill already allocated"}, nil
 	}
 
 	if err := s.repo.Allocate(ctx, userID, skillID); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("allocate skill: %w", err)
 	}
 
 	pts, err = s.repo.GetPoints(ctx, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get points: %w", err)
 	}
 	remaining := pts.Earned - pts.Spent
 	if remaining < 0 {
@@ -164,7 +165,7 @@ func (s *liveService) RefundSkill(ctx context.Context, userID uuid.UUID, skillID
 
 	has, err := s.repo.HasAllocation(ctx, userID, skillID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("has allocation: %w", err)
 	}
 	if !has {
 		return &v1.RefundSkillResponse{Success: false, ErrorMessage: "skill not allocated"}, nil
@@ -183,7 +184,7 @@ func (s *liveService) RefundSkill(ctx context.Context, userID uuid.UUID, skillID
 	}
 
 	if err := s.repo.Refund(ctx, userID, skillID); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("refund skill: %w", err)
 	}
 
 	return &v1.RefundSkillResponse{
@@ -197,7 +198,10 @@ func (s *liveService) AddEarnedPoints(ctx context.Context, userID uuid.UUID, del
 	if delta <= 0 {
 		return nil
 	}
-	return s.repo.AddEarnedPoints(ctx, userID, delta)
+	if err := s.repo.AddEarnedPoints(ctx, userID, delta); err != nil {
+		return fmt.Errorf("add earned points: %w", err)
+	}
+	return nil
 }
 
 // ── Node/edge builders ────────────────────────────────────────────────────────

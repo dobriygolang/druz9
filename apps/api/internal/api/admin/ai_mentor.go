@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"fmt"
 
 	kerrs "github.com/go-kratos/kratos/v2/errors"
 	klog "github.com/go-kratos/kratos/v2/log"
@@ -29,7 +30,7 @@ func (i *AIMentorImpl) GetDescription() grpc.ServiceDesc {
 
 func (i *AIMentorImpl) ListAIMentors(ctx context.Context, _ *v1.ListAIMentorsRequest) (*v1.ListAIMentorsResponse, error) {
 	if _, err := apihelpers.RequireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require admin: %w", err)
 	}
 	rows, err := i.repo.List(ctx)
 	if err != nil {
@@ -45,7 +46,7 @@ func (i *AIMentorImpl) ListAIMentors(ctx context.Context, _ *v1.ListAIMentorsReq
 
 func (i *AIMentorImpl) CreateAIMentor(ctx context.Context, req *v1.CreateAIMentorRequest) (*v1.AIMentor, error) {
 	if _, err := apihelpers.RequireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require admin: %w", err)
 	}
 	m := &aimdata.Row{
 		Name:           req.GetName(),
@@ -71,7 +72,7 @@ func (i *AIMentorImpl) CreateAIMentor(ctx context.Context, req *v1.CreateAIMento
 
 func (i *AIMentorImpl) UpdateAIMentor(ctx context.Context, req *v1.UpdateAIMentorRequest) (*v1.AIMentor, error) {
 	if _, err := apihelpers.RequireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require admin: %w", err)
 	}
 	id, err := uuid.Parse(req.GetId())
 	if err != nil {
@@ -96,7 +97,7 @@ func (i *AIMentorImpl) UpdateAIMentor(ctx context.Context, req *v1.UpdateAIMento
 
 func (i *AIMentorImpl) DeleteAIMentor(ctx context.Context, req *v1.DeleteAIMentorRequest) (*v1.DeleteAIMentorResponse, error) {
 	if _, err := apihelpers.RequireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require admin: %w", err)
 	}
 	id, err := uuid.Parse(req.GetId())
 	if err != nil {

@@ -32,7 +32,7 @@ func scanTask(s scanner) (*model.InterviewPrepTask, error) {
 		&item.CreatedAt,
 		&item.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan task: %w", err)
 	}
 	item.PrepType = model.InterviewPrepTypeFromRoundType(prepType)
 	return &item, nil
@@ -68,7 +68,7 @@ func scanTaskWithPoolCount(s scanner) (*model.InterviewPrepTask, error) {
 		&item.UpdatedAt,
 		&item.PoolCount,
 	); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan task with pool count: %w", err)
 	}
 	item.PrepType = model.InterviewPrepTypeFromRoundType(prepType)
 	return &item, nil

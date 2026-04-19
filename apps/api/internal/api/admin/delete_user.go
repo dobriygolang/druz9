@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -16,7 +17,7 @@ func (i *Implementation) DeleteUser(ctx context.Context, req *v1.DeleteUserReque
 		return nil, errors.BadRequest("INVALID_USER_ID", "invalid user id")
 	}
 	if err := i.service.DeleteUser(ctx, userID); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("delete user: %w", err)
 	}
 	return &v1.AdminStatusResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_OK}, nil
 }

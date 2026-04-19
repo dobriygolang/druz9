@@ -98,7 +98,7 @@ func scanLeaderboardEntry(row scanner, item *domain.LeaderboardEntry) error {
 }
 
 func scanPlayerStats(row scanner, item *domain.PlayerStats) error {
-	return row.Scan(
+	if err := row.Scan(
 		&item.UserID,
 		&item.DisplayName,
 		&item.Rating,
@@ -110,11 +110,14 @@ func scanPlayerStats(row scanner, item *domain.PlayerStats) error {
 		&item.PeakRating,
 		&item.CurrentWinStreak,
 		&item.BestWinStreak,
-	)
+	); err != nil {
+		return fmt.Errorf("scan player stats: %w", err)
+	}
+	return nil
 }
 
 func scanPlayerWithTimestamps(row scanner, player *domain.Player, freezeUntil, acceptedAt, joinedAt, updatedAt *pgtype.Timestamptz) error {
-	return row.Scan(
+	if err := row.Scan(
 		&player.MatchID,
 		&player.UserID,
 		&player.DisplayName,
@@ -129,5 +132,8 @@ func scanPlayerWithTimestamps(row scanner, player *domain.Player, freezeUntil, a
 		joinedAt,
 		updatedAt,
 		&player.CurrentCode,
-	)
+	); err != nil {
+		return fmt.Errorf("scan player with timestamps: %w", err)
+	}
+	return nil
 }
