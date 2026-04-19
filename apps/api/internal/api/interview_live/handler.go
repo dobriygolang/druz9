@@ -12,8 +12,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"api/internal/aireview"
-	"api/internal/model"
 	premiumdata "api/internal/data/premium"
+	"api/internal/model"
 )
 
 // MentorResolver fetches an active mentor's persona by ID. Returns

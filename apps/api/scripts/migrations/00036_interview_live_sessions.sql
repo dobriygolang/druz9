@@ -3,6 +3,7 @@
 -- evaluation holds the AI-generated feedback returned at session end.
 -- front_id is nullable — set when the session was started from a guild war front.
 
+-- +goose Up
 CREATE TABLE IF NOT EXISTS interview_live_sessions (
     id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id      UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -17,3 +18,8 @@ CREATE TABLE IF NOT EXISTS interview_live_sessions (
 
 CREATE INDEX IF NOT EXISTS idx_ils_user_id    ON interview_live_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_ils_created_at ON interview_live_sessions(created_at DESC);
+
+-- +goose Down
+DROP INDEX IF EXISTS idx_ils_created_at;
+DROP INDEX IF EXISTS idx_ils_user_id;
+DROP TABLE IF EXISTS interview_live_sessions;

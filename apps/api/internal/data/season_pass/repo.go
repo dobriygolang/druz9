@@ -14,6 +14,11 @@ import (
 	"api/internal/storage/postgres"
 )
 
+var (
+	ErrTierNotFound   = errors.New("season pass tier not found")
+	ErrNoActivePass   = errors.New("no active season pass")
+)
+
 type Repo struct {
 	data *postgres.Store
 	log  *log.Helper
@@ -38,8 +43,7 @@ func (r *Repo) GetActive(ctx context.Context, at time.Time) (*model.SeasonPass, 
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			//nolint:nilnil // No active pass is represented as nil for service-level handling.
-			return nil, nil
+			return nil, ErrNoActivePass
 		}
 		return nil, fmt.Errorf("get active pass: %w", err)
 	}
@@ -93,7 +97,7 @@ func (r *Repo) GetTier(ctx context.Context, seasonPassID uuid.UUID, tier int32) 
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, ErrTierNotFound
 		}
 		return nil, fmt.Errorf("get tier: %w", err)
 	}

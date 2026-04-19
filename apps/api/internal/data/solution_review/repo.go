@@ -13,6 +13,8 @@ import (
 	"api/internal/storage/postgres"
 )
 
+var ErrReviewNotFound = errors.New("solution review not found")
+
 // Repo provides data access for solution reviews.
 type Repo struct {
 	data *postgres.Store
@@ -230,7 +232,7 @@ func scanReview(s scannable) (*model.SolutionReview, error) {
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, ErrReviewNotFound
 		}
 		return nil, fmt.Errorf("scan review: %w", err)
 	}

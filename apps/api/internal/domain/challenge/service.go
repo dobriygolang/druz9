@@ -135,7 +135,7 @@ func (s *Service) GetWeeklyTask(ctx context.Context, weekKey string) (*model.Wee
 		return nil, fmt.Errorf("get hard task IDs: %w", err)
 	}
 	if len(ids) == 0 {
-		return nil, nil
+		return nil, nil //nolint:nilnil
 	}
 	taskID := SelectWeeklyTask(ids, weekKey)
 	title, slug, err := s.repo.GetTaskInfo(ctx, taskID)

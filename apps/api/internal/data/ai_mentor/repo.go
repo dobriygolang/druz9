@@ -11,6 +11,8 @@ import (
 	"api/internal/storage/postgres"
 )
 
+var ErrMentorNotFound = errors.New("ai mentor not found")
+
 // Row mirrors the ai_mentors table.
 type Row struct {
 	ID             uuid.UUID
@@ -122,7 +124,7 @@ func (r *Repo) GetActiveByID(ctx context.Context, id uuid.UUID) (*Row, error) {
 	m := &Row{}
 	if err := row.Scan(&m.ID, &m.Name, &m.Provider, &m.ModelID, &m.Tier, &m.PromptTemplate, &m.IsActive); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, ErrMentorNotFound
 		}
 		return nil, fmt.Errorf("get ai_mentor by id: %w", err)
 	}

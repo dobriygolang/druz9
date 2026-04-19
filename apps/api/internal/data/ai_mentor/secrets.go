@@ -11,7 +11,10 @@ import (
 
 // Secret stores the cipher-text + nonce as written to ai_mentor_secrets.
 // Encryption/decryption happens in the aireview package (see ADR-001).
-var errEncryptedKeyEmpty = errors.New("upsert ai_mentor_secret: encrypted_key must not be empty")
+var (
+	errEncryptedKeyEmpty = errors.New("upsert ai_mentor_secret: encrypted_key must not be empty")
+	ErrSecretNotFound    = errors.New("ai mentor secret not found")
+)
 
 type Secret struct {
 	MentorID     uuid.UUID
@@ -31,7 +34,7 @@ func (r *Repo) GetSecret(ctx context.Context, mentorID uuid.UUID) (*Secret, erro
 	s := &Secret{}
 	if err := row.Scan(&s.MentorID, &s.EncryptedKey, &s.Nonce); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, ErrSecretNotFound
 		}
 		return nil, fmt.Errorf("get ai_mentor_secret: %w", err)
 	}

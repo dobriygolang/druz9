@@ -231,7 +231,7 @@ func (i *Implementation) CancelBooking(ctx context.Context, req *v1.CancelBookin
 
 	if scoreDelta < 0 {
 		ban := time.Duration(0)
-		if nextPenaltyCount, _ := i.recentPenaltyCount(ctx, user.ID); nextPenaltyCount+1 >= banAfterPenalties {
+		if nextPenaltyCount := i.recentPenaltyCount(ctx, user.ID); nextPenaltyCount+1 >= banAfterPenalties {
 			ban = banDuration
 		}
 		if err := i.repo.ApplyPenalty(ctx, user.ID, scoreDelta, ban); err != nil {
@@ -328,17 +328,16 @@ func (i *Implementation) ensureNotBanned(ctx context.Context, userID uuid.UUID) 
 	return nil
 }
 
-func (i *Implementation) recentPenaltyCount(ctx context.Context, userID uuid.UUID) (int, error) {
+func (i *Implementation) recentPenaltyCount(ctx context.Context, userID uuid.UUID) int {
 	rel, err := i.repo.GetReliability(ctx, userID)
 	if err != nil || rel.LastPenaltyAt == nil {
-		//nolint:nilerr // Missing reliability data is treated as zero recent penalties.
-		return 0, nil
+		return 0
 	}
 	// Very rough: use total penalty_count if last penalty is within banWindow.
 	if time.Since(*rel.LastPenaltyAt) > banWindow {
-		return 0, nil
+		return 0
 	}
-	return int(rel.PenaltyCount), nil
+	return int(rel.PenaltyCount)
 }
 
 func mapSlot(s *model.MockSlot) *v1.Slot {

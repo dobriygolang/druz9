@@ -274,7 +274,7 @@ func (s *liveService) resolveTaskForModule(ctx context.Context, userID uuid.UUID
 	return nil, node
 }
 
-func (s *liveService) evaluateCases(ctx context.Context, task *codeeditordomain.Task, testCases []*model.CodeTestCase, code string, language policy.Language, overrideLanguage string) ([]*v1.TrainingTestResult, int32, int32, bool, string) {
+func (s *liveService) evaluateCases(ctx context.Context, task *codeeditordomain.Task, testCases []*model.CodeTestCase, code string, _ policy.Language, overrideLanguage string) ([]*v1.TrainingTestResult, int32, int32, bool, string) {
 	results := make([]*v1.TrainingTestResult, 0, len(testCases))
 	passedCount := int32(0)
 	for _, testCase := range testCases {

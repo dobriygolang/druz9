@@ -89,7 +89,7 @@ func (r *Repo) FindUserByUsername(ctx context.Context, username string) (*model.
 	if err != nil {
 		// scanUser wraps pgx.ErrNoRows as profileerrors.ErrUserNotFound.
 		if errors.Is(err, profileerrors.ErrUserNotFound) {
-			return nil, nil
+			return nil, nil //nolint:nilnil
 		}
 		return nil, err
 	}

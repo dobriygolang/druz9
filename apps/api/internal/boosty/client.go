@@ -16,11 +16,11 @@ import (
 const baseURL = "https://api.boosty.to"
 
 var (
-	ErrNotSubscribed    = errors.New("boosty: email not found in active subscribers")
-	ErrTokenExpired     = errors.New("boosty: access token expired or invalid")
-	ErrNotConfigured    = errors.New("boosty: client not configured")
-	ErrEmailRequired    = errors.New("boosty: email is required")
-	ErrNoRefreshCreds   = errors.New("boosty: no refresh credentials configured")
+	ErrNotSubscribed     = errors.New("boosty: email not found in active subscribers")
+	ErrTokenExpired      = errors.New("boosty: access token expired or invalid")
+	ErrNotConfigured     = errors.New("boosty: client not configured")
+	ErrEmailRequired     = errors.New("boosty: email is required")
+	ErrNoRefreshCreds    = errors.New("boosty: no refresh credentials configured")
 	ErrEmptyRefreshToken = errors.New("boosty: refresh returned empty token")
 )
 

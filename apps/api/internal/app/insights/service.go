@@ -47,7 +47,7 @@ func (s *Service) GetOrGenerate(ctx context.Context, userID uuid.UUID) (*insight
 	if writeErr := s.repo.Upsert(ctx, fresh); writeErr != nil {
 		// Persist failure is non-fatal: we can still return the in-memory
 		// insight so the page renders. Cron will retry next tick.
-		return fresh, nil
+		return fresh, nil //nolint:nilerr
 	}
 	return fresh, nil
 }

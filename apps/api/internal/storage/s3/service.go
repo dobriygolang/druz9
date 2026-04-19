@@ -24,6 +24,7 @@ var (
 	errEndpointRequired      = errors.New("s3 endpoint is required")
 	errObjectKeyRequired     = errors.New("object key is required")
 	errPublicEndpointInvalid = errors.New("S3_PUBLIC_ENDPOINT must include scheme and host")
+	errNoPublicEndpoint      = errors.New("s3 public endpoint not configured")
 )
 
 type Service struct {
@@ -44,7 +45,7 @@ func New(cfg *config.S3) (*Service, error) {
 	}
 
 	publicEndpoint, err := parsePublicEndpoint(cfg.PublicEndpoint)
-	if err != nil {
+	if err != nil && !errors.Is(err, errNoPublicEndpoint) {
 		return nil, err
 	}
 
@@ -221,7 +222,7 @@ func normalizeObjectKey(key string) string {
 func parsePublicEndpoint(raw string) (*url.URL, error) {
 	raw = strings.TrimSpace(raw)
 	if raw == "" {
-		return nil, nil
+		return nil, errNoPublicEndpoint
 	}
 	u, err := url.Parse(raw)
 	if err != nil {
