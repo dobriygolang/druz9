@@ -301,6 +301,7 @@ export const RouterProvider: React.FC = () => {
               element={gate ? <Navigate to="/login" replace /> : <ProfilePage />}
             />
             <Route path="/guild" element={gate ? <Navigate to="/login" replace /> : <GuildPage />} />
+            <Route path="/guild/:guildId" element={gate ? <Navigate to="/login" replace /> : <GuildPage />} />
             <Route path="/arena" element={gate ? <Navigate to="/login" replace /> : <ArenaHubPage />} />
             <Route
               path="/arena/:matchId"

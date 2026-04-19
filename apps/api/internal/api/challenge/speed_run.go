@@ -2,6 +2,7 @@ package challenge
 
 import (
 	"context"
+	"fmt"
 
 	"api/internal/apihelpers"
 	v1 "api/pkg/api/challenge/v1"
@@ -14,11 +15,11 @@ import (
 func (i *Implementation) GetSpeedRunRecords(ctx context.Context, _ *v1.GetSpeedRunRecordsRequest) (*v1.GetSpeedRunRecordsResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	records, err := i.service.GetUserRecords(ctx, user.ID, 50)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get user records: %w", err)
 	}
 	out := make([]*v1.TaskRecord, 0, len(records))
 	for _, r := range records {

@@ -53,5 +53,8 @@ func (r *Repo) ListSeries(ctx context.Context, limit, offset int32) ([]*Series, 
 		}
 		out = append(out, s)
 	}
-	return out, total, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("iterate podcast series: %w", err)
+	}
+	return out, total, nil
 }

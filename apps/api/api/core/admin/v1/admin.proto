@@ -29,6 +29,13 @@ service AdminService {
   rpc GetRuntimeConfig(GetRuntimeConfigRequest) returns (GetRuntimeConfigResponse) {
     option (google.api.http) = { get: "/api/public/runtime-config" };
   }
+
+  // Admin grant — credit any wallet currency to any user. Mirrors the
+  // shop's Purchase debit but in reverse; intended for support tooling
+  // and seasonal events. Audited via wallet ledger automatically.
+  rpc GrantCurrency(GrantCurrencyRequest) returns (AdminStatusResponse) {
+    option (google.api.http) = { post: "/api/admin/users/{user_id}/grant", body: "*" };
+  }
 }
 
 message DeleteUserRequest {
@@ -43,6 +50,18 @@ message UpdateUserTrustRequest {
 message UpdateUserAdminRequest {
   string user_id  = 1;
   bool   is_admin = 2;
+}
+
+// Currency strings the wallet domain understands ("gold", "gems", "shards").
+// Kept as a string instead of an enum so we can introduce new currencies
+// (souls, etc.) without touching this proto.
+message GrantCurrencyRequest {
+  string user_id  = 1;
+  string currency = 2;
+  int64  amount   = 3;
+  // Free-form note recorded in the ledger so audits can trace why a
+  // grant happened (event, support ticket id, etc.).
+  string reason   = 4;
 }
 
 message GetRuntimeConfigRequest {}

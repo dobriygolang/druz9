@@ -16,6 +16,7 @@ type Implementation struct {
 	walletRepo   WalletRepository
 	notif        notif.Sender
 	prefsRepo    PreferencesRepository
+	tours        ToursRepo
 }
 
 // New returns new instance of Implementation.

@@ -45,7 +45,7 @@ func scanRoomFull(row scanner) (*codeeditordomain.Room, error) {
 		&room.IsPrivate,
 		&participantsJSON,
 	); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan room: %w", err)
 	}
 
 	var rows []participantRow
@@ -75,7 +75,7 @@ func scanRoomFull(row scanner) (*codeeditordomain.Room, error) {
 }
 
 func scanSubmission(row scanner, submission *codeeditordomain.Submission) error {
-	return row.Scan(
+	err := row.Scan(
 		&submission.ID,
 		&submission.RoomID,
 		&submission.UserID,
@@ -88,4 +88,8 @@ func scanSubmission(row scanner, submission *codeeditordomain.Submission) error 
 		&submission.PassedCount,
 		&submission.TotalCount,
 	)
+	if err != nil {
+		return fmt.Errorf("scan submission: %w", err)
+	}
+	return nil
 }

@@ -133,7 +133,11 @@ export function ProfilePage() {
         }
       />
 
-      {/* Chamber scene */}
+      {/* Legacy hardcoded "chamber scene" — kept as a fallback ONLY when
+          the user isn't logged in (so anonymous viewers still see decor).
+          Signed-in users get the persisted ADR-003 SceneViewer below
+          (which renders their actual saved layout, editable via toggle). */}
+      {!user?.id && (
       <Panel nailed style={{ padding: 0, overflow: 'hidden', marginBottom: 18 }}>
         <RoomScene variant={tweaks.roomLayout} height={320}>
           {/* left cluster */}
@@ -283,6 +287,7 @@ export function ProfilePage() {
           )}
         </RoomScene>
       </Panel>
+      )}
 
       {/* ADR-003: persisted Hero Room. Owner sees an "Edit" toggle that
           flips the panel into SceneEditor (drag-and-drop). Visitors see

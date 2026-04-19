@@ -103,8 +103,12 @@ func registerBackgroundWorkers(bootstrap *bootstrapContext, storage *storageCont
 	}
 	closer.AddSync(startStreakWarningWorker(services.notificationSender, storage.store.DB))
 	closer.AddSync(startGuildDigestWorker(services.notificationSender, storage.store.DB))
-	closer.AddSync(startGuildWarCronWorker(storage.guildRepo))
+	closer.AddSync(startGuildWarCronWorker(storage.guildRepo, notifyDeps{
+		events: storage.eventRepo,
+		hub:    services.guildWarHub,
+	}))
 	closer.AddSync(startInsightsCronWorker(storage.profileRepo, storage.insightsRepo))
+	closer.AddSync(startLobbyMatchmakerWorker(storage.store))
 }
 
 func registerManualHTTPRoutes(
@@ -124,6 +128,19 @@ func registerManualHTTPRoutes(
 
 	// POST /api/v1/interview/live/chat — live interview AI mentor chat.
 	r.POST("/api/v1/interview/live/chat", liveChatHandler.Chat)
+
+	// ADR-004 — Live guild-war fan-out. Subscribers connect over WS;
+	// the cron and ContributeToFront publish events into the hub.
+	r.GET("/api/v1/realtime/guildwar/{warId}", func(ctx kratoshttp.Context) error {
+		warID, err := uuid.Parse(server.PathSegment(ctx.Request().URL.Path, "guildwar", 1))
+		if err != nil {
+			ctx.Response().WriteHeader(http.StatusBadRequest)
+			//nolint:nilerr // manual handler writes status directly
+			return nil
+		}
+		services.guildWarHub.Handler(warID).ServeHTTP(ctx.Response(), ctx.Request())
+		return nil
+	})
 
 	// GET /api/v1/profile/avatar/{user_id} — serves a fresh Telegram avatar.
 	// Stays manual: response is a binary image, not a JSON proto message.

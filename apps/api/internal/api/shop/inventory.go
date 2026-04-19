@@ -2,6 +2,7 @@ package shop
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	klog "github.com/go-kratos/kratos/v2/log"
@@ -13,7 +14,7 @@ import (
 func (i *Implementation) GetInventory(ctx context.Context, _ *v1.GetInventoryRequest) (*v1.GetInventoryResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	rows, err := i.service.GetInventory(ctx, user.ID)
 	if err != nil {

@@ -3,6 +3,7 @@ package shop
 import (
 	"context"
 	goerr "errors"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	klog "github.com/go-kratos/kratos/v2/log"
@@ -15,7 +16,7 @@ import (
 func (i *Implementation) EquipCosmetic(ctx context.Context, req *v1.EquipCosmeticRequest) (*v1.EquipCosmeticResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	itemID, err := i.service.ResolveItem(ctx, req.GetItemId())
 	if err != nil {

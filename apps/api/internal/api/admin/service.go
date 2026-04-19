@@ -32,6 +32,13 @@ type CacheInvalidator interface {
 	InvalidateProfileCache(userID uuid.UUID)
 }
 
+// WalletGranter mints currency for a user. The full wallet domain has
+// dozens of methods; we expose only the slice the admin handler needs so
+// tests can satisfy it with a tiny fake.
+type WalletGranter interface {
+	Grant(ctx context.Context, userID uuid.UUID, currency string, amount int64, reason string) error
+}
+
 // Implementation of admin service.
 type Implementation struct {
 	v1.UnimplementedAdminServiceServer
@@ -40,6 +47,7 @@ type Implementation struct {
 	userManager      UserManager
 	cacheInval       CacheInvalidator
 	dockerLogsRunner dockerLogsRunner
+	wallet           WalletGranter
 }
 
 // New returns new instance of Implementation.
@@ -50,6 +58,12 @@ func New(service Service, configService ConfigService, userManager UserManager, 
 		userManager:   userManager,
 		cacheInval:    cacheInval,
 	}
+}
+
+// WithWalletGranter wires the wallet credit path used by GrantCurrency.
+func (i *Implementation) WithWalletGranter(g WalletGranter) *Implementation {
+	i.wallet = g
+	return i
 }
 
 // GetDescription returns grpc service description.

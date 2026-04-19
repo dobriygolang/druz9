@@ -58,6 +58,7 @@ import (
 	walletdomain "api/internal/domain/wallet"
 	arenart "api/internal/realtime/arena"
 	codeeditorrt "api/internal/realtime/codeeditor"
+	guildwarrt "api/internal/realtime/guildwar"
 	"api/internal/sandbox"
 	server "api/internal/server"
 )
@@ -75,6 +76,7 @@ type serviceContext struct {
 	friendChallengeDomain   *friendchallengedomain.Service
 	realtimeHub             *codeeditorrt.Hub
 	arenaRealtimeHub        *arenart.Hub
+	guildWarHub             *guildwarrt.Hub
 
 	aiReviewer aireview.Reviewer
 
@@ -255,6 +257,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		Reviewer:   aiReviewService,
 	})
 	arenaRealtimeHub := arenart.NewHub(arenaServiceDomain, bootstrap.cfg.Server.AllowedOrigins)
+	guildWarHub := guildwarrt.NewHub(bootstrap.kratosLogger, bootstrap.cfg.Server.AllowedOrigins)
 	closer.AddSync(func() error { arenaRealtimeHub.Stop(); return nil })
 	solutionReviewService := solutionreview.New(solutionreview.Config{
 		Repo:      storage.solutionReviewRepo,
@@ -283,18 +286,23 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		friendChallengeDomain:   friendChallengeDomain,
 		realtimeHub:             realtimeHub,
 		arenaRealtimeHub:        arenaRealtimeHub,
+		guildWarHub:             guildWarHub,
 
 		aiReviewer: aiReviewService,
 
-		adminService:      adminservice.New(adminServiceDomain, bootstrap.rtcManager, storage.profileRepo, profileServiceDomain),
-		profileService:    profileservice.New(profileServiceDomain, cookies, profileservice.NewCachedProgressRepository(storage.profileRepo), storage.walletRepo, notifSender),
+		adminService: adminservice.New(adminServiceDomain, bootstrap.rtcManager, storage.profileRepo, profileServiceDomain).
+			WithWalletGranter(adminWalletGranter{repo: storage.walletRepo}),
+		profileService: profileservice.New(profileServiceDomain, cookies, profileservice.NewCachedProgressRepository(storage.profileRepo), storage.walletRepo, notifSender).
+			WithPreferencesRepo(profilePreferencesAdapter{repo: storage.profileRepo}).
+			WithToursRepo(storage.profileRepo),
 		geoService:        geoservice.New(geoServiceDomain),
 		hubService:        hubservice.New(storage.profileRepo, missionServiceDomain, eventServiceDomain, arenaServiceDomain, guildServiceDomain, seasonPassDomain),
 		guildService:      guildservice.New(guildServiceDomain, eventServiceDomain, notifSender).WithWarRepo(storage.guildRepo),
 		eventService:      eventservice.New(eventServiceDomain),
 		podcastService: podcastservice.New(podcastServiceDomain).
 			WithSeriesRepo(podcastSeriesAdapter{repo: storage.podcastRepo}).
-			WithSavedRepo(podcastSavedAdapter{repo: storage.podcastRepo}),
+			WithSavedRepo(podcastSavedAdapter{repo: storage.podcastRepo}).
+			WithSeriesAdminRepo(podcastSeriesAdminAdapter{repo: storage.podcastRepo}),
 		referralService:   referralservice.New(referralServiceDomain),
 		skillsService:     skillsservice.New(skillsDomain),
 		trainingService:   trainingservice.New(trainingservice.NewService(storage.profileRepo, codeEditorServiceDomain, sandboxService, solutionReviewService, seasonPassDomain)),

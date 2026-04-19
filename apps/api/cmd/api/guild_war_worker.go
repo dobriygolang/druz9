@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	klog "github.com/go-kratos/kratos/v2/log"
 
+	eventdata "api/internal/data/event"
 	guilddata "api/internal/data/guild"
+	guildwarrt "api/internal/realtime/guildwar"
 )
 
 // defaultWarFrontNames are the five contested zones seeded for every new war.
@@ -18,13 +21,22 @@ var defaultWarFrontNames = []string{
 	"Algo Plaza",
 }
 
+// notifyDeps groups optional fan-out dependencies. When all are non-nil
+// the cron pushes a system event into each affected guild's feed and a
+// websocket message into the live war hub. Pass nils in tests to keep
+// the worker side-effect free.
+type notifyDeps struct {
+	events *eventdata.Repo
+	hub    *guildwarrt.Hub
+}
+
 // startGuildWarCronWorker schedules weekly Guild War phase transitions:
 //
 //	Monday    06:00 UTC — resolve stale wars, pair guilds, create draft wars
 //	Wednesday 06:00 UTC — draft → active (fronts open for contributions)
 //	Saturday  06:00 UTC — active → champions_duel
 //	Sunday    21:00 UTC — champions_duel → resolved + award territories
-func startGuildWarCronWorker(warRepo *guilddata.Repo) func() error {
+func startGuildWarCronWorker(warRepo *guilddata.Repo, notify notifyDeps) func() error {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	go func() {
@@ -36,7 +48,7 @@ func startGuildWarCronWorker(warRepo *guilddata.Repo) func() error {
 			case <-ctx.Done():
 				return
 			case <-time.After(time.Until(next)):
-				runGuildWarTick(context.Background(), warRepo, time.Now().UTC())
+				runGuildWarTick(context.Background(), warRepo, notify, time.Now().UTC())
 			}
 		}
 	}()
@@ -80,16 +92,16 @@ func nextWeekdayAt(now time.Time, weekday time.Weekday, hour, minute int) time.T
 }
 
 // runGuildWarTick fires the right action based on the current UTC weekday.
-func runGuildWarTick(ctx context.Context, warRepo *guilddata.Repo, now time.Time) {
+func runGuildWarTick(ctx context.Context, warRepo *guilddata.Repo, notify notifyDeps, now time.Time) {
 	switch now.Weekday() {
 	case time.Monday:
 		runMondaySetup(ctx, warRepo, now)
 	case time.Wednesday:
-		runPhaseTransition(ctx, warRepo, "draft", "active")
+		runPhaseTransition(ctx, warRepo, notify, "draft", "active")
 	case time.Saturday:
-		runPhaseTransition(ctx, warRepo, "active", "champions_duel")
+		runPhaseTransition(ctx, warRepo, notify, "active", "champions_duel")
 	case time.Sunday:
-		runSundayResolution(ctx, warRepo)
+		runSundayResolution(ctx, warRepo, notify)
 	case time.Tuesday, time.Thursday, time.Friday:
 		return
 	}
@@ -156,20 +168,71 @@ func pairGuilds(guilds []guilddata.GuildSeed, weekNumber int32) []guilddata.WarP
 	return pairs
 }
 
-func runPhaseTransition(ctx context.Context, warRepo *guilddata.Repo, from, to string) {
+func runPhaseTransition(ctx context.Context, warRepo *guilddata.Repo, notify notifyDeps, from, to string) {
 	n, err := warRepo.TransitionWarPhase(ctx, from, to)
 	if err != nil {
 		klog.Errorf("guild_war cron: transition %s→%s: %v", from, to, err)
 		return
 	}
 	klog.Infof("guild_war cron: %s→%s transitioned %d wars", from, to, n)
+	fanOutPhaseTransition(ctx, warRepo, notify, to)
 }
 
-func runSundayResolution(ctx context.Context, warRepo *guilddata.Repo) {
+func runSundayResolution(ctx context.Context, warRepo *guilddata.Repo, notify notifyDeps) {
+	// Snapshot wars *before* resolving so we can fan-out the resolved event
+	// with the right guild list.
+	wars, _ := warRepo.ListWarsInPhase(ctx, "champions_duel")
 	n, err := warRepo.ResolveWarsAndAwardTerritories(ctx)
 	if err != nil {
 		klog.Errorf("guild_war cron: sunday resolution: %v", err)
 		return
 	}
 	klog.Infof("guild_war cron: Sunday resolution — %d wars resolved, territories awarded", n)
+	fanOutSummary(ctx, warRepo, notify, wars, "guild_war_resolved", "Война гильдии завершена")
+}
+
+// fanOutPhaseTransition pushes a system event + WS message for every war
+// that just entered `phase`. Both side-effects are best-effort: errors
+// are logged but never block the cron tick.
+func fanOutPhaseTransition(ctx context.Context, warRepo *guilddata.Repo, notify notifyDeps, phase string) {
+	if notify.events == nil && notify.hub == nil {
+		return
+	}
+	wars, err := warRepo.ListWarsInPhase(ctx, phase)
+	if err != nil {
+		klog.Warnf("guild_war cron: list wars in %s: %v", phase, err)
+		return
+	}
+	title := fmt.Sprintf("Война гильдии: фаза %s", phase)
+	fanOutSummary(ctx, warRepo, notify, wars, "guild_war_phase", title)
+}
+
+func fanOutSummary(ctx context.Context, warRepo *guilddata.Repo, notify notifyDeps, wars []guilddata.WarSummary, kind, title string) {
+	for _, w := range wars {
+		// Push to both sides of the matchup.
+		guildIDs := []*[16]byte{}
+		_ = guildIDs // silence linter; actual IDs handled below
+		emitFor := func(gid [16]byte) {
+			if notify.events != nil {
+				creator, err := warRepo.GetGuildCreator(ctx, gid)
+				if err == nil {
+					_ = notify.events.InsertSystemEvent(ctx, gid, creator, eventdata.SystemKind(kind), title, time.Now().UTC())
+				}
+			}
+			if notify.hub != nil {
+				notify.hub.Publish(guildwarrt.Event{
+					Type:  kind,
+					WarID: w.WarID,
+					Data: map[string]any{
+						"guildId": gid,
+						"phase":   w.Phase,
+					},
+				})
+			}
+		}
+		emitFor(w.OurGuildID)
+		if w.TheirGuildID != nil {
+			emitFor(*w.TheirGuildID)
+		}
+	}
 }

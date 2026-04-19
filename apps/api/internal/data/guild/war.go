@@ -337,6 +337,52 @@ func (r *Repo) TransitionWarPhase(ctx context.Context, fromPhase, toPhase string
 	return tag.RowsAffected(), nil
 }
 
+// WarSummary identifies an active guild war for notification fan-out.
+// Used by the cron worker to push system events to affected guilds after
+// a phase transition (ADR-004).
+type WarSummary struct {
+	WarID        uuid.UUID
+	OurGuildID   uuid.UUID
+	TheirGuildID *uuid.UUID
+	TheirName    string
+	Phase        string
+}
+
+// ListWarsInPhase returns active wars currently in `phase` so the cron can
+// fan out per-guild system events. Includes both sides' guild IDs (the
+// "their" side may be nil for placeholder rivals).
+func (r *Repo) ListWarsInPhase(ctx context.Context, phase string) ([]WarSummary, error) {
+	rows, err := r.data.DB.Query(ctx, `
+        SELECT id, our_guild_id, their_guild_id, their_guild_name, phase
+        FROM guild_wars
+        WHERE status = 'active' AND phase = $1
+    `, phase)
+	if err != nil {
+		return nil, fmt.Errorf("list wars in phase %s: %w", phase, err)
+	}
+	defer rows.Close()
+	out := make([]WarSummary, 0, 16)
+	for rows.Next() {
+		var w WarSummary
+		if err := rows.Scan(&w.WarID, &w.OurGuildID, &w.TheirGuildID, &w.TheirName, &w.Phase); err != nil {
+			return nil, fmt.Errorf("scan war: %w", err)
+		}
+		out = append(out, w)
+	}
+	return out, rows.Err()
+}
+
+// GetGuildCreator returns the user_id of a guild's creator. Used by the
+// system-event helper to satisfy events.creator_id FK.
+func (r *Repo) GetGuildCreator(ctx context.Context, guildID uuid.UUID) (uuid.UUID, error) {
+	var creator uuid.UUID
+	err := r.data.DB.QueryRow(ctx, `SELECT creator_id FROM guilds WHERE id = $1`, guildID).Scan(&creator)
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("get guild creator %s: %w", guildID, err)
+	}
+	return creator, nil
+}
+
 // ResolveWarsAndAwardTerritories finalises all wars in the 'champions_duel'
 // phase: counts fronts captured by each side, marks the war resolved, and
 // upserts a guild_territories row for every front the winner captured.

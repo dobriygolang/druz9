@@ -3060,6 +3060,132 @@ func (x *UpdateUserPreferencesRequest) GetLocale() string {
 	return ""
 }
 
+type ListCompletedToursRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCompletedToursRequest) Reset() {
+	*x = ListCompletedToursRequest{}
+	mi := &file_core_profile_v1_profile_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCompletedToursRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCompletedToursRequest) ProtoMessage() {}
+
+func (x *ListCompletedToursRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_core_profile_v1_profile_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCompletedToursRequest.ProtoReflect.Descriptor instead.
+func (*ListCompletedToursRequest) Descriptor() ([]byte, []int) {
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{42}
+}
+
+type ListCompletedToursResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// tour_id values, e.g. "arena_intro", "war_intro", "events_intro",
+	// "hub_intro". Frontend treats anything in this list as "skip the tour".
+	TourIds       []string `protobuf:"bytes,1,rep,name=tour_ids,json=tourIds,proto3" json:"tour_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCompletedToursResponse) Reset() {
+	*x = ListCompletedToursResponse{}
+	mi := &file_core_profile_v1_profile_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCompletedToursResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCompletedToursResponse) ProtoMessage() {}
+
+func (x *ListCompletedToursResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_core_profile_v1_profile_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCompletedToursResponse.ProtoReflect.Descriptor instead.
+func (*ListCompletedToursResponse) Descriptor() ([]byte, []int) {
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{43}
+}
+
+func (x *ListCompletedToursResponse) GetTourIds() []string {
+	if x != nil {
+		return x.TourIds
+	}
+	return nil
+}
+
+type MarkTourCompletedRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TourId        string                 `protobuf:"bytes,1,opt,name=tour_id,json=tourId,proto3" json:"tour_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MarkTourCompletedRequest) Reset() {
+	*x = MarkTourCompletedRequest{}
+	mi := &file_core_profile_v1_profile_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MarkTourCompletedRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MarkTourCompletedRequest) ProtoMessage() {}
+
+func (x *MarkTourCompletedRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_core_profile_v1_profile_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MarkTourCompletedRequest.ProtoReflect.Descriptor instead.
+func (*MarkTourCompletedRequest) Descriptor() ([]byte, []int) {
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *MarkTourCompletedRequest) GetTourId() string {
+	if x != nil {
+		return x.TourId
+	}
+	return ""
+}
+
 type GetWalletRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -3068,7 +3194,7 @@ type GetWalletRequest struct {
 
 func (x *GetWalletRequest) Reset() {
 	*x = GetWalletRequest{}
-	mi := &file_core_profile_v1_profile_proto_msgTypes[42]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3080,7 +3206,7 @@ func (x *GetWalletRequest) String() string {
 func (*GetWalletRequest) ProtoMessage() {}
 
 func (x *GetWalletRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_core_profile_v1_profile_proto_msgTypes[42]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3093,7 +3219,7 @@ func (x *GetWalletRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWalletRequest.ProtoReflect.Descriptor instead.
 func (*GetWalletRequest) Descriptor() ([]byte, []int) {
-	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{42}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{45}
 }
 
 type GetWalletResponse struct {
@@ -3107,7 +3233,7 @@ type GetWalletResponse struct {
 
 func (x *GetWalletResponse) Reset() {
 	*x = GetWalletResponse{}
-	mi := &file_core_profile_v1_profile_proto_msgTypes[43]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3119,7 +3245,7 @@ func (x *GetWalletResponse) String() string {
 func (*GetWalletResponse) ProtoMessage() {}
 
 func (x *GetWalletResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_core_profile_v1_profile_proto_msgTypes[43]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3132,7 +3258,7 @@ func (x *GetWalletResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWalletResponse.ProtoReflect.Descriptor instead.
 func (*GetWalletResponse) Descriptor() ([]byte, []int) {
-	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{43}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *GetWalletResponse) GetGold() int32 {
@@ -3181,7 +3307,7 @@ type User struct {
 
 func (x *User) Reset() {
 	*x = User{}
-	mi := &file_core_profile_v1_profile_proto_msgTypes[44]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3193,7 +3319,7 @@ func (x *User) String() string {
 func (*User) ProtoMessage() {}
 
 func (x *User) ProtoReflect() protoreflect.Message {
-	mi := &file_core_profile_v1_profile_proto_msgTypes[44]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3206,7 +3332,7 @@ func (x *User) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use User.ProtoReflect.Descriptor instead.
 func (*User) Descriptor() ([]byte, []int) {
-	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{44}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *User) GetId() string {
@@ -3537,7 +3663,12 @@ const file_core_profile_v1_profile_proto_rawDesc = "" +
 	"\x19GetUserPreferencesRequest\"x\n" +
 	"\x1cUpdateUserPreferencesRequest\x12@\n" +
 	"\x0elayout_density\x18\x01 \x01(\x0e2\x19.profile.v1.LayoutDensityR\rlayoutDensity\x12\x16\n" +
-	"\x06locale\x18\x02 \x01(\tR\x06locale\"\x12\n" +
+	"\x06locale\x18\x02 \x01(\tR\x06locale\"\x1b\n" +
+	"\x19ListCompletedToursRequest\"7\n" +
+	"\x1aListCompletedToursResponse\x12\x19\n" +
+	"\btour_ids\x18\x01 \x03(\tR\atourIds\"3\n" +
+	"\x18MarkTourCompletedRequest\x12\x17\n" +
+	"\atour_id\x18\x01 \x01(\tR\x06tourId\"\x12\n" +
 	"\x10GetWalletRequest\"S\n" +
 	"\x11GetWalletResponse\x12\x12\n" +
 	"\x04gold\x18\x01 \x01(\x05R\x04gold\x12\x12\n" +
@@ -3604,7 +3735,7 @@ const file_core_profile_v1_profile_proto_rawDesc = "" +
 	"\rLayoutDensity\x12\x1e\n" +
 	"\x1aLAYOUT_DENSITY_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aLAYOUT_DENSITY_COMFORTABLE\x10\x01\x12\x1a\n" +
-	"\x16LAYOUT_DENSITY_COMPACT\x10\x022\xa8\x14\n" +
+	"\x16LAYOUT_DENSITY_COMPACT\x10\x022\xb3\x16\n" +
 	"\x0eProfileService\x12\xb2\x01\n" +
 	"\x1bCreateTelegramAuthChallenge\x12..profile.v1.CreateTelegramAuthChallengeRequest\x1a/.profile.v1.CreateTelegramAuthChallengeResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/api/v1/profile/auth/telegram/challenge\x12v\n" +
 	"\fTelegramAuth\x12\x1f.profile.v1.TelegramAuthRequest\x1a\x1b.profile.v1.ProfileResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/profile/auth/telegram\x12\x85\x01\n" +
@@ -3626,7 +3757,9 @@ const file_core_profile_v1_profile_proto_rawDesc = "" +
 	"\x17ListProfileAchievements\x12*.profile.v1.ListProfileAchievementsRequest\x1a+.profile.v1.ListProfileAchievementsResponse\".\x82\xd3\xe4\x93\x02(\x12&/api/v1/profile/{user_id}/achievements\x12\x92\x01\n" +
 	"\x13ListProfileActivity\x12&.profile.v1.ListProfileActivityRequest\x1a'.profile.v1.ListProfileActivityResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/api/v1/profile/{user_id}/activity\x12}\n" +
 	"\x12GetUserPreferences\x12%.profile.v1.GetUserPreferencesRequest\x1a\x1b.profile.v1.UserPreferences\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/api/v1/profile/preferences\x12\x86\x01\n" +
-	"\x15UpdateUserPreferences\x12(.profile.v1.UpdateUserPreferencesRequest\x1a\x1b.profile.v1.UserPreferences\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/profile/preferences\x12`\n" +
+	"\x15UpdateUserPreferences\x12(.profile.v1.UpdateUserPreferencesRequest\x1a\x1b.profile.v1.UserPreferences\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/profile/preferences\x12\x82\x01\n" +
+	"\x12ListCompletedTours\x12%.profile.v1.ListCompletedToursRequest\x1a&.profile.v1.ListCompletedToursResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v1/profile/tours\x12\x83\x01\n" +
+	"\x11MarkTourCompleted\x12$.profile.v1.MarkTourCompletedRequest\x1a&.profile.v1.ListCompletedToursResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/profile/tours\x12`\n" +
 	"\tGetWallet\x12\x1c.profile.v1.GetWalletRequest\x1a\x1d.profile.v1.GetWalletResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/api/v1/walletB\x1bZ\x19api/pkg/api/profile/v1;v1b\x06proto3"
 
 var (
@@ -3642,7 +3775,7 @@ func file_core_profile_v1_profile_proto_rawDescGZIP() []byte {
 }
 
 var file_core_profile_v1_profile_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
-var file_core_profile_v1_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 45)
+var file_core_profile_v1_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 48)
 var file_core_profile_v1_profile_proto_goTypes = []any{
 	(UserGoalKind)(0),                           // 0: profile.v1.UserGoalKind
 	(ReadinessLevel)(0),                         // 1: profile.v1.ReadinessLevel
@@ -3693,12 +3826,15 @@ var file_core_profile_v1_profile_proto_goTypes = []any{
 	(*UserPreferences)(nil),                     // 46: profile.v1.UserPreferences
 	(*GetUserPreferencesRequest)(nil),           // 47: profile.v1.GetUserPreferencesRequest
 	(*UpdateUserPreferencesRequest)(nil),        // 48: profile.v1.UpdateUserPreferencesRequest
-	(*GetWalletRequest)(nil),                    // 49: profile.v1.GetWalletRequest
-	(*GetWalletResponse)(nil),                   // 50: profile.v1.GetWalletResponse
-	(*User)(nil),                                // 51: profile.v1.User
-	(v1.OperationStatus)(0),                     // 52: common.v1.OperationStatus
-	(*timestamppb.Timestamp)(nil),               // 53: google.protobuf.Timestamp
-	(v1.UserActivityStatus)(0),                  // 54: common.v1.UserActivityStatus
+	(*ListCompletedToursRequest)(nil),           // 49: profile.v1.ListCompletedToursRequest
+	(*ListCompletedToursResponse)(nil),          // 50: profile.v1.ListCompletedToursResponse
+	(*MarkTourCompletedRequest)(nil),            // 51: profile.v1.MarkTourCompletedRequest
+	(*GetWalletRequest)(nil),                    // 52: profile.v1.GetWalletRequest
+	(*GetWalletResponse)(nil),                   // 53: profile.v1.GetWalletResponse
+	(*User)(nil),                                // 54: profile.v1.User
+	(v1.OperationStatus)(0),                     // 55: common.v1.OperationStatus
+	(*timestamppb.Timestamp)(nil),               // 56: google.protobuf.Timestamp
+	(v1.UserActivityStatus)(0),                  // 57: common.v1.UserActivityStatus
 }
 var file_core_profile_v1_profile_proto_depIdxs = []int32{
 	0,  // 0: profile.v1.SetUserGoalRequest.kind:type_name -> profile.v1.UserGoalKind
@@ -3709,14 +3845,14 @@ var file_core_profile_v1_profile_proto_depIdxs = []int32{
 	23, // 5: profile.v1.GetReadinessResponse.next_action:type_name -> profile.v1.ReadinessNextAction
 	24, // 6: profile.v1.GetReadinessResponse.company_readiness:type_name -> profile.v1.CompanyReadiness
 	2,  // 7: profile.v1.ReadinessNextAction.action_type:type_name -> profile.v1.ProfileActionType
-	52, // 8: profile.v1.ProfileStatusResponse.status:type_name -> common.v1.OperationStatus
-	53, // 9: profile.v1.CreateTelegramAuthChallengeResponse.expires_at:type_name -> google.protobuf.Timestamp
-	53, // 10: profile.v1.StartYandexAuthResponse.expires_at:type_name -> google.protobuf.Timestamp
-	51, // 11: profile.v1.ProfileResponse.user:type_name -> profile.v1.User
-	53, // 12: profile.v1.ProfileProgressOverview.last_activity_at:type_name -> google.protobuf.Timestamp
+	55, // 8: profile.v1.ProfileStatusResponse.status:type_name -> common.v1.OperationStatus
+	56, // 9: profile.v1.CreateTelegramAuthChallengeResponse.expires_at:type_name -> google.protobuf.Timestamp
+	56, // 10: profile.v1.StartYandexAuthResponse.expires_at:type_name -> google.protobuf.Timestamp
+	54, // 11: profile.v1.ProfileResponse.user:type_name -> profile.v1.User
+	56, // 12: profile.v1.ProfileProgressOverview.last_activity_at:type_name -> google.protobuf.Timestamp
 	3,  // 13: profile.v1.ProfileCompetency.confidence:type_name -> profile.v1.ProfileCompetencyConfidence
 	4,  // 14: profile.v1.ProfileCompetency.level:type_name -> profile.v1.ProfileCompetencyLevel
-	53, // 15: profile.v1.ProfileCheckpointProgress.finished_at:type_name -> google.protobuf.Timestamp
+	56, // 15: profile.v1.ProfileCheckpointProgress.finished_at:type_name -> google.protobuf.Timestamp
 	2,  // 16: profile.v1.NextAction.action_type:type_name -> profile.v1.ProfileActionType
 	0,  // 17: profile.v1.UserGoal.kind:type_name -> profile.v1.UserGoalKind
 	29, // 18: profile.v1.ProfileProgress.overview:type_name -> profile.v1.ProfileProgressOverview
@@ -3729,16 +3865,16 @@ var file_core_profile_v1_profile_proto_depIdxs = []int32{
 	34, // 25: profile.v1.ProfileProgress.goal:type_name -> profile.v1.UserGoal
 	35, // 26: profile.v1.ProfileProgressResponse.progress:type_name -> profile.v1.ProfileProgress
 	5,  // 27: profile.v1.FeedItem.type:type_name -> profile.v1.FeedItemType
-	53, // 28: profile.v1.FeedItem.timestamp:type_name -> google.protobuf.Timestamp
+	56, // 28: profile.v1.FeedItem.timestamp:type_name -> google.protobuf.Timestamp
 	37, // 29: profile.v1.GetProfileFeedResponse.items:type_name -> profile.v1.FeedItem
-	53, // 30: profile.v1.ProfileAchievement.earned_at:type_name -> google.protobuf.Timestamp
+	56, // 30: profile.v1.ProfileAchievement.earned_at:type_name -> google.protobuf.Timestamp
 	40, // 31: profile.v1.ListProfileAchievementsResponse.achievements:type_name -> profile.v1.ProfileAchievement
-	53, // 32: profile.v1.ProfileActivityEntry.at:type_name -> google.protobuf.Timestamp
+	56, // 32: profile.v1.ProfileActivityEntry.at:type_name -> google.protobuf.Timestamp
 	43, // 33: profile.v1.ListProfileActivityResponse.entries:type_name -> profile.v1.ProfileActivityEntry
 	6,  // 34: profile.v1.UserPreferences.layout_density:type_name -> profile.v1.LayoutDensity
 	6,  // 35: profile.v1.UpdateUserPreferencesRequest.layout_density:type_name -> profile.v1.LayoutDensity
-	53, // 36: profile.v1.User.created_at:type_name -> google.protobuf.Timestamp
-	54, // 37: profile.v1.User.activity_status:type_name -> common.v1.UserActivityStatus
+	56, // 36: profile.v1.User.created_at:type_name -> google.protobuf.Timestamp
+	57, // 37: profile.v1.User.activity_status:type_name -> common.v1.UserActivityStatus
 	7,  // 38: profile.v1.ProfileService.CreateTelegramAuthChallenge:input_type -> profile.v1.CreateTelegramAuthChallengeRequest
 	8,  // 39: profile.v1.ProfileService.TelegramAuth:input_type -> profile.v1.TelegramAuthRequest
 	9,  // 40: profile.v1.ProfileService.StartYandexAuth:input_type -> profile.v1.StartYandexAuthRequest
@@ -3758,29 +3894,33 @@ var file_core_profile_v1_profile_proto_depIdxs = []int32{
 	44, // 54: profile.v1.ProfileService.ListProfileActivity:input_type -> profile.v1.ListProfileActivityRequest
 	47, // 55: profile.v1.ProfileService.GetUserPreferences:input_type -> profile.v1.GetUserPreferencesRequest
 	48, // 56: profile.v1.ProfileService.UpdateUserPreferences:input_type -> profile.v1.UpdateUserPreferencesRequest
-	49, // 57: profile.v1.ProfileService.GetWallet:input_type -> profile.v1.GetWalletRequest
-	26, // 58: profile.v1.ProfileService.CreateTelegramAuthChallenge:output_type -> profile.v1.CreateTelegramAuthChallengeResponse
-	28, // 59: profile.v1.ProfileService.TelegramAuth:output_type -> profile.v1.ProfileResponse
-	27, // 60: profile.v1.ProfileService.StartYandexAuth:output_type -> profile.v1.StartYandexAuthResponse
-	28, // 61: profile.v1.ProfileService.YandexAuth:output_type -> profile.v1.ProfileResponse
-	28, // 62: profile.v1.ProfileService.CompleteRegistration:output_type -> profile.v1.ProfileResponse
-	28, // 63: profile.v1.ProfileService.GetProfile:output_type -> profile.v1.ProfileResponse
-	28, // 64: profile.v1.ProfileService.GetProfileByID:output_type -> profile.v1.ProfileResponse
-	28, // 65: profile.v1.ProfileService.UpdateLocation:output_type -> profile.v1.ProfileResponse
-	28, // 66: profile.v1.ProfileService.UpdateProfile:output_type -> profile.v1.ProfileResponse
-	25, // 67: profile.v1.ProfileService.Logout:output_type -> profile.v1.ProfileStatusResponse
-	25, // 68: profile.v1.ProfileService.BindTelegram:output_type -> profile.v1.ProfileStatusResponse
-	36, // 69: profile.v1.ProfileService.GetProfileProgress:output_type -> profile.v1.ProfileProgressResponse
-	21, // 70: profile.v1.ProfileService.SetUserGoal:output_type -> profile.v1.SetUserGoalResponse
-	22, // 71: profile.v1.ProfileService.GetReadiness:output_type -> profile.v1.GetReadinessResponse
-	39, // 72: profile.v1.ProfileService.GetProfileFeed:output_type -> profile.v1.GetProfileFeedResponse
-	42, // 73: profile.v1.ProfileService.ListProfileAchievements:output_type -> profile.v1.ListProfileAchievementsResponse
-	45, // 74: profile.v1.ProfileService.ListProfileActivity:output_type -> profile.v1.ListProfileActivityResponse
-	46, // 75: profile.v1.ProfileService.GetUserPreferences:output_type -> profile.v1.UserPreferences
-	46, // 76: profile.v1.ProfileService.UpdateUserPreferences:output_type -> profile.v1.UserPreferences
-	50, // 77: profile.v1.ProfileService.GetWallet:output_type -> profile.v1.GetWalletResponse
-	58, // [58:78] is the sub-list for method output_type
-	38, // [38:58] is the sub-list for method input_type
+	49, // 57: profile.v1.ProfileService.ListCompletedTours:input_type -> profile.v1.ListCompletedToursRequest
+	51, // 58: profile.v1.ProfileService.MarkTourCompleted:input_type -> profile.v1.MarkTourCompletedRequest
+	52, // 59: profile.v1.ProfileService.GetWallet:input_type -> profile.v1.GetWalletRequest
+	26, // 60: profile.v1.ProfileService.CreateTelegramAuthChallenge:output_type -> profile.v1.CreateTelegramAuthChallengeResponse
+	28, // 61: profile.v1.ProfileService.TelegramAuth:output_type -> profile.v1.ProfileResponse
+	27, // 62: profile.v1.ProfileService.StartYandexAuth:output_type -> profile.v1.StartYandexAuthResponse
+	28, // 63: profile.v1.ProfileService.YandexAuth:output_type -> profile.v1.ProfileResponse
+	28, // 64: profile.v1.ProfileService.CompleteRegistration:output_type -> profile.v1.ProfileResponse
+	28, // 65: profile.v1.ProfileService.GetProfile:output_type -> profile.v1.ProfileResponse
+	28, // 66: profile.v1.ProfileService.GetProfileByID:output_type -> profile.v1.ProfileResponse
+	28, // 67: profile.v1.ProfileService.UpdateLocation:output_type -> profile.v1.ProfileResponse
+	28, // 68: profile.v1.ProfileService.UpdateProfile:output_type -> profile.v1.ProfileResponse
+	25, // 69: profile.v1.ProfileService.Logout:output_type -> profile.v1.ProfileStatusResponse
+	25, // 70: profile.v1.ProfileService.BindTelegram:output_type -> profile.v1.ProfileStatusResponse
+	36, // 71: profile.v1.ProfileService.GetProfileProgress:output_type -> profile.v1.ProfileProgressResponse
+	21, // 72: profile.v1.ProfileService.SetUserGoal:output_type -> profile.v1.SetUserGoalResponse
+	22, // 73: profile.v1.ProfileService.GetReadiness:output_type -> profile.v1.GetReadinessResponse
+	39, // 74: profile.v1.ProfileService.GetProfileFeed:output_type -> profile.v1.GetProfileFeedResponse
+	42, // 75: profile.v1.ProfileService.ListProfileAchievements:output_type -> profile.v1.ListProfileAchievementsResponse
+	45, // 76: profile.v1.ProfileService.ListProfileActivity:output_type -> profile.v1.ListProfileActivityResponse
+	46, // 77: profile.v1.ProfileService.GetUserPreferences:output_type -> profile.v1.UserPreferences
+	46, // 78: profile.v1.ProfileService.UpdateUserPreferences:output_type -> profile.v1.UserPreferences
+	50, // 79: profile.v1.ProfileService.ListCompletedTours:output_type -> profile.v1.ListCompletedToursResponse
+	50, // 80: profile.v1.ProfileService.MarkTourCompleted:output_type -> profile.v1.ListCompletedToursResponse
+	53, // 81: profile.v1.ProfileService.GetWallet:output_type -> profile.v1.GetWalletResponse
+	60, // [60:82] is the sub-list for method output_type
+	38, // [38:60] is the sub-list for method input_type
 	38, // [38:38] is the sub-list for extension type_name
 	38, // [38:38] is the sub-list for extension extendee
 	0,  // [0:38] is the sub-list for field type_name
@@ -3797,7 +3937,7 @@ func file_core_profile_v1_profile_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_core_profile_v1_profile_proto_rawDesc), len(file_core_profile_v1_profile_proto_rawDesc)),
 			NumEnums:      7,
-			NumMessages:   45,
+			NumMessages:   48,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

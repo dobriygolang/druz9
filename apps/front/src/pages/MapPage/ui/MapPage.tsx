@@ -498,7 +498,14 @@ function MapLibreCanvas({
           .setPopup(popup)
           .addTo(map)
 
-        el.onclick = () => marker!.togglePopup()
+        el.onclick = () => {
+          // Click on a player avatar: zoom in to a comfortable city-level
+          // detail (zoom 12 ≈ ~3km radius) and reveal the popup. Previously
+          // we only toggled the popup at whatever zoom the user was on,
+          // which made it hard to see other players nearby.
+          map.flyTo({ center: [cp.longitude, cp.latitude], zoom: 12, duration: 600 })
+          marker!.togglePopup()
+        }
         playerMarkersRef.current.set(cp.userId, marker)
       } else {
         marker.setLngLat([cp.longitude, cp.latitude])
@@ -510,7 +517,9 @@ function MapLibreCanvas({
   useEffect(() => {
     const map = mapRef.current
     if (!map || !selected) return
-    map.flyTo({ center: [selected.longitude, selected.latitude], zoom: Math.max(4, map.getZoom()), duration: 600 })
+    // Selected guild/event: zoom up to city-level so users can see what's
+    // around. Cap by current zoom so we never zoom OUT on selection.
+    map.flyTo({ center: [selected.longitude, selected.latitude], zoom: Math.max(11, map.getZoom()), duration: 600 })
   }, [selected?.id])
 
   return <div ref={containerRef} style={{ width: '100%', height: 520 }} />

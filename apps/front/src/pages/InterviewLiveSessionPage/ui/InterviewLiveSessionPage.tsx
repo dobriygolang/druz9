@@ -40,6 +40,11 @@ const MENTOR_NAME_BY_ID: Record<string, string> = {
   new: 'Alden the Archivist',
 }
 
+// Per-focus scenario briefings. Picked by the `?focus=...` query param so
+// solo-practice mode actually opens the right kind of task. Without an
+// entry, falls back to `default` (graphs/BFS). Real backend resolution
+// (admin-curated task pool) lands when interview_prep mock-tasks are
+// wired into solo mode.
 const SCENARIOS: Record<string, ScenarioBriefing> = {
   default: {
     title: 'Connected caverns',
@@ -68,6 +73,61 @@ const SCENARIOS: Record<string, ScenarioBriefing> = {
       'Communication & pacing',
     ],
   },
+  algorithms: {
+    title: 'Connected caverns',
+    difficulty: 'medium',
+    topic: 'Graphs · BFS',
+    duration: '45 min',
+    intro: 'Algorithms warm-up: walk me through the approach before you code.',
+    starterQuestion: 'Given an undirected graph of N caverns and an edge list, count connected components.',
+    starterCode: `def count_components(n: int, edges: list[list[int]]) -> int:\n    return 0\n`,
+    followUps: ['Directed variant?', 'Time complexity in N+E?', 'How would you parallelise for N=10⁸?'],
+    evaluation: ['Clarifying', 'Algorithm choice', 'Edge cases', 'Complexity', 'Communication'],
+  },
+  sql: {
+    title: 'Top customers by revenue',
+    difficulty: 'medium',
+    topic: 'SQL · joins, window functions',
+    duration: '30 min',
+    intro: "SQL practice: I'll give you a schema, walk me through the query before you write it.",
+    starterQuestion:
+      'Tables: orders(id, customer_id, total_cents, created_at) and customers(id, name, country). Find the top 3 customers per country by total revenue in the last 90 days. Output: country, name, revenue, rank.',
+    starterCode: `-- write your query here\nSELECT\n  c.country,\n  c.name,\n  SUM(o.total_cents) / 100.0 AS revenue,\n  -- rank by country\nFROM orders o\nJOIN customers c ON c.id = o.customer_id\nWHERE o.created_at >= NOW() - INTERVAL '90 days'\nGROUP BY c.country, c.id, c.name\n-- ORDER BY ... LIMIT ...\n`,
+    followUps: [
+      'How does ROW_NUMBER differ from RANK and DENSE_RANK here?',
+      'What index would speed this up?',
+      'How would you handle ties on revenue?',
+    ],
+    evaluation: ['Correct join', 'Window function', 'Date filter', 'Index awareness', 'Tie handling'],
+  },
+  system_design: {
+    title: 'Design a URL shortener',
+    difficulty: 'hard',
+    topic: 'System design',
+    duration: '45 min',
+    intro: "System design: gather requirements, then sketch the components, data, and capacity numbers out loud.",
+    starterQuestion:
+      'Design a URL shortener (bit.ly clone) for ~100M new links/day with 10 reads per write. Cover API, datastore choice, ID generation, caching, and analytics.',
+    starterCode: `# Use this scratch area for capacity math:\n# writes/sec = ?\n# reads/sec  = ?\n# storage/yr = ?\n`,
+    followUps: ['Pros/cons of base62 sequential vs. hash IDs?', 'What does the cache layer look like?', 'How do you keep analytics from becoming a bottleneck?'],
+    evaluation: ['Requirements', 'API contract', 'Datastore choice', 'ID strategy', 'Caching + analytics'],
+  },
+  behavioral: {
+    title: 'Tell me about a time…',
+    difficulty: 'easy',
+    topic: 'Behavioral · STAR',
+    duration: '20 min',
+    intro: "Behavioral round. Use the STAR framework: Situation, Task, Action, Result.",
+    starterQuestion: 'Tell me about a time you disagreed with a teammate on a technical decision. How did you resolve it?',
+    starterCode: `# Optional notes:\n# Situation:\n# Task:\n# Action:\n# Result:\n`,
+    followUps: ['What would you do differently?', 'How did the team feel afterwards?', 'What did you learn long-term?'],
+    evaluation: ['Specific example', 'Owned actions', 'Measurable outcome', 'Self-reflection', 'Communication'],
+  },
+}
+
+function pickScenario(focus: string | null): ScenarioBriefing {
+  if (!focus) return SCENARIOS.default
+  return SCENARIOS[focus.toLowerCase()] ?? SCENARIOS.default
 }
 
 export function InterviewLiveSessionPage() {
@@ -86,27 +146,34 @@ export function InterviewLiveSessionPage() {
   const { t } = useTranslation()
 
   const mentor = MENTOR_NAME_BY_ID[sessionId] ?? MENTOR_NAME_BY_ID.new
+  // ADR-001 / #6 — solo focus picks the matching scenario (sql, system_design,
+  // behavioral, …) instead of always opening graphs/BFS. When focus isn't a
+  // solo-practice entry, we keep the i18n-backed default scenario.
+  const scenarioBase = soloMode ? pickScenario(soloFocus) : SCENARIOS.default
   const focusLabel = soloFocus ? soloFocus.charAt(0).toUpperCase() + soloFocus.slice(1) : null
-  const scenario = {
-    ...SCENARIOS.default,
-    title: soloMode && focusLabel ? `Solo · ${focusLabel}` : t('interviewLive.scenario.title'),
-    topic: soloMode && focusLabel ? focusLabel : t('interviewLive.scenario.topic'),
-    duration: t('interviewLive.scenario.duration'),
-    intro: t('interviewLive.scenario.intro'),
-    starterQuestion: t('interviewLive.scenario.question'),
-    evaluation: [
-      t('interviewLive.rubric.clarifying'),
-      t('interviewLive.rubric.algorithm'),
-      t('interviewLive.rubric.edgeCases'),
-      t('interviewLive.rubric.complexity'),
-      t('interviewLive.rubric.communication'),
-    ],
-    followUps: [
-      t('interviewLive.followUps.directedGraph'),
-      t('interviewLive.followUps.complexity'),
-      t('interviewLive.followUps.parallel'),
-    ],
-  }
+  const scenario = soloMode
+    ? scenarioBase
+    : {
+        ...scenarioBase,
+        title: t('interviewLive.scenario.title'),
+        topic: t('interviewLive.scenario.topic'),
+        duration: t('interviewLive.scenario.duration'),
+        intro: t('interviewLive.scenario.intro'),
+        starterQuestion: t('interviewLive.scenario.question'),
+        evaluation: [
+          t('interviewLive.rubric.clarifying'),
+          t('interviewLive.rubric.algorithm'),
+          t('interviewLive.rubric.edgeCases'),
+          t('interviewLive.rubric.complexity'),
+          t('interviewLive.rubric.communication'),
+        ],
+        followUps: [
+          t('interviewLive.followUps.directedGraph'),
+          t('interviewLive.followUps.complexity'),
+          t('interviewLive.followUps.parallel'),
+        ],
+      }
+  void focusLabel
 
   const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
@@ -234,12 +301,31 @@ Guidelines:
     toast({ kind: 'success', message: t('interviewLive.toast.ended') })
   }
 
+  // Cap of 3 hints per session — each costs +30s of "interview time".
+  // Past the cap the mentor declines politely; this avoids the previous
+  // behaviour of cycling the same 3 fallback strings forever.
+  const HINT_LIMIT = 3
+  const HINT_PENALTY_SECONDS = 30
   const requestNudge = async () => {
     if (mentorTyping) return
     const time = `${mm}:${ss}`
+    if (nudgeCount >= HINT_LIMIT) {
+      setMessages((m) => [
+        ...m,
+        {
+          id: nextId.current++,
+          speaker: 'mentor',
+          text: t('interviewLive.hint.exhausted', {
+            defaultValue: 'Подсказки исчерпаны (лимит 3 за сессию). Двигайся вперёд — я подскажу, если ты сформулируешь конкретный вопрос.',
+          }),
+          timeAt: time,
+        },
+      ])
+      return
+    }
     const hintText = t('interviewLive.hint.request')
-    const idx = nudgeCount % 3
     setNudgeCount((n) => n + 1)
+    setSeconds((s) => s + HINT_PENALTY_SECONDS) // штрафные минуты ⇒ секунды
 
     setMessages((m) => [...m, { id: nextId.current++, speaker: 'you', text: hintText, timeAt: time }])
     setMentorTyping(true)
@@ -247,11 +333,27 @@ Guidelines:
     const snapshot = [...messages]
     try {
       const reply = await callMentor(snapshot, hintText, code, true)
-      setMessages((m) => [...m, { id: nextId.current++, speaker: 'mentor', text: reply, timeAt: time }])
-    } catch {
       setMessages((m) => [
         ...m,
-        { id: nextId.current++, speaker: 'mentor', text: t(`interviewLive.hint.response${idx}`), timeAt: time },
+        {
+          id: nextId.current++,
+          speaker: 'mentor',
+          text: `${reply}\n\n⏱ +${HINT_PENALTY_SECONDS}с штрафа за подсказку (${nudgeCount + 1}/${HINT_LIMIT}).`,
+          timeAt: time,
+        },
+      ])
+    } catch {
+      // Inline error — no canned-response cycling. The user gets a
+      // single honest message instead of pretending we have hints when
+      // the API is down.
+      setMessages((m) => [
+        ...m,
+        {
+          id: nextId.current++,
+          speaker: 'mentor',
+          text: t('interviewLive.hint.error', { defaultValue: 'Не удалось получить подсказку. Попробуй ещё раз через минуту.' }),
+          timeAt: time,
+        },
       ])
     } finally {
       setMentorTyping(false)

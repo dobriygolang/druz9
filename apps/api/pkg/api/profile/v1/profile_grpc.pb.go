@@ -38,6 +38,8 @@ const (
 	ProfileService_ListProfileActivity_FullMethodName         = "/profile.v1.ProfileService/ListProfileActivity"
 	ProfileService_GetUserPreferences_FullMethodName          = "/profile.v1.ProfileService/GetUserPreferences"
 	ProfileService_UpdateUserPreferences_FullMethodName       = "/profile.v1.ProfileService/UpdateUserPreferences"
+	ProfileService_ListCompletedTours_FullMethodName          = "/profile.v1.ProfileService/ListCompletedTours"
+	ProfileService_MarkTourCompleted_FullMethodName           = "/profile.v1.ProfileService/MarkTourCompleted"
 	ProfileService_GetWallet_FullMethodName                   = "/profile.v1.ProfileService/GetWallet"
 )
 
@@ -66,6 +68,11 @@ type ProfileServiceClient interface {
 	// notification settings (which live in notification.proto).
 	GetUserPreferences(ctx context.Context, in *GetUserPreferencesRequest, opts ...grpc.CallOption) (*UserPreferences, error)
 	UpdateUserPreferences(ctx context.Context, in *UpdateUserPreferencesRequest, opts ...grpc.CallOption) (*UserPreferences, error)
+	// ADR-004 — Onboarding tours. The frontend triggers a guided tour the
+	// first time a user lands on a page with no completed_at row; calling
+	// MarkTourCompleted records the dismissal so it never re-triggers.
+	ListCompletedTours(ctx context.Context, in *ListCompletedToursRequest, opts ...grpc.CallOption) (*ListCompletedToursResponse, error)
+	MarkTourCompleted(ctx context.Context, in *MarkTourCompletedRequest, opts ...grpc.CallOption) (*ListCompletedToursResponse, error)
 	GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error)
 }
 
@@ -267,6 +274,26 @@ func (c *profileServiceClient) UpdateUserPreferences(ctx context.Context, in *Up
 	return out, nil
 }
 
+func (c *profileServiceClient) ListCompletedTours(ctx context.Context, in *ListCompletedToursRequest, opts ...grpc.CallOption) (*ListCompletedToursResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListCompletedToursResponse)
+	err := c.cc.Invoke(ctx, ProfileService_ListCompletedTours_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *profileServiceClient) MarkTourCompleted(ctx context.Context, in *MarkTourCompletedRequest, opts ...grpc.CallOption) (*ListCompletedToursResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListCompletedToursResponse)
+	err := c.cc.Invoke(ctx, ProfileService_MarkTourCompleted_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *profileServiceClient) GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetWalletResponse)
@@ -302,6 +329,11 @@ type ProfileServiceServer interface {
 	// notification settings (which live in notification.proto).
 	GetUserPreferences(context.Context, *GetUserPreferencesRequest) (*UserPreferences, error)
 	UpdateUserPreferences(context.Context, *UpdateUserPreferencesRequest) (*UserPreferences, error)
+	// ADR-004 — Onboarding tours. The frontend triggers a guided tour the
+	// first time a user lands on a page with no completed_at row; calling
+	// MarkTourCompleted records the dismissal so it never re-triggers.
+	ListCompletedTours(context.Context, *ListCompletedToursRequest) (*ListCompletedToursResponse, error)
+	MarkTourCompleted(context.Context, *MarkTourCompletedRequest) (*ListCompletedToursResponse, error)
 	GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error)
 	mustEmbedUnimplementedProfileServiceServer()
 }
@@ -369,6 +401,12 @@ func (UnimplementedProfileServiceServer) GetUserPreferences(context.Context, *Ge
 }
 func (UnimplementedProfileServiceServer) UpdateUserPreferences(context.Context, *UpdateUserPreferencesRequest) (*UserPreferences, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateUserPreferences not implemented")
+}
+func (UnimplementedProfileServiceServer) ListCompletedTours(context.Context, *ListCompletedToursRequest) (*ListCompletedToursResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListCompletedTours not implemented")
+}
+func (UnimplementedProfileServiceServer) MarkTourCompleted(context.Context, *MarkTourCompletedRequest) (*ListCompletedToursResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method MarkTourCompleted not implemented")
 }
 func (UnimplementedProfileServiceServer) GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetWallet not implemented")
@@ -736,6 +774,42 @@ func _ProfileService_UpdateUserPreferences_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProfileService_ListCompletedTours_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCompletedToursRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).ListCompletedTours(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfileService_ListCompletedTours_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).ListCompletedTours(ctx, req.(*ListCompletedToursRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProfileService_MarkTourCompleted_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MarkTourCompletedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).MarkTourCompleted(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfileService_MarkTourCompleted_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).MarkTourCompleted(ctx, req.(*MarkTourCompletedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ProfileService_GetWallet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetWalletRequest)
 	if err := dec(in); err != nil {
@@ -836,6 +910,14 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateUserPreferences",
 			Handler:    _ProfileService_UpdateUserPreferences_Handler,
+		},
+		{
+			MethodName: "ListCompletedTours",
+			Handler:    _ProfileService_ListCompletedTours_Handler,
+		},
+		{
+			MethodName: "MarkTourCompleted",
+			Handler:    _ProfileService_MarkTourCompleted_Handler,
 		},
 		{
 			MethodName: "GetWallet",

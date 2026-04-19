@@ -66,6 +66,7 @@ var adminExactOperations = map[string]struct{}{
 	"/admin.v1.AdminService/UpdateConfig":    {},
 	"/admin.v1.AdminService/UpdateUserTrust": {},
 	"/admin.v1.AdminService/UpdateUserAdmin": {},
+	"/admin.v1.AdminService/GrantCurrency":   {},
 
 	// Code editor admin (task CRUD)
 	"/code_editor.v1.CodeEditorService/CreateTask": {},

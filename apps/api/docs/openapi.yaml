@@ -627,6 +627,34 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/admin.v1.AdminStatusResponse'
+    /api/admin/users/{userId}/grant:
+        post:
+            tags:
+                - AdminService
+            description: |-
+                Admin grant — credit any wallet currency to any user. Mirrors the
+                 shop's Purchase debit but in reverse; intended for support tooling
+                 and seasonal events. Audited via wallet ledger automatically.
+            operationId: AdminService_GrantCurrency
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/admin.v1.GrantCurrencyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.AdminStatusResponse'
     /api/admin/users/{userId}/trust:
         patch:
             tags:
@@ -3832,6 +3860,39 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.UserPreferences'
+    /api/v1/profile/tours:
+        get:
+            tags:
+                - ProfileService
+            description: |-
+                ADR-004 — Onboarding tours. The frontend triggers a guided tour the
+                 first time a user lands on a page with no completed_at row; calling
+                 MarkTourCompleted records the dismissal so it never re-triggers.
+            operationId: ProfileService_ListCompletedTours
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.ListCompletedToursResponse'
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_MarkTourCompleted
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/profile.v1.MarkTourCompletedRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.ListCompletedToursResponse'
     /api/v1/profile/update:
         post:
             tags:
@@ -4754,6 +4815,24 @@ components:
                     type: boolean
                 arenaRequireAuth:
                     type: boolean
+        admin.v1.GrantCurrencyRequest:
+            type: object
+            properties:
+                userId:
+                    type: string
+                currency:
+                    type: string
+                amount:
+                    type: string
+                reason:
+                    type: string
+                    description: |-
+                        Free-form note recorded in the ledger so audits can trace why a
+                         grant happened (event, support ticket id, etc.).
+            description: |-
+                Currency strings the wallet domain understands ("gold", "gems", "shards").
+                 Kept as a string instead of an enum so we can introduce new currencies
+                 (souls, etc.) without touching this proto.
         admin.v1.ListAIMentorsResponse:
             type: object
             properties:
@@ -8724,6 +8803,16 @@ components:
                 shards:
                     type: integer
                     format: int32
+        profile.v1.ListCompletedToursResponse:
+            type: object
+            properties:
+                tourIds:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        tour_id values, e.g. "arena_intro", "war_intro", "events_intro",
+                         "hub_intro". Frontend treats anything in this list as "skip the tour".
         profile.v1.ListProfileAchievementsResponse:
             type: object
             properties:
@@ -8741,6 +8830,11 @@ components:
         profile.v1.LogoutRequest:
             type: object
             properties: {}
+        profile.v1.MarkTourCompletedRequest:
+            type: object
+            properties:
+                tourId:
+                    type: string
         profile.v1.NextAction:
             type: object
             properties:

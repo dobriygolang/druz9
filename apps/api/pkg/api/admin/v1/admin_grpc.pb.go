@@ -26,6 +26,7 @@ const (
 	AdminService_ListConfig_FullMethodName       = "/admin.v1.AdminService/ListConfig"
 	AdminService_UpdateConfig_FullMethodName     = "/admin.v1.AdminService/UpdateConfig"
 	AdminService_GetRuntimeConfig_FullMethodName = "/admin.v1.AdminService/GetRuntimeConfig"
+	AdminService_GrantCurrency_FullMethodName    = "/admin.v1.AdminService/GrantCurrency"
 )
 
 // AdminServiceClient is the client API for AdminService service.
@@ -39,6 +40,10 @@ type AdminServiceClient interface {
 	ListConfig(ctx context.Context, in *ListConfigRequest, opts ...grpc.CallOption) (*ListConfigResponse, error)
 	UpdateConfig(ctx context.Context, in *UpdateConfigRequest, opts ...grpc.CallOption) (*UpdateConfigResponse, error)
 	GetRuntimeConfig(ctx context.Context, in *GetRuntimeConfigRequest, opts ...grpc.CallOption) (*GetRuntimeConfigResponse, error)
+	// Admin grant — credit any wallet currency to any user. Mirrors the
+	// shop's Purchase debit but in reverse; intended for support tooling
+	// and seasonal events. Audited via wallet ledger automatically.
+	GrantCurrency(ctx context.Context, in *GrantCurrencyRequest, opts ...grpc.CallOption) (*AdminStatusResponse, error)
 }
 
 type adminServiceClient struct {
@@ -119,6 +124,16 @@ func (c *adminServiceClient) GetRuntimeConfig(ctx context.Context, in *GetRuntim
 	return out, nil
 }
 
+func (c *adminServiceClient) GrantCurrency(ctx context.Context, in *GrantCurrencyRequest, opts ...grpc.CallOption) (*AdminStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminStatusResponse)
+	err := c.cc.Invoke(ctx, AdminService_GrantCurrency_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServiceServer is the server API for AdminService service.
 // All implementations must embed UnimplementedAdminServiceServer
 // for forward compatibility.
@@ -130,6 +145,10 @@ type AdminServiceServer interface {
 	ListConfig(context.Context, *ListConfigRequest) (*ListConfigResponse, error)
 	UpdateConfig(context.Context, *UpdateConfigRequest) (*UpdateConfigResponse, error)
 	GetRuntimeConfig(context.Context, *GetRuntimeConfigRequest) (*GetRuntimeConfigResponse, error)
+	// Admin grant — credit any wallet currency to any user. Mirrors the
+	// shop's Purchase debit but in reverse; intended for support tooling
+	// and seasonal events. Audited via wallet ledger automatically.
+	GrantCurrency(context.Context, *GrantCurrencyRequest) (*AdminStatusResponse, error)
 	mustEmbedUnimplementedAdminServiceServer()
 }
 
@@ -160,6 +179,9 @@ func (UnimplementedAdminServiceServer) UpdateConfig(context.Context, *UpdateConf
 }
 func (UnimplementedAdminServiceServer) GetRuntimeConfig(context.Context, *GetRuntimeConfigRequest) (*GetRuntimeConfigResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetRuntimeConfig not implemented")
+}
+func (UnimplementedAdminServiceServer) GrantCurrency(context.Context, *GrantCurrencyRequest) (*AdminStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GrantCurrency not implemented")
 }
 func (UnimplementedAdminServiceServer) mustEmbedUnimplementedAdminServiceServer() {}
 func (UnimplementedAdminServiceServer) testEmbeddedByValue()                      {}
@@ -308,6 +330,24 @@ func _AdminService_GetRuntimeConfig_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AdminService_GrantCurrency_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GrantCurrencyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).GrantCurrency(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_GrantCurrency_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).GrantCurrency(ctx, req.(*GrantCurrencyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AdminService_ServiceDesc is the grpc.ServiceDesc for AdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -342,6 +382,10 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetRuntimeConfig",
 			Handler:    _AdminService_GetRuntimeConfig_Handler,
+		},
+		{
+			MethodName: "GrantCurrency",
+			Handler:    _AdminService_GrantCurrency_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -96,12 +96,12 @@ func (s *Service) YandexAuth(ctx context.Context, state, code string) (*model.Pr
 		AvatarURL:      userInfo.AvatarURL,
 	})
 	if err != nil {
-		return nil, "", time.Time{}, err
+		return nil, "", time.Time{}, fmt.Errorf("upsert user by identity: %w", err)
 	}
 
 	rawToken, session, err := s.NewSession(ctx, user.ID)
 	if err != nil {
-		return nil, "", time.Time{}, err
+		return nil, "", time.Time{}, fmt.Errorf("create session: %w", err)
 	}
 
 	return &model.ProfileResponse{
@@ -210,7 +210,7 @@ func (s *Service) exchangeYandexCode(ctx context.Context, code string) (string, 
 func generateOpaqueToken(size int) (string, error) {
 	bytes := make([]byte, size)
 	if _, err := rand.Read(bytes); err != nil {
-		return "", err
+		return "", fmt.Errorf("generate opaque token: %w", err)
 	}
 	return base64.RawURLEncoding.EncodeToString(bytes), nil
 }

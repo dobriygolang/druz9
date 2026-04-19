@@ -69,7 +69,10 @@ func (r *Repo) ListSavedPodcasts(ctx context.Context, userID uuid.UUID, limit, o
 		}
 		out = append(out, p)
 	}
-	return out, total, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("iterate saved podcasts: %w", err)
+	}
+	return out, total, nil
 }
 
 // podcastColumnsAliased rewrites the canonical column list to qualify

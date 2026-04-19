@@ -29,9 +29,11 @@ const OperationProfileServiceGetProfileProgress = "/profile.v1.ProfileService/Ge
 const OperationProfileServiceGetReadiness = "/profile.v1.ProfileService/GetReadiness"
 const OperationProfileServiceGetUserPreferences = "/profile.v1.ProfileService/GetUserPreferences"
 const OperationProfileServiceGetWallet = "/profile.v1.ProfileService/GetWallet"
+const OperationProfileServiceListCompletedTours = "/profile.v1.ProfileService/ListCompletedTours"
 const OperationProfileServiceListProfileAchievements = "/profile.v1.ProfileService/ListProfileAchievements"
 const OperationProfileServiceListProfileActivity = "/profile.v1.ProfileService/ListProfileActivity"
 const OperationProfileServiceLogout = "/profile.v1.ProfileService/Logout"
+const OperationProfileServiceMarkTourCompleted = "/profile.v1.ProfileService/MarkTourCompleted"
 const OperationProfileServiceSetUserGoal = "/profile.v1.ProfileService/SetUserGoal"
 const OperationProfileServiceStartYandexAuth = "/profile.v1.ProfileService/StartYandexAuth"
 const OperationProfileServiceTelegramAuth = "/profile.v1.ProfileService/TelegramAuth"
@@ -53,9 +55,14 @@ type ProfileServiceHTTPServer interface {
 	// notification settings (which live in notification.proto).
 	GetUserPreferences(context.Context, *GetUserPreferencesRequest) (*UserPreferences, error)
 	GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error)
+	// ListCompletedTours ADR-004 — Onboarding tours. The frontend triggers a guided tour the
+	// first time a user lands on a page with no completed_at row; calling
+	// MarkTourCompleted records the dismissal so it never re-triggers.
+	ListCompletedTours(context.Context, *ListCompletedToursRequest) (*ListCompletedToursResponse, error)
 	ListProfileAchievements(context.Context, *ListProfileAchievementsRequest) (*ListProfileAchievementsResponse, error)
 	ListProfileActivity(context.Context, *ListProfileActivityRequest) (*ListProfileActivityResponse, error)
 	Logout(context.Context, *LogoutRequest) (*ProfileStatusResponse, error)
+	MarkTourCompleted(context.Context, *MarkTourCompletedRequest) (*ListCompletedToursResponse, error)
 	SetUserGoal(context.Context, *SetUserGoalRequest) (*SetUserGoalResponse, error)
 	StartYandexAuth(context.Context, *StartYandexAuthRequest) (*StartYandexAuthResponse, error)
 	TelegramAuth(context.Context, *TelegramAuthRequest) (*ProfileResponse, error)
@@ -86,6 +93,8 @@ func RegisterProfileServiceHTTPServer(s *http.Server, srv ProfileServiceHTTPServ
 	r.GET("/api/v1/profile/{user_id}/activity", _ProfileService_ListProfileActivity0_HTTP_Handler(srv))
 	r.GET("/api/v1/profile/preferences", _ProfileService_GetUserPreferences0_HTTP_Handler(srv))
 	r.POST("/api/v1/profile/preferences", _ProfileService_UpdateUserPreferences0_HTTP_Handler(srv))
+	r.GET("/api/v1/profile/tours", _ProfileService_ListCompletedTours0_HTTP_Handler(srv))
+	r.POST("/api/v1/profile/tours", _ProfileService_MarkTourCompleted0_HTTP_Handler(srv))
 	r.GET("/api/v1/wallet", _ProfileService_GetWallet0_HTTP_Handler(srv))
 }
 
@@ -495,6 +504,47 @@ func _ProfileService_UpdateUserPreferences0_HTTP_Handler(srv ProfileServiceHTTPS
 	}
 }
 
+func _ProfileService_ListCompletedTours0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListCompletedToursRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceListCompletedTours)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListCompletedTours(ctx, req.(*ListCompletedToursRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListCompletedToursResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ProfileService_MarkTourCompleted0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in MarkTourCompletedRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceMarkTourCompleted)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.MarkTourCompleted(ctx, req.(*MarkTourCompletedRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListCompletedToursResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _ProfileService_GetWallet0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in GetWalletRequest
@@ -527,9 +577,14 @@ type ProfileServiceHTTPClient interface {
 	// notification settings (which live in notification.proto).
 	GetUserPreferences(ctx context.Context, req *GetUserPreferencesRequest, opts ...http.CallOption) (rsp *UserPreferences, err error)
 	GetWallet(ctx context.Context, req *GetWalletRequest, opts ...http.CallOption) (rsp *GetWalletResponse, err error)
+	// ListCompletedTours ADR-004 — Onboarding tours. The frontend triggers a guided tour the
+	// first time a user lands on a page with no completed_at row; calling
+	// MarkTourCompleted records the dismissal so it never re-triggers.
+	ListCompletedTours(ctx context.Context, req *ListCompletedToursRequest, opts ...http.CallOption) (rsp *ListCompletedToursResponse, err error)
 	ListProfileAchievements(ctx context.Context, req *ListProfileAchievementsRequest, opts ...http.CallOption) (rsp *ListProfileAchievementsResponse, err error)
 	ListProfileActivity(ctx context.Context, req *ListProfileActivityRequest, opts ...http.CallOption) (rsp *ListProfileActivityResponse, err error)
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *ProfileStatusResponse, err error)
+	MarkTourCompleted(ctx context.Context, req *MarkTourCompletedRequest, opts ...http.CallOption) (rsp *ListCompletedToursResponse, err error)
 	SetUserGoal(ctx context.Context, req *SetUserGoalRequest, opts ...http.CallOption) (rsp *SetUserGoalResponse, err error)
 	StartYandexAuth(ctx context.Context, req *StartYandexAuthRequest, opts ...http.CallOption) (rsp *StartYandexAuthResponse, err error)
 	TelegramAuth(ctx context.Context, req *TelegramAuthRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
@@ -679,6 +734,22 @@ func (c *ProfileServiceHTTPClientImpl) GetWallet(ctx context.Context, in *GetWal
 	return &out, nil
 }
 
+// ListCompletedTours ADR-004 — Onboarding tours. The frontend triggers a guided tour the
+// first time a user lands on a page with no completed_at row; calling
+// MarkTourCompleted records the dismissal so it never re-triggers.
+func (c *ProfileServiceHTTPClientImpl) ListCompletedTours(ctx context.Context, in *ListCompletedToursRequest, opts ...http.CallOption) (*ListCompletedToursResponse, error) {
+	var out ListCompletedToursResponse
+	pattern := "/api/v1/profile/tours"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationProfileServiceListCompletedTours))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *ProfileServiceHTTPClientImpl) ListProfileAchievements(ctx context.Context, in *ListProfileAchievementsRequest, opts ...http.CallOption) (*ListProfileAchievementsResponse, error) {
 	var out ListProfileAchievementsResponse
 	pattern := "/api/v1/profile/{user_id}/achievements"
@@ -710,6 +781,19 @@ func (c *ProfileServiceHTTPClientImpl) Logout(ctx context.Context, in *LogoutReq
 	pattern := "/api/v1/profile/auth/logout"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationProfileServiceLogout))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ProfileServiceHTTPClientImpl) MarkTourCompleted(ctx context.Context, in *MarkTourCompletedRequest, opts ...http.CallOption) (*ListCompletedToursResponse, error) {
+	var out ListCompletedToursResponse
+	pattern := "/api/v1/profile/tours"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationProfileServiceMarkTourCompleted))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

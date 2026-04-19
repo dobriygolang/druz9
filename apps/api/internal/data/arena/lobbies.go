@@ -132,7 +132,10 @@ func (r *Repo) GetLobby(ctx context.Context, lobbyID uuid.UUID) (*LobbyRow, erro
 		}
 		l.Members = append(l.Members, u)
 	}
-	return l, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate lobby members: %w", err)
+	}
+	return l, nil
 }
 
 // LeaveLobby removes a member. If the lobby is empty after removal, mark
@@ -158,7 +161,10 @@ func (r *Repo) LeaveLobby(ctx context.Context, lobbyID, userID uuid.UUID) error 
 			return fmt.Errorf("leave lobby mark expired: %w", err)
 		}
 	}
-	return tx.Commit(ctx)
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("leave lobby commit: %w", err)
+	}
+	return nil
 }
 
 // EnqueueLobby flips status to 'queued' so the matchmaker (when it gains

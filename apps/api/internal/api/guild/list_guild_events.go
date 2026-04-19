@@ -2,6 +2,7 @@ package guild
 
 import (
 	"context"
+	"fmt"
 	"math"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -30,12 +31,12 @@ func guildEventsFilterToString(f eventv1.EventListFilter) string {
 func (i *Implementation) ListGuildEvents(ctx context.Context, req *guildv1.ListGuildEventsRequest) (*guildv1.ListGuildEventsResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	guildID, err := apihelpers.ParseUUID(req.GetGuildId(), "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse guild id: %w", err)
 	}
 
 	resp, err := i.eventSvc.ListEvents(ctx, user.ID, model.ListEventsOptions{
@@ -44,7 +45,7 @@ func (i *Implementation) ListGuildEvents(ctx context.Context, req *guildv1.ListG
 		Status:  guildEventsFilterToString(req.GetStatus()),
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list guild events: %w", err)
 	}
 
 	events := make([]*eventv1.Event, 0, len(resp.Events))

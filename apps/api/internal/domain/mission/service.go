@@ -2,6 +2,7 @@ package mission
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -38,12 +39,12 @@ func (s *Service) GetDailyMissions(ctx context.Context, userID uuid.UUID) (*mode
 
 	counts, err := s.repo.GetActivityCounts(ctx, userID, now)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get activity counts: %w", err)
 	}
 
 	completions, err := s.repo.GetCompletions(ctx, userID, periodKey)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get completions: %w", err)
 	}
 
 	result := BuildDailyMissions(userID.String(), now, counts, completions)
@@ -52,7 +53,9 @@ func (s *Service) GetDailyMissions(ctx context.Context, userID uuid.UUID) (*mode
 	// (so they persist even if the activity gets cleaned up).
 	for _, m := range result.Missions {
 		if m.Completed && !completions[m.Key] {
-			_ = s.repo.RecordCompletion(ctx, userID, m.Key, periodKey)
+			if err := s.repo.RecordCompletion(ctx, userID, m.Key, periodKey); err != nil {
+				return nil, fmt.Errorf("record completion: %w", err)
+			}
 		}
 	}
 
@@ -78,5 +81,8 @@ func (s *Service) CompleteMission(ctx context.Context, userID uuid.UUID, mission
 		return nil // silently ignore — mission not in today's selection
 	}
 
-	return s.repo.RecordCompletion(ctx, userID, missionKey, periodKey)
+	if err := s.repo.RecordCompletion(ctx, userID, missionKey, periodKey); err != nil {
+		return fmt.Errorf("record completion: %w", err)
+	}
+	return nil
 }

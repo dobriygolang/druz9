@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -11,22 +12,35 @@ import (
 
 // CreateSession creates a new session.
 func (s *Service) CreateSession(ctx context.Context, session *model.Session) error {
-	return s.sessions.CreateSession(ctx, session)
+	if err := s.sessions.CreateSession(ctx, session); err != nil {
+		return fmt.Errorf("create session: %w", err)
+	}
+	return nil
 }
 
 // ReplaceSession replaces an existing session with a new one.
 func (s *Service) ReplaceSession(ctx context.Context, hash string, session *model.Session) error {
-	return s.sessions.ReplaceSession(ctx, hash, session)
+	if err := s.sessions.ReplaceSession(ctx, hash, session); err != nil {
+		return fmt.Errorf("replace session: %w", err)
+	}
+	return nil
 }
 
 // DeleteSessionByHash deletes a session by its hash.
 func (s *Service) DeleteSessionByHash(ctx context.Context, hash string) error {
-	return s.sessions.DeleteSessionByHash(ctx, hash)
+	if err := s.sessions.DeleteSessionByHash(ctx, hash); err != nil {
+		return fmt.Errorf("delete session: %w", err)
+	}
+	return nil
 }
 
 // FindSessionByHash retrieves session and auth state by hash.
 func (s *Service) FindSessionByHash(ctx context.Context, hash string) (*model.AuthState, error) {
-	return s.sessions.FindSessionByHash(ctx, hash)
+	res, err := s.sessions.FindSessionByHash(ctx, hash)
+	if err != nil {
+		return nil, fmt.Errorf("find session: %w", err)
+	}
+	return res, nil
 }
 
 // TouchSession updates session activity timestamps.
@@ -40,7 +54,7 @@ func (s *Service) TouchSession(ctx context.Context, userID, sessionID uuid.UUID,
 			s.CacheSession(sessionID, session)
 		}
 	}
-	return err
+	return fmt.Errorf("touch session: %w", err)
 }
 
 // NewSession creates a new session for a user.
@@ -60,7 +74,7 @@ func (s *Service) NewSession(ctx context.Context, userID uuid.UUID) (string, *mo
 	}
 
 	if err := s.sessions.CreateSession(ctx, session); err != nil {
-		return "", nil, err
+		return "", nil, fmt.Errorf("create session: %w", err)
 	}
 	return rawToken, session, nil
 }
@@ -82,7 +96,7 @@ func (s *Service) RotateSession(ctx context.Context, currentSessionHash string, 
 	}
 
 	if err := s.sessions.ReplaceSession(ctx, currentSessionHash, session); err != nil {
-		return "", nil, err
+		return "", nil, fmt.Errorf("replace session: %w", err)
 	}
 	return rawToken, session, nil
 }

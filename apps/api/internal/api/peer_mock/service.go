@@ -208,7 +208,7 @@ func (i *Implementation) CancelBooking(ctx context.Context, req *v1.CancelBookin
 	}
 	bookingID, err := apihelpers.ParseUUID(req.GetBookingId(), "INVALID_BOOKING_ID", "booking_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse booking_id: %w", err)
 	}
 	booking, isBooker, err := i.repo.CancelBooking(ctx, bookingID, user.ID)
 	if err != nil {
@@ -255,7 +255,7 @@ func (i *Implementation) SubmitReview(ctx context.Context, req *v1.SubmitReviewR
 	}
 	bookingID, err := apihelpers.ParseUUID(req.GetBookingId(), "INVALID_BOOKING_ID", "booking_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse booking_id: %w", err)
 	}
 	booking, err := i.repo.GetBooking(ctx, bookingID, user.ID)
 	if err != nil {

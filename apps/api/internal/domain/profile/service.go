@@ -153,7 +153,7 @@ func (s *Service) Now() time.Time {
 func generateSessionToken() (string, string, error) {
 	tokenBytes := make([]byte, 32)
 	if _, err := rand.Read(tokenBytes); err != nil {
-		return "", "", err
+		return "", "", fmt.Errorf("generate random token: %w", err)
 	}
 
 	rawToken := base64.RawURLEncoding.EncodeToString(tokenBytes)

@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"errors"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -42,15 +44,80 @@ func (a podcastSeriesAdapter) ListSeries(ctx context.Context, limit, offset int3
 	}
 	out := make([]*podcastservice.SeriesRow, len(rows))
 	for i, s := range rows {
-		out[i] = &podcastservice.SeriesRow{
-			ID:            s.ID.String(),
-			Slug:          s.Slug,
-			Title:         s.Title,
-			Description:   s.Description,
-			CoverRef:      s.CoverRef,
-			EpisodeCount:  s.EpisodeCount,
-			CreatedAtUnix: s.CreatedAt.Unix(),
-		}
+		out[i] = toSeriesRow(s)
 	}
 	return out, total, nil
 }
+
+func toSeriesRow(s *podcastdata.Series) *podcastservice.SeriesRow {
+	if s == nil {
+		return nil
+	}
+	return &podcastservice.SeriesRow{
+		ID:            s.ID.String(),
+		Slug:          s.Slug,
+		Title:         s.Title,
+		Description:   s.Description,
+		CoverRef:      s.CoverRef,
+		EpisodeCount:  s.EpisodeCount,
+		CreatedAtUnix: s.CreatedAt.Unix(),
+	}
+}
+
+// podcastSeriesAdminAdapter implements podcastservice.SeriesAdminRepo. It
+// translates the data-layer slug-collision sentinel into the API-layer
+// counterpart so handlers stay free of pgx imports.
+type podcastSeriesAdminAdapter struct {
+	repo *podcastdata.Repo
+}
+
+func (a podcastSeriesAdminAdapter) CreateSeries(ctx context.Context, slug, title, description, coverRef string) (*podcastservice.SeriesRow, error) {
+	row, err := a.repo.CreateSeries(ctx, slug, title, description, coverRef)
+	if err != nil {
+		if errors.Is(err, podcastdata.ErrSeriesSlugTaken) {
+			return nil, podcastservice.ErrSeriesSlugTaken
+		}
+		return nil, err
+	}
+	return toSeriesRow(row), nil
+}
+
+func (a podcastSeriesAdminAdapter) UpdateSeries(ctx context.Context, id uuid.UUID, title, description, coverRef string) (*podcastservice.SeriesRow, error) {
+	row, err := a.repo.UpdateSeries(ctx, id, title, description, coverRef)
+	if err != nil {
+		return nil, err
+	}
+	return toSeriesRow(row), nil
+}
+
+func (a podcastSeriesAdminAdapter) DeleteSeries(ctx context.Context, id uuid.UUID) error {
+	return a.repo.DeleteSeries(ctx, id)
+}
+
+func (a podcastSeriesAdminAdapter) ToggleFeatured(ctx context.Context, podcastID uuid.UUID, featured bool) (*time.Time, error) {
+	return a.repo.ToggleFeatured(ctx, podcastID, featured)
+}
+
+func (a podcastSeriesAdminAdapter) GetPodcast(ctx context.Context, podcastID uuid.UUID) (*podcastservice.PodcastWire, error) {
+	p, err := a.repo.GetPodcast(ctx, podcastID)
+	if err != nil || p == nil {
+		return nil, err
+	}
+	return &podcastservice.PodcastWire{
+		ID:              p.ID.String(),
+		Title:           p.Title,
+		AuthorID:        p.AuthorID,
+		AuthorName:      p.AuthorName,
+		DurationSeconds: p.DurationSeconds,
+		ListensCount:    p.ListensCount,
+		FileName:        p.FileName,
+		IsUploaded:      p.ObjectKey != "",
+		ContentType:     int32(p.ContentType),
+		CreatedAt:       p.CreatedAt,
+	}, nil
+}
+
+// Compile-time interface check.
+var _ podcastservice.SeriesAdminRepo = podcastSeriesAdminAdapter{}
+var _ podcastservice.SeriesRepo = podcastSeriesAdapter{}
+var _ podcastservice.SavedRepo = podcastSavedAdapter{}

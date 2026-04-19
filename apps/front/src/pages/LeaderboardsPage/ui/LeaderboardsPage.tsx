@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Panel, Badge, RpgButton, PageHeader } from '@/shared/ui/pixel'
 import { useAuth } from '@/app/providers/AuthProvider'
@@ -39,6 +40,7 @@ function rowBg(i: number, isYou: boolean) {
 
 export function LeaderboardsPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { user } = useAuth()
   const season = useActiveSeason()
   const [tab, setTab]     = useState<Tab>('arena')
@@ -245,6 +247,9 @@ export function LeaderboardsPage() {
           return (
             <div
               key={s.userId}
+              onClick={() => navigate(`/profile/${s.userId}`)}
+              role="button"
+              tabIndex={0}
               style={{
                 display: 'grid',
                 gridTemplateColumns: '48px 1fr 100px 80px 90px',
@@ -254,6 +259,7 @@ export function LeaderboardsPage() {
                 background: rowBg(i, isYou),
                 borderBottom: '1px dashed var(--ink-3)',
                 borderLeft: isYou ? '4px solid var(--ember-1)' : 'none',
+                cursor: 'pointer',
               }}
             >
               <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 20, color: RANK_COLOR(i) }}>

@@ -207,7 +207,7 @@ func scanOne(s scanner) (*model.FriendChallenge, error) {
 		&winnerID, &ch.DeadlineAt, &ch.CreatedAt, &ch.CompletedAt,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan challenge: %w", err)
 	}
 	ch.TaskDifficulty = model.ChallengeDifficulty(difficulty)
 	ch.Status = model.ChallengeStatus(status)

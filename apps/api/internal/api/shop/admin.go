@@ -3,7 +3,6 @@ package shop
 import (
 	"context"
 	"fmt"
-
 	klog "github.com/go-kratos/kratos/v2/log"
 
 	"api/internal/apihelpers"
@@ -63,7 +62,7 @@ func (i *Implementation) AdminUpdateItem(ctx context.Context, req *v1.AdminUpdat
 	}
 	id, err := apihelpers.ParseUUID(req.GetId(), "INVALID_ITEM_ID", "item_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse item id: %w", err)
 	}
 	item := &model.ShopItem{
 		ID:          id,
@@ -94,7 +93,7 @@ func (i *Implementation) AdminDeleteItem(ctx context.Context, req *v1.AdminDelet
 	}
 	id, err := apihelpers.ParseUUID(req.GetId(), "INVALID_ITEM_ID", "item_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse item id: %w", err)
 	}
 	if err := i.service.AdminDeleteItem(ctx, id); err != nil {
 		klog.Errorf("shop: admin delete item id=%s: %v", id, err)

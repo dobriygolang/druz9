@@ -9,9 +9,10 @@ import (
 // Implementation of podcast service.
 type Implementation struct {
 	v1.UnimplementedPodcastServiceServer
-	service Service
-	series  SeriesRepo
-	saved   SavedRepo
+	service     Service
+	series      SeriesRepo
+	saved       SavedRepo
+	seriesAdmin SeriesAdminRepo
 }
 
 // New returns new instance of Implementation.

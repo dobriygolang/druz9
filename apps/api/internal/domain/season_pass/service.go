@@ -205,7 +205,7 @@ func (s *Service) ClaimTierReward(
 func (s *Service) PurchasePremium(ctx context.Context, userID uuid.UUID) (*model.SeasonPassProgress, error) {
 	pass, err := s.repo.GetActive(ctx, s.clock.Now())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get active pass: %w", err)
 	}
 	if pass == nil {
 		return nil, ErrNoActivePass

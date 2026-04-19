@@ -18,7 +18,7 @@ func (s *Service) CreateMatch(ctx context.Context, creator *domain.User, topic s
 
 	task, err := s.repo.PickRandomTask(ctx, topic, difficulty.String())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("pick random task: %w", err)
 	}
 	if task == nil {
 		return nil, domain.ErrNoAvailableTasks
@@ -65,7 +65,7 @@ func (s *Service) CreateMatch(ctx context.Context, creator *domain.User, topic s
 func (s *Service) GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, error) {
 	match, err := s.repo.GetMatch(ctx, matchID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get match: %w", err)
 	}
 	if match == nil {
 		return nil, domain.ErrMatchNotFound
@@ -76,7 +76,7 @@ func (s *Service) GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Matc
 	if match.Status == domain.MatchStatusFinished {
 		refreshed, err := s.repo.GetMatch(ctx, matchID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("get match: %w", err)
 		}
 		if refreshed != nil {
 			refreshed.AntiCheatEnabled = s.antiCheatEnabled()
@@ -90,7 +90,7 @@ func (s *Service) GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Matc
 func (s *Service) ListOpenMatches(ctx context.Context, limit int32) ([]*domain.Match, error) {
 	ids, err := s.repo.ListOpenMatchIDs(ctx, limit)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list open match IDs: %w", err)
 	}
 
 	if len(ids) == 0 {
@@ -100,7 +100,7 @@ func (s *Service) ListOpenMatches(ctx context.Context, limit int32) ([]*domain.M
 	// Batch load all matches in single query (instead of N+1)
 	matches, err := s.repo.ListMatchesByIDs(ctx, ids)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list matches by IDs: %w", err)
 	}
 
 	// Filter out finished matches and apply anti-cheat setting
@@ -122,7 +122,7 @@ func (s *Service) JoinMatch(ctx context.Context, matchID uuid.UUID, user *domain
 
 	match, err := s.repo.GetMatch(ctx, matchID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get match: %w", err)
 	}
 	if match == nil {
 		return nil, domain.ErrMatchNotFound
@@ -185,7 +185,7 @@ func (s *Service) LeaveMatch(ctx context.Context, matchID uuid.UUID, user *domai
 
 	match, err := s.repo.GetMatch(ctx, matchID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get match: %w", err)
 	}
 	if match == nil {
 		return nil, domain.ErrMatchNotFound
@@ -215,12 +215,12 @@ func (s *Service) LeaveMatch(ctx context.Context, matchID uuid.UUID, user *domai
 		winnerReason = domain.WinnerReasonNone
 	}
 	if err := s.repo.FinishMatch(ctx, match.ID, winnerUserID, winnerReason, time.Now()); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("finish match: %w", err)
 	}
 
 	refreshed, err := s.repo.GetMatch(ctx, matchID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get match: %w", err)
 	}
 	if refreshed == nil {
 		return nil, domain.ErrMatchNotFound

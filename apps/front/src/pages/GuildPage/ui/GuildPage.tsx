@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Panel, RpgButton, Bar, Badge, PageHeader } from '@/shared/ui/pixel'
 import {
   Statue,
@@ -67,13 +67,14 @@ const HALL_COLORS: Record<HallTheme, { wall: string; floor: string }> = {
 export function GuildPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { guildId: guildIdParam } = useParams<{ guildId?: string }>()
   const [hallTheme] = useState<HallTheme>('moss')
   const { wall: wallColor, floor: floorColor } = HALL_COLORS[hallTheme]
 
-  // Only load the user's own guild. If they aren't in one, render the
-  // onboarding screen (join existing / create new) instead of showing
-  // someone else's hall. That was the staging complaint — hardcoded
-  // Mossveil always appeared.
+  // Two modes:
+  //  - /guild       → own guild (or onboarding if user isn't in one)
+  //  - /guild/:id   → visit any guild (read-only for non-members; the
+  //    "Customize hall" / member-management buttons hide via canEdit).
   const [guild, setGuild] = useState<Guild | null>(null)
   const [loaded, setLoaded] = useState(false)
   const [members, setMembers] = useState<MemberRow[]>([])
@@ -102,10 +103,13 @@ export function GuildPage() {
     guildApi
       .listGuilds({ limit: 50 })
       .then((r) => {
-        if (cancelled) return
-        const mine = r.guilds.find((g) => g.isJoined) ?? null
-        setGuild(mine)
-        return mine ? guildApi.listMembers(mine.id) : null
+        if (cancelled) return null
+        // /guild/:id picks the targeted guild; /guild defaults to own.
+        const target = guildIdParam
+          ? r.guilds.find((g) => g.id === guildIdParam) ?? null
+          : r.guilds.find((g) => g.isJoined) ?? null
+        setGuild(target)
+        return target ? guildApi.listMembers(target.id) : null
       })
       .then((list) => {
         if (cancelled) return
@@ -114,7 +118,7 @@ export function GuildPage() {
       .catch(() => {})
       .finally(() => { if (!cancelled) setLoaded(true) })
     return () => { cancelled = true }
-  }, [])
+  }, [guildIdParam])
 
   // No joined guild yet → onboarding screen.
   if (loaded && !guild) {

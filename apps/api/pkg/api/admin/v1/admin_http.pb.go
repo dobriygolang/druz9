@@ -22,6 +22,7 @@ const _ = http.SupportPackageIsVersion1
 const OperationAdminServiceDeleteUser = "/admin.v1.AdminService/DeleteUser"
 const OperationAdminServiceGetConfig = "/admin.v1.AdminService/GetConfig"
 const OperationAdminServiceGetRuntimeConfig = "/admin.v1.AdminService/GetRuntimeConfig"
+const OperationAdminServiceGrantCurrency = "/admin.v1.AdminService/GrantCurrency"
 const OperationAdminServiceListConfig = "/admin.v1.AdminService/ListConfig"
 const OperationAdminServiceUpdateConfig = "/admin.v1.AdminService/UpdateConfig"
 const OperationAdminServiceUpdateUserAdmin = "/admin.v1.AdminService/UpdateUserAdmin"
@@ -31,6 +32,10 @@ type AdminServiceHTTPServer interface {
 	DeleteUser(context.Context, *DeleteUserRequest) (*AdminStatusResponse, error)
 	GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error)
 	GetRuntimeConfig(context.Context, *GetRuntimeConfigRequest) (*GetRuntimeConfigResponse, error)
+	// GrantCurrency Admin grant — credit any wallet currency to any user. Mirrors the
+	// shop's Purchase debit but in reverse; intended for support tooling
+	// and seasonal events. Audited via wallet ledger automatically.
+	GrantCurrency(context.Context, *GrantCurrencyRequest) (*AdminStatusResponse, error)
 	ListConfig(context.Context, *ListConfigRequest) (*ListConfigResponse, error)
 	UpdateConfig(context.Context, *UpdateConfigRequest) (*UpdateConfigResponse, error)
 	UpdateUserAdmin(context.Context, *UpdateUserAdminRequest) (*AdminStatusResponse, error)
@@ -46,6 +51,7 @@ func RegisterAdminServiceHTTPServer(s *http.Server, srv AdminServiceHTTPServer) 
 	r.GET("/api/admin/config", _AdminService_ListConfig0_HTTP_Handler(srv))
 	r.PUT("/api/admin/config/{key}", _AdminService_UpdateConfig0_HTTP_Handler(srv))
 	r.GET("/api/public/runtime-config", _AdminService_GetRuntimeConfig0_HTTP_Handler(srv))
+	r.POST("/api/admin/users/{user_id}/grant", _AdminService_GrantCurrency0_HTTP_Handler(srv))
 }
 
 func _AdminService_DeleteUser0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
@@ -205,10 +211,39 @@ func _AdminService_GetRuntimeConfig0_HTTP_Handler(srv AdminServiceHTTPServer) fu
 	}
 }
 
+func _AdminService_GrantCurrency0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GrantCurrencyRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAdminServiceGrantCurrency)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GrantCurrency(ctx, req.(*GrantCurrencyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AdminStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type AdminServiceHTTPClient interface {
 	DeleteUser(ctx context.Context, req *DeleteUserRequest, opts ...http.CallOption) (rsp *AdminStatusResponse, err error)
 	GetConfig(ctx context.Context, req *GetConfigRequest, opts ...http.CallOption) (rsp *GetConfigResponse, err error)
 	GetRuntimeConfig(ctx context.Context, req *GetRuntimeConfigRequest, opts ...http.CallOption) (rsp *GetRuntimeConfigResponse, err error)
+	// GrantCurrency Admin grant — credit any wallet currency to any user. Mirrors the
+	// shop's Purchase debit but in reverse; intended for support tooling
+	// and seasonal events. Audited via wallet ledger automatically.
+	GrantCurrency(ctx context.Context, req *GrantCurrencyRequest, opts ...http.CallOption) (rsp *AdminStatusResponse, err error)
 	ListConfig(ctx context.Context, req *ListConfigRequest, opts ...http.CallOption) (rsp *ListConfigResponse, err error)
 	UpdateConfig(ctx context.Context, req *UpdateConfigRequest, opts ...http.CallOption) (rsp *UpdateConfigResponse, err error)
 	UpdateUserAdmin(ctx context.Context, req *UpdateUserAdminRequest, opts ...http.CallOption) (rsp *AdminStatusResponse, err error)
@@ -256,6 +291,22 @@ func (c *AdminServiceHTTPClientImpl) GetRuntimeConfig(ctx context.Context, in *G
 	opts = append(opts, http.Operation(OperationAdminServiceGetRuntimeConfig))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// GrantCurrency Admin grant — credit any wallet currency to any user. Mirrors the
+// shop's Purchase debit but in reverse; intended for support tooling
+// and seasonal events. Audited via wallet ledger automatically.
+func (c *AdminServiceHTTPClientImpl) GrantCurrency(ctx context.Context, in *GrantCurrencyRequest, opts ...http.CallOption) (*AdminStatusResponse, error) {
+	var out AdminStatusResponse
+	pattern := "/api/admin/users/{user_id}/grant"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAdminServiceGrantCurrency))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

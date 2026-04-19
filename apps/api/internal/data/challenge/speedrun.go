@@ -41,5 +41,8 @@ func (r *Repo) GetUserRecords(ctx context.Context, userID uuid.UUID, limit int) 
 		}
 		records = append(records, rec)
 	}
-	return records, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate user records: %w", err)
+	}
+	return records, nil
 }

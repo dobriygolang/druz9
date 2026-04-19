@@ -78,24 +78,66 @@ export function SceneEditor({ scope, ownerId, initial, onSaved, onCancel, maxHei
 
   const startDrag = (key: string) => (e: ReactPointerEvent<HTMLDivElement>) => {
     e.stopPropagation()
+    e.preventDefault()
     setSelectedKey(key)
-    const target = e.currentTarget.parentElement // canvas
-    if (!target) return
-    target.setPointerCapture(e.pointerId)
-    const rect = target.getBoundingClientRect()
+    // Capture the canvas rect *once* — using window-level events instead of
+    // bound-element listeners means the drag continues even when the
+    // pointer leaves the canvas. The previous version listened on the
+    // parent element, which silently dropped pointermove the moment the
+    // pointer crossed into a sibling div.
+    const canvas = e.currentTarget.parentElement
+    if (!canvas) return
+    const rect = canvas.getBoundingClientRect()
+    const pointerId = e.pointerId
+
     const move = (mv: PointerEvent) => {
+      if (mv.pointerId !== pointerId) return
       const x = ((mv.clientX - rect.left) / rect.width) * width
       const y = ((mv.clientY - rect.top) / rect.height) * height
       setItems((arr) => arr.map((it) => (it.k === key
         ? { ...it, x: clamp(x, 0, width), y: clamp(y, 0, height) }
         : it)))
     }
-    const up = () => {
-      target.removeEventListener('pointermove', move)
-      target.removeEventListener('pointerup', up)
+    const up = (mv: PointerEvent) => {
+      if (mv.pointerId !== pointerId) return
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+      window.removeEventListener('pointercancel', up)
     }
-    target.addEventListener('pointermove', move)
-    target.addEventListener('pointerup', up)
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
+    window.addEventListener('pointercancel', up)
+  }
+
+  // Resize via corner-handle drag: each pixel moved scales the item by a
+  // small factor. Same window-level pointer pattern as startDrag so the
+  // gesture survives leaving the canvas.
+  const startResize = (key: string) => (e: ReactPointerEvent<HTMLDivElement>) => {
+    e.stopPropagation()
+    e.preventDefault()
+    const startX = e.clientX
+    const startY = e.clientY
+    const initial = items.find((i) => i.k === key)
+    if (!initial) return
+    const startScale = initial.scale
+    const pointerId = e.pointerId
+
+    const move = (mv: PointerEvent) => {
+      if (mv.pointerId !== pointerId) return
+      // Average dx/dy keeps proportional scaling intuitive on diagonal drags.
+      const delta = ((mv.clientX - startX) + (mv.clientY - startY)) / 2
+      const next = Math.max(0.3, Math.min(4, startScale + delta / 200))
+      setItems((arr) => arr.map((it) => (it.k === key ? { ...it, scale: next } : it)))
+    }
+    const up = (mv: PointerEvent) => {
+      if (mv.pointerId !== pointerId) return
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+      window.removeEventListener('pointercancel', up)
+    }
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
+    window.addEventListener('pointercancel', up)
   }
 
   const addItem = (itemId: string) => {
@@ -163,7 +205,27 @@ export function SceneEditor({ scope, ownerId, initial, onSaved, onCancel, maxHei
             transformOrigin: 'center',
           }
           return (
-            <div key={it.k} style={itemStyle} onPointerDown={startDrag(it.k)}>
+            <div key={it.k} style={{ ...itemStyle, touchAction: 'none' }} onPointerDown={startDrag(it.k)}>
+              {/* Resize handle: drag the bottom-right corner to scale the
+                  item. Sits inside the rotated container so visual feedback
+                  stays correct on rotated items. */}
+              {isSel && (
+                <div
+                  onPointerDown={startResize(it.k)}
+                  style={{
+                    position: 'absolute',
+                    right: -8,
+                    bottom: -8,
+                    width: 16,
+                    height: 16,
+                    background: 'var(--ember-1, #b34a18)',
+                    border: '2px solid var(--ink-0, #2a1a0c)',
+                    cursor: 'nwse-resize',
+                    zIndex: 1000,
+                    touchAction: 'none',
+                  }}
+                />
+              )}
               {meta?.item.iconRef ? (
                 <img src={meta.item.iconRef} alt={meta.item.name} draggable={false} style={{ width: '100%', display: 'block', pointerEvents: 'none' }} />
               ) : (

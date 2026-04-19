@@ -113,6 +113,19 @@ service ProfileService {
     };
   }
 
+  // ADR-004 — Onboarding tours. The frontend triggers a guided tour the
+  // first time a user lands on a page with no completed_at row; calling
+  // MarkTourCompleted records the dismissal so it never re-triggers.
+  rpc ListCompletedTours(ListCompletedToursRequest) returns (ListCompletedToursResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/tours" };
+  }
+  rpc MarkTourCompleted(MarkTourCompletedRequest) returns (ListCompletedToursResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/tours"
+      body: "*"
+    };
+  }
+
   rpc GetWallet(GetWalletRequest) returns (GetWalletResponse) {
     // NB: /api/v1/profile/wallet would collide with the path pattern
     // /api/v1/profile/{user_id} (grpc-gateway routes "wallet" as a
@@ -465,6 +478,18 @@ message GetUserPreferencesRequest {}
 message UpdateUserPreferencesRequest {
   LayoutDensity layout_density = 1;
   string locale = 2;
+}
+
+message ListCompletedToursRequest {}
+
+message ListCompletedToursResponse {
+  // tour_id values, e.g. "arena_intro", "war_intro", "events_intro",
+  // "hub_intro". Frontend treats anything in this list as "skip the tour".
+  repeated string tour_ids = 1;
+}
+
+message MarkTourCompletedRequest {
+  string tour_id = 1;
 }
 
 message GetWalletRequest {}

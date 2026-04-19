@@ -315,7 +315,10 @@ func (r *Repo) loadProfileProgressMockSessions(ctx context.Context, userID uuid.
 		}
 		items = append(items, &s)
 	}
-	return items, fmt.Errorf("iterate profile mock sessions: %w", rows.Err())
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate profile mock sessions: %w", err)
+	}
+	return items, nil
 }
 
 // GetStreakStats exposes the streak computation (used by the streak
@@ -634,5 +637,8 @@ func (r *Repo) GetProfileFeed(ctx context.Context, userID uuid.UUID, limit int) 
 		item.Score = score
 		items = append(items, &item)
 	}
-	return items, fmt.Errorf("iterate profile mock sessions: %w", rows.Err())
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate profile feed items: %w", err)
+	}
+	return items, nil
 }
