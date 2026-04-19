@@ -304,7 +304,7 @@ export function EventsPage() {
                 </div>
                 <div
                   style={{
-                    fontFamily: 'Pixelify Sans, monospace',
+                    fontFamily: 'Pixelify Sans, Unbounded, monospace',
                     fontSize: 22,
                     color: 'var(--parch-0)',
                   }}

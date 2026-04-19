@@ -49,7 +49,7 @@ func recommendedFocusForType(t model.SlotType) []string {
 // and packs the result into a storable row. When real AI lands,
 // replace this function body with a call to the provider and keep the
 // return shape — callers are unaffected.
-func buildCoachReport(bookingID string, b *model.MockBooking, slotType model.SlotType, rating int16, notes string) *pmdata.CoachReportRow {
+func buildCoachReport(_ string, b *model.MockBooking, slotType model.SlotType, rating int16, notes string) *pmdata.CoachReportRow {
 	lower := strings.ToLower(notes)
 	fillerHits := 0
 	for _, f := range fillerPatterns {

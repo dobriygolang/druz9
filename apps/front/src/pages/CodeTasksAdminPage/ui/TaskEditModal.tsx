@@ -7,9 +7,10 @@ import { Select } from '@/shared/ui/Select'
 import { Toggle } from '@/shared/ui/Toggle'
 import {
   TASK_CATEGORIES,
-  getCategoryFromTopics,
-  setCategoryInTopics,
+  getCategoriesFromTopics,
+  toggleCategoryInTopics,
   getDisplayTopics,
+  type TaskCategory,
 } from '@/features/Admin/model/taskCategories'
 
 const LANGUAGES = [
@@ -69,13 +70,13 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
   const [showAdvanced, setShowAdvanced] = useState(false)
   if (!task) return null
 
-  const category = getCategoryFromTopics(task.topics)
+  const categories = getCategoriesFromTopics(task.topics)
   const displayTopics = getDisplayTopics(task.topics)
 
   const set = (key: string, value: any) => onChange({ ...task, [key]: value })
 
-  const setCategory = (val: string) => {
-    const newTopics = setCategoryInTopics(task.topics ?? [], val || null)
+  const toggleCategory = (cat: TaskCategory) => {
+    const newTopics = toggleCategoryInTopics(task.topics ?? [], cat)
     onChange({ ...task, topics: newTopics })
   }
 
@@ -126,12 +127,22 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
           <div className="grid grid-cols-2 gap-3">
             <Input label="Title" value={task.title ?? ''} onChange={e => set('title', e.target.value)} />
             <Input label="Slug" value={task.slug ?? ''} onChange={e => set('slug', e.target.value)} />
-            <Select
-              label="Category"
-              options={[{ value: '', label: 'No category' }, ...TASK_CATEGORIES.map(c => ({ value: c.value, label: c.label }))]}
-              value={category ?? ''}
-              onChange={setCategory}
-            />
+            <div>
+              <p className="text-xs text-[#4B6B52] font-medium mb-1.5">Category</p>
+              <div className="flex flex-col gap-1.5">
+                {TASK_CATEGORIES.map(c => (
+                  <label key={c.value} className="flex items-center gap-2 cursor-pointer text-sm text-[#0B1210]">
+                    <input
+                      type="checkbox"
+                      checked={categories.includes(c.value)}
+                      onChange={() => toggleCategory(c.value)}
+                      className="accent-[#059669] w-4 h-4"
+                    />
+                    {c.label}
+                  </label>
+                ))}
+              </div>
+            </div>
             <Select label="Difficulty" options={DIFFICULTIES} value={task.difficulty ?? 'TASK_DIFFICULTY_MEDIUM'} onChange={v => set('difficulty', v)} />
             <Select label="Language" options={LANGUAGES} value={task.language ?? 'PROGRAMMING_LANGUAGE_PYTHON'} onChange={v => set('language', v)} />
             <Select label="Task type" options={TASK_TYPES} value={task.taskType ?? 'TASK_TYPE_ALGORITHM'} onChange={v => set('taskType', v)} />

@@ -110,7 +110,7 @@ export function InventoryModal({
                           className={`rpg-item-card rpg-rarity-border--${rarityKey(o.item.rarity)}`}
                           style={{ padding: 10, display: 'flex', flexDirection: 'column', gap: 6 }}
                         >
-                          <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 12 }}>{o.item.name}</div>
+                          <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 12 }}>{o.item.name}</div>
                           <div style={{ fontSize: 10, color: 'var(--ink-2)' }}>{o.item.slug}</div>
                           {o.equipped ? (
                             <RpgButton

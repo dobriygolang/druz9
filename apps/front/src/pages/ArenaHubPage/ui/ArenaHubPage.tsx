@@ -292,7 +292,7 @@ export function ArenaHubPage() {
               </div>
               <div
                 style={{
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   fontSize: 52,
                   color: 'var(--ember-3)',
                   lineHeight: 1,
@@ -349,7 +349,7 @@ export function ArenaHubPage() {
                     #{i + 1}
                   </span>
                   <span
-                    style={{ flex: 1, fontFamily: 'Pixelify Sans, monospace', fontSize: 13, display: 'flex', gap: 6, alignItems: 'center' }}
+                    style={{ flex: 1, fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13, display: 'flex', gap: 6, alignItems: 'center' }}
                   >
                     {p.displayName}
                     {isYou && (
@@ -426,7 +426,7 @@ export function ArenaHubPage() {
                 <Sword scale={2} />
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 15 }}>
+                <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 15 }}>
                   {m.title}
                 </div>
                 <div
@@ -514,7 +514,7 @@ export function ArenaHubPage() {
                 >
                   {youWon ? t('arenaHub.victory') : t('arenaHub.defeat')}
                 </span>
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>
+                <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14 }}>
                   {t('arenaHub.vsOpponent', { name: oppName })}
                 </div>
                 <span
@@ -579,16 +579,16 @@ export function ArenaHubPage() {
               >
                 <div style={{ textAlign: 'center' }}>
                   <Banner scale={2} color="#3d6149" crest="✦" />
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14, color: 'var(--parch-0)' }}>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14, color: 'var(--parch-0)' }}>
                     {guildWar.ourGuildName}
                   </div>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 28, color: 'var(--ember-3)' }}>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 28, color: 'var(--ember-3)' }}>
                     {guildWar.ourScore}
                   </div>
                 </div>
                 <div
                   style={{
-                    fontFamily: 'Pixelify Sans, monospace',
+                    fontFamily: 'Pixelify Sans, Unbounded, monospace',
                     fontSize: 22,
                     textAlign: 'center',
                     color: 'var(--parch-0)',
@@ -598,10 +598,10 @@ export function ArenaHubPage() {
                 </div>
                 <div style={{ textAlign: 'center' }}>
                   <Banner scale={2} color="#a23a2a" crest="◆" />
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14, color: 'var(--parch-0)' }}>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14, color: 'var(--parch-0)' }}>
                     {guildWar.theirGuildName}
                   </div>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 28, color: 'var(--ember-3)' }}>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 28, color: 'var(--ember-3)' }}>
                     {guildWar.theirScore}
                   </div>
                 </div>
@@ -651,7 +651,7 @@ export function ArenaHubPage() {
                   <Hero scale={1} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13, display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13, display: 'flex', gap: 6, alignItems: 'center' }}>
                     {m.name}
                     {m.you && <Badge variant="ember" style={{ fontSize: 8 }}>{t('arenaHub.you')}</Badge>}
                     {m.friend && <Badge variant="dark" style={{ fontSize: 8 }}>{t('arenaHub.friend')}</Badge>}
@@ -666,7 +666,7 @@ export function ArenaHubPage() {
                  is not yet shipped — the second slot is always a placeholder. */}
           </div>
 
-          <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 22, textAlign: 'center', color: 'var(--ink-2)' }}>vs</div>
+          <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 22, textAlign: 'center', color: 'var(--ink-2)' }}>vs</div>
 
           {/* Enemy team (TBD) */}
           <div style={{ background: 'var(--parch-2)', border: '3px dashed var(--ink-3)', padding: 14 }}>
@@ -676,7 +676,7 @@ export function ArenaHubPage() {
             {[0, 1].map((i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                 <div style={{ width: 32, height: 32, background: 'var(--ink-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 16, color: 'var(--parch-2)' }}>?</span>
+                  <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 16, color: 'var(--parch-2)' }}>?</span>
                 </div>
                 <div className="font-silkscreen uppercase" style={{ fontSize: 9, color: 'var(--ink-3)', letterSpacing: '0.06em' }}>
                   {t('arenaHub.searching')}

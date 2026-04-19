@@ -121,7 +121,7 @@ export function AchievementDrawer({
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontFamily: 'Silkscreen, monospace',
+                      fontFamily: 'Silkscreen, Unbounded, monospace',
                     }}
                   >
                     {done && '✓'}
@@ -146,7 +146,7 @@ export function AchievementDrawer({
               earned
             </div>
             <div
-              style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14, marginBottom: 10 }}
+              style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14, marginBottom: 10 }}
             >
               {a.earned}
             </div>

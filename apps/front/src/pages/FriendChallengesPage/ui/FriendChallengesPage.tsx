@@ -252,14 +252,14 @@ function ChallengeRow({
           width: 44, height: 44,
           background: 'var(--ink-0)', color: 'var(--parch-0)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'Pixelify Sans, monospace', fontSize: 16,
+          fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 16,
         }}
       >
         {otherName.slice(0, 2).toUpperCase() || '??'}
       </div>
       <div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4 }}>
-          <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 15 }}>{otherName}</span>
+          <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 15 }}>{otherName}</span>
           <Badge variant={viewerStatus === 'won' ? 'moss' : viewerStatus === 'your-turn' ? 'ember' : 'dark'} style={{ fontSize: 8 }}>
             {STATUS_LABEL[viewerStatus]}
           </Badge>
@@ -275,7 +275,7 @@ function ChallengeRow({
           )}
         </div>
         {hasResults && (
-          <div style={{ display: 'flex', gap: 12, marginTop: 6, fontFamily: 'Pixelify Sans, monospace', fontSize: 11 }}>
+          <div style={{ display: 'flex', gap: 12, marginTop: 6, fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 11 }}>
             <span>you · {myTimeMs ? `${(myTimeMs / 1000).toFixed(1)}s` : '—'} ({myScore ?? 0}/5)</span>
             <span style={{ color: 'var(--ink-2)' }}>
               {otherName} · {theirTimeMs ? `${(theirTimeMs / 1000).toFixed(1)}s` : '—'} ({theirScore ?? 0}/5)
@@ -449,7 +449,7 @@ function ComposeChallengeModal({
               color: 'var(--rpg-danger, #a23a2a)',
               fontSize: 12,
               marginBottom: 10,
-              fontFamily: 'Pixelify Sans, monospace',
+              fontFamily: 'Pixelify Sans, Unbounded, monospace',
             }}
           >
             {error}
@@ -474,7 +474,7 @@ const textInputStyle: React.CSSProperties = {
   padding: '8px 10px',
   background: 'var(--parch-0)',
   border: '3px solid var(--ink-0)',
-  fontFamily: 'Pixelify Sans, monospace',
+  fontFamily: 'Pixelify Sans, Unbounded, monospace',
   fontSize: 13,
   color: 'var(--ink-0)',
   outline: 'none',

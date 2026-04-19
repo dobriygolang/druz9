@@ -158,7 +158,7 @@ export function AtlasSvgCanvas({
       </div>
       <div style={{
         position: 'absolute', left: 12, bottom: 8,
-        fontFamily: 'Pixelify Sans, monospace', fontSize: 11,
+        fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 11,
         color: 'var(--parch-0, #fbf3dd)', background: 'rgba(0,0,0,0.4)',
         padding: '2px 8px', borderRadius: 4, zIndex: 10, pointerEvents: 'none',
       }}>
@@ -180,7 +180,7 @@ function Btn({ children, onClick, ariaLabel }: { children: React.ReactNode; onCl
         background: 'var(--parch-0, #fbf3dd)',
         border: '2px solid var(--ink-0, #2a1a0c)',
         boxShadow: '2px 2px 0 var(--ink-0, #2a1a0c)',
-        fontFamily: 'Pixelify Sans, monospace',
+        fontFamily: 'Pixelify Sans, Unbounded, monospace',
         fontSize: 18,
         cursor: 'pointer',
         color: 'var(--ink-0, #2a1a0c)',

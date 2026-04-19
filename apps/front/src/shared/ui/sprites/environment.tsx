@@ -141,7 +141,7 @@ FR......RF
           right: 0,
           top: scale * 3,
           textAlign: 'center',
-          fontFamily: 'Pixelify Sans, monospace',
+          fontFamily: 'Pixelify Sans, Unbounded, monospace',
           fontSize: scale * 4,
           color: '#e9b866',
           fontWeight: 700,

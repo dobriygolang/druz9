@@ -132,7 +132,7 @@ html[data-theme="pixel"] {
    Buttons
    ============================================================ */
 .rpg-btn {
-  font-family: 'Pixelify Sans', monospace;
+  font-family: 'Pixelify Sans', 'Unbounded', monospace;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -227,7 +227,7 @@ html[data-theme="pixel"] {
   padding: 3px 8px;
   border: 2px solid var(--ink-0);
   background: var(--parch-0);
-  font-family: 'Silkscreen', monospace;
+  font-family: 'Silkscreen', 'Unbounded', monospace;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -238,7 +238,7 @@ html[data-theme="pixel"] {
 .rpg-badge--ember { background: var(--ember-2); }
 .rpg-badge--dark { background: var(--ink-0); color: var(--parch-0); }
 
-.rpg-rarity { font-family: 'Silkscreen', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+.rpg-rarity { font-family: 'Silkscreen', 'Unbounded', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
 .rpg-rarity--common { color: var(--r-common); }
 .rpg-rarity--uncommon { color: var(--r-uncommon); }
 .rpg-rarity--rare { color: var(--r-rare); }
@@ -295,7 +295,7 @@ html[data-theme="pixel"] {
    ============================================================ */
 .rpg-coin {
   display: inline-flex; align-items: center; gap: 6px;
-  font-family: 'Silkscreen', monospace;
+  font-family: 'Silkscreen', 'Unbounded', monospace;
   font-size: 12px;
 }
 .rpg-coin-icon {
@@ -325,7 +325,7 @@ html[data-theme="pixel"] {
   padding: 10px;
   margin-bottom: 4px;
   min-height: 58px;
-  font-family: 'Pixelify Sans', monospace;
+  font-family: 'Pixelify Sans', 'Unbounded', monospace;
   font-size: 14px;
   line-height: 1.1;
   color: var(--ink-1);
@@ -349,7 +349,7 @@ html[data-theme="pixel"] {
 }
 .rpg-sidenav__item--active:hover { color: var(--parch-0); }
 .rpg-sidenav__section {
-  font-family: 'Silkscreen', monospace;
+  font-family: 'Silkscreen', 'Unbounded', monospace;
   font-size: 10px;
   color: var(--ink-2);
   text-transform: uppercase;
@@ -378,7 +378,7 @@ html[data-theme="pixel"] {
   background: rgba(59, 42, 26, 0.35);
   border: 2px solid var(--ink-0);
   color: var(--parch-0);
-  font-family: 'Silkscreen', monospace;
+  font-family: 'Silkscreen', 'Unbounded', monospace;
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -395,7 +395,7 @@ html[data-theme="pixel"] {
 }
 .rpg-tab {
   padding: 10px 18px;
-  font-family: 'Pixelify Sans', monospace;
+  font-family: 'Pixelify Sans', 'Unbounded', monospace;
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -440,7 +440,7 @@ html[data-theme="pixel"] {
   transform: translateX(-50%) translateY(4px);
   background: var(--ember-1);
   color: var(--parch-0);
-  font-family: 'Pixelify Sans', monospace;
+  font-family: 'Pixelify Sans', 'Unbounded', monospace;
   font-size: 11px;
   padding: 2px 8px;
   border: 2px solid var(--ink-0);
@@ -543,7 +543,7 @@ html[data-theme="pixel"] {
   background: var(--parch-2);
   border: 3px solid var(--ink-0);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  font-family: 'Pixelify Sans', monospace;
+  font-family: 'Pixelify Sans', 'Unbounded', monospace;
   font-size: 8px; text-align: center; line-height: 1.25;
   cursor: pointer;
   color: var(--ink-0);
@@ -601,7 +601,7 @@ html[data-theme="pixel"] {
   background: var(--parch-2);
   border: 2px solid var(--ink-0);
   color: var(--ink-0);
-  font-family: 'Silkscreen', monospace;
+  font-family: 'Silkscreen', 'Unbounded', monospace;
   font-size: 10px;
   letter-spacing: 0.06em;
   text-transform: uppercase;

@@ -99,7 +99,7 @@ export function BlindReviewPage() {
           <div style={{ padding: 32, textAlign: 'center' }}>
             <div style={{ fontSize: 40, marginBottom: 10 }}>👁</div>
             <div
-              style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14, color: 'var(--ink-1)', marginBottom: 4 }}
+              style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14, color: 'var(--ink-1)', marginBottom: 4 }}
             >
               {t('blindReview.empty', 'Click "Start" to get anonymous code for review')}
             </div>
@@ -160,7 +160,7 @@ export function BlindReviewPage() {
                 padding: 12,
                 background: 'var(--parch-0)',
                 border: '3px solid var(--ink-0)',
-                fontFamily: 'Pixelify Sans, monospace',
+                fontFamily: 'Pixelify Sans, Unbounded, monospace',
                 fontSize: 13,
                 color: 'var(--ink-0)',
                 outline: 'none',
@@ -203,7 +203,7 @@ export function BlindReviewPage() {
             <div>
               <div
                 style={{
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   fontSize: 32,
                   color: scoreColor(result.aiScore),
                   lineHeight: 1,

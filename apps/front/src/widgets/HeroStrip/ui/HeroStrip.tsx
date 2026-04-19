@@ -118,7 +118,7 @@ export function HeroStrip({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontFamily: 'Pixelify Sans, monospace',
+                fontFamily: 'Pixelify Sans, Unbounded, monospace',
                 fontSize: 22,
                 color: 'var(--parch-0)',
               }}
@@ -128,7 +128,7 @@ export function HeroStrip({
             <div>
               <div
                 style={{
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   fontSize: 22,
                   color: 'var(--parch-0)',
                   lineHeight: 1,
@@ -195,7 +195,7 @@ export function HeroStrip({
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
               <div
                 style={{
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   fontSize: 26,
                   color: 'var(--parch-0)',
                   lineHeight: 1,
@@ -266,7 +266,7 @@ export function HeroStrip({
               <PixelCoin scale={2} />
               <span
                 style={{
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   color: 'var(--ember-3)',
                   fontSize: 18,
                 }}
@@ -294,7 +294,7 @@ export function HeroStrip({
               />
               <span
                 style={{
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   color: '#d4e2ec',
                   fontSize: 18,
                 }}

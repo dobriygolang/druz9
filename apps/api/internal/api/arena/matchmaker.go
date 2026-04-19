@@ -52,16 +52,9 @@ func NewMatchmaker() *Matchmaker {
 // the catalog of modes grows this should consult an admin-editable
 // table; a static switch is fine while the feature is limited to two
 // variants.
-func pickTopic(mode string) (string, model.ArenaDifficulty) {
-	switch mode {
-	case "team_2v2":
-		return "arrays", model.ArenaDifficultyMedium
-	case "casual_1v1":
-		return "arrays", model.ArenaDifficultyEasy
-	default:
-		// ranked_1v1 or unknown — conservative default.
-		return "arrays", model.ArenaDifficultyMedium
-	}
+func pickTopic(_ string) (string, model.ArenaDifficulty) {
+	// TODO: expand when more modes are added
+	return "arrays", model.ArenaDifficultyMedium
 }
 
 // EnqueueForMatch puts the caller into the queue for their mode. If a

@@ -211,7 +211,7 @@ export function DuelReplayPage() {
             ))}
           </div>
           <div style={{ flex: 1 }} />
-          <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 18, color: 'var(--ember-1)' }}>
+          <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 18, color: 'var(--ember-1)' }}>
             {fmtTime(tSec)} / {fmtTime(durationSec)}
           </span>
         </div>
@@ -312,7 +312,7 @@ function PlayerPanel({ name, lines, won }: { name: string; lines: number; won: b
     <Panel variant={won ? 'default' : 'recessed'}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
         <div>
-          <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 20 }}>{name}</div>
+          <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 20 }}>{name}</div>
         </div>
         {won && <Badge variant="moss">winner</Badge>}
       </div>
@@ -323,7 +323,7 @@ function PlayerPanel({ name, lines, won }: { name: string; lines: number; won: b
         >
           lines written
         </div>
-        <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 28, color: 'var(--ember-1)', lineHeight: 1 }}>
+        <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 28, color: 'var(--ember-1)', lineHeight: 1 }}>
           {lines}
         </div>
       </div>
@@ -407,7 +407,7 @@ function EventLog({
             >
               {fmtTime(e.tMs / 1000)}
             </span>
-            <span style={{ fontSize: 12, fontFamily: 'Pixelify Sans, monospace' }}>
+            <span style={{ fontSize: 12, fontFamily: 'Pixelify Sans, Unbounded, monospace' }}>
               {e.label || kindName(e.kind)}
             </span>
           </div>

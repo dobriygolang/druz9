@@ -80,7 +80,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             >
               {t('sidebar.todaysPact')}
             </div>
-            <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13, marginBottom: 8 }}>
+            <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13, marginBottom: 8 }}>
               {todaysPact.title}
             </div>
             <Bar value={pactPct} />

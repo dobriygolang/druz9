@@ -63,7 +63,7 @@ export function AdminSidebar() {
             border: isActive ? '2px solid var(--ember-1)' : '2px solid transparent',
             background: isActive ? 'var(--parch-2)' : 'transparent',
             boxShadow: isActive ? '2px 2px 0 var(--ember-1)' : 'none',
-            fontFamily: 'Pixelify Sans, monospace',
+            fontFamily: 'Pixelify Sans, Unbounded, monospace',
             fontSize: 13,
             color: 'var(--ink-0)',
             textDecoration: 'none',
@@ -72,7 +72,7 @@ export function AdminSidebar() {
         >
           <span
             style={{
-              fontFamily: 'Silkscreen, monospace',
+              fontFamily: 'Silkscreen, Unbounded, monospace',
               fontSize: 14,
               color: 'var(--ember-1)',
               width: 18,

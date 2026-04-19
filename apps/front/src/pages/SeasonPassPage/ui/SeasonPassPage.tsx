@@ -171,7 +171,7 @@ export function SeasonPassPage() {
             </div>
             <div
               style={{
-                fontFamily: 'Pixelify Sans, monospace',
+                fontFamily: 'Pixelify Sans, Unbounded, monospace',
                 fontSize: 42,
                 color: 'var(--ember-1)',
                 lineHeight: 1,
@@ -275,7 +275,7 @@ export function SeasonPassPage() {
                 style={{
                   width: 56,
                   textAlign: 'center',
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   fontSize: 13,
                   color: progress.currentTier >= t.tier ? 'var(--ember-1)' : 'var(--ink-3)',
                   flexShrink: 0,

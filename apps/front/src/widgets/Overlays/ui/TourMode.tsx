@@ -91,7 +91,7 @@ export function TourMode({ onEnd }: TourModeProps) {
               background: 'transparent',
               border: 'none',
               color: 'var(--ink-2)',
-              fontFamily: 'Pixelify Sans, monospace',
+              fontFamily: 'Pixelify Sans, Unbounded, monospace',
               fontSize: 14,
               cursor: 'pointer',
             }}

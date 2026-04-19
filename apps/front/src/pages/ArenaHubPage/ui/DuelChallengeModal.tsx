@@ -107,7 +107,7 @@ export function DuelChallengeModal({ open, defaultMode = '2v2', onClose }: Props
           </h3>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Silkscreen, monospace', fontSize: 12, color: 'var(--ink-2)' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Silkscreen, Unbounded, monospace', fontSize: 12, color: 'var(--ink-2)' }}
             aria-label="Close"
           >
             ✕
@@ -128,7 +128,7 @@ export function DuelChallengeModal({ open, defaultMode = '2v2', onClose }: Props
                 padding: '8px 0',
                 border: `2px solid ${mode === m ? 'var(--ember-1)' : 'var(--ink-2)'}`,
                 background: mode === m ? 'var(--ember-0)' : 'var(--parch-2)',
-                fontFamily: 'Pixelify Sans, monospace',
+                fontFamily: 'Pixelify Sans, Unbounded, monospace',
                 fontSize: 14,
                 cursor: 'pointer',
                 color: mode === m ? 'var(--ember-3)' : 'var(--ink-1)',
@@ -146,12 +146,12 @@ export function DuelChallengeModal({ open, defaultMode = '2v2', onClose }: Props
         </div>
         <div style={{ maxHeight: 200, overflowY: 'auto', border: '2px solid var(--ink-0)', marginBottom: 16 }}>
           {loading && (
-            <div style={{ padding: '12px 14px', fontFamily: 'Pixelify Sans, monospace', fontSize: 12, color: 'var(--ink-2)' }}>
+            <div style={{ padding: '12px 14px', fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 12, color: 'var(--ink-2)' }}>
               {t('common.loading', { defaultValue: 'Loading…' })}
             </div>
           )}
           {!loading && sortedFriends.length === 0 && (
-            <div style={{ padding: '12px 14px', fontFamily: 'Pixelify Sans, monospace', fontSize: 12, color: 'var(--ink-2)' }}>
+            <div style={{ padding: '12px 14px', fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 12, color: 'var(--ink-2)' }}>
               {t('arena.challenge.noFriends', { defaultValue: 'No friends yet — add some first!' })}
             </div>
           )}
@@ -174,11 +174,11 @@ export function DuelChallengeModal({ open, defaultMode = '2v2', onClose }: Props
             >
               {presenceDot(f.presence)}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13, color: 'var(--ink-0)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13, color: 'var(--ink-0)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {f.displayName || f.username}
                 </div>
                 {f.guildName && (
-                  <div style={{ fontFamily: 'Silkscreen, monospace', fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.05em' }}>
+                  <div style={{ fontFamily: 'Silkscreen, Unbounded, monospace', fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.05em' }}>
                     {f.guildName}
                   </div>
                 )}
@@ -193,14 +193,14 @@ export function DuelChallengeModal({ open, defaultMode = '2v2', onClose }: Props
         </div>
 
         {error && (
-          <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 11, color: 'var(--ember-3)', marginBottom: 10 }}>
+          <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 11, color: 'var(--ember-3)', marginBottom: 10 }}>
             {error}
           </div>
         )}
 
         {sent ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '8px 0' }}>
-            <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13, color: 'var(--moss-3)' }}>
+            <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13, color: 'var(--moss-3)' }}>
               {t('arena.challenge.sent', { defaultValue: '⚔ Challenge sent!', username: selected?.displayName || selected?.username })}
             </div>
             <div style={{ display: 'flex', gap: 8 }}>

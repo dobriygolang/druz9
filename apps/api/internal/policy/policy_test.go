@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"api/internal/model"
 )
@@ -76,7 +77,7 @@ func TestDefaultPolicy(t *testing.T) {
 		t.Parallel()
 
 		_, err := DefaultPolicy("unknown")
-		assert.Error(t, err)
+		require.Error(t, err)
 		assert.ErrorIs(t, err, ErrUnsupportedProfile)
 	})
 }
@@ -470,7 +471,7 @@ func TestValidatePolicy_InvalidTimeLimit(t *testing.T) {
 		}
 
 		err := ValidatePolicy(policy)
-		assert.Error(t, err)
+		require.Error(t, err)
 		assert.Contains(t, err.Error(), "time_limit_ms")
 	})
 
@@ -498,7 +499,7 @@ func TestValidatePolicy_InvalidTimeLimit(t *testing.T) {
 		}
 
 		err := ValidatePolicy(policy)
-		assert.Error(t, err)
+		require.Error(t, err)
 		assert.Contains(t, err.Error(), "time_limit_ms")
 	})
 }
@@ -810,7 +811,7 @@ func TestResolvePolicy(t *testing.T) {
 
 		spec := TaskSpecForCodeEditorRun()
 		policy, err := ResolvePolicy(spec)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, policy)
 	})
 
@@ -822,7 +823,7 @@ func TestResolvePolicy(t *testing.T) {
 		}
 		spec := TaskSpecForArenaTask(task)
 		policy, err := ResolvePolicy(spec)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotNil(t, policy)
 	})
 }

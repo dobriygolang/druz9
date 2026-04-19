@@ -70,7 +70,7 @@ function ExperienceCard({ e }: { e: InterviewExperience }) {
     <Panel>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 }}>
         <div>
-          <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 15 }}>
+          <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 15 }}>
             {e.companyTag.toUpperCase()} · {e.role || 'role n/a'} · {e.level || 'level n/a'}
           </div>
           <div className="font-silkscreen uppercase" style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.08em' }}>

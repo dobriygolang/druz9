@@ -203,7 +203,7 @@ export function GuildWarPage() {
             ) : challenges.map((c) => (
               <div key={c.id} style={{ padding: '10px 0', borderBottom: '1px dashed var(--ink-3)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 15 }}>{c.fromName}</div>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 15 }}>{c.fromName}</div>
                   <div className="font-silkscreen uppercase" style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}>
                     истекает {new Date(c.expiresAt).toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' })}
                   </div>
@@ -339,7 +339,7 @@ export function GuildWarPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <Banner scale={4} color="var(--moss-1)" crest="✦" />
             <div>
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 26, color: 'var(--parch-0)' }}>
+              <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 26, color: 'var(--parch-0)' }}>
                 {war.ourGuildName}
               </div>
               <div
@@ -348,7 +348,7 @@ export function GuildWarPage() {
               >
                 {war.ourRoster} members · {war.ourDeployed} deployed
               </div>
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 56, color: 'var(--moss-2)', lineHeight: 1 }}>
+              <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 56, color: 'var(--moss-2)', lineHeight: 1 }}>
                 {war.ourScore}
               </div>
             </div>
@@ -360,7 +360,7 @@ export function GuildWarPage() {
             >
               day {war.dayNumber} / {war.totalDays}
             </div>
-            <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 40, color: 'var(--ember-3)' }}>
+            <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 40, color: 'var(--ember-3)' }}>
               vs
             </div>
             <div
@@ -381,7 +381,7 @@ export function GuildWarPage() {
           >
             <Banner scale={4} color="var(--rpg-danger, #a23a2a)" crest="▲" />
             <div>
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 26, color: 'var(--parch-0)' }}>
+              <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 26, color: 'var(--parch-0)' }}>
                 {war.theirGuildName}
               </div>
               <div
@@ -392,7 +392,7 @@ export function GuildWarPage() {
               </div>
               <div
                 style={{
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   fontSize: 56,
                   color: 'var(--rpg-danger, #a23a2a)',
                   lineHeight: 1,
@@ -435,7 +435,7 @@ export function GuildWarPage() {
                 }}
               >
                 <div>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 16 }}>{f.name}</div>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 16 }}>{f.name}</div>
                   <div
                     className="font-silkscreen uppercase"
                     style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
@@ -525,7 +525,7 @@ export function GuildWarPage() {
                 }}
               >
                 <div>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13 }}>{m.username}</div>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13 }}>{m.username}</div>
                   <div
                     className="font-silkscreen uppercase"
                     style={{

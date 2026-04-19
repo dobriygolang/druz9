@@ -173,7 +173,7 @@ export function LoginPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontFamily: 'Pixelify Sans, monospace',
+                fontFamily: 'Pixelify Sans, Unbounded, monospace',
                 fontSize: 26,
                 color: 'var(--parch-0)',
               }}
@@ -259,7 +259,7 @@ export function LoginPage() {
                 style={{
                   width: '100%',
                   padding: '12px 14px',
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   fontSize: 18,
                   letterSpacing: '0.2em',
                   textAlign: 'center',

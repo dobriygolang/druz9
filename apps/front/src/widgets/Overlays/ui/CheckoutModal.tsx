@@ -113,7 +113,7 @@ export function CheckoutModal({
                 >
                   <span
                     style={{
-                      fontFamily: 'Pixelify Sans, monospace',
+                      fontFamily: 'Pixelify Sans, Unbounded, monospace',
                       fontSize: 14,
                       color: 'var(--parch-0)',
                     }}
@@ -182,7 +182,7 @@ export function CheckoutModal({
                 borderBottom: '1px dashed var(--ink-3)',
               }}
             >
-              <span style={{ fontFamily: 'Pixelify Sans, monospace' }}>{item.name}</span>
+              <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace' }}>{item.name}</span>
               <span
                 className="font-silkscreen uppercase"
                 style={{ fontSize: 11, letterSpacing: '0.06em' }}
@@ -232,10 +232,10 @@ export function CheckoutModal({
                 padding: '10px 0',
               }}
             >
-              <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 18 }}>total</span>
+              <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 18 }}>total</span>
               <span
                 style={{
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   fontSize: 22,
                   color: 'var(--ember-1)',
                 }}

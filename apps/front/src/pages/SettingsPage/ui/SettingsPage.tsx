@@ -72,7 +72,7 @@ export function SettingsPage() {
                   cursor: 'pointer',
                   background: tab === id ? 'var(--parch-2)' : 'transparent',
                   borderLeft: tab === id ? '4px solid var(--ember-1)' : '4px solid transparent',
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   fontSize: 14,
                   display: 'flex',
                   alignItems: 'center',
@@ -81,7 +81,7 @@ export function SettingsPage() {
               >
                 <span
                   style={{
-                    fontFamily: 'Silkscreen, monospace',
+                    fontFamily: 'Silkscreen, Unbounded, monospace',
                     fontSize: 16,
                     color: 'var(--ember-1)',
                   }}
@@ -126,7 +126,7 @@ function Setting({
       }}
     >
       <div>
-        <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>{label}</div>
+        <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14 }}>{label}</div>
         {help && (
           <div style={{ color: 'var(--ink-2)', fontSize: 11, marginTop: 2 }}>{help}</div>
         )}
@@ -226,7 +226,7 @@ function SettingsAccount() {
           <Hero scale={3} pose="wave" />
         </div>
         <div>
-          <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 22 }}>{displayName}</div>
+          <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 22 }}>{displayName}</div>
           <div
             className="font-silkscreen uppercase"
             style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
@@ -358,7 +358,7 @@ function SettingsLanguage() {
             }}
           >
             <span style={{ fontSize: 20 }}>{l.flag}</span>
-            <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>{l.name}</span>
+            <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14 }}>{l.name}</span>
             {lang === l.code && (
               <span className="font-silkscreen" style={{ marginLeft: 'auto', fontSize: 9, color: 'var(--ember-1)' }}>{t('settings.lang.active')}</span>
             )}
@@ -414,14 +414,14 @@ function SettingsTweaks() {
           <button
             className="rpg-btn rpg-btn--sm"
             onClick={() => navigate('/tavern')}
-            style={{ fontFamily: 'Pixelify Sans, monospace' }}
+            style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace' }}
           >
             Browse tavern →
           </button>
           <button
             className="rpg-btn rpg-btn--sm rpg-btn--primary"
             onClick={() => navigate('/seasonpass')}
-            style={{ fontFamily: 'Pixelify Sans, monospace' }}
+            style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace' }}
           >
             Season pass →
           </button>

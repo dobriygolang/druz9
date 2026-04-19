@@ -410,7 +410,7 @@ export function TrainingTaskPage() {
                   <div className="font-silkscreen uppercase" style={{ fontSize: 10, letterSpacing: '0.1em', marginBottom: 4 }}>
                     {t('trainingTask.accepted')}
                   </div>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 16 }}>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 16 }}>
                     {t('trainingTask.rewards')}: {task.rewards.join(' · ')}
                   </div>
                 </div>
@@ -454,7 +454,7 @@ export function TrainingTaskPage() {
               border: '4px solid var(--ink-0)',
               boxShadow: '4px 4px 0 var(--ink-0)',
               padding: '14px 28px',
-              fontFamily: 'Pixelify Sans, monospace',
+              fontFamily: 'Pixelify Sans, Unbounded, monospace',
               fontSize: 22,
               whiteSpace: 'nowrap',
               animation: 'rpg-toast-in 0.25s ease-out',

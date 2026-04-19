@@ -114,7 +114,7 @@ func (i *Implementation) GetGuildWar(ctx context.Context, _ *v1.GetGuildWarReque
 }
 
 // myGuild returns the first guild the user has joined, or nil.
-func (i *Implementation) myGuild(ctx context.Context, userID interface{}) (*model.Guild, error) {
+func (i *Implementation) myGuild(ctx context.Context, _ interface{}) (*model.Guild, error) {
 	uid, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("require user: %w", err)

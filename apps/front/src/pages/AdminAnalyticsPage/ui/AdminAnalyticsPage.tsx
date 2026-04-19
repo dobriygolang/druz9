@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { BarChart2, Code2, Layers, CheckCircle, RefreshCw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { adminApi } from '@/features/Admin/api/adminApi'
-import { getCategoryFromTopics, CATEGORY_LABELS } from '@/features/Admin/model/taskCategories'
+import { getCategoriesFromTopics, CATEGORY_LABELS } from '@/features/Admin/model/taskCategories'
 import { PageMeta } from '@/shared/ui/PageMeta'
 
 function StatCard({ label, value, icon }: { label: string; value: string | number; icon: React.ReactNode }) {
@@ -71,10 +71,10 @@ export function AdminAnalyticsPage() {
 
         for (const t of tasks) {
           if (t.isActive !== false) active++
-          const cat = getCategoryFromTopics(t.topics)
-          if (cat === 'mock') mock++
-          else if (cat === 'solo_practice') solo++
-          else uncategorized++
+          const cats = getCategoriesFromTopics(t.topics)
+          if (cats.includes('mock')) mock++
+          if (cats.includes('solo_practice')) solo++
+          if (cats.length === 0) uncategorized++
 
           if (t.difficulty === 'TASK_DIFFICULTY_EASY') easy++
           else if (t.difficulty === 'TASK_DIFFICULTY_MEDIUM') medium++

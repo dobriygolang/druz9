@@ -354,7 +354,7 @@ export function InboxPage() {
                       padding: '8px 12px',
                       background: 'var(--parch-0)',
                       border: '3px solid var(--ink-0)',
-                      fontFamily: 'Pixelify Sans, monospace',
+                      fontFamily: 'Pixelify Sans, Unbounded, monospace',
                       fontSize: 13,
                       color: 'var(--ink-0)',
                       outline: 'none',
@@ -378,7 +378,7 @@ export function InboxPage() {
                     textAlign: 'center',
                     fontSize: 11,
                     color: 'var(--ink-2)',
-                    fontFamily: 'Silkscreen, monospace',
+                    fontFamily: 'Silkscreen, Unbounded, monospace',
                     letterSpacing: '0.08em',
                     textTransform: 'uppercase',
                   }}
@@ -461,7 +461,7 @@ function GiftsPanel() {
               <div style={{ width: 56, height: 56, background: 'var(--parch-3)', border: '2px solid var(--ink-0)' }} />
             )}
             <div>
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>
+              <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14 }}>
                 {g.itemName} {' '}
                 <span style={{ fontSize: 11, color: 'var(--ink-2)' }}>
                   · {side === 'received' ? `от ${g.senderName}` : `→ recipient`}
@@ -548,7 +548,7 @@ function TradesPanel() {
           }}>
             <TradeIcon src={trade.initiatorItemIcon} />
             <div>
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>
+              <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14 }}>
                 {trade.initiatorItemName || trade.initiatorItemId.slice(0, 8)}
                 <span style={{ color: 'var(--ink-2)' }}> → </span>
                 {trade.counterpartyItemName || trade.counterpartyItemId.slice(0, 8)}
@@ -694,7 +694,7 @@ function FriendsPanel() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontFamily: 'Pixelify Sans, monospace',
+                fontFamily: 'Pixelify Sans, Unbounded, monospace',
                 fontSize: 14,
               }}
             >
@@ -702,7 +702,7 @@ function FriendsPanel() {
             </div>
             <div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>
+                <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14 }}>
                   {f.displayName || f.username}
                 </span>
                 {f.presence === PresenceStatus.ONLINE && <Badge variant="moss" style={{ fontSize: 8 }}>{t('inbox.online')}</Badge>}
@@ -766,7 +766,7 @@ function FriendsPanel() {
                   background: 'var(--parch-0)',
                 }}
               >
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13 }}>@{req.fromUsername}</div>
+                <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13 }}>@{req.fromUsername}</div>
                 {req.message && (
                   <div style={{ fontSize: 11, color: 'var(--ink-2)', marginTop: 2 }}>{req.message}</div>
                 )}
@@ -897,7 +897,7 @@ function ComposeFriendModal({ onClose, onSent }: { onClose: () => void; onSent: 
               padding: '8px 10px',
               border: '3px solid var(--ink-0)',
               background: 'var(--parch-0)',
-              fontFamily: 'Pixelify Sans, monospace',
+              fontFamily: 'Pixelify Sans, Unbounded, monospace',
               fontSize: 14,
               boxSizing: 'border-box',
             }}
@@ -944,7 +944,7 @@ function ComposeFriendModal({ onClose, onSent }: { onClose: () => void; onSent: 
                     <div style={{ width: 28, height: 28, background: 'var(--moss-1)', border: '2px solid var(--ink-0)' }} />
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {hit.displayName || hit.username}
                     </div>
                     <div style={{ fontSize: 10, color: 'var(--ink-2)' }}>@{hit.username}</div>
@@ -972,7 +972,7 @@ function ComposeFriendModal({ onClose, onSent }: { onClose: () => void; onSent: 
             padding: '8px 10px',
             border: '3px solid var(--ink-0)',
             background: 'var(--parch-0)',
-            fontFamily: 'Pixelify Sans, monospace',
+            fontFamily: 'Pixelify Sans, Unbounded, monospace',
             fontSize: 12,
             resize: 'vertical',
             boxSizing: 'border-box',
@@ -1037,7 +1037,7 @@ function ThreadRow({
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 16 }}>{thread.avatar}</span>
-          <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13 }}>{thread.subject}</div>
+          <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13 }}>{thread.subject}</div>
         </div>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
           {thread.unreadCount > 0 && (
@@ -1046,7 +1046,7 @@ function ThreadRow({
                 background: 'var(--ember-1)',
                 color: 'var(--parch-0)',
                 border: '2px solid var(--ink-0)',
-                fontFamily: 'Silkscreen, monospace',
+                fontFamily: 'Silkscreen, Unbounded, monospace',
                 fontSize: 8,
                 padding: '1px 5px',
                 lineHeight: 1.5,
@@ -1107,7 +1107,7 @@ function ConversationHeader({ thread }: { thread: InboxThread }) {
     >
       <span style={{ fontSize: 20 }}>{thread.avatar}</span>
       <div style={{ flex: 1 }}>
-        <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 15 }}>{thread.subject}</div>
+        <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 15 }}>{thread.subject}</div>
         <div
           className="font-silkscreen uppercase"
           style={{ fontSize: 8, color: KIND_COLOR[thread.kind], letterSpacing: '0.08em' }}
@@ -1146,7 +1146,7 @@ function MessageBubble({ msg, avatar }: { msg: InboxMessage; avatar: string }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontFamily: 'Pixelify Sans, monospace',
+            fontFamily: 'Pixelify Sans, Unbounded, monospace',
             fontSize: 14,
             flexShrink: 0,
           }}

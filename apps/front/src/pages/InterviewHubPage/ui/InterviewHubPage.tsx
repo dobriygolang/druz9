@@ -235,7 +235,7 @@ export function InterviewHubPage() {
               style={{
                 padding: '10px 14px',
                 borderLeft: `6px solid ${c.accent}`,
-                fontFamily: 'Pixelify Sans, monospace',
+                fontFamily: 'Pixelify Sans, Unbounded, monospace',
                 fontSize: 13,
               }}
             >
@@ -305,7 +305,7 @@ export function InterviewHubPage() {
                       x="60"
                       y="62"
                       textAnchor="middle"
-                      fontFamily="Pixelify Sans, monospace"
+                      fontFamily="Pixelify Sans, Unbounded, monospace"
                       fontSize="28"
                       fill="#f6ead0"
                     >
@@ -315,7 +315,7 @@ export function InterviewHubPage() {
                       x="60"
                       y="78"
                       textAnchor="middle"
-                      fontFamily="Silkscreen, monospace"
+                      fontFamily="Silkscreen, Unbounded, monospace"
                       fontSize="8"
                       fill="#dcc690"
                     >
@@ -346,7 +346,7 @@ export function InterviewHubPage() {
                       </div>
                       <div
                         style={{
-                          fontFamily: 'Pixelify Sans, monospace',
+                          fontFamily: 'Pixelify Sans, Unbounded, monospace',
                           fontSize: 20,
                           color: 'var(--ember-3)',
                         }}
@@ -425,7 +425,7 @@ export function InterviewHubPage() {
                     >
                       <Hero scale={2} pose={pose} />
                     </div>
-                    <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>
+                    <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14 }}>
                       {m.title || m.primaryAliasName || m.slug}
                     </div>
                     <div
@@ -495,7 +495,7 @@ export function InterviewHubPage() {
               }}
               style={{
                 padding: '10px 16px',
-                fontFamily: 'Pixelify Sans, monospace',
+                fontFamily: 'Pixelify Sans, Unbounded, monospace',
                 fontSize: 13,
                 display: 'flex',
                 alignItems: 'center',
@@ -555,7 +555,7 @@ export function InterviewHubPage() {
                 >
                   <Trophy scale={2} tier={medal} />
                   <div>
-                    <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>
+                    <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14 }}>
                       {s.title}
                     </div>
                     <div
@@ -571,7 +571,7 @@ export function InterviewHubPage() {
                   <div
                     style={{
                       textAlign: 'right',
-                      fontFamily: 'Pixelify Sans, monospace',
+                      fontFamily: 'Pixelify Sans, Unbounded, monospace',
                       fontSize: 22,
                       color: 'var(--ember-1)',
                     }}
@@ -631,7 +631,7 @@ export function InterviewHubPage() {
               onClick={() => navigate(`/interview/live/new?mode=solo&focus=${s.key}`)}
             >
               <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13 }}>{s.title}</div>
+                <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13 }}>{s.title}</div>
                 <div
                   className="font-silkscreen uppercase"
                   style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}

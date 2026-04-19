@@ -160,7 +160,7 @@ export function DailyChallengePage() {
         title={t('daily.title', 'Daily Challenge')}
         subtitle="One curated task per day. Solve it before midnight to claim the scroll."
         right={
-          <Badge variant="ember" style={{ fontFamily: 'Pixelify Sans, monospace' }}>
+          <Badge variant="ember" style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace' }}>
             ⏱ {timeLeft}
           </Badge>
         }

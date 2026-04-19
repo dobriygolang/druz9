@@ -59,7 +59,7 @@ export function LevelUpModal({
         </div>
         <div
           style={{
-            fontFamily: 'Pixelify Sans, monospace',
+            fontFamily: 'Pixelify Sans, Unbounded, monospace',
             fontSize: 88,
             color: 'var(--ember-1)',
             lineHeight: 1,

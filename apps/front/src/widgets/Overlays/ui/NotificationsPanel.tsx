@@ -219,14 +219,14 @@ export function NotificationsPanel({ onClose }: { onClose: () => void }) {
                       alignItems: 'center',
                       justifyContent: 'center',
                       color: 'var(--parch-0)',
-                      fontFamily: 'Silkscreen, monospace',
+                      fontFamily: 'Silkscreen, Unbounded, monospace',
                       flexShrink: 0,
                     }}
                   >
                     {ICON[n.kind]}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13, lineHeight: 1.3 }}>
+                    <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13, lineHeight: 1.3 }}>
                       {n.title}
                     </div>
                     <div

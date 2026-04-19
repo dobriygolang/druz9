@@ -303,7 +303,7 @@ export function MapPage() {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div
                           style={{
-                            fontFamily: 'Pixelify Sans, monospace',
+                            fontFamily: 'Pixelify Sans, Unbounded, monospace',
                             fontSize: 13,
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
@@ -357,7 +357,7 @@ export function MapPage() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontFamily: 'Pixelify Sans, monospace',
+                        fontFamily: 'Pixelify Sans, Unbounded, monospace',
                         fontSize: 11,
                         flexShrink: 0,
                         imageRendering: 'pixelated',
@@ -371,7 +371,7 @@ export function MapPage() {
                       )}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {cp.firstName || cp.username}
                       </div>
                       <div className="font-silkscreen uppercase" style={{ fontSize: 8, color: 'var(--ink-2)', letterSpacing: '0.06em' }}>

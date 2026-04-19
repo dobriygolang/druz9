@@ -118,7 +118,7 @@ export function DemoFlowOverlay({ onClose }: Props) {
             >
               <div style={{ fontSize: 28 }}>⚔️</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 15 }}>Quest unlocked: Reverse a String</div>
+                <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 15 }}>Quest unlocked: Reverse a String</div>
                 <div className="font-silkscreen" style={{ fontSize: 10, color: 'var(--ink-2)', marginTop: 2 }}>
                   easy · +40 xp · +6 embers · from: daily system
                 </div>
@@ -139,7 +139,7 @@ export function DemoFlowOverlay({ onClose }: Props) {
             >
               <div style={{ fontSize: 22 }}>⛨</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13 }}>Guild defense in 2h</div>
+                <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13 }}>Guild defense in 2h</div>
                 <div className="font-silkscreen" style={{ fontSize: 9, color: 'var(--ink-2)', marginTop: 2 }}>
                   Iron Pact · join defense
                 </div>
@@ -162,7 +162,7 @@ export function DemoFlowOverlay({ onClose }: Props) {
             <div className="rpg-panel" style={{ padding: 16 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                 <div>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 20 }}>Reverse a String</div>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 20 }}>Reverse a String</div>
                   <div className="font-silkscreen" style={{ fontSize: 10, color: 'var(--ink-2)', marginTop: 2 }}>
                     easy · arrays · 10 min
                   </div>
@@ -264,7 +264,7 @@ export function DemoFlowOverlay({ onClose }: Props) {
               }}
             >
               <div style={{ fontSize: 36, marginBottom: 8 }}>⚔️</div>
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 18, marginBottom: 10 }}>
+              <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 18, marginBottom: 10 }}>
                 Coding task solved
               </div>
               <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -293,7 +293,7 @@ export function DemoFlowOverlay({ onClose }: Props) {
             </div>
             <div
               style={{
-                fontFamily: 'Pixelify Sans, monospace',
+                fontFamily: 'Pixelify Sans, Unbounded, monospace',
                 fontSize: 88,
                 color: 'var(--ember-1)',
                 lineHeight: 1,
@@ -352,7 +352,7 @@ export function DemoFlowOverlay({ onClose }: Props) {
                   }}
                 >
                   <div style={{ height: 46, background: it.c, border: '2px solid var(--ink-0)', marginBottom: 4 }} />
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 9, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 9, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {it.n}
                   </div>
                   {(it as { isNew?: boolean }).isNew && (

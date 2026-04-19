@@ -78,7 +78,7 @@ export function AdminLayout() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontFamily: 'Pixelify Sans, monospace',
+              fontFamily: 'Pixelify Sans, Unbounded, monospace',
               fontSize: 16,
               color: 'var(--parch-0)',
             }}
@@ -92,7 +92,7 @@ export function AdminLayout() {
             >
               ADMIN CONTROL
             </div>
-            <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>druz9 · manage</div>
+            <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14 }}>druz9 · manage</div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

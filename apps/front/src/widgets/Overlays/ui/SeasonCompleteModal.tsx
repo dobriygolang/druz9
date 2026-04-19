@@ -95,7 +95,7 @@ export function SeasonCompleteModal({
           <div className="font-silkscreen uppercase" style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.1em', marginBottom: 4 }}>
             final rank
           </div>
-          <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 44, color: 'var(--ember-1)', lineHeight: 1 }}>
+          <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 44, color: 'var(--ember-1)', lineHeight: 1 }}>
             #{finalRank}
           </div>
           <div className="font-silkscreen uppercase" style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.08em', marginTop: 4 }}>
@@ -135,7 +135,7 @@ function RewardTile({ label, value, color }: { label: string; value: string; col
       <div className="font-silkscreen uppercase" style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}>
         {label}
       </div>
-      <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 22, color, lineHeight: 1.1 }}>
+      <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 22, color, lineHeight: 1.1 }}>
         {value}
       </div>
     </div>

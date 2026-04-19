@@ -267,7 +267,7 @@ function SelectedToolbar({ item, onChange, onDelete }: {
   onDelete: () => void
 }) {
   return (
-    <div style={{ display: 'flex', gap: 8, marginTop: 10, alignItems: 'center', flexWrap: 'wrap', fontSize: 12, fontFamily: 'Pixelify Sans, monospace' }}>
+    <div style={{ display: 'flex', gap: 8, marginTop: 10, alignItems: 'center', flexWrap: 'wrap', fontSize: 12, fontFamily: 'Pixelify Sans, Unbounded, monospace' }}>
       <label>Размер
         <input type="range" min={0.5} max={3} step={0.05} value={item.scale} onChange={(e) => onChange({ scale: parseFloat(e.target.value) })} style={{ marginLeft: 6 }} />
       </label>

@@ -263,7 +263,7 @@ export function HubPage() {
                   width: '100%',
                   background: 'rgba(246,234,208,0.06)',
                   border: '2px solid rgba(246,234,208,0.15)',
-                  fontFamily: 'Silkscreen, monospace',
+                  fontFamily: 'Silkscreen, Unbounded, monospace',
                   fontSize: 11,
                   letterSpacing: '0.04em',
                   color: 'var(--parch-0)',
@@ -321,7 +321,7 @@ export function HubPage() {
               >
                 <div className="rpg-quest__check" />
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13 }}>{mission.title}</div>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13 }}>{mission.title}</div>
                   {mission.rewardLabel && (
                     <div
                       className="font-silkscreen uppercase"
@@ -366,7 +366,7 @@ export function HubPage() {
                   </div>
                   <div
                     style={{
-                      fontFamily: 'Pixelify Sans, monospace',
+                      fontFamily: 'Pixelify Sans, Unbounded, monospace',
                       fontSize: 14,
                       marginBottom: 4,
                     }}
@@ -429,7 +429,7 @@ export function HubPage() {
                     {formatEventDate(event.startsAt, i18n.language)}
                   </div>
                 )}
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13 }}>{event.title}</div>
+                <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13 }}>{event.title}</div>
                 {event.meta && (
                   <div
                     className="font-silkscreen uppercase"
@@ -547,7 +547,7 @@ export function HubPage() {
                   <div className="rpg-item-card__art" style={{ overflow: 'hidden' }}>
                     <MerchantIcon rarity={item.rarity} />
                   </div>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 12, marginTop: 6 }}>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 12, marginTop: 6 }}>
                     {item.name}
                   </div>
                   <div
@@ -629,7 +629,7 @@ function MemberChip({
         padding: '3px 7px',
         border: '2px solid var(--ink-0)',
         background: filled ? 'var(--parch-2)' : 'var(--parch-0)',
-        fontFamily: 'Silkscreen, monospace',
+        fontFamily: 'Silkscreen, Unbounded, monospace',
         fontSize: 9,
         letterSpacing: '0.06em',
       }}

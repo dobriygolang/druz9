@@ -237,7 +237,7 @@ export function PodcastsPage() {
             </div>
             <div
               style={{
-                fontFamily: 'Pixelify Sans, monospace',
+                fontFamily: 'Pixelify Sans, Unbounded, monospace',
                 fontSize: 22,
                 color: 'var(--parch-0)',
                 marginTop: 2,
@@ -378,7 +378,7 @@ export function PodcastsPage() {
                   >
                     <span
                       style={{
-                        fontFamily: 'Silkscreen, monospace',
+                        fontFamily: 'Silkscreen, Unbounded, monospace',
                         fontSize: 20,
                         color: 'var(--parch-0)',
                         letterSpacing: '0.04em',
@@ -390,7 +390,7 @@ export function PodcastsPage() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                       style={{
-                        fontFamily: 'Pixelify Sans, monospace',
+                        fontFamily: 'Pixelify Sans, Unbounded, monospace',
                         fontSize: 14,
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
@@ -464,7 +464,7 @@ export function PodcastsPage() {
                 >
                   {q.slot}
                 </div>
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 12 }}>{q.title}</div>
+                <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 12 }}>{q.title}</div>
                 <div
                   className="font-silkscreen uppercase"
                   style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}

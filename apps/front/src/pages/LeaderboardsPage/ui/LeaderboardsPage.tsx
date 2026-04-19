@@ -187,9 +187,9 @@ export function LeaderboardsPage() {
                 cursor: 'pointer',
               }}
             >
-              <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 20, color: RANK_COLOR(i) }}>#{i + 1}</span>
+              <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 20, color: RANK_COLOR(i) }}>#{i + 1}</span>
               <div>
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
                   {r.displayName}
                   {isYou && <Badge variant="ember" style={{ fontSize: 8 }}>{t('leaderboards.you')}</Badge>}
                 </div>
@@ -203,7 +203,7 @@ export function LeaderboardsPage() {
               <span className="font-silkscreen uppercase" style={{ fontSize: 10, letterSpacing: '0.06em' }}>
                 {r.league || tierFromRating(r.rating)}
               </span>
-              <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 18, color: 'var(--ember-1)' }}>
+              <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 18, color: 'var(--ember-1)' }}>
                 {r.rating}
               </span>
             </div>
@@ -231,8 +231,8 @@ export function LeaderboardsPage() {
               cursor: 'pointer',
             }}
           >
-            <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 20, color: RANK_COLOR(i) }}>#{i + 1}</span>
-            <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>{g.name}</div>
+            <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 20, color: RANK_COLOR(i) }}>#{i + 1}</span>
+            <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14 }}>{g.name}</div>
             <span className="font-silkscreen uppercase" style={{ fontSize: 11 }}>{t('leaderboards.membersCount', { count: g.memberCount })}</span>
             <span className="font-silkscreen uppercase" style={{ fontSize: 11 }}>{t('leaderboards.pointsCount', { count: g.aggregatePoints })}</span>
             <span
@@ -270,11 +270,11 @@ export function LeaderboardsPage() {
                 cursor: 'pointer',
               }}
             >
-              <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 20, color: RANK_COLOR(i) }}>
+              <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 20, color: RANK_COLOR(i) }}>
                 #{i + 1}
               </span>
               <div>
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14, display: 'flex', gap: 6, alignItems: 'center' }}>
+                <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14, display: 'flex', gap: 6, alignItems: 'center' }}>
                   {s.displayName || s.username}
                   {isYou && <Badge variant="ember" style={{ fontSize: 8 }}>{t('leaderboards.you')}</Badge>}
                 </div>
@@ -284,7 +284,7 @@ export function LeaderboardsPage() {
                   </div>
                 )}
               </div>
-              <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 16 }}>{s.xp.toLocaleString()}</span>
+              <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 16 }}>{s.xp.toLocaleString()}</span>
               <span className="font-silkscreen uppercase" style={{ fontSize: 10 }}>{t('leaderboards.tierValue', { tier: s.currentTier })}</span>
               <span className="font-silkscreen uppercase" style={{ fontSize: 10 }}>{s.trophies} 🏆</span>
             </div>
@@ -304,12 +304,12 @@ export function LeaderboardsPage() {
               <span className="font-silkscreen uppercase" style={{ fontSize: 9, color: 'var(--parch-2)', letterSpacing: '0.1em' }}>{t('leaderboards.yourPosition')}</span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '48px 1fr 140px 90px', alignItems: 'center', gap: 10, padding: '10px 12px', background: 'rgba(184,105,42,0.15)', borderTop: '2px solid var(--ember-1)', borderLeft: '4px solid var(--ember-1)' }}>
-              <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 20, color: 'var(--ink-1)' }}>#{youGlobal}</span>
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14, display: 'flex', gap: 6, alignItems: 'center' }}>
+              <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 20, color: 'var(--ink-1)' }}>#{youGlobal}</span>
+              <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14, display: 'flex', gap: 6, alignItems: 'center' }}>
                 {youArena.displayName}<Badge variant="ember" style={{ fontSize: 8 }}>{t('leaderboards.you')}</Badge>
               </div>
               <span className="font-silkscreen uppercase" style={{ fontSize: 10 }}>{youArena.league || tierFromRating(youArena.rating)}</span>
-              <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 18, color: 'var(--ember-1)' }}>{youArena.rating}</span>
+              <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 18, color: 'var(--ember-1)' }}>{youArena.rating}</span>
             </div>
           </>
         )}

@@ -108,7 +108,7 @@ export function WeeklyBossPage() {
         )}
         right={
           data?.endsAt ? (
-            <Badge variant="ember" style={{ fontFamily: 'Pixelify Sans, monospace' }}>
+            <Badge variant="ember" style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace' }}>
               ⏱ {timeRemaining(data.endsAt)}
             </Badge>
           ) : null
@@ -128,7 +128,7 @@ export function WeeklyBossPage() {
               </div>
               <div
                 style={{
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   fontSize: 32,
                   color: 'var(--moss-1)',
                   lineHeight: 1.1,
@@ -145,7 +145,7 @@ export function WeeklyBossPage() {
                 {t('weeklyBoss.solveTime', 'Solve time')}
               </div>
               <div
-                style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 20, color: 'var(--ink-1)' }}
+                style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 20, color: 'var(--ink-1)' }}
               >
                 {formatTime(myEntry.solveTimeMs)}
               </div>
@@ -180,7 +180,7 @@ export function WeeklyBossPage() {
               👑
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 15 }}>
+              <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 15 }}>
                 {weeklyTask.taskTitle}
               </div>
               <div
@@ -237,7 +237,7 @@ export function WeeklyBossPage() {
               >
                 <span
                   style={{
-                    fontFamily: 'Pixelify Sans, monospace',
+                    fontFamily: 'Pixelify Sans, Unbounded, monospace',
                     fontSize: 16,
                     color: rankColor,
                     textAlign: 'center',
@@ -254,7 +254,7 @@ export function WeeklyBossPage() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontFamily: 'Pixelify Sans, monospace',
+                    fontFamily: 'Pixelify Sans, Unbounded, monospace',
                     fontSize: 13,
                   }}
                 >
@@ -262,7 +262,7 @@ export function WeeklyBossPage() {
                 </div>
                 <span
                   style={{
-                    fontFamily: 'Pixelify Sans, monospace',
+                    fontFamily: 'Pixelify Sans, Unbounded, monospace',
                     fontSize: 13,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
@@ -274,7 +274,7 @@ export function WeeklyBossPage() {
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                   <span
                     style={{
-                      fontFamily: 'Pixelify Sans, monospace',
+                      fontFamily: 'Pixelify Sans, Unbounded, monospace',
                       fontSize: 14,
                       color: 'var(--ember-1)',
                     }}
@@ -337,7 +337,7 @@ function RewardTile({ emoji, label, value }: { emoji: string; label: string; val
         >
           {label}
         </div>
-        <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 12 }}>{value}</div>
+        <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 12 }}>{value}</div>
       </div>
     </div>
   )

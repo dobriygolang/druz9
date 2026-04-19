@@ -319,7 +319,7 @@ function SlotCard({
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 15 }}>
+        <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 15 }}>
           {ownerView ? 'Your slot' : slot.interviewerName}
         </div>
         <span className="font-silkscreen uppercase" style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}>
@@ -386,7 +386,7 @@ function BookingRow({
       }}
     >
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13 }}>{otherName}</div>
+        <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13 }}>{otherName}</div>
         <div className="font-silkscreen uppercase" style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}>
           {formatRange(booking.startsAt, booking.endsAt)}
           {booking.priceGold > 0 ? ` · ${booking.priceGold} gold` : ''}

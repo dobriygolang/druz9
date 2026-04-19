@@ -447,7 +447,7 @@ export function ProfilePage() {
                   }}
                 />
                 <div
-                  style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 10, lineHeight: 1.1 }}
+                  style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 10, lineHeight: 1.1 }}
                 >
                   {it.n}
                 </div>
@@ -486,7 +486,7 @@ export function ProfilePage() {
               }}
             >
               <span style={{ color: 'var(--ink-2)', fontSize: 13 }}>{k}</span>
-              <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>{v}</span>
+              <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14 }}>{v}</span>
             </div>
           ))}
           <div className="rpg-divider" />
@@ -550,7 +550,7 @@ export function ProfilePage() {
                     tier={a.rarity === 'legendary' ? 'gold' : a.rarity === 'epic' ? 'silver' : 'bronze'}
                   />
                   <div>
-                    <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 12 }}>
+                    <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 12 }}>
                       {a.title}
                     </div>
                     <div className={`rpg-rarity rpg-rarity--${a.rarity}`}>{t(`profile.rare.${a.rarity}`)}</div>
@@ -606,7 +606,7 @@ export function ProfilePage() {
             >
               <div style={{ width: 6, background: 'var(--ember-1)', flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 12 }}>
+                <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 12 }}>
                   {r.title}
                 </div>
                 <div
@@ -646,7 +646,7 @@ export function ProfilePage() {
           {cosmetics.map((c) => (
             <div key={c.t} className={`rpg-item-card rpg-rarity-border--${c.r}`}>
               <div className="rpg-item-card__art" style={{ height: 64, flex: 'none' }}>{c.icon}</div>
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 11, marginTop: 4 }}>
+              <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 11, marginTop: 4 }}>
                 {c.t}
               </div>
               <div className={`rpg-rarity rpg-rarity--${c.r}`}>{t(`profile.rare.${c.r}`)}</div>
@@ -791,7 +791,7 @@ function SceneCanvasInline({
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         padding: 24, minHeight: 180,
         background: 'var(--parch-1, #f6e9c8)', border: '3px dashed var(--ink-1, #5b4331)',
-        color: 'var(--ink-2, #7d6850)', fontFamily: 'Pixelify Sans, monospace',
+        color: 'var(--ink-2, #7d6850)', fontFamily: 'Pixelify Sans, Unbounded, monospace',
       }}>
         Комната пуста — нажми «Редактировать сцену», чтобы расставить предметы.
       </div>

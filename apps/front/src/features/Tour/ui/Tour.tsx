@@ -165,7 +165,7 @@ const btnStyle: React.CSSProperties = {
   padding: '6px 12px',
   border: '2px solid var(--ink-0, #2a1a0c)',
   background: 'var(--parch-2, #efe1bf)',
-  fontFamily: 'Pixelify Sans, monospace',
+  fontFamily: 'Pixelify Sans, Unbounded, monospace',
   fontSize: 12,
   cursor: 'pointer',
   boxShadow: '2px 2px 0 var(--ink-0, #2a1a0c)',

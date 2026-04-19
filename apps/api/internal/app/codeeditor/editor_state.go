@@ -120,7 +120,7 @@ func defaultEditorStarter(room *domain.Room, task *domain.Task, language model.P
 	return defaultSharedRoomStarter(language)
 }
 
-func shouldReplaceStarterCode(currentCode string, room *domain.Room, task *domain.Task, currentLanguage, nextLanguage model.ProgrammingLanguage) bool {
+func shouldReplaceStarterCode(currentCode string, room *domain.Room, task *domain.Task, currentLanguage model.ProgrammingLanguage, _ model.ProgrammingLanguage) bool {
 	trimmedCurrent := strings.TrimSpace(currentCode)
 	if trimmedCurrent == "" {
 		return true

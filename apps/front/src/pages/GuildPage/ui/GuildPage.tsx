@@ -377,14 +377,14 @@ export function GuildPage() {
               <div style={{ textAlign: 'right' }}>
                 <div
                   style={{
-                    fontFamily: 'Pixelify Sans, monospace',
+                    fontFamily: 'Pixelify Sans, Unbounded, monospace',
                     fontSize: 18,
                     color: 'var(--moss-1)',
                   }}
                 >
                   {t('guild.page.guildName')}
                 </div>
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 36 }}>2150</div>
+                <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 36 }}>2150</div>
                 <div
                   className="font-silkscreen uppercase"
                   style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
@@ -394,7 +394,7 @@ export function GuildPage() {
               </div>
               <div
                 style={{
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   fontSize: 24,
                   textAlign: 'center',
                 }}
@@ -404,14 +404,14 @@ export function GuildPage() {
               <div>
                 <div
                   style={{
-                    fontFamily: 'Pixelify Sans, monospace',
+                    fontFamily: 'Pixelify Sans, Unbounded, monospace',
                     fontSize: 18,
                     color: 'var(--rpg-danger, #a23a2a)',
                   }}
                 >
                   {t('guild.page.redRavens')}
                 </div>
-                <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 36 }}>1920</div>
+                <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 36 }}>1920</div>
                 <div
                   className="font-silkscreen uppercase"
                   style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
@@ -444,7 +444,7 @@ export function GuildPage() {
                 >
                   <div className="rpg-item-card__art">{r.icon}</div>
                   <div
-                    style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 11, marginTop: 4 }}
+                    style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 11, marginTop: 4 }}
                   >
                     {t(`guild.page.reward.${index}`)}
                   </div>
@@ -526,7 +526,7 @@ export function GuildPage() {
                       )}
                     </div>
                     <div>
-                      <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 12 }}>
+                      <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 12 }}>
                         {n}
                       </div>
                       <div
@@ -582,7 +582,7 @@ export function GuildPage() {
               >
                 <Trophy scale={2} tier={a.r === 'legendary' ? 'gold' : 'silver'} />
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13 }}>{t(`guild.page.achievement.${index}.title`)}</div>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 13 }}>{t(`guild.page.achievement.${index}.title`)}</div>
                   <div
                     className="font-silkscreen uppercase"
                     style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
@@ -629,7 +629,7 @@ export function GuildPage() {
                     {i === 2 && <Banner scale={2} color="#a23a2a" />}
                     {i === 3 && <Trophy scale={3} tier="gold" />}
                   </div>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 11, marginTop: 4 }}>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 11, marginTop: 4 }}>
                     {t(`guild.page.hallItem.${i}`)}
                   </div>
                   <div
@@ -707,7 +707,7 @@ function InviteModal({ guild, onClose }: { guild: Guild | null; onClose: () => v
             padding: '10px 12px',
             border: '2px solid var(--ink-0)',
             background: 'var(--parch-2)',
-            fontFamily: 'Pixelify Sans, monospace',
+            fontFamily: 'Pixelify Sans, Unbounded, monospace',
             fontSize: 12,
             wordBreak: 'break-all',
             marginBottom: 12,
@@ -889,7 +889,7 @@ function GuildOnboarding({ onJoined }: { onJoined: () => void }) {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 16 }}>{g.name}</div>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 16 }}>{g.name}</div>
                   <span
                     className="font-silkscreen uppercase"
                     style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em', whiteSpace: 'nowrap' }}
@@ -943,7 +943,7 @@ function GuildOnboarding({ onJoined }: { onJoined: () => void }) {
                   padding: '10px 12px',
                   border: '3px solid var(--ink-0)',
                   background: 'var(--parch-2)',
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   fontSize: 18,
                   color: 'var(--ink-0)',
                   outline: 'none',

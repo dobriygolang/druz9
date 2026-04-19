@@ -131,7 +131,7 @@ export function DuelLivePage() {
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
                 <span
                   style={{
-                    fontFamily: 'Pixelify Sans, monospace',
+                    fontFamily: 'Pixelify Sans, Unbounded, monospace',
                     fontSize: 22,
                     color: 'var(--parch-0)',
                   }}
@@ -192,7 +192,7 @@ export function DuelLivePage() {
             </div>
             <div
               style={{
-                fontFamily: 'Pixelify Sans, monospace',
+                fontFamily: 'Pixelify Sans, Unbounded, monospace',
                 fontSize: 52,
                 color: remainingSec < 60 ? 'var(--rpg-danger, #a23a2a)' : 'var(--ember-3)',
                 lineHeight: 1,
@@ -243,7 +243,7 @@ export function DuelLivePage() {
                 </span>
                 <span
                   style={{
-                    fontFamily: 'Pixelify Sans, monospace',
+                    fontFamily: 'Pixelify Sans, Unbounded, monospace',
                     fontSize: 22,
                     color: 'var(--parch-0)',
                   }}
@@ -423,19 +423,19 @@ export function DuelLivePage() {
             </div>
             <div style={{ fontSize: 11, lineHeight: 1.5 }}>
               <div>
-                <span style={{ color: 'var(--ember-1)', fontFamily: 'Silkscreen, monospace' }}>
+                <span style={{ color: 'var(--ember-1)', fontFamily: 'Silkscreen, Unbounded, monospace' }}>
                   glowbeacon:
                 </span>{' '}
                 nice edge case
               </div>
               <div>
-                <span style={{ color: 'var(--moss-1)', fontFamily: 'Silkscreen, monospace' }}>
+                <span style={{ color: 'var(--moss-1)', fontFamily: 'Silkscreen, Unbounded, monospace' }}>
                   thornmoss:
                 </span>{' '}
                 mod coming 🔥
               </div>
               <div>
-                <span style={{ color: 'var(--ember-1)', fontFamily: 'Silkscreen, monospace' }}>
+                <span style={{ color: 'var(--ember-1)', fontFamily: 'Silkscreen, Unbounded, monospace' }}>
                   glowbeacon:
                 </span>{' '}
                 gl hf
@@ -480,7 +480,7 @@ export function DuelLivePage() {
                   fontSize: 11,
                 }}
               >
-                <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 11 }}>{b.name}</span>
+                <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 11 }}>{b.name}</span>
                 <span
                   className="font-silkscreen uppercase"
                   style={{ color: 'var(--ember-1)', fontSize: 9, letterSpacing: '0.08em' }}

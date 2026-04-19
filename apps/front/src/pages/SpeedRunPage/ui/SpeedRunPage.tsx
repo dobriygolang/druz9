@@ -96,7 +96,7 @@ export function SpeedRunPage() {
               ⚡
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 15 }}>
+              <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 15 }}>
                 {t('speedRun.startNew', 'Start a Speed Run')}
               </div>
               <div
@@ -176,7 +176,7 @@ export function SpeedRunPage() {
               <div style={{ minWidth: 0 }}>
                 <div
                   style={{
-                    fontFamily: 'Pixelify Sans, monospace',
+                    fontFamily: 'Pixelify Sans, Unbounded, monospace',
                     fontSize: 14,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
@@ -196,7 +196,7 @@ export function SpeedRunPage() {
               <div style={{ textAlign: 'right' }}>
                 <div
                   style={{
-                    fontFamily: 'Pixelify Sans, monospace',
+                    fontFamily: 'Pixelify Sans, Unbounded, monospace',
                     fontSize: 18,
                     color: 'var(--moss-1)',
                     lineHeight: 1,

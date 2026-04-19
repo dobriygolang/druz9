@@ -509,7 +509,7 @@ func computeModuleProgress(stats nodeProgress, projects int32, visible bool) (*i
 	return &pct, done
 }
 
-func defaultDescription(node nodeDefinition, state string, total int32) string {
+func defaultDescription(_ nodeDefinition, state string, total int32) string {
 	switch state {
 	case "locked":
 		return "Locked. Clear the prior nodes in this branch to unlock the module."

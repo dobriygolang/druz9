@@ -124,7 +124,7 @@ export function AdminDashboardPage() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontFamily: 'Silkscreen, monospace',
+                    fontFamily: 'Silkscreen, Unbounded, monospace',
                     fontSize: 20,
                     color: 'var(--parch-0)',
                   }}
@@ -132,7 +132,7 @@ export function AdminDashboardPage() {
                   {c.icon}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 18, color: 'var(--ink-0)' }}>
+                  <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 18, color: 'var(--ink-0)' }}>
                     {c.title}
                   </div>
                   <Badge variant="dark">{c.href}</Badge>

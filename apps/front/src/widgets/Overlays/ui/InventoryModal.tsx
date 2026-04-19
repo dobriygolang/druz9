@@ -107,7 +107,7 @@ export function InventoryModal({ onClose }: { onClose: () => void }) {
               />
               <div
                 style={{
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   fontSize: 11,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',

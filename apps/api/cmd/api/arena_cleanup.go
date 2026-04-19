@@ -10,7 +10,7 @@ import (
 	"api/internal/rtc"
 )
 
-func startArenaCleanupWorker(logger klog.Logger, rtcManager *rtc.Manager, service *apparena.Service) func() error {
+func startArenaCleanupWorker(_ klog.Logger, rtcManager *rtc.Manager, service *apparena.Service) func() error {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	// Get initial values

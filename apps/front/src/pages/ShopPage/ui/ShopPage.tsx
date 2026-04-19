@@ -199,7 +199,7 @@ export function ShopPage() {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                fontFamily: 'Pixelify Sans, monospace',
+                fontFamily: 'Pixelify Sans, Unbounded, monospace',
                 fontSize: 13,
                 boxShadow: currentCategory === c.category ? '3px 3px 0 var(--ember-1)' : 'none',
               }}
@@ -289,7 +289,7 @@ export function ShopPage() {
                   </div>
                   <div
                     style={{
-                      fontFamily: 'Pixelify Sans, monospace',
+                      fontFamily: 'Pixelify Sans, Unbounded, monospace',
                       fontSize: 12,
                       marginTop: 6,
                       whiteSpace: 'nowrap',

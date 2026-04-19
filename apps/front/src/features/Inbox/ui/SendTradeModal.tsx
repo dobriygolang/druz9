@@ -117,7 +117,7 @@ export function SendTradeModal({ counterpartyId, counterpartyName, onClose, onSe
               padding: 10,
               border: '2px solid var(--ink-0)',
               background: 'var(--parch-0)',
-              fontFamily: 'Pixelify Sans, monospace',
+              fontFamily: 'Pixelify Sans, Unbounded, monospace',
               boxSizing: 'border-box',
             }}
           />

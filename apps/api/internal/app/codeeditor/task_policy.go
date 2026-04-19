@@ -79,9 +79,9 @@ func normalizeTaskPolicy(task *domain.Task) error {
 	return nil
 }
 
-func policyTaskTypeForTask(task *domain.Task, fallback policy.TaskType) policy.TaskType {
+func policyTaskTypeForTask(task *domain.Task, _ policy.TaskType) policy.TaskType {
 	if task == nil {
-		return fallback
+		return policy.TaskTypeAlgorithmPractice
 	}
 
 	switch task.ExecutionProfile {
@@ -92,9 +92,9 @@ func policyTaskTypeForTask(task *domain.Task, fallback policy.TaskType) policy.T
 	case model.ExecutionProfileInterviewRealistic:
 		return policy.TaskTypeInterviewPractice
 	case model.ExecutionProfilePure:
-		return fallback
+		return policy.TaskTypeAlgorithmPractice
 	default:
-		return fallback
+		return policy.TaskTypeAlgorithmPractice
 	}
 }
 

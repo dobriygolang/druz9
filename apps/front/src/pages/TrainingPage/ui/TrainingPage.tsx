@@ -126,7 +126,7 @@ export function TrainingPage() {
                     marginBottom: 8,
                   }}
                 >
-                  <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>{branch.name}</span>
+                  <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14 }}>{branch.name}</span>
                   <span
                     className="font-silkscreen uppercase"
                     style={{ fontSize: 11, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
@@ -358,7 +358,7 @@ function DetailStat({ label, value }: { label: string; value: string | number })
         {label}
       </div>
       <div
-        style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 18, color: 'var(--ink-0)' }}
+        style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 18, color: 'var(--ink-0)' }}
       >
         {value}
       </div>

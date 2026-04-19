@@ -42,7 +42,7 @@ export function ToastStack() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: 'var(--parch-0)',
-                fontFamily: 'Silkscreen, monospace',
+                fontFamily: 'Silkscreen, Unbounded, monospace',
                 fontSize: 16,
                 flexShrink: 0,
               }}
@@ -56,7 +56,7 @@ export function ToastStack() {
               >
                 {t.kind}
               </div>
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14, lineHeight: 1.2 }}>
+              <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14, lineHeight: 1.2 }}>
                 {t.title}
               </div>
               {t.body && (

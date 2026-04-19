@@ -186,7 +186,7 @@ export function SkillsPage() {
             <div className="font-silkscreen uppercase" style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.1em' }}>
               skill points
             </div>
-            <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 22, color: 'var(--ember-1)', lineHeight: 1 }}>
+            <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 22, color: 'var(--ember-1)', lineHeight: 1 }}>
               {data?.pointsAvailable ?? 0}
               <span style={{ fontSize: 13, color: 'var(--ink-2)', marginLeft: 4 }}>
                 / {data?.pointsEarned ?? 0}
@@ -224,7 +224,7 @@ export function SkillsPage() {
               return (
                 <Panel key={branch} variant="tight">
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>{BRANCH_LABELS[branch]}</span>
+                    <span style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14 }}>{BRANCH_LABELS[branch]}</span>
                     <span className="font-silkscreen uppercase" style={{ fontSize: 11, color: 'var(--ink-2)', letterSpacing: '0.08em' }}>
                       {s.done}/{s.total}
                     </span>

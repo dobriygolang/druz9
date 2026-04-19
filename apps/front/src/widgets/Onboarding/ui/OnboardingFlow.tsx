@@ -176,7 +176,7 @@ function TutorialDuel({ name, klassLabel, onWin }: TutorialDuelProps) {
         </div>
         <div
           style={{
-            fontFamily: 'Pixelify Sans, monospace',
+            fontFamily: 'Pixelify Sans, Unbounded, monospace',
             fontSize: 96,
             color: count === 0 ? 'var(--moss-1)' : 'var(--ember-1)',
             textShadow: '6px 6px 0 var(--ink-0)',
@@ -448,7 +448,7 @@ export function OnboardingFlow({ onFinish }: { onFinish: () => void }) {
                   fontSize: 72,
                   margin: 0,
                   lineHeight: 1,
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   textShadow: '6px 6px 0 var(--ink-3)',
                 }}
               >
@@ -599,7 +599,7 @@ export function OnboardingFlow({ onFinish }: { onFinish: () => void }) {
                         <Hero scale={2} />
                       </div>
                       <div>
-                        <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 18 }}>{k.t}</div>
+                        <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 18 }}>{k.t}</div>
                         <div style={{ fontSize: 11, color: 'var(--ink-2)' }}>{k.s}</div>
                       </div>
                     </div>
@@ -654,7 +654,7 @@ export function OnboardingFlow({ onFinish }: { onFinish: () => void }) {
                       >
                         <Sprite scale={4} />
                       </div>
-                      <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 16 }}>{p.t}</div>
+                      <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 16 }}>{p.t}</div>
                       <div style={{ fontSize: 10, color: 'var(--ink-2)' }}>{p.s}</div>
                     </div>
                   )
@@ -716,7 +716,7 @@ export function OnboardingFlow({ onFinish }: { onFinish: () => void }) {
                       }}
                     />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 16 }}>{g.t}</div>
+                      <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 16 }}>{g.t}</div>
                       <div style={{ fontSize: 11, color: 'var(--ink-2)' }}>{g.s}</div>
                     </div>
                     {goal === g.id && (
@@ -747,7 +747,7 @@ export function OnboardingFlow({ onFinish }: { onFinish: () => void }) {
               >INITIATION COMPLETE</div>
               <h1
                 style={{
-                  fontFamily: 'Pixelify Sans, monospace',
+                  fontFamily: 'Pixelify Sans, Unbounded, monospace',
                   fontSize: 52,
                   margin: '8px 0',
                   whiteSpace: 'normal',

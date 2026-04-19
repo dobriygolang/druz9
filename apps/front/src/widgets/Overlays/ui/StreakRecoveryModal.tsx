@@ -36,14 +36,14 @@ export function StreakRecoveryModal({ streakBefore, onUseShield, onDismiss }: St
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
           <div style={{ background: 'var(--parch-2)', border: '2px solid var(--ink-0)', padding: 12 }}>
             <div className="font-silkscreen uppercase" style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}>WAS</div>
-            <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 32, color: 'var(--ember-1)', lineHeight: 1 }}>
+            <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 32, color: 'var(--ember-1)', lineHeight: 1 }}>
               {streakBefore}d
             </div>
             <div className="font-silkscreen" style={{ fontSize: 9, color: 'var(--ember-1)' }}>🔥 streak</div>
           </div>
           <div style={{ background: 'var(--parch-2)', border: '2px dashed var(--rpg-danger)', padding: 12 }}>
             <div className="font-silkscreen uppercase" style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}>NOW</div>
-            <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 32, color: 'var(--rpg-danger)', lineHeight: 1 }}>
+            <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 32, color: 'var(--rpg-danger)', lineHeight: 1 }}>
               0d
             </div>
             <div className="font-silkscreen" style={{ fontSize: 9, color: 'var(--ink-3)' }}>streak reset</div>
@@ -62,7 +62,7 @@ export function StreakRecoveryModal({ streakBefore, onUseShield, onDismiss }: St
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-            <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 15 }}>⛨ Streak Shield</div>
+            <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 15 }}>⛨ Streak Shield</div>
             <Badge variant="ember">1 owned</Badge>
           </div>
           <div style={{ fontSize: 12, color: 'var(--ink-2)', marginBottom: 10 }}>

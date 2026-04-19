@@ -119,7 +119,7 @@ export function CodeRoomsIndexPage() {
               ⌨
             </div>
             <div>
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>
+              <div style={{ fontFamily: 'Pixelify Sans, Unbounded, monospace', fontSize: 14 }}>
                 {room.task || t('rooms.untitledTask')}
               </div>
               <div

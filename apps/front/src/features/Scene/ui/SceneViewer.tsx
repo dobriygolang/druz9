@@ -117,7 +117,7 @@ function SceneEmpty({ title, hint }: { title: string; hint: string }) {
         background: 'var(--parch-1, #f6e9c8)',
         border: '3px dashed var(--ink-1, #5b4331)',
         color: 'var(--ink-0, #2a1a0c)',
-        fontFamily: 'Pixelify Sans, monospace',
+        fontFamily: 'Pixelify Sans, Unbounded, monospace',
       }}
     >
       <div style={{ fontSize: 16, marginBottom: 6 }}>{title}</div>
