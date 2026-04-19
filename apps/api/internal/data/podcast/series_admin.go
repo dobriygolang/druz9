@@ -52,7 +52,7 @@ func (r *Repo) UpdateSeries(ctx context.Context, id uuid.UUID, title, descriptio
 	s := &Series{}
 	if err := row.Scan(&s.ID, &s.Slug, &s.Title, &s.Description, &s.CoverRef, &s.CreatedAt); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, fmt.Errorf("update series: not found")
+			return nil, fmt.Errorf("update series: %w", ErrSeriesNotFound)
 		}
 		return nil, fmt.Errorf("update series: %w", err)
 	}
@@ -65,7 +65,7 @@ func (r *Repo) DeleteSeries(ctx context.Context, id uuid.UUID) error {
 		return fmt.Errorf("delete series: %w", err)
 	}
 	if tag.RowsAffected() == 0 {
-		return fmt.Errorf("delete series: not found")
+		return fmt.Errorf("delete series: %w", ErrSeriesNotFound)
 	}
 	return nil
 }
@@ -82,7 +82,7 @@ func (r *Repo) ToggleFeatured(ctx context.Context, podcastID uuid.UUID, featured
 		var ts time.Time
 		if err := row.Scan(&ts); err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
-				return nil, fmt.Errorf("toggle featured: podcast not found")
+				return nil, fmt.Errorf("toggle featured: %w", ErrSeriesNotFound)
 			}
 			return nil, fmt.Errorf("toggle featured: %w", err)
 		}

@@ -29,6 +29,26 @@ interface TourProps {
   onClose?: () => void
 }
 
+const DONE_KEY = 'druz9_tours_done'
+let completedCache: Set<string> | null = null
+
+function readLocalDone(): Set<string> {
+  if (completedCache) return completedCache
+  try {
+    completedCache = new Set(JSON.parse(localStorage.getItem(DONE_KEY) ?? '[]') as string[])
+  } catch {
+    completedCache = new Set()
+  }
+  return completedCache
+}
+
+function rememberDone(tourId: string) {
+  const done = readLocalDone()
+  if (done.has(tourId)) return
+  done.add(tourId)
+  localStorage.setItem(DONE_KEY, JSON.stringify([...done]))
+}
+
 export function Tour({ tourId, steps, onClose }: TourProps) {
   const [active, setActive] = useState(false)
   const [step, setStep] = useState(0)
@@ -37,13 +57,17 @@ export function Tour({ tourId, steps, onClose }: TourProps) {
   // Decide whether to show this tour at all. Local fallback prevents the
   // re-render storm if the backend is offline.
   useEffect(() => {
+    if (readLocalDone().has(tourId)) return
     let cancelled = false
     toursApi
       .list()
-      .then((ids) => { if (!cancelled && !ids.includes(tourId)) setActive(true) })
+      .then((ids) => {
+        if (cancelled) return
+        for (const id of ids) rememberDone(id)
+        if (!ids.includes(tourId)) setActive(true)
+      })
       .catch(() => {
-        const local = JSON.parse(localStorage.getItem('druz9_tours_done') ?? '[]') as string[]
-        if (!local.includes(tourId)) setActive(true)
+        if (!readLocalDone().has(tourId)) setActive(true)
       })
     return () => { cancelled = true }
   }, [tourId])
@@ -54,8 +78,9 @@ export function Tour({ tourId, steps, onClose }: TourProps) {
     if (!active) return
     const target = document.querySelector(steps[step]?.selector ?? '') as HTMLElement | null
     if (!target) {
-      // Element not in DOM yet — try again next tick.
-      const t = setTimeout(() => setRect(null), 100)
+      const t = setTimeout(() => {
+        setStep((s) => (s < steps.length - 1 ? s + 1 : s))
+      }, 250)
       return () => clearTimeout(t)
     }
     const update = () => setRect(target.getBoundingClientRect())
@@ -67,18 +92,13 @@ export function Tour({ tourId, steps, onClose }: TourProps) {
 
   const finish = (skipped: boolean) => {
     setActive(false)
-    void toursApi.markCompleted(tourId).catch(() => {
-      const local = JSON.parse(localStorage.getItem('druz9_tours_done') ?? '[]') as string[]
-      if (!local.includes(tourId)) {
-        local.push(tourId)
-        localStorage.setItem('druz9_tours_done', JSON.stringify(local))
-      }
-    })
+    rememberDone(tourId)
+    void toursApi.markCompleted(tourId).catch(() => {})
     onClose?.()
     void skipped
   }
 
-  if (!active || steps.length === 0) return null
+  if (!active || steps.length === 0 || !rect) return null
   const cur = steps[step]
 
   // Cutout: clip-path with a hole around the target rect; fall back to

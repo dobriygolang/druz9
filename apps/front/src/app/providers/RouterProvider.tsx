@@ -32,9 +32,7 @@ const GuildPage = lazy(() =>
 const ArenaHubPage = lazy(() =>
   import('@/pages/ArenaHubPage/ui/ArenaHubPage').then((m) => ({ default: m.ArenaHubPage })),
 )
-// /atlas uses the TrainingPage layout (the card design the user prefers).
-// SkillsPage stayed around briefly as the candidate but we ended up on
-// Training's cleaner node cards.
+// Training/skills remain the skill tree. /atlas is the dedicated SVG world map.
 const TrainingPage = lazy(() =>
   import('@/pages/TrainingPage/ui/TrainingPage').then((m) => ({ default: m.TrainingPage })),
 )

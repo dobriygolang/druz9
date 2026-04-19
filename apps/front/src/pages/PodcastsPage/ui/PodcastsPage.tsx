@@ -6,11 +6,13 @@ import type { Podcast } from '@/entities/Podcast/model/types'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { addToast } from '@/shared/lib/toasts'
 import { Tour } from '@/features/Tour/ui/Tour'
+import { useAudioPlayer } from '@/features/Podcast/providers/AudioPlayerProvider'
 
 type Tab = 'featured' | 'series' | 'history' | 'saved'
 
 interface Episode {
   id: string
+  podcast: Podcast
   t: string
   h: string
   d: string
@@ -28,10 +30,18 @@ function pickColor(title: string, i: number): string {
   return PALETTE[Math.abs(h) % PALETTE.length]
 }
 
+function formatTime(seconds: number): string {
+  if (!Number.isFinite(seconds) || seconds <= 0) return '0:00'
+  const m = Math.floor(seconds / 60)
+  const s = Math.floor(seconds % 60)
+  return `${m}:${s.toString().padStart(2, '0')}`
+}
+
 function toEpisode(p: Podcast, i: number): Episode {
   const mins = Math.max(1, Math.round(p.durationSeconds / 60))
   return {
     id: p.id,
+    podcast: p,
     t: p.title,
     h: p.authorName || 'druz9 mentor',
     d: `${mins} min`,
@@ -55,11 +65,13 @@ type QueueItem = { episodeId: string; title: string; mins: number; slot: string 
 
 export function PodcastsPage() {
   const { user } = useAuth()
+  const player = useAudioPlayer()
   const [uploadOpen, setUploadOpen] = useState(false)
   const [tab, setTab] = useState<Tab>('featured')
   const [episodes, setEpisodes] = useState<Episode[]>([])
   const [totalCatalog, setTotalCatalog] = useState(0)
   const [playing, setPlaying] = useState<{ title: string; host: string; ep: string; pos: number } | null>(null)
+  const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null)
   const [history, setHistory] = useState<Episode[]>([])
   // ADR-005: saved list now lives on the server (cross-device). The
   // localStorage cache is hydrated on first paint to avoid a flash, then
@@ -118,6 +130,7 @@ export function PodcastsPage() {
         setEpisodes(eps)
         setTotalCatalog(r.total)
         if (eps[0] && !playing) {
+          setSelectedEpisode(eps[0])
           setPlaying({ title: eps[0].t, host: eps[0].h, ep: `Ep. ${eps[0].ep} · ${eps[0].d}`, pos: 0 })
         }
       })
@@ -125,6 +138,26 @@ export function PodcastsPage() {
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const visibleEpisodes = tab === 'history' ? history : tab === 'saved' ? savedEpisodes : episodes
+  const selectedIndex = selectedEpisode ? visibleEpisodes.findIndex((e) => e.id === selectedEpisode.id) : -1
+  const playEpisode = async (episode: Episode) => {
+    setSelectedEpisode(episode)
+    setPlaying({ title: episode.t, host: episode.h, ep: `Ep. ${episode.ep} · ${episode.d}`, pos: 0 })
+    setHistory((h) => [episode, ...h.filter((e) => e.id !== episode.id)].slice(0, 20))
+    await player.play(episode.podcast)
+  }
+  const playRelative = (delta: number) => {
+    if (visibleEpisodes.length === 0) return
+    const base = selectedIndex >= 0 ? selectedIndex : 0
+    const next = visibleEpisodes[Math.max(0, Math.min(visibleEpisodes.length - 1, base + delta))]
+    if (next) void playEpisode(next)
+  }
+  const cycleSpeed = () => {
+    const speeds = [1, 1.25, 1.5, 2]
+    const next = speeds[(speeds.indexOf(player.speed) + 1) % speeds.length] ?? 1
+    player.setSpeed(next)
+  }
 
   return (
     <>
@@ -224,7 +257,15 @@ export function PodcastsPage() {
               {playing ? `with ${playing.host}` : 'tavern is quiet'}
             </div>
             <div style={{ marginTop: 10 }}>
-              <Bar value={(playing?.pos ?? 0) * 100} />
+              <div
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  player.seek(((e.clientX - rect.left) / rect.width) * 100)
+                }}
+                style={{ cursor: player.playing ? 'pointer' : 'default' }}
+              >
+                <Bar value={player.progress || (playing?.pos ?? 0) * 100} />
+              </div>
             </div>
             <div
               style={{
@@ -238,19 +279,21 @@ export function PodcastsPage() {
                 className="font-silkscreen uppercase"
                 style={{ color: 'var(--parch-2)', fontSize: 9, letterSpacing: '0.08em' }}
               >
-                17:42 / 52:14
+                {formatTime(player.currentTime)} / {formatTime(player.duration)}
               </span>
               <div style={{ display: 'flex', gap: 8 }}>
-                <span
+                <button
+                  onClick={cycleSpeed}
                   className="rpg-tweak-chip"
                   style={{
                     background: '#2a1f15',
                     color: 'var(--parch-2)',
                     borderColor: '#4a3028',
+                    cursor: 'pointer',
                   }}
                 >
-                  1.0×
-                </span>
+                  {player.speed === 1 ? '1.0' : player.speed}×
+                </button>
                 <span
                   className="rpg-tweak-chip"
                   style={{
@@ -265,13 +308,19 @@ export function PodcastsPage() {
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
-            <RpgButton size="sm" style={{ padding: '12px 14px', fontSize: 18 }}>
+            <RpgButton size="sm" style={{ padding: '12px 14px', fontSize: 18 }} onClick={() => playRelative(-1)}>
               ⏮
             </RpgButton>
-            <RpgButton size="sm" variant="primary" style={{ padding: '14px 18px', fontSize: 20 }}>
-              ▶
+            <RpgButton
+              size="sm"
+              variant="primary"
+              style={{ padding: '14px 18px', fontSize: 20 }}
+              disabled={!selectedEpisode}
+              onClick={() => selectedEpisode && void playEpisode(selectedEpisode)}
+            >
+              {player.isPlaying && player.playing?.id === selectedEpisode?.id ? '⏸' : '▶'}
             </RpgButton>
-            <RpgButton size="sm" style={{ padding: '12px 14px', fontSize: 18 }}>
+            <RpgButton size="sm" style={{ padding: '12px 14px', fontSize: 18 }} onClick={() => playRelative(1)}>
               ⏭
             </RpgButton>
           </div>
@@ -307,20 +356,12 @@ export function PodcastsPage() {
             {tab === 'saved' && 'Saved for later'}
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            {(tab === 'history' ? history : tab === 'saved' ? savedEpisodes : episodes).map((p) => (
+            {visibleEpisodes.map((p) => (
               <Panel
                 key={p.ep}
                 variant="tight"
                 style={{ padding: 12, cursor: 'pointer' }}
-                onClick={() => {
-                  setPlaying({
-                    title: p.t,
-                    host: p.h,
-                    ep: `Ep. ${p.ep} · ${p.d}`,
-                    pos: 0,
-                  })
-                  setHistory((h) => [p, ...h.filter((e) => e.id !== p.id)].slice(0, 20))
-                }}
+                onClick={() => void playEpisode(p)}
               >
                 <div style={{ display: 'flex', gap: 12, alignItems: 'stretch' }}>
                   <div

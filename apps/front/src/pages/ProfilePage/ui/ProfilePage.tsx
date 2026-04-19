@@ -29,6 +29,7 @@ import { InventoryModal } from '@/features/Shop/ui/InventoryModal'
 import type { ProfileProgress, User } from '@/entities/User/model/types'
 import { SceneViewer } from '@/features/Scene/ui/SceneViewer'
 import { SceneEditor } from '@/features/Scene/ui/SceneEditor'
+import { renderSceneItemArt } from '@/features/Scene/ui/sceneItemArt'
 import { SendGiftModal } from '@/features/Inbox/ui/SendGiftModal'
 import { Tour } from '@/features/Tour/ui/Tour'
 
@@ -816,25 +817,12 @@ function SceneCanvasInline({
             transform: `translate(-50%, -50%) rotate(${it.rotationDeg}deg) scaleX(${it.flipped ? -1 : 1})`,
             zIndex: it.zIndex, transformOrigin: 'center', pointerEvents: 'none',
         }
-        if (asset?.src) {
-          return (
-            <img
-              key={`${it.itemId}-${idx}`}
-              src={asset.src}
-              alt={asset.label ?? it.itemId}
-              style={itemStyle}
-              draggable={false}
-            />
-          )
-        }
         return (
           <div key={`${it.itemId}-${idx}`} style={{
             ...itemStyle,
-            padding: '6px 10px', background: 'var(--parch-2, #efe1bf)',
-            border: '2px solid var(--ink-0, #2a1a0c)',
-            fontFamily: 'Pixelify Sans, monospace', fontSize: 11,
-            whiteSpace: 'nowrap', color: 'var(--ink-0, #2a1a0c)',
-          }}>{asset?.label ?? it.itemId.slice(0, 8)}</div>
+          }}>
+            {renderSceneItemArt(asset?.src, asset?.label ?? it.itemId, 4)}
+          </div>
         )
       })}
     </div>

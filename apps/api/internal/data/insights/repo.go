@@ -15,6 +15,8 @@ import (
 	"api/internal/storage/postgres"
 )
 
+var errInsightUserIDRequired = errors.New("upsert insight: user_id required")
+
 type Item struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`

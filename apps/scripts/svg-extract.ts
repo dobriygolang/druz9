@@ -28,11 +28,14 @@ const fallback: Region[] = [
 const regions = [...svg.matchAll(/<g\b[^>]*\bid=["']region-([^"']+)["'][^>]*>([\s\S]*?)<\/g>/g)].map((m) => {
   const id = slug(m[1])
   const body = m[2]
+  const groupOpen = m[0].match(/^<g\b[^>]*>/)?.[0] ?? ''
+  const explicitX = attrNumber(groupOpen, 'data-centroid-x')
+  const explicitY = attrNumber(groupOpen, 'data-centroid-y')
   const nums = [...body.matchAll(/[-+]?\d*\.?\d+(?:e[-+]?\d+)?/gi)].map((n) => Number(n[0])).filter(Number.isFinite)
   const xs = nums.filter((_, i) => i % 2 === 0)
   const ys = nums.filter((_, i) => i % 2 === 1)
-  const cx = xs.length ? avg(xs) : minX + width / 2
-  const cy = ys.length ? avg(ys) : minY + height / 2
+  const cx = explicitX ?? (xs.length ? avg(xs) : minX + width / 2)
+  const cy = explicitY ?? (ys.length ? avg(ys) : minY + height / 2)
   const label = decodeEntities((body.match(/<text\b[^>]*>([\s\S]*?)<\/text>/)?.[1] ?? id).replace(/<[^>]+>/g, '').trim())
   return {
     id,
@@ -53,6 +56,12 @@ if (!regions.length) console.warn(`no <g id="region-*"> groups found in ${svgPat
 function avg(v: number[]) { return v.reduce((s, n) => s + n, 0) / v.length }
 function round(v: number) { return Math.round(v * 100) / 100 }
 function slug(v: string) { return v.trim().replace(/^region-/, '').replace(/-/g, '_') }
+function attrNumber(tag: string, name: string) {
+  const m = tag.match(new RegExp(`${name}=["']([^"']+)["']`))
+  if (!m) return undefined
+  const n = Number(m[1])
+  return Number.isFinite(n) ? n : undefined
+}
 function decodeEntities(v: string) {
   return v.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
 }

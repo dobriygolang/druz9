@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState, type CSSProperties, type PointerEvent as 
 import { sceneApi, type PlacedItem, type SceneLayout } from '@/features/Scene/api/sceneApi'
 import { shopApi } from '@/features/Shop/api/shopApi'
 import type { OwnedItem } from '@/features/Shop/model/types'
+import { renderSceneItemArt } from './sceneItemArt'
 
 interface SceneEditorProps {
   scope: 'user_room' | 'guild_hall'
@@ -226,20 +227,7 @@ export function SceneEditor({ scope, ownerId, initial, onSaved, onCancel, maxHei
                   }}
                 />
               )}
-              {meta?.item.iconRef ? (
-                <img src={meta.item.iconRef} alt={meta.item.name} draggable={false} style={{ width: '100%', display: 'block', pointerEvents: 'none' }} />
-              ) : (
-                <div style={{
-                  padding: '6px 10px',
-                  background: 'var(--parch-2, #efe1bf)',
-                  border: '2px solid var(--ink-0, #2a1a0c)',
-                  fontFamily: 'Pixelify Sans, monospace',
-                  fontSize: 11,
-                  whiteSpace: 'nowrap',
-                  color: 'var(--ink-0, #2a1a0c)',
-                  pointerEvents: 'none',
-                }}>{meta?.item.name ?? it.itemId.slice(0, 8)}</div>
-              )}
+              {renderSceneItemArt(meta?.item.iconRef, meta?.item.name ?? it.itemId, 4)}
             </div>
           )
         })}
@@ -321,9 +309,9 @@ function ItemPicker({ owned, onPick, onClose }: {
           {owned?.map((o) => (
             <button key={o.item.id} className="rpg-btn rpg-btn--sm" onClick={() => onPick(o.item.id)}
               style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: 8 }}>
-              {o.item.iconRef
-                ? <img src={o.item.iconRef} alt="" style={{ width: 56, height: 56, objectFit: 'contain' }} draggable={false} />
-                : <div style={{ width: 56, height: 56, background: 'var(--parch-2, #efe1bf)', display: 'grid', placeItems: 'center', fontSize: 10 }}>—</div>}
+              <div style={{ width: 56, height: 56, display: 'grid', placeItems: 'center' }}>
+                {renderSceneItemArt(o.item.iconRef, o.item.name, 2)}
+              </div>
               <span style={{ fontSize: 11, textAlign: 'center', lineHeight: 1.2 }}>{o.item.name}</span>
             </button>
           ))}

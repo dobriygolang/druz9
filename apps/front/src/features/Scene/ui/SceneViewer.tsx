@@ -3,6 +3,7 @@
 // shows whatever the owner saved last.
 import { useEffect, useState, type CSSProperties } from 'react'
 import { sceneApi, type SceneLayout, type SceneLayoutResponse } from '@/features/Scene/api/sceneApi'
+import { renderSceneItemArt } from './sceneItemArt'
 
 interface SceneViewerProps {
   scope: 'user_room' | 'guild_hall'
@@ -90,32 +91,12 @@ function SceneCanvas({
             transformOrigin: 'center',
             pointerEvents: 'none',
           }
-          if (asset?.src) {
-            return (
-              <img
-                key={`${it.itemId}-${idx}`}
-                src={asset.src}
-                alt={asset.label ?? it.itemId}
-                style={itemStyle}
-                draggable={false}
-              />
-            )
-          }
           return (
             <div
               key={`${it.itemId}-${idx}`}
-              style={{
-                ...itemStyle,
-                padding: '6px 10px',
-                background: 'var(--parch-2, #efe1bf)',
-                border: '2px solid var(--ink-0, #2a1a0c)',
-                fontFamily: 'Pixelify Sans, monospace',
-                fontSize: 11,
-                whiteSpace: 'nowrap',
-                color: 'var(--ink-0, #2a1a0c)',
-              }}
+              style={itemStyle}
             >
-              {asset?.label ?? it.itemId.slice(0, 8)}
+              {renderSceneItemArt(asset?.src, asset?.label ?? it.itemId, 4)}
             </div>
           )
         })}
