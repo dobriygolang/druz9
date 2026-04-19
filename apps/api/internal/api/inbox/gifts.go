@@ -26,17 +26,17 @@ type GiftsRepo interface {
 
 // GiftRowAPI mirrors data/inbox.GiftRow on the API boundary.
 type GiftRowAPI struct {
-	ID            string
-	SenderID      string
-	SenderName    string
-	RecipientID   string
-	ItemID        string
-	ItemName      string
-	ItemIconRef   string
-	Note          string
-	Status        string
-	SentAt        time.Time
-	DecidedAt     *time.Time
+	ID          string
+	SenderID    string
+	SenderName  string
+	RecipientID string
+	ItemID      string
+	ItemName    string
+	ItemIconRef string
+	Note        string
+	Status      string
+	SentAt      time.Time
+	DecidedAt   *time.Time
 }
 
 // API-level sentinels mirroring the data-layer ones.

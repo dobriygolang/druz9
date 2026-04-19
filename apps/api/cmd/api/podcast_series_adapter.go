@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -26,21 +27,31 @@ type podcastSavedAdapter struct {
 }
 
 func (a podcastSavedAdapter) SavePodcast(ctx context.Context, userID, podcastID uuid.UUID) error {
-	return a.repo.SavePodcast(ctx, userID, podcastID)
+	if err := a.repo.SavePodcast(ctx, userID, podcastID); err != nil {
+		return fmt.Errorf("save podcast: %w", err)
+	}
+	return nil
 }
 
 func (a podcastSavedAdapter) UnsavePodcast(ctx context.Context, userID, podcastID uuid.UUID) error {
-	return a.repo.UnsavePodcast(ctx, userID, podcastID)
+	if err := a.repo.UnsavePodcast(ctx, userID, podcastID); err != nil {
+		return fmt.Errorf("unsave podcast: %w", err)
+	}
+	return nil
 }
 
 func (a podcastSavedAdapter) ListSavedPodcasts(ctx context.Context, userID uuid.UUID, limit, offset int32) ([]*model.Podcast, int32, error) {
-	return a.repo.ListSavedPodcasts(ctx, userID, limit, offset)
+	out, total, err := a.repo.ListSavedPodcasts(ctx, userID, limit, offset)
+	if err != nil {
+		return nil, 0, fmt.Errorf("list saved podcasts: %w", err)
+	}
+	return out, total, nil
 }
 
 func (a podcastSeriesAdapter) ListSeries(ctx context.Context, limit, offset int32) ([]*podcastservice.SeriesRow, int32, error) {
 	rows, total, err := a.repo.ListSeries(ctx, limit, offset)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("list series: %w", err)
 	}
 	out := make([]*podcastservice.SeriesRow, len(rows))
 	for i, s := range rows {
@@ -77,7 +88,7 @@ func (a podcastSeriesAdminAdapter) CreateSeries(ctx context.Context, slug, title
 		if errors.Is(err, podcastdata.ErrSeriesSlugTaken) {
 			return nil, podcastservice.ErrSeriesSlugTaken
 		}
-		return nil, err
+		return nil, fmt.Errorf("create series: %w", err)
 	}
 	return toSeriesRow(row), nil
 }
@@ -85,23 +96,33 @@ func (a podcastSeriesAdminAdapter) CreateSeries(ctx context.Context, slug, title
 func (a podcastSeriesAdminAdapter) UpdateSeries(ctx context.Context, id uuid.UUID, title, description, coverRef string) (*podcastservice.SeriesRow, error) {
 	row, err := a.repo.UpdateSeries(ctx, id, title, description, coverRef)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("update series: %w", err)
 	}
 	return toSeriesRow(row), nil
 }
 
 func (a podcastSeriesAdminAdapter) DeleteSeries(ctx context.Context, id uuid.UUID) error {
-	return a.repo.DeleteSeries(ctx, id)
+	if err := a.repo.DeleteSeries(ctx, id); err != nil {
+		return fmt.Errorf("delete series: %w", err)
+	}
+	return nil
 }
 
 func (a podcastSeriesAdminAdapter) ToggleFeatured(ctx context.Context, podcastID uuid.UUID, featured bool) (*time.Time, error) {
-	return a.repo.ToggleFeatured(ctx, podcastID, featured)
+	ts, err := a.repo.ToggleFeatured(ctx, podcastID, featured)
+	if err != nil {
+		return nil, fmt.Errorf("toggle featured: %w", err)
+	}
+	return ts, nil
 }
 
 func (a podcastSeriesAdminAdapter) GetPodcast(ctx context.Context, podcastID uuid.UUID) (*podcastservice.PodcastWire, error) {
 	p, err := a.repo.GetPodcast(ctx, podcastID)
-	if err != nil || p == nil {
-		return nil, err
+	if err != nil {
+		return nil, fmt.Errorf("get podcast: %w", err)
+	}
+	if p == nil {
+		return nil, nil
 	}
 	return &podcastservice.PodcastWire{
 		ID:              p.ID.String(),
@@ -118,6 +139,8 @@ func (a podcastSeriesAdminAdapter) GetPodcast(ctx context.Context, podcastID uui
 }
 
 // Compile-time interface check.
-var _ podcastservice.SeriesAdminRepo = podcastSeriesAdminAdapter{}
-var _ podcastservice.SeriesRepo = podcastSeriesAdapter{}
-var _ podcastservice.SavedRepo = podcastSavedAdapter{}
+var (
+	_ podcastservice.SeriesAdminRepo = podcastSeriesAdminAdapter{}
+	_ podcastservice.SeriesRepo      = podcastSeriesAdapter{}
+	_ podcastservice.SavedRepo       = podcastSavedAdapter{}
+)

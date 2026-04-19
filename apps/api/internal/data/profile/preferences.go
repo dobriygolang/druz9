@@ -9,6 +9,11 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+var (
+	errInvalidDensity = errors.New("preferences upsert: invalid density")
+	errInvalidLocale  = errors.New("preferences upsert: invalid locale")
+)
+
 // Preferences mirrors the user_preferences row (ADR-005). The shape is
 // duplicated in api/profile.PreferencesRow so the API package can declare
 // its repository contract without importing data/.
@@ -42,10 +47,10 @@ func (r *Repo) UpsertPreferences(ctx context.Context, userID uuid.UUID, density,
 		return r.GetOrInitPreferences(ctx, userID)
 	}
 	if density != "" && density != "comfortable" && density != "compact" {
-		return nil, fmt.Errorf("preferences upsert: invalid density %q", density)
+		return nil, fmt.Errorf("preferences upsert: invalid density %q: %w", density, errInvalidDensity)
 	}
 	if locale != "" && locale != "ru" && locale != "en" {
-		return nil, fmt.Errorf("preferences upsert: invalid locale %q", locale)
+		return nil, fmt.Errorf("preferences upsert: invalid locale %q: %w", locale, errInvalidLocale)
 	}
 
 	// COALESCE keeps existing values when caller passes empty strings.

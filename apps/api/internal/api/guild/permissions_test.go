@@ -3,6 +3,7 @@ package guild
 import "testing"
 
 func TestCan(t *testing.T) {
+	t.Parallel()
 	cases := []struct {
 		name   string
 		role   Role
@@ -35,7 +36,9 @@ func TestCan(t *testing.T) {
 	}
 
 	for _, tc := range cases {
+		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			if got := Can(tc.role, tc.action); got != tc.want {
 				t.Fatalf("Can(%q, %q) = %v, want %v", tc.role, tc.action, got, tc.want)
 			}

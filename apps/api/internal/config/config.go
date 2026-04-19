@@ -105,6 +105,15 @@ type External struct {
 	S3                  *S3                  `json:"s3"`
 	AIReview            *AIReview            `json:"ai_review"`
 	NotificationService *NotificationService `json:"notification_service"`
+	Boosty              *Boosty              `json:"boosty"`
+}
+
+type Boosty struct {
+	AccessToken  string        `json:"access_token"`
+	RefreshToken string        `json:"refresh_token"`
+	DeviceID     string        `json:"device_id"`
+	BlogName     string        `json:"blog_name"`
+	Timeout      time.Duration `json:"timeout"`
 }
 
 type NotificationService struct {

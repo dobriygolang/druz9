@@ -6,6 +6,8 @@ import { Panel, PageHeader } from '@/shared/ui/pixel'
 import { Hero } from '@/shared/ui/sprites'
 import { notificationApi, type NotificationSettings } from '@/features/Notification/api/notificationApi'
 import { preferencesApi } from '@/features/UserPreferences/api/preferencesApi'
+import { premiumApi, type PremiumStatus } from '@/features/Premium/api/premiumApi'
+import { RpgButton } from '@/shared/ui/pixel'
 import { addToast } from '@/shared/lib/toasts'
 import { useTweaks, type Density } from '@/shared/lib/gameState'
 import { useAuth } from '@/app/providers/AuthProvider'
@@ -16,13 +18,14 @@ import { Tour } from '@/features/Tour/ui/Tour'
 // Leaving them in would keep suggesting to users that preferences are
 // being saved when they aren't. They'll come back when each has a
 // real UserPreferences RPC backing it.
-type Section = 'account' | 'tweaks' | 'notifs' | 'language'
+type Section = 'account' | 'tweaks' | 'notifs' | 'language' | 'premium'
 
 const ICONS: Record<Section, string> = {
   account:  '◎',
   tweaks:   '✦',
   notifs:   '✉',
   language: '◈',
+  premium:  '★',
 }
 
 export function SettingsPage() {
@@ -34,6 +37,7 @@ export function SettingsPage() {
     ['tweaks',   t('settings.tab.tweaks', { defaultValue: 'Flavour & tweaks' })],
     ['notifs',   t('settings.tab.notifications')],
     ['language', t('settings.tab.language')],
+    ['premium',  'Premium'],
   ]
 
   return (
@@ -93,6 +97,7 @@ export function SettingsPage() {
             {tab === 'tweaks'   && <SettingsTweaks />}
             {tab === 'notifs'   && <SettingsNotifs />}
             {tab === 'language' && <SettingsLanguage />}
+            {tab === 'premium'  && <SettingsPremium />}
           </div>
         </div>
       </Panel>
@@ -451,6 +456,134 @@ function SettingsTweaks() {
       >
         Active cosmetic: {tweaks.roomLayout} room · {tweaks.heroPose} pose · {tweaks.pet} pet · {tweaks.season} time.
       </div>
+    </>
+  )
+}
+
+function SettingsPremium() {
+  const [status, setStatus] = useState<PremiumStatus | null>(null)
+  const [email, setEmail] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
+
+  useEffect(() => {
+    premiumApi.getStatus().then(setStatus).catch(() => {})
+  }, [])
+
+  const link = async () => {
+    if (!email.trim() || busy) return
+    setBusy(true)
+    setMsg(null)
+    try {
+      const s = await premiumApi.linkBoosty(email.trim())
+      setStatus(s)
+      setEmail('')
+      setMsg({ ok: true, text: 'Premium активирован! Спасибо за поддержку.' })
+    } catch (e: any) {
+      const code = e?.response?.data?.code
+      if (code === 'NOT_SUBSCRIBED')
+        setMsg({ ok: false, text: 'Этот email не найден среди подписчиков Boosty. Убедись, что подписка активна.' })
+      else if (code === 'NOT_CONFIGURED')
+        setMsg({ ok: false, text: 'Интеграция с Boosty пока не настроена.' })
+      else
+        setMsg({ ok: false, text: 'Не удалось проверить подписку. Попробуй позже.' })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const unlink = async () => {
+    if (busy) return
+    setBusy(true)
+    try {
+      await premiumApi.unlinkBoosty()
+      setStatus({ active: false, source: null, boostyEmail: null, expiresAt: null })
+      setMsg({ ok: true, text: 'Boosty отвязан.' })
+    } catch {
+      setMsg({ ok: false, text: 'Не удалось отвязать.' })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const isActive = status?.active === true
+
+  return (
+    <>
+      <h3 className="font-display" style={{ fontSize: 17, marginBottom: 6 }}>Premium</h3>
+      <div style={{ color: 'var(--ink-2)', fontSize: 12, marginBottom: 20, lineHeight: 1.6 }}>
+        Подпишись на{' '}
+        <a href="https://boosty.to" target="_blank" rel="noreferrer"
+          style={{ color: 'var(--ember-1)' }}>Boosty</a>
+        {' '}и введи email, чтобы разблокировать Premium-менторов в интервью.
+      </div>
+
+      {/* Status card */}
+      <div style={{
+        padding: 16, marginBottom: 20,
+        border: `3px solid ${isActive ? 'var(--moss-1)' : 'var(--ink-3)'}`,
+        background: isActive ? 'rgba(80,140,80,0.08)' : 'var(--parch-0)',
+        boxShadow: '3px 3px 0 var(--ink-0)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: isActive ? 8 : 0 }}>
+          <span className="font-silkscreen uppercase" style={{
+            fontSize: 11, letterSpacing: '0.1em',
+            color: isActive ? 'var(--moss-1)' : 'var(--ink-2)',
+          }}>
+            {isActive ? '★ premium активен' : '○ premium не активен'}
+          </span>
+        </div>
+        {isActive && status && (
+          <div style={{ fontSize: 11, color: 'var(--ink-2)' }}>
+            <span>Boosty: <b>{status.boostyEmail}</b></span>
+            {status.expiresAt && (
+              <span style={{ marginLeft: 12 }}>
+                до {new Date(status.expiresAt).toLocaleDateString('ru')}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Link form */}
+      {!isActive && (
+        <Setting label="Email на Boosty" help="Тот же email, с которым ты подписан на Boosty">
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && void link()}
+              placeholder="you@example.com"
+              style={{
+                flex: 1, padding: '6px 8px', border: '2px solid var(--ink-0)',
+                background: 'var(--parch-0)', fontFamily: 'monospace', fontSize: 12,
+                outline: 'none',
+              }}
+            />
+            <RpgButton size="sm" variant="primary" disabled={busy || !email.trim()} onClick={link}>
+              {busy ? '…' : 'Привязать'}
+            </RpgButton>
+          </div>
+        </Setting>
+      )}
+
+      {/* Unlink */}
+      {isActive && (
+        <Setting label="Отвязать Boosty" help="Premium деактивируется немедленно">
+          <RpgButton size="sm" disabled={busy} onClick={unlink}>Отвязать</RpgButton>
+        </Setting>
+      )}
+
+      {/* Message */}
+      {msg && (
+        <div style={{
+          marginTop: 14, padding: '8px 12px', fontSize: 12,
+          color: msg.ok ? 'var(--moss-1)' : 'var(--rpg-danger, #a23a2a)',
+          border: `2px solid ${msg.ok ? 'var(--moss-1)' : 'var(--rpg-danger, #a23a2a)'}`,
+        }}>
+          {msg.text}
+        </div>
+      )}
     </>
   )
 }

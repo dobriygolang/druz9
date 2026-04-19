@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	klog "github.com/go-kratos/kratos/v2/log"
@@ -203,7 +202,7 @@ func fanOutPhaseTransition(ctx context.Context, warRepo *guilddata.Repo, notify 
 		klog.Warnf("guild_war cron: list wars in %s: %v", phase, err)
 		return
 	}
-	title := fmt.Sprintf("Война гильдии: фаза %s", phase)
+	title := "Война гильдии: фаза " + phase
 	fanOutSummary(ctx, warRepo, notify, wars, "guild_war_phase", title)
 }
 

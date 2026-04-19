@@ -16,13 +16,13 @@ const (
 type Action string
 
 const (
-	ActionEditGuildSettings  Action = "edit_guild_settings"
-	ActionSetMemberRole      Action = "set_member_role"
-	ActionEjectMember        Action = "eject_member"
-	ActionEditGuildHall      Action = "edit_guild_hall"
-	ActionSpendGuildBank     Action = "spend_guild_bank"
-	ActionDonateToGuildBank  Action = "donate_to_guild_bank"
-	ActionCreateGuildEvent   Action = "create_guild_event"
+	ActionEditGuildSettings Action = "edit_guild_settings"
+	ActionSetMemberRole     Action = "set_member_role"
+	ActionEjectMember       Action = "eject_member"
+	ActionEditGuildHall     Action = "edit_guild_hall"
+	ActionSpendGuildBank    Action = "spend_guild_bank"
+	ActionDonateToGuildBank Action = "donate_to_guild_bank"
+	ActionCreateGuildEvent  Action = "create_guild_event"
 )
 
 // Can returns true if a member with the given role is allowed to perform the

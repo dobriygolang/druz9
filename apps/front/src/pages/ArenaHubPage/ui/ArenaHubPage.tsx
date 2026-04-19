@@ -5,9 +5,11 @@ import { Panel, RpgButton, Badge, PageHeader, SkeletonRow } from '@/shared/ui/pi
 import { Sword, Banner, Hero } from '@/shared/ui/sprites'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { arenaApi, arenaMatchmaking, type ArenaLeaderboardEntry, type ArenaStats } from '@/features/Arena/api/arenaApi'
+import { guildApi, type GuildWar } from '@/features/Guild/api/guildApi'
 import { duelReplayApi, type ReplaySummary } from '@/features/DuelReplay'
 import { useActiveSeason } from '@/features/Hub/api/useActiveSeason'
 import { Tour } from '@/features/Tour/ui/Tour'
+import { DuelChallengeModal } from './DuelChallengeModal'
 
 // Team slots are a pure UI concept for now: the authenticated user + one
 // invite placeholder. Wire to a real team API when available.
@@ -48,12 +50,15 @@ export function ArenaHubPage() {
   const season = useActiveSeason()
   const [matchmaking, setMatchmaking] = useState(false)
   const [teamMatchmaking, setTeamMatchmaking] = useState(false)
+  const [challengeOpen, setChallengeOpen] = useState(false)
+  const [challengeMode, setChallengeMode] = useState<'1v1' | '2v2'>('1v1')
 
   // Live data from API.
   const [ladder, setLadder] = useState<ArenaLeaderboardEntry[]>([])
   const [ladderLoaded, setLadderLoaded] = useState(false)
   const [recent, setRecent] = useState<ReplaySummary[]>([])
   const [stats, setStats] = useState<ArenaStats | null>(null)
+  const [guildWar, setGuildWar] = useState<GuildWar | null | undefined>(undefined)
 
   useEffect(() => {
     let cancelled = false
@@ -72,6 +77,9 @@ export function ArenaHubPage() {
         .then((s) => { if (!cancelled) setStats(s) })
         .catch(() => {})
     }
+    guildApi.getGuildWar()
+      .then((w) => { if (!cancelled) setGuildWar(w) })
+      .catch(() => { if (!cancelled) setGuildWar(null) })
     return () => { cancelled = true }
   }, [user?.id])
 
@@ -232,6 +240,9 @@ export function ArenaHubPage() {
           <div style={{ display: 'flex', gap: 8 }}>
             <RpgButton size="sm" onClick={() => navigate('/duel/replay')}>
               {t('arenaHub.matchHistory')}
+            </RpgButton>
+            <RpgButton size="sm" variant="ghost" onClick={() => { setChallengeMode('1v1'); setChallengeOpen(true) }}>
+              {t('arena.challenge.challengeFriend', { defaultValue: '⚔ Вызвать друга' })}
             </RpgButton>
             <RpgButton size="sm" variant="primary" onClick={enterDuel}>
               {t('arenaHub.findDuel')}
@@ -540,68 +551,80 @@ export function ArenaHubPage() {
             <h3 className="font-display" style={{ fontSize: 17, color: 'var(--parch-0)' }}>
               {t('arenaHub.guildRivalry')}
             </h3>
-            <span
-              className="font-silkscreen uppercase"
-              style={{ color: 'var(--ember-3)', fontSize: 10, letterSpacing: '0.08em' }}
-            >
-              {t('arenaHub.live')}
-            </span>
+            {guildWar && (
+              <span
+                className="font-silkscreen uppercase"
+                style={{ color: 'var(--ember-3)', fontSize: 10, letterSpacing: '0.08em' }}
+              >
+                {t('arenaHub.live')}
+              </span>
+            )}
           </div>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 50px 1fr',
-              alignItems: 'center',
-              gap: 12,
-              marginBottom: 14,
-            }}
-          >
-            <div style={{ textAlign: 'center' }}>
-              <Banner scale={2} color="#3d6149" crest="✦" />
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14, color: 'var(--parch-0)' }}>
-                {t('arenaHub.guild.mossveil')}
-              </div>
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 28, color: 'var(--ember-3)' }}>
-                14
-              </div>
+          {guildWar === undefined && <SkeletonRow />}
+          {guildWar === null && (
+            <div className="font-silkscreen uppercase" style={{ fontSize: 9, color: 'var(--parch-2)', opacity: 0.7, letterSpacing: '0.08em', paddingBottom: 8 }}>
+              {t('arenaHub.noActiveWar', { defaultValue: 'No active guild war' })}
             </div>
-            <div
-              style={{
-                fontFamily: 'Pixelify Sans, monospace',
-                fontSize: 22,
-                textAlign: 'center',
-                color: 'var(--parch-0)',
-              }}
-            >
-              vs
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <Banner scale={2} color="#a23a2a" crest="◆" />
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14, color: 'var(--parch-0)' }}>
-                {t('arenaHub.guild.redRavens')}
+          )}
+          {guildWar && (
+            <>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 50px 1fr',
+                  alignItems: 'center',
+                  gap: 12,
+                  marginBottom: 14,
+                }}
+              >
+                <div style={{ textAlign: 'center' }}>
+                  <Banner scale={2} color="#3d6149" crest="✦" />
+                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14, color: 'var(--parch-0)' }}>
+                    {guildWar.ourGuildName}
+                  </div>
+                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 28, color: 'var(--ember-3)' }}>
+                    {guildWar.ourScore}
+                  </div>
+                </div>
+                <div
+                  style={{
+                    fontFamily: 'Pixelify Sans, monospace',
+                    fontSize: 22,
+                    textAlign: 'center',
+                    color: 'var(--parch-0)',
+                  }}
+                >
+                  vs
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <Banner scale={2} color="#a23a2a" crest="◆" />
+                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14, color: 'var(--parch-0)' }}>
+                    {guildWar.theirGuildName}
+                  </div>
+                  <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 28, color: 'var(--ember-3)' }}>
+                    {guildWar.theirScore}
+                  </div>
+                </div>
               </div>
-              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 28, color: 'var(--ember-3)' }}>
-                11
+              <div
+                className="font-silkscreen uppercase"
+                style={{
+                  color: 'var(--parch-2)',
+                  opacity: 0.7,
+                  fontSize: 10,
+                  letterSpacing: '0.08em',
+                  marginBottom: 8,
+                }}
+              >
+                {t('arenaHub.battleBanner')}
               </div>
-            </div>
-          </div>
-          <div
-            className="font-silkscreen uppercase"
-            style={{
-              color: 'var(--parch-2)',
-              opacity: 0.7,
-              fontSize: 10,
-              letterSpacing: '0.08em',
-              marginBottom: 8,
-            }}
-          >
-            {t('arenaHub.battleBanner')}
-          </div>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            <Badge variant="ember">{t('arenaHub.reward.seasonalRelic')}</Badge>
-            <Badge>{t('arenaHub.reward.hallBanner')}</Badge>
-            <Badge>{t('arenaHub.reward.guildGold')}</Badge>
-          </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <Badge variant="ember">{t('arenaHub.reward.seasonalRelic')}</Badge>
+                <Badge>{t('arenaHub.reward.hallBanner')}</Badge>
+                <Badge>{t('arenaHub.reward.guildGold')}</Badge>
+              </div>
+            </>
+          )}
         </Panel>
       </div>
 
@@ -671,7 +694,7 @@ export function ArenaHubPage() {
           >
             {teamMatchmaking ? t('arenaHub.team.queuing') : t('arenaHub.team.startQueue')}
           </RpgButton>
-          <RpgButton size="sm" variant="ghost" onClick={() => navigate('/inbox?tab=friends')}>
+          <RpgButton size="sm" variant="ghost" onClick={() => { setChallengeMode('2v2'); setChallengeOpen(true) }}>
             {t('arenaHub.team.inviteFromFriends')}
           </RpgButton>
           <span className="font-silkscreen uppercase" style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em', marginLeft: 'auto' }}>
@@ -692,6 +715,12 @@ export function ArenaHubPage() {
           </div>
         )}
       </Panel>
+
+      <DuelChallengeModal
+        open={challengeOpen}
+        defaultMode={challengeMode}
+        onClose={() => setChallengeOpen(false)}
+      />
     </>
   )
 }

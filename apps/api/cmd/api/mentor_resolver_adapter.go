@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -18,8 +19,11 @@ type mentorResolverAdapter struct {
 
 func (a mentorResolverAdapter) GetActiveByID(ctx context.Context, id uuid.UUID) (*interviewlive.MentorPersona, error) {
 	row, err := a.repo.GetActiveByID(ctx, id)
-	if err != nil || row == nil {
-		return nil, err
+	if err != nil {
+		return nil, fmt.Errorf("get mentor by id: %w", err)
+	}
+	if row == nil {
+		return nil, nil
 	}
 	return &interviewlive.MentorPersona{
 		ID:             row.ID,

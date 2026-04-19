@@ -63,10 +63,10 @@ type AdminRepo interface {
 // Implementation of interview_prep service.
 type Implementation struct {
 	v1.UnimplementedInterviewPrepServiceServer
-	service    Service
-	admin      AdminRepo
-	notif      notif.Sender
-	aiMentors  *aimentordata.Repo
+	service   Service
+	admin     AdminRepo
+	notif     notif.Sender
+	aiMentors *aimentordata.Repo
 }
 
 // New returns new instance of Implementation.

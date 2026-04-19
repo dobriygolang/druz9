@@ -19,7 +19,7 @@ func normalizeRoomLanguage(language model.ProgrammingLanguage) model.Programming
 	case model.ProgrammingLanguageSQL:
 		return model.ProgrammingLanguageSQL
 	case model.ProgrammingLanguageGo:
-		fallthrough
+		return model.ProgrammingLanguageGo
 	default:
 		return model.ProgrammingLanguageGo
 	}

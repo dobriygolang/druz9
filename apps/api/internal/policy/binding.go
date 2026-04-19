@@ -18,7 +18,7 @@ func LanguageForProgrammingLanguage(language model.ProgrammingLanguage) Language
 	case model.ProgrammingLanguageSQL:
 		return LanguageSQL
 	case model.ProgrammingLanguageGo:
-		fallthrough
+		return LanguageGo
 	default:
 		return LanguageGo
 	}

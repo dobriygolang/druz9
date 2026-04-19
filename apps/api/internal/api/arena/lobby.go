@@ -9,10 +9,9 @@ import (
 	"github.com/google/uuid"
 
 	"api/internal/apihelpers"
-	commonv1 "api/pkg/api/common/v1"
-
 	arenadata "api/internal/data/arena"
 	v1 "api/pkg/api/arena/v1"
+	commonv1 "api/pkg/api/common/v1"
 )
 
 // LobbyRepo is the slice of data/arena.Repo this handler consumes.

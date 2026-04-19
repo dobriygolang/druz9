@@ -186,7 +186,7 @@ func (r *Repo) PickRandomTask(ctx context.Context, topic, difficulty string) (*c
 }
 
 func (r *Repo) insertTaskCases(ctx context.Context, tx pgx.Tx, task *codeeditordomain.Task) error {
-	var allCases []*codeeditordomain.TestCase
+	allCases := make([]*codeeditordomain.TestCase, 0, len(task.PublicTestCases)+len(task.HiddenTestCases))
 	for _, tc := range task.PublicTestCases {
 		tc.TaskID = task.ID
 		tc.IsPublic = true

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -19,16 +20,22 @@ type profilePreferencesAdapter struct {
 
 func (a profilePreferencesAdapter) GetOrInitPreferences(ctx context.Context, userID uuid.UUID) (*profileservice.PreferencesRow, error) {
 	p, err := a.repo.GetOrInitPreferences(ctx, userID)
-	if err != nil || p == nil {
-		return nil, err
+	if err != nil {
+		return nil, fmt.Errorf("get or init preferences: %w", err)
+	}
+	if p == nil {
+		return nil, nil
 	}
 	return &profileservice.PreferencesRow{UserID: p.UserID, LayoutDensity: p.LayoutDensity, Locale: p.Locale}, nil
 }
 
 func (a profilePreferencesAdapter) UpsertPreferences(ctx context.Context, userID uuid.UUID, density, locale string) (*profileservice.PreferencesRow, error) {
 	p, err := a.repo.UpsertPreferences(ctx, userID, density, locale)
-	if err != nil || p == nil {
-		return nil, err
+	if err != nil {
+		return nil, fmt.Errorf("upsert preferences: %w", err)
+	}
+	if p == nil {
+		return nil, nil
 	}
 	return &profileservice.PreferencesRow{UserID: p.UserID, LayoutDensity: p.LayoutDensity, Locale: p.Locale}, nil
 }

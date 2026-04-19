@@ -183,11 +183,11 @@ func (m *Manager) reload() error {
 		updated[key] = variableFromDefinition(key, definition)
 	}
 
-	var changes []struct {
+	changes := make([]struct {
 		oldVariable Variable
 		newVariable Variable
 		callbacks   []VariableChangeCallback
-	}
+	}, 0, len(definitions))
 
 	m.mu.Lock()
 	for key, newVariable := range updated {

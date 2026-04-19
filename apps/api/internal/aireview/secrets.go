@@ -26,9 +26,9 @@ type KeyVault struct {
 }
 
 var (
-	errMasterKeyLen       = errors.New("master key must be 32 bytes")
-	errMasterKeyEncoding  = errors.New("master key must be hex or base64 encoded")
-	errInvalidNonceSize   = errors.New("invalid nonce size")
+	errMasterKeyLen      = errors.New("master key must be 32 bytes")
+	errMasterKeyEncoding = errors.New("master key must be hex or base64 encoded")
+	errInvalidNonceSize  = errors.New("invalid nonce size")
 )
 
 // NewKeyVaultFromEnv reads AI_MENTOR_KEY_KMS. Accepts hex (64 chars) or
@@ -37,7 +37,7 @@ var (
 func NewKeyVaultFromEnv() (*KeyVault, error) {
 	raw := os.Getenv("AI_MENTOR_KEY_KMS")
 	if raw == "" {
-		return nil, nil
+		return nil, ErrNotConfigured
 	}
 	keyBytes, err := decodeMasterKey(raw)
 	if err != nil {

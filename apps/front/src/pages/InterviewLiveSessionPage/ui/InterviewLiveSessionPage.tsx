@@ -7,7 +7,8 @@ import { Panel, RpgButton, Badge, Modal, usePixelToast } from '@/shared/ui/pixel
 import { Hero, Fireflies } from '@/shared/ui/sprites'
 import { PageMeta } from '@/shared/ui/PageMeta'
 import { i18n } from '@/shared/i18n'
-import { chatWithMentor, type LiveChatMessage } from '@/features/InterviewPrep/api/interviewLiveApi'
+import { chatWithMentor, evaluateSession, saveSession, type LiveChatMessage } from '@/features/InterviewPrep/api/interviewLiveApi'
+import { guildApi } from '@/features/Guild/api/guildApi'
 
 type Speaker = 'mentor' | 'you'
 
@@ -133,47 +134,15 @@ function pickScenario(focus: string | null): ScenarioBriefing {
 export function InterviewLiveSessionPage() {
   const { sessionId = 'new' } = useParams()
   const navigate = useNavigate()
-  // Solo-practice entry: /interview/live/new?mode=solo&focus=algorithms.
-  // We honour `focus` for the scenario topic; `mode` itself is purely a
-  // UI marker today (no separate backend session yet — see ADR-001).
   const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
   const soloFocus = searchParams?.get('focus') ?? null
-  const soloMode = searchParams?.get('mode') === 'solo'
-  // ADR-001: mentor_id (UUID from /api/v1/interview-prep/ai-mentors). When
-  // present, the server applies that mentor's persona prompt + model.
   const mentorIdParam = searchParams?.get('mentorId') ?? null
+  const frontIdParam = searchParams?.get('frontId') ?? null
   const { toast } = usePixelToast()
   const { t } = useTranslation()
 
   const mentor = MENTOR_NAME_BY_ID[sessionId] ?? MENTOR_NAME_BY_ID.new
-  // ADR-001 / #6 — solo focus picks the matching scenario (sql, system_design,
-  // behavioral, …) instead of always opening graphs/BFS. When focus isn't a
-  // solo-practice entry, we keep the i18n-backed default scenario.
-  const scenarioBase = soloMode ? pickScenario(soloFocus) : SCENARIOS.default
-  const focusLabel = soloFocus ? soloFocus.charAt(0).toUpperCase() + soloFocus.slice(1) : null
-  const scenario = soloMode
-    ? scenarioBase
-    : {
-        ...scenarioBase,
-        title: t('interviewLive.scenario.title'),
-        topic: t('interviewLive.scenario.topic'),
-        duration: t('interviewLive.scenario.duration'),
-        intro: t('interviewLive.scenario.intro'),
-        starterQuestion: t('interviewLive.scenario.question'),
-        evaluation: [
-          t('interviewLive.rubric.clarifying'),
-          t('interviewLive.rubric.algorithm'),
-          t('interviewLive.rubric.edgeCases'),
-          t('interviewLive.rubric.complexity'),
-          t('interviewLive.rubric.communication'),
-        ],
-        followUps: [
-          t('interviewLive.followUps.directedGraph'),
-          t('interviewLive.followUps.complexity'),
-          t('interviewLive.followUps.parallel'),
-        ],
-      }
-  void focusLabel
+  const scenario = pickScenario(soloFocus)
 
   const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
@@ -192,6 +161,8 @@ export function InterviewLiveSessionPage() {
   const [paused, setPaused] = useState(false)
   const [showEndModal, setShowEndModal] = useState(false)
   const [nudgeCount, setNudgeCount] = useState(0)
+  const [evaluation, setEvaluation] = useState<string | null>(null)
+  const [evaluating, setEvaluating] = useState(false)
   const [mentorTyping, setMentorTyping] = useState(false)
   const nextId = useRef(4)
 
@@ -256,17 +227,11 @@ Guidelines:
       const reply = await callMentor(snapshot, text, currentCode)
       setMessages((m) => [...m, { id: nextId.current++, speaker: 'mentor', text: reply, timeAt: `${mm}:${ss}` }])
     } catch (err) {
-      // Stay on the page on any failure — previously a 401/5xx triggered the
-      // global redirect and silently lost the user's draft. Now we surface
-      // the issue inline as a mentor message so the candidate can retry.
-      const reason = (err as { response?: { status?: number } })?.response?.status === 401
+      const is401 = (err as { response?: { status?: number } })?.response?.status === 401
+      const errorText = is401
         ? '⚠️ Сессия истекла. Обнови страницу и войди заново — твой код останется в редакторе.'
-        : null
-      const used = snapshot.filter((x) => x.speaker === 'mentor').length - 3
-      const fallback = reason
-        ?? scenario.followUps[used % scenario.followUps.length]
-        ?? t('interviewLive.followUps.constraints')
-      setMessages((m) => [...m, { id: nextId.current++, speaker: 'mentor', text: fallback, timeAt: `${mm}:${ss}` }])
+        : '⚠️ Ошибка соединения с наставником. Попробуй ещё раз.'
+      setMessages((m) => [...m, { id: nextId.current++, speaker: 'mentor', text: errorText, timeAt: `${mm}:${ss}` }])
     } finally {
       setMentorTyping(false)
     }
@@ -299,6 +264,50 @@ Guidelines:
     setShowEndModal(false)
     setEnded(true)
     toast({ kind: 'success', message: t('interviewLive.toast.ended') })
+
+    const transcript: LiveChatMessage[] = messages.map((m) => ({
+      role: m.speaker === 'mentor' ? 'assistant' : 'user',
+      content: m.text,
+    }))
+
+    // Run evaluation + save + front contribution concurrently
+    setEvaluating(true)
+    evaluateSession(
+      mentor,
+      scenario.topic,
+      scenario.starterQuestion,
+      scenario.evaluation,
+      transcript,
+      code,
+      { mentorId: mentorIdParam ?? undefined },
+    )
+      .then((text) => {
+        setEvaluation(text)
+        // Save session after we have the evaluation text
+        saveSession({
+          focus: soloFocus ?? 'default',
+          frontId: frontIdParam ?? undefined,
+          transcript: transcript.map((m) => ({ role: m.role, content: m.content })),
+          code,
+          evaluation: text,
+          durationS: seconds,
+        })
+      })
+      .catch(() => setEvaluation(t('interviewLive.evaluation.error', { defaultValue: 'Не удалось получить оценку. Сессия сохранена.' })))
+      .finally(() => setEvaluating(false))
+
+    // Contribute to guild war front if this session was launched from the war page
+    if (frontIdParam) {
+      guildApi.contributeToFront(frontIdParam, 1).then(({ captured }) => {
+        if (captured) {
+          toast({ kind: 'success', message: '⚔️ Фронт захвачен!' })
+        } else {
+          toast({ kind: 'success', message: '✓ Вклад в фронт засчитан.' })
+        }
+      }).catch(() => {
+        // Quota reached or other error — non-fatal
+      })
+    }
   }
 
   // Cap of 3 hints per session — each costs +30s of "interview time".
@@ -541,23 +550,39 @@ Guidelines:
               >
                 <div
                   className="font-silkscreen uppercase"
-                  style={{
-                    fontSize: 10,
-                    color: 'var(--ember-1)',
-                    letterSpacing: '0.08em',
-                    marginBottom: 4,
-                  }}
+                  style={{ fontSize: 10, color: 'var(--ember-1)', letterSpacing: '0.08em', marginBottom: 8 }}
                 >
                   {t('interviewLive.summary.ended')}
                 </div>
-                <div style={{ fontSize: 13 }}>
-                  {t('interviewLive.summary.body')} <strong>{t('interviewLive.summary.scorePending')}</strong>.
-                </div>
-                <RpgButton
-                  size="sm"
-                  style={{ marginTop: 10 }}
-                  onClick={() => navigate('/interview')}
-                >
+                {evaluating && (
+                  <div style={{ fontSize: 12, color: 'var(--ink-2)', marginBottom: 8 }}>
+                    {t('interviewLive.evaluation.loading', { defaultValue: 'Наставник оценивает сессию…' })}
+                  </div>
+                )}
+                {evaluation && (
+                  <div
+                    style={{
+                      fontSize: 12,
+                      lineHeight: 1.6,
+                      whiteSpace: 'pre-wrap',
+                      background: 'var(--parch-2)',
+                      border: '2px solid var(--ink-0)',
+                      padding: '8px 10px',
+                      marginBottom: 10,
+                    }}
+                  >
+                    {evaluation}
+                  </div>
+                )}
+                {frontIdParam && (
+                  <div
+                    className="font-silkscreen uppercase"
+                    style={{ fontSize: 9, color: 'var(--moss-1)', letterSpacing: '0.08em', marginBottom: 8 }}
+                  >
+                    ⚔ вклад в гильдейский фронт отправлен
+                  </div>
+                )}
+                <RpgButton size="sm" style={{ marginTop: 4 }} onClick={() => navigate('/interview')}>
                   {t('interviewLive.summary.back')}
                 </RpgButton>
               </div>

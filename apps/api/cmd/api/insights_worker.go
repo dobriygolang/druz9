@@ -20,9 +20,9 @@ func startInsightsCronWorker(profileRepo *profiledata.Repo, insightsRepo *insigh
 	svc := insightsapp.New(profileRepo, insightsRepo)
 
 	const (
-		tickInterval    = 6 * time.Hour
-		activeWindow    = 7 * 24 * time.Hour
-		userBatchLimit  = 500 // safety cap per tick — bump when LLM is wired
+		tickInterval   = 6 * time.Hour
+		activeWindow   = 7 * 24 * time.Hour
+		userBatchLimit = 500 // safety cap per tick — bump when LLM is wired
 	)
 
 	go func() {

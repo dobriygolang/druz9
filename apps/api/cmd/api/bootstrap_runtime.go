@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	klog "github.com/go-kratos/kratos/v2/log"
 
 	"api/internal/closer"
@@ -19,7 +21,7 @@ type bootstrapContext struct {
 func initializeBootstrap() (*bootstrapContext, error) {
 	logger, err := appLogger.New()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create logger: %w", err)
 	}
 	closer.AddSync(logger.Sync)
 
@@ -31,7 +33,7 @@ func initializeBootstrap() (*bootstrapContext, error) {
 	rtcPath := config.ResolveRTCValuesPath()
 	rtcManager, rtcCleanup, err := rtc.NewManager(rtcPath, kratosLogger)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create rtc manager: %w", err)
 	}
 	closer.AddSync(func() error {
 		rtcCleanup()
@@ -40,7 +42,7 @@ func initializeBootstrap() (*bootstrapContext, error) {
 
 	cfg, err := config.Load(rtcManager)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("load config: %w", err)
 	}
 
 	return &bootstrapContext{

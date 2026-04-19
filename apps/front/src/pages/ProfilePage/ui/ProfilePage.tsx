@@ -645,7 +645,7 @@ export function ProfilePage() {
         <div className="rpg-profile-cosmetics" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10 }}>
           {cosmetics.map((c) => (
             <div key={c.t} className={`rpg-item-card rpg-rarity-border--${c.r}`}>
-              <div className="rpg-item-card__art">{c.icon}</div>
+              <div className="rpg-item-card__art" style={{ height: 64, flex: 'none' }}>{c.icon}</div>
               <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 11, marginTop: 4 }}>
                 {c.t}
               </div>
@@ -883,8 +883,8 @@ function buildCosmeticsFromOwned(equipped: OwnedItem[]) {
     icon: (
       <div
         style={{
-          width: 20,
-          height: 20,
+          width: 36,
+          height: 36,
           background: o.item.accentColor || 'var(--ember-3)',
           border: '2px solid var(--ink-0)',
         }}

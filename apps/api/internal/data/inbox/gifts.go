@@ -13,24 +13,24 @@ import (
 // GiftRow mirrors the user_gifts table joined with shop_items for the
 // item_name/icon and users for the sender display name.
 type GiftRow struct {
-	ID            uuid.UUID
-	SenderID      uuid.UUID
-	SenderName    string
-	RecipientID   uuid.UUID
-	ItemID        uuid.UUID
-	ItemName      string
-	ItemIconRef   string
-	Note          string
-	Status        string
-	SentAt        time.Time
-	DecidedAt     *time.Time
+	ID          uuid.UUID
+	SenderID    uuid.UUID
+	SenderName  string
+	RecipientID uuid.UUID
+	ItemID      uuid.UUID
+	ItemName    string
+	ItemIconRef string
+	Note        string
+	Status      string
+	SentAt      time.Time
+	DecidedAt   *time.Time
 }
 
 var (
-	ErrGiftItemNotOwned    = errors.New("gift: sender does not own this item")
-	ErrGiftNotFound        = errors.New("gift: not found")
-	ErrGiftNotPending      = errors.New("gift: not pending")
-	ErrGiftItemEquipped    = errors.New("gift: item is currently equipped — unequip before sending")
+	ErrGiftItemNotOwned = errors.New("gift: sender does not own this item")
+	ErrGiftNotFound     = errors.New("gift: not found")
+	ErrGiftNotPending   = errors.New("gift: not pending")
+	ErrGiftItemEquipped = errors.New("gift: item is currently equipped — unequip before sending")
 )
 
 // SendGift creates a 'pending' gift after verifying the sender owns the
@@ -210,7 +210,10 @@ func (r *Repo) ListGifts(ctx context.Context, side string, userID uuid.UUID, sta
 		}
 		out = append(out, g)
 	}
-	return out, fmt.Errorf("list gifts: %w", rows.Err())
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("list gifts: %w", err)
+	}
+	return out, nil
 }
 
 const giftSelectSQL = `

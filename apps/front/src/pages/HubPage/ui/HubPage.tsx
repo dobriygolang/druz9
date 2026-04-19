@@ -222,7 +222,6 @@ export function HubPage() {
                 {quest?.actionLabel ?? t('hub.resume')}
               </RpgButton>
             </div>
-            <QuestChainMap t={t} />
           </div>
         </Panel>
 
@@ -664,45 +663,6 @@ function MerchantIcon({ rarity }: { rarity?: string }) {
   return <Torch scale={2} />
 }
 
-const CHAIN_STEPS = [
-  { key: 'stormGate', done: true },
-  { key: 'ironOath', done: true },
-  { key: 'verdantRite', done: true },
-  { key: 'emberPact', done: false, current: true },
-  { key: 'mentorTower', done: false },
-  { key: 'redRaven', done: false },
-  { key: 'seasonRelic', done: false },
-]
-
-function QuestChainMap({ t }: { t: (key: string, options?: Record<string, unknown>) => string }) {
-  return (
-    <div style={{ marginTop: 18, paddingTop: 14, borderTop: '2px dashed var(--ink-3)' }}>
-      <div
-        className="font-silkscreen uppercase"
-        style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.1em', marginBottom: 10 }}
-      >
-        {t('hub.campaignChain')}
-      </div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        {CHAIN_STEPS.map((step) => (
-          <div
-            key={step.key}
-            style={{
-              padding: '5px 8px',
-              border: '2px solid var(--ink-0)',
-              background: step.current ? 'var(--ember-1)' : step.done ? 'var(--moss-1)' : 'var(--parch-0)',
-              color: step.current ? 'var(--parch-0)' : 'var(--ink-0)',
-              fontFamily: 'Silkscreen, monospace',
-              fontSize: 9,
-            }}
-          >
-            {t(`hub.chain.${step.key}`)}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
 
 function formatEventDate(value: string, locale: string) {
   const date = new Date(value)

@@ -11,6 +11,8 @@ import (
 
 // Secret stores the cipher-text + nonce as written to ai_mentor_secrets.
 // Encryption/decryption happens in the aireview package (see ADR-001).
+var errEncryptedKeyEmpty = errors.New("upsert ai_mentor_secret: encrypted_key must not be empty")
+
 type Secret struct {
 	MentorID     uuid.UUID
 	EncryptedKey []byte
@@ -40,7 +42,7 @@ func (r *Repo) GetSecret(ctx context.Context, mentorID uuid.UUID) (*Secret, erro
 // for system-driven seeds; admin endpoints should pass the staff user ID.
 func (r *Repo) UpsertSecret(ctx context.Context, mentorID uuid.UUID, encryptedKey, nonce []byte, actorID uuid.UUID) error {
 	if len(encryptedKey) == 0 {
-		return fmt.Errorf("upsert ai_mentor_secret: encrypted_key must not be empty")
+		return fmt.Errorf("upsert ai_mentor_secret: encrypted_key must not be empty: %w", errEncryptedKeyEmpty)
 	}
 	var actor any = nil
 	if actorID != uuid.Nil {

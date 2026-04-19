@@ -340,7 +340,7 @@ func (r *Repo) GetPlayer(ctx context.Context, matchID, userID uuid.UUID) (*domai
 	var updatedAt, joinedAt pgtype.Timestamptz
 	err := scanPlayerWithTimestamps(row, &player, &freezeUntil, &acceptedAt, &joinedAt, &updatedAt)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, nil
+		return nil, ErrPlayerNotFound
 	}
 	if err != nil {
 		return nil, fmt.Errorf("get arena player: %w", err)

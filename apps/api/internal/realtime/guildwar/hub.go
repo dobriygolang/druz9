@@ -21,10 +21,10 @@ import (
 // Event is the wire shape pushed to subscribers. Type discriminates
 // the payload; clients can add new types defensively.
 type Event struct {
-	Type string         `json:"type"` // snapshot | phase_transition | front_contribution | mvp_changed | feed
-	WarID uuid.UUID     `json:"warId"`
-	At   time.Time      `json:"at"`
-	Data map[string]any `json:"data,omitempty"`
+	Type  string         `json:"type"` // snapshot | phase_transition | front_contribution | mvp_changed | feed
+	WarID uuid.UUID      `json:"warId"`
+	At    time.Time      `json:"at"`
+	Data  map[string]any `json:"data,omitempty"`
 }
 
 type subscriber struct {

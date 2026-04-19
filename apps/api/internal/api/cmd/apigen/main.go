@@ -271,7 +271,7 @@ func renderMethodFile(svc service, m method) ([]byte, error) {
 }
 
 func toSnakeCase(value string) string {
-	var out []rune
+	out := make([]rune, 0, len(value))
 	for i, r := range value {
 		if i > 0 && r >= 'A' && r <= 'Z' {
 			prev := rune(value[i-1])

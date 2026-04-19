@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -25,7 +26,7 @@ func (a inboxGiftsAdapter) SendGift(ctx context.Context, senderID, recipientID, 
 func (a inboxGiftsAdapter) ListGifts(ctx context.Context, side string, userID uuid.UUID, status string) ([]*inboxservice.GiftRowAPI, error) {
 	rows, err := a.repo.ListGifts(ctx, side, userID, status)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list gifts: %w", translateGiftErr(err))
 	}
 	out := make([]*inboxservice.GiftRowAPI, len(rows))
 	for i, r := range rows {
@@ -73,10 +74,11 @@ func (a inboxTradesAdapter) ProposeTrade(ctx context.Context, initiatorID, count
 	row, err := a.repo.ProposeTrade(ctx, initiatorID, counterpartyID, initiatorItemID, counterpartyItemID, note)
 	return mapTrade(row), translateTradeErr(err)
 }
+
 func (a inboxTradesAdapter) ListTrades(ctx context.Context, side string, userID uuid.UUID, status string) ([]*inboxservice.TradeRowAPI, error) {
 	rows, err := a.repo.ListTrades(ctx, side, userID, status)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list trades: %w", translateTradeErr(err))
 	}
 	out := make([]*inboxservice.TradeRowAPI, len(rows))
 	for i, r := range rows {
@@ -84,10 +86,12 @@ func (a inboxTradesAdapter) ListTrades(ctx context.Context, side string, userID 
 	}
 	return out, nil
 }
+
 func (a inboxTradesAdapter) AcceptTrade(ctx context.Context, counterpartyID, tradeID uuid.UUID) (*inboxservice.TradeRowAPI, error) {
 	row, err := a.repo.AcceptTrade(ctx, counterpartyID, tradeID)
 	return mapTrade(row), translateTradeErr(err)
 }
+
 func (a inboxTradesAdapter) CancelTrade(ctx context.Context, actorID, tradeID uuid.UUID) (*inboxservice.TradeRowAPI, error) {
 	row, err := a.repo.CancelTrade(ctx, actorID, tradeID)
 	return mapTrade(row), translateTradeErr(err)

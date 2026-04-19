@@ -500,11 +500,7 @@ function MapLibreCanvas({
           .addTo(map)
 
         el.onclick = () => {
-          // Click on a player avatar: zoom in to a comfortable city-level
-          // detail (zoom 12 ≈ ~3km radius) and reveal the popup. Previously
-          // we only toggled the popup at whatever zoom the user was on,
-          // which made it hard to see other players nearby.
-          map.flyTo({ center: [cp.longitude, cp.latitude], zoom: 12, duration: 600 })
+          map.flyTo({ center: [cp.longitude, cp.latitude], zoom: 18, duration: 600 })
           marker!.togglePopup()
         }
         playerMarkersRef.current.set(cp.userId, marker)

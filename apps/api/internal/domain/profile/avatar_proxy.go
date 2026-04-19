@@ -15,12 +15,12 @@ import (
 const telegramAPIBase = "https://api.telegram.org"
 
 var (
-	errDownloadAvatarStatus   = errors.New("download telegram avatar status error")
-	errTelegramBotTokenEmpty  = errors.New("telegram bot token is empty")
-	errTelegramAvatarNA       = errors.New("telegram avatar is not available")
-	errTelegramFilePathEmpty  = errors.New("telegram file path is empty")
-	errTelegramAPIStatus      = errors.New("telegram api status error")
-	errTelegramAPIError       = errors.New("telegram api error")
+	errDownloadAvatarStatus  = errors.New("download telegram avatar status error")
+	errTelegramBotTokenEmpty = errors.New("telegram bot token is empty")
+	errTelegramAvatarNA      = errors.New("telegram avatar is not available")
+	errTelegramFilePathEmpty = errors.New("telegram file path is empty")
+	errTelegramAPIStatus     = errors.New("telegram api status error")
+	errTelegramAPIError      = errors.New("telegram api error")
 )
 
 type telegramAPIResponse[T any] struct {

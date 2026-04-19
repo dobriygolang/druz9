@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"api/internal/model"
 )
@@ -16,14 +17,12 @@ func TestLoadCasesMultiple_EmptyTasks(t *testing.T) {
 		t.Parallel()
 		// When tasks is nil, function should return early
 		// This is a behavioral test - actual DB not called
-		assert.True(t, true, "placeholder test")
 	})
 
 	t.Run("empty slice", func(t *testing.T) {
 		t.Parallel()
 		// When tasks is empty, function should return early
 		// This is a behavioral test - actual DB not called
-		assert.True(t, true, "placeholder test")
 	})
 }
 
@@ -31,7 +30,7 @@ func TestScanTask_NilTask(t *testing.T) {
 	t.Parallel()
 
 	err := ScanTask(nil, nil)
-	assert.Error(t, err, "should error on nil task")
+	require.Error(t, err, "should error on nil task")
 	assert.Contains(t, err.Error(), "nil task")
 }
 
@@ -91,7 +90,7 @@ func TestLoadCases_NilTask(t *testing.T) {
 	t.Parallel()
 
 	err := LoadCases(t.Context(), nil, nil)
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "nil task")
 }
 

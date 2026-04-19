@@ -19,7 +19,7 @@ func (r *Runner) runSQLSeeds(ctx context.Context) ([]Result, error) {
 		return entries[i].Name() < entries[j].Name()
 	})
 
-	var results []Result
+	results := make([]Result, 0, len(entries))
 	for _, entry := range entries {
 		if entry.IsDir() || filepath.Ext(entry.Name()) != ".sql" {
 			continue

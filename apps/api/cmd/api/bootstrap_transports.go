@@ -25,6 +25,7 @@ import (
 	guildv1 "api/pkg/api/guild/v1"
 	hubv1 "api/pkg/api/hub/v1"
 	inboxv1 "api/pkg/api/inbox/v1"
+	insightsv1 "api/pkg/api/insights/v1"
 	interviewprepv1 "api/pkg/api/interview_prep/v1"
 	missionv1 "api/pkg/api/mission/v1"
 	notificationv1 "api/pkg/api/notification/v1"
@@ -32,7 +33,6 @@ import (
 	podcastv1 "api/pkg/api/podcast/v1"
 	profilev1 "api/pkg/api/profile/v1"
 	referralv1 "api/pkg/api/referral/v1"
-	insightsv1 "api/pkg/api/insights/v1"
 	scenev1 "api/pkg/api/scene/v1"
 	seasonpassv1 "api/pkg/api/season_pass/v1"
 	shopv1 "api/pkg/api/shop/v1"
@@ -109,6 +109,7 @@ func registerBackgroundWorkers(bootstrap *bootstrapContext, storage *storageCont
 	}))
 	closer.AddSync(startInsightsCronWorker(storage.profileRepo, storage.insightsRepo))
 	closer.AddSync(startLobbyMatchmakerWorker(storage.store))
+	closer.AddSync(startBoostyRenewalWorker(storage.premiumRepo, services.premiumHandler.BoostyClient()))
 }
 
 func registerManualHTTPRoutes(
@@ -121,13 +122,33 @@ func registerManualHTTPRoutes(
 	wshandler.Register(httpServer, services.realtimeHub, services.arenaRealtimeHub, services.profileServiceDomain)
 
 	liveChatHandler := interviewlive.New(services.aiReviewer).
-		WithMentorResolver(mentorResolverAdapter{repo: storage.aiMentorRepo})
+		WithMentorResolver(mentorResolverAdapter{repo: storage.aiMentorRepo}).
+		WithDB(storage.store.DB).
+		WithPremiumRepo(storage.premiumRepo)
 	adminapi.RegisterDockerLogsHTTPRoute(httpServer, services.adminService)
 
 	r := httpServer.Route("/")
 
 	// POST /api/v1/interview/live/chat — live interview AI mentor chat.
 	r.POST("/api/v1/interview/live/chat", liveChatHandler.Chat)
+	// POST /api/v1/interview/live/sessions — save completed live session.
+	r.POST("/api/v1/interview/live/sessions", liveChatHandler.SaveSession)
+	// GET /api/v1/guilds/war/quota — daily contribution energy for war fronts.
+	r.GET("/api/v1/guilds/war/quota", services.guildService.GetWarQuota)
+
+	// Premium subscription (Boosty).
+	r.GET("/api/v1/premium/status", services.premiumHandler.GetStatus)
+	r.POST("/api/v1/premium/boosty/link", services.premiumHandler.LinkBoosty)
+	r.DELETE("/api/v1/premium/boosty/link", services.premiumHandler.UnlinkBoosty)
+
+	// War declarations — direct challenge + matchmaking queue.
+	r.POST("/api/v1/guilds/war/challenge", services.guildService.SendChallenge)
+	r.GET("/api/v1/guilds/war/challenges/incoming", services.guildService.ListIncomingChallenges)
+	r.POST("/api/v1/guilds/war/challenge/{id}/accept", services.guildService.AcceptChallenge)
+	r.POST("/api/v1/guilds/war/challenge/{id}/decline", services.guildService.DeclineChallenge)
+	r.POST("/api/v1/guilds/war/matchmaking", services.guildService.JoinMatchmaking)
+	r.DELETE("/api/v1/guilds/war/matchmaking", services.guildService.LeaveMatchmaking)
+	r.GET("/api/v1/guilds/war/matchmaking", services.guildService.GetMatchmakingStatus)
 
 	// ADR-004 — Live guild-war fan-out. Subscribers connect over WS;
 	// the cron and ContributeToFront publish events into the hub.

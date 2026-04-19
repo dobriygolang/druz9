@@ -71,7 +71,7 @@ func (r *Repo) Get(ctx context.Context, userID uuid.UUID) (*Insight, error) {
 
 func (r *Repo) Upsert(ctx context.Context, ins *Insight) error {
 	if ins == nil || ins.UserID == uuid.Nil {
-		return fmt.Errorf("upsert insight: user_id required")
+		return fmt.Errorf("upsert insight: %w", errInsightUserIDRequired)
 	}
 	strengths, err := json.Marshal(ins.TopStrengths)
 	if err != nil {

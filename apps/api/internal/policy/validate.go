@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	errEmptyPath        = errors.New("empty path is not allowed")
-	errPathNotRelative  = errors.New("path must be relative")
-	errPathEscapes      = errors.New("path escapes workspace")
+	errEmptyPath       = errors.New("empty path is not allowed")
+	errPathNotRelative = errors.New("path must be relative")
+	errPathEscapes     = errors.New("path escapes workspace")
 )
 
 const (

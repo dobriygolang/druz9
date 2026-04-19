@@ -14,9 +14,9 @@ import (
 // the slug-collision case as ErrSeriesSlugTaken so handlers can map it
 // to 409 Conflict.
 var (
-	ErrSeriesSlugTaken    = errors.New("podcast series slug already taken")
+	ErrSeriesSlugTaken      = errors.New("podcast series slug already taken")
 	ErrSeriesFieldsRequired = errors.New("create series: slug and title required")
-	ErrSeriesNotFound      = errors.New("series not found")
+	ErrSeriesNotFound       = errors.New("series not found")
 )
 
 func (r *Repo) CreateSeries(ctx context.Context, slug, title, description, coverRef string) (*Series, error) {

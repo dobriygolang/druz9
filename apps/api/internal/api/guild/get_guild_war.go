@@ -8,108 +8,66 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"api/internal/apihelpers"
+	guilddata "api/internal/data/guild"
 	"api/internal/model"
 	v1 "api/pkg/api/guild/v1"
 )
 
-// GetGuildWar returns the current guild-war snapshot for the caller's
-// guild. The full war system (schedules, rosters, live state, persistence)
-// is on the roadmap; this handler ships a deterministic "demo war" so the
-// /war page has real backend-sourced data instead of hardcoded HTML.
+// GetGuildWar returns the active war for the caller's guild.
+// Returns an empty response (nil War field) when:
+//   - the caller is not in any guild, or
+//   - the guild has no active war yet.
 //
-// Deterministic inputs:
-//   - our guild: the caller's joined guild (first one returned).
-//   - their guild: the next public guild by member count (fallback to a
-//     fixed "Red Ravens" placeholder when there's no second guild yet).
-//   - day number: days since the user's guild was created, modulo 3,
-//     clamped to [1, 3] — gives a "day N / 3" that advances naturally.
-//   - fronts / mvps / feed: curated static content that matches the
-//     visual layout of the existing page.
-//
-// When the user isn't in any guild we return a nil war so the client can
-// render "join a guild to participate" instead.
+// Clients should show the war-declaration UI in the nil case.
 func (i *Implementation) GetGuildWar(ctx context.Context, _ *v1.GetGuildWarRequest) (*v1.GetGuildWarResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("require user: %w", err)
 	}
 
-	// Find the user's guild. ListGuilds returns is_joined=true for them.
-	list, err := i.service.ListGuilds(ctx, user.ID, model.ListGuildsOptions{Limit: 50})
+	ours, err := i.myGuild(ctx, user.ID)
 	if err != nil {
-		return nil, fmt.Errorf("list guilds for war: %w", err)
-	}
-
-	var ours *model.Guild
-	for _, g := range list.Guilds {
-		if g != nil && g.IsJoined {
-			ours = g
-			break
-		}
+		return nil, fmt.Errorf("get my guild: %w", err)
 	}
 	if ours == nil {
 		return &v1.GetGuildWarResponse{}, nil
 	}
 
-	// Pick an opponent — another public guild, ideally with similar size.
-	theirName := "Red Ravens"
-	for _, g := range list.Guilds {
-		if g == nil || g.ID == ours.ID {
-			continue
+	if i.warRepo == nil {
+		return &v1.GetGuildWarResponse{}, nil
+	}
+
+	war, err := i.warRepo.GetActiveWarForGuild(ctx, ours.ID)
+	if err != nil {
+		if guilddata.IsNoRows(err) {
+			return &v1.GetGuildWarResponse{}, nil
 		}
-		theirName = g.Name
-		break
+		return nil, fmt.Errorf("get active war: %w", err)
 	}
 
-	daysSinceCreated := int32(time.Since(ours.CreatedAt).Hours() / 24)
-	if daysSinceCreated < 1 {
-		daysSinceCreated = 1
-	}
-	dayNumber := (daysSinceCreated % 3) + 1
-
-	// Members of the user's guild drive the deployed count + MVP seeds.
-	members, _ := i.service.ListGuildMembers(ctx, ours.ID, 10)
-	deployed := int32(len(members) * 3 / 4) // ~75% of members "deployed"
-	roster := int32(ours.MemberCount)
-	if roster == 0 {
-		roster = int32(len(members))
+	fronts, err := i.warRepo.ListFronts(ctx, war.ID)
+	if err != nil {
+		return nil, fmt.Errorf("list fronts: %w", err)
 	}
 
-	var front []*v1.GuildWarFront
-	// Prefer persistent war state when the repo is wired (Wave B.5).
-	// Fronts carry a real id so the client can invoke ContributeToFront.
-	if i.warRepo != nil {
-		war, _, errWar := i.ensureActiveWar(ctx, user.ID)
-		if errWar == nil && war != nil {
-			fronts, errFronts := i.warRepo.ListFronts(ctx, war.ID)
-			if errFronts == nil && len(fronts) > 0 {
-				for _, f := range fronts {
-					front = append(front, mapFrontRow(f))
-				}
-			}
-		}
-	}
-	// Legacy demo fronts — rendered when the repo hasn't produced rows
-	// yet. Clients disable the contribute button when front.id is "".
-	if len(front) == 0 {
-		front = []*v1.GuildWarFront{
-			{Name: "Graphs Bastion", OurRounds: 4, TheirRounds: 3, DurationLabel: "14m left", Status: "contested", IsHot: true},
-			{Name: "Systems Tower", OurRounds: 3, TheirRounds: 1, DurationLabel: "32m left", Status: "leading"},
-			{Name: "DP Canyon", OurRounds: 1, TheirRounds: 4, DurationLabel: "9m left", Status: "losing", IsDanger: true},
-			{Name: "String Bridge", OurRounds: 2, TheirRounds: 2, DurationLabel: "1h left", Status: "contested"},
-			{Name: "Algo Plaza", OurRounds: 2, TheirRounds: 0, DurationLabel: "next round", Status: "leading"},
-		}
+	frontPBs := make([]*v1.GuildWarFront, 0, len(fronts))
+	for _, f := range fronts {
+		frontPBs = append(frontPBs, mapFrontRow(f))
 	}
 
-	ourScore := int32(0)
-	theirScore := int32(0)
-	for _, f := range front {
+	var ourScore, theirScore int32
+	for _, f := range frontPBs {
 		ourScore += f.GetOurRounds()
 		theirScore += f.GetTheirRounds()
 	}
 
-	// MVPs: top members from our guild. Opponent MVPs only shown when
-	// we have a real war with identified players (future wave).
+	members, _ := i.service.ListGuildMembers(ctx, ours.ID, 10)
+	roster := int32(ours.MemberCount)
+	if roster == 0 {
+		roster = int32(len(members))
+	}
+	deployed := int32(len(members) * 3 / 4)
+
 	mvps := make([]*v1.GuildWarMvp, 0, len(members))
 	for idx, m := range members {
 		if idx >= 3 {
@@ -117,7 +75,7 @@ func (i *Implementation) GetGuildWar(ctx context.Context, _ *v1.GetGuildWarReque
 		}
 		name := m.FirstName
 		if name == "" {
-			name = fmt.Sprintf("hero-%d", idx+1)
+			name = m.LastName
 		}
 		mvps = append(mvps, &v1.GuildWarMvp{
 			Username:  name,
@@ -128,52 +86,47 @@ func (i *Implementation) GetGuildWar(ctx context.Context, _ *v1.GetGuildWarReque
 		})
 	}
 
-	// Feed: build from real front data when available; otherwise generic guild events.
-	now := time.Now().UTC()
-	var feed []*v1.GuildWarFeed
-	if len(front) > 0 {
-		for idx, f := range front {
-			if idx >= 4 {
-				break
-			}
-			var text string
-			switch f.GetStatus() {
-			case "leading", "won":
-				text = ours.Name + " leads " + f.GetName()
-			case "losing", "lost":
-				text = theirName + " pressures " + f.GetName()
-			default:
-				text = f.GetName() + " contested"
-			}
-			feed = append(feed, &v1.GuildWarFeed{
-				At:   timestamppb.New(now.Add(-time.Duration(idx+1) * 8 * time.Minute)),
-				Text: text,
-			})
-		}
-	} else {
-		feed = []*v1.GuildWarFeed{
-			{At: timestamppb.New(now.Add(-5 * time.Minute)), Text: ours.Name + " war started vs " + theirName},
-			{At: timestamppb.New(now.Add(-10 * time.Minute)), Text: "Day " + fmt.Sprintf("%d", dayNumber) + " of 3"},
-		}
+	totalDays := int32(war.EndsAt.Sub(war.StartsAt).Hours() / 24)
+	if totalDays < 1 {
+		totalDays = 7
 	}
-
-	endsAt := now.Add(time.Duration(int64(time.Hour) * 24 * int64(3-dayNumber+1)))
+	dayNumber := int32(time.Since(war.StartsAt).Hours()/24) + 1
+	if dayNumber < 1 {
+		dayNumber = 1
+	}
 
 	return &v1.GetGuildWarResponse{
 		War: &v1.GuildWarSnapshot{
-			Id:             ours.ID.String(),
+			Id:             war.ID.String(),
 			OurGuildName:   ours.Name,
-			TheirGuildName: theirName,
+			TheirGuildName: war.TheirGuildName,
 			OurScore:       ourScore,
 			TheirScore:     theirScore,
 			DayNumber:      dayNumber,
-			TotalDays:      3,
+			TotalDays:      totalDays,
 			OurDeployed:    deployed,
 			OurRoster:      roster,
-			EndsAt:         timestamppb.New(endsAt),
-			Front:          front,
+			EndsAt:         timestamppb.New(war.EndsAt),
+			Front:          frontPBs,
 			Mvps:           mvps,
-			Feed:           feed,
 		},
 	}, nil
+}
+
+// myGuild returns the first guild the user has joined, or nil.
+func (i *Implementation) myGuild(ctx context.Context, userID interface{}) (*model.Guild, error) {
+	uid, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("require user: %w", err)
+	}
+	list, err := i.service.ListGuilds(ctx, uid.ID, model.ListGuildsOptions{Limit: 50})
+	if err != nil {
+		return nil, fmt.Errorf("list guilds: %w", err)
+	}
+	for _, g := range list.Guilds {
+		if g != nil && g.IsJoined {
+			return g, nil
+		}
+	}
+	return nil, nil
 }

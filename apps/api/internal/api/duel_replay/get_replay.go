@@ -2,8 +2,8 @@ package duel_replay
 
 import (
 	"context"
-	"fmt"
 	goerr "errors"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 

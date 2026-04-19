@@ -154,6 +154,31 @@ const frontCaptureThreshold int32 = 10
 // a front that's already been won by someone.
 var ErrFrontAlreadyCaptured = errors.New("guild_war: front already captured")
 
+// ErrDailyLimitExceeded is returned when a user tries to contribute more
+// times than the daily limit allows.
+var ErrDailyLimitExceeded = errors.New("guild_war: daily contribution limit reached")
+
+// DailyContributionLimit is the max number of front contributions a single
+// member can make per calendar day (UTC). Small enough to prevent spam,
+// large enough to let engaged players matter.
+const DailyContributionLimit int32 = 3
+
+// CountUserTodayContributions returns how many times the user has
+// contributed to any front in this war since midnight UTC today.
+func (r *Repo) CountUserTodayContributions(ctx context.Context, userID, warID uuid.UUID) (int32, error) {
+	var count int32
+	err := r.data.DB.QueryRow(ctx, `
+        SELECT COUNT(*)
+        FROM guild_war_contributions
+        WHERE user_id = $1 AND war_id = $2
+          AND contributed_at >= CURRENT_DATE
+    `, userID, warID).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("count today contributions: %w", err)
+	}
+	return count, nil
+}
+
 // ContributeRounds atomically adds rounds to a front's our_rounds, logs
 // the contribution, and captures the front when it crosses the
 // threshold. Returns the updated row and a flag indicating whether
@@ -183,6 +208,20 @@ func (r *Repo) ContributeRounds(
 	if f.CapturedBy != "" {
 		return &f, false, ErrFrontAlreadyCaptured
 	}
+
+	// Enforce daily contribution limit inside the same transaction so the
+	// check and the insert are atomic (no TOCTOU race).
+	var todayCount int32
+	if err := tx.QueryRow(ctx, `
+        SELECT COUNT(*) FROM guild_war_contributions
+        WHERE user_id = $1 AND war_id = $2 AND contributed_at >= CURRENT_DATE
+    `, userID, warID).Scan(&todayCount); err != nil {
+		return nil, false, fmt.Errorf("count today contributions: %w", err)
+	}
+	if todayCount >= DailyContributionLimit {
+		return &f, false, ErrDailyLimitExceeded
+	}
+
 	f.OurRounds += rounds
 	captured := false
 	if f.OurRounds >= frontCaptureThreshold {
@@ -241,6 +280,194 @@ func (r *Repo) ListTerritories(ctx context.Context, guildID uuid.UUID) ([]*Terri
 // pgx.ErrNoRows, i.e. no active war?" — this keeps them from needing to
 // import pgx themselves.
 func IsNoRows(err error) bool { return errors.Is(err, pgx.ErrNoRows) }
+
+// ── War declaration ────────────────────────────────────────────────────────
+
+type ChallengeRow struct {
+	ID           uuid.UUID
+	FromGuildID  uuid.UUID
+	FromName     string
+	ToGuildID    uuid.UUID
+	Status       string // pending | accepted | declined | expired
+	CreatedAt    time.Time
+	ExpiresAt    time.Time
+}
+
+var ErrChallengeNotFound = errors.New("guild_war: challenge not found")
+var ErrAlreadyAtWar      = errors.New("guild_war: guild already has an active war")
+
+// SendChallenge inserts a new pending challenge from fromGuildID to toGuildID.
+// Returns ErrAlreadyAtWar if either guild is already in an active war.
+func (r *Repo) SendChallenge(ctx context.Context, fromGuildID uuid.UUID, fromName string, toGuildID uuid.UUID) (*ChallengeRow, error) {
+	// Guard: neither side should already be in a war.
+	for _, id := range []uuid.UUID{fromGuildID, toGuildID} {
+		if _, err := r.GetActiveWarForGuild(ctx, id); err == nil {
+			return nil, ErrAlreadyAtWar
+		}
+	}
+	row := &ChallengeRow{
+		ID:          uuid.New(),
+		FromGuildID: fromGuildID,
+		FromName:    fromName,
+		ToGuildID:   toGuildID,
+		Status:      "pending",
+	}
+	if _, err := r.data.DB.Exec(ctx, `
+        INSERT INTO guild_war_challenges (id, from_guild_id, from_name, to_guild_id)
+        VALUES ($1, $2, $3, $4)
+    `, row.ID, row.FromGuildID, row.FromName, row.ToGuildID); err != nil {
+		return nil, fmt.Errorf("insert challenge: %w", err)
+	}
+	return row, nil
+}
+
+// ListIncomingChallenges returns pending (non-expired) challenges directed at toGuildID.
+func (r *Repo) ListIncomingChallenges(ctx context.Context, toGuildID uuid.UUID) ([]*ChallengeRow, error) {
+	rows, err := r.data.DB.Query(ctx, `
+        SELECT id, from_guild_id, from_name, to_guild_id, status, created_at, expires_at
+        FROM guild_war_challenges
+        WHERE to_guild_id = $1 AND status = 'pending' AND expires_at > NOW()
+        ORDER BY created_at DESC
+    `, toGuildID)
+	if err != nil {
+		return nil, fmt.Errorf("list incoming challenges: %w", err)
+	}
+	defer rows.Close()
+	var out []*ChallengeRow
+	for rows.Next() {
+		c := &ChallengeRow{}
+		if err := rows.Scan(&c.ID, &c.FromGuildID, &c.FromName, &c.ToGuildID, &c.Status, &c.CreatedAt, &c.ExpiresAt); err != nil {
+			return nil, fmt.Errorf("scan challenge: %w", err)
+		}
+		out = append(out, c)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate challenges: %w", err)
+	}
+	return out, nil
+}
+
+// AcceptChallenge marks the challenge as accepted and creates an active war
+// for both guilds. Returns ErrChallengeNotFound if the challenge doesn't
+// belong to toGuildID or is no longer pending.
+func (r *Repo) AcceptChallenge(ctx context.Context, challengeID, toGuildID uuid.UUID, frontNames []string) (*WarRow, error) {
+	var c ChallengeRow
+	err := r.data.DB.QueryRow(ctx, `
+        SELECT id, from_guild_id, from_name, to_guild_id
+        FROM guild_war_challenges
+        WHERE id = $1 AND to_guild_id = $2 AND status = 'pending' AND expires_at > NOW()
+    `, challengeID, toGuildID).Scan(&c.ID, &c.FromGuildID, &c.FromName, &c.ToGuildID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ErrChallengeNotFound
+		}
+		return nil, fmt.Errorf("get challenge: %w", err)
+	}
+
+	war, _, err := r.CreateWarWithFronts(ctx, c.ToGuildID, c.FromName, frontNames, 7*24*time.Hour)
+	if err != nil {
+		return nil, fmt.Errorf("create war on accept: %w", err)
+	}
+
+	if _, err := r.data.DB.Exec(ctx, `
+        UPDATE guild_war_challenges SET status = 'accepted' WHERE id = $1
+    `, c.ID); err != nil {
+		return nil, fmt.Errorf("mark challenge accepted: %w", err)
+	}
+	// Clean up any stale matchmaking entries for both guilds.
+	_, _ = r.data.DB.Exec(ctx, `DELETE FROM guild_war_matchmaking WHERE guild_id IN ($1, $2)`, c.FromGuildID, c.ToGuildID)
+	return war, nil
+}
+
+// DeclineChallenge marks a pending challenge as declined.
+func (r *Repo) DeclineChallenge(ctx context.Context, challengeID, toGuildID uuid.UUID) error {
+	tag, err := r.data.DB.Exec(ctx, `
+        UPDATE guild_war_challenges SET status = 'declined'
+        WHERE id = $1 AND to_guild_id = $2 AND status = 'pending'
+    `, challengeID, toGuildID)
+	if err != nil {
+		return fmt.Errorf("decline challenge: %w", err)
+	}
+	if tag.RowsAffected() == 0 {
+		return ErrChallengeNotFound
+	}
+	return nil
+}
+
+// ── Matchmaking ────────────────────────────────────────────────────────────
+
+type MatchmakingStatus struct {
+	InQueue  bool
+	JoinedAt time.Time
+}
+
+// JoinMatchmaking adds the guild to the queue. If another guild is already
+// waiting, a war is created immediately and both are removed from the queue.
+// Returns (matched=true, war) on immediate match; (false, nil) when queued.
+func (r *Repo) JoinMatchmaking(ctx context.Context, guildID uuid.UUID, guildName string, memberCount int32, frontNames []string) (bool, *WarRow, error) {
+	// Check already in queue.
+	var existing uuid.UUID
+	_ = r.data.DB.QueryRow(ctx, `SELECT guild_id FROM guild_war_matchmaking WHERE guild_id = $1`, guildID).Scan(&existing)
+	if existing == guildID {
+		return false, nil, nil // already in queue, idempotent
+	}
+
+	// Look for another guild waiting (not us, ordered by join time).
+	var opponentID uuid.UUID
+	var opponentName string
+	err := r.data.DB.QueryRow(ctx, `
+        SELECT guild_id, guild_name FROM guild_war_matchmaking
+        WHERE guild_id != $1
+        ORDER BY joined_at ASC
+        LIMIT 1
+    `, guildID).Scan(&opponentID, &opponentName)
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return false, nil, fmt.Errorf("matchmaking lookup: %w", err)
+	}
+
+	if opponentID != uuid.Nil {
+		// Immediate match — create war for us (vs opponent name) and remove both.
+		war, _, err := r.CreateWarWithFronts(ctx, guildID, opponentName, frontNames, 7*24*time.Hour)
+		if err != nil {
+			return false, nil, fmt.Errorf("create war on match: %w", err)
+		}
+		_, _ = r.data.DB.Exec(ctx, `DELETE FROM guild_war_matchmaking WHERE guild_id IN ($1, $2)`, guildID, opponentID)
+		return true, war, nil
+	}
+
+	// No opponent yet — join queue.
+	if _, err := r.data.DB.Exec(ctx, `
+        INSERT INTO guild_war_matchmaking (guild_id, guild_name, member_count)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (guild_id) DO NOTHING
+    `, guildID, guildName, memberCount); err != nil {
+		return false, nil, fmt.Errorf("join matchmaking: %w", err)
+	}
+	return false, nil, nil
+}
+
+// LeaveMatchmaking removes the guild from the queue.
+func (r *Repo) LeaveMatchmaking(ctx context.Context, guildID uuid.UUID) error {
+	_, err := r.data.DB.Exec(ctx, `DELETE FROM guild_war_matchmaking WHERE guild_id = $1`, guildID)
+	if err != nil {
+		return fmt.Errorf("leave matchmaking: %w", err)
+	}
+	return nil
+}
+
+// GetMatchmakingStatus returns whether the guild is currently queued.
+func (r *Repo) GetMatchmakingStatus(ctx context.Context, guildID uuid.UUID) (MatchmakingStatus, error) {
+	var s MatchmakingStatus
+	err := r.data.DB.QueryRow(ctx, `SELECT joined_at FROM guild_war_matchmaking WHERE guild_id = $1`, guildID).Scan(&s.JoinedAt)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return s, nil
+		}
+		return s, fmt.Errorf("get matchmaking status: %w", err)
+	}
+	s.InQueue = true
+	return s, nil
+}
 
 // GuildSeed is a lightweight struct used by the cron to pair guilds.
 type GuildSeed struct {

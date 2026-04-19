@@ -172,6 +172,9 @@ export function LeaderboardsPage() {
           return (
             <div
               key={r.userId}
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate(`/profile/${r.userId}`)}
               style={{
                 display: 'grid',
                 gridTemplateColumns: '48px 1fr 140px 90px',
@@ -181,6 +184,7 @@ export function LeaderboardsPage() {
                 background: rowBg(i, isYou),
                 borderBottom: '1px dashed var(--ink-3)',
                 borderLeft: isYou ? '4px solid var(--ember-1)' : 'none',
+                cursor: 'pointer',
               }}
             >
               <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 20, color: RANK_COLOR(i) }}>#{i + 1}</span>
@@ -213,6 +217,9 @@ export function LeaderboardsPage() {
         {tab === 'guilds' && guildEntries.map((g, i) => (
           <div
             key={g.guildId}
+            role="button"
+            tabIndex={0}
+            onClick={() => navigate(`/guild/${g.guildId}`)}
             style={{
               display: 'grid',
               gridTemplateColumns: '48px 1fr 90px 100px 90px',
@@ -221,6 +228,7 @@ export function LeaderboardsPage() {
               padding: '10px 12px',
               background: rowBg(i, false),
               borderBottom: '1px dashed var(--ink-3)',
+              cursor: 'pointer',
             }}
           >
             <span style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 20, color: RANK_COLOR(i) }}>#{i + 1}</span>

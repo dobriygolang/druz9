@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	errEmptyDateTime      = errors.New("empty datetime")
-	errUnsupportedFormat  = errors.New("unsupported datetime format")
+	errEmptyDateTime     = errors.New("empty datetime")
+	errUnsupportedFormat = errors.New("unsupported datetime format")
 )
 
 const (

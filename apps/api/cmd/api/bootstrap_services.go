@@ -7,6 +7,8 @@ import (
 
 	"api/internal/aireview"
 	adminservice "api/internal/api/admin"
+	premiumapi "api/internal/api/premium"
+	"api/internal/boosty"
 	arenaservice "api/internal/api/arena"
 	challengeservice "api/internal/api/challenge"
 	codeeditorservice "api/internal/api/code_editor"
@@ -107,6 +109,7 @@ type serviceContext struct {
 	socialService          *socialservice.Implementation
 	peerMockService        *peermockservice.Implementation
 	aiMentorService        *adminservice.AIMentorImpl
+	premiumHandler         *premiumapi.Handler
 }
 
 func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*serviceContext, error) {
@@ -271,7 +274,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 	if bootstrap.cfg.External.NotificationService != nil && bootstrap.cfg.External.NotificationService.Addr != "" {
 		adapter, adapterErr := notification.NewGRPCAdapter(bootstrap.cfg.External.NotificationService.Addr)
 		if adapterErr != nil {
-			return nil, adapterErr
+			return nil, fmt.Errorf("create notification adapter: %w", adapterErr)
 		}
 		closer.AddSync(adapter.Close)
 		notifSender = adapter
@@ -326,6 +329,24 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		insightsService:        insightsservice.New(insightsapp.New(storage.profileRepo, storage.insightsRepo)),
 		socialService:          socialservice.New(socialDomain),
 		peerMockService:        peermockservice.New(storage.peerMockRepo),
-		aiMentorService:        adminservice.NewAIMentorImpl(storage.aiMentorRepo).WithKeyVault(mentorKeyVault),
+		aiMentorService: adminservice.NewAIMentorImpl(storage.aiMentorRepo).WithKeyVault(mentorKeyVault),
+		premiumHandler:  newPremiumHandler(bootstrap, storage),
 	}, nil
+}
+
+func newPremiumHandler(bootstrap *bootstrapContext, storage *storageContext) *premiumapi.Handler {
+	var boostyClient *boosty.Client
+	if bootstrap.cfg.External.Boosty != nil {
+		c, err := boosty.New(boosty.Config{
+			AccessToken:  bootstrap.cfg.External.Boosty.AccessToken,
+			RefreshToken: bootstrap.cfg.External.Boosty.RefreshToken,
+			DeviceID:     bootstrap.cfg.External.Boosty.DeviceID,
+			BlogName:     bootstrap.cfg.External.Boosty.BlogName,
+			Timeout:      bootstrap.cfg.External.Boosty.Timeout,
+		})
+		if err == nil {
+			boostyClient = c
+		}
+	}
+	return premiumapi.New(storage.premiumRepo, boostyClient)
 }

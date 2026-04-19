@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	klog "github.com/go-kratos/kratos/v2/log"
@@ -65,7 +66,7 @@ func pairQueuedLobbies(ctx context.Context, store *postgres.Store) (int64, error
         )
     `)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("match lobbies: %w", err)
 	}
 	return tag.RowsAffected(), nil
 }

@@ -157,6 +157,7 @@ export const guildApi = {
       front: {
         id: f.id ?? '',
         name: f.name ?? '',
+        topic: frontTopic(f.name ?? ''),
         ourRounds: f.ourRounds ?? 0,
         theirRounds: f.theirRounds ?? 0,
         durationLabel: f.durationLabel ?? '',
@@ -180,6 +181,81 @@ export const guildApi = {
       capturedAt: t.capturedAt ?? '',
     }))
   },
+
+  getWarQuota: async (): Promise<{ used: number; limit: number }> => {
+    try {
+      const r = await apiClient.get<{ used?: number; limit?: number }>('/api/v1/guilds/war/quota')
+      return { used: r.data.used ?? 0, limit: r.data.limit ?? 3 }
+    } catch {
+      return { used: 0, limit: 3 }
+    }
+  },
+
+  // ── War declarations ──────────────────────────────────────────────────
+
+  sendChallenge: async (toGuildId: string): Promise<{ id: string; status: string }> => {
+    const r = await apiClient.post<{ id?: string; status?: string }>('/api/v1/guilds/war/challenge', { toGuildId })
+    return { id: r.data.id ?? '', status: r.data.status ?? 'pending' }
+  },
+
+  listIncomingChallenges: async (): Promise<WarChallenge[]> => {
+    try {
+      const r = await apiClient.get<{ challenges?: BackendWarChallenge[] }>('/api/v1/guilds/war/challenges/incoming')
+      return (r.data.challenges ?? []).map(normalizeWarChallenge)
+    } catch {
+      return []
+    }
+  },
+
+  acceptChallenge: async (challengeId: string): Promise<{ warId: string }> => {
+    const r = await apiClient.post<{ warId?: string }>(`/api/v1/guilds/war/challenge/${challengeId}/accept`, {})
+    return { warId: r.data.warId ?? '' }
+  },
+
+  declineChallenge: async (challengeId: string): Promise<void> => {
+    await apiClient.post(`/api/v1/guilds/war/challenge/${challengeId}/decline`, {})
+  },
+
+  joinMatchmaking: async (): Promise<{ status: 'queued' | 'matched'; warId?: string }> => {
+    const r = await apiClient.post<{ status?: string; warId?: string }>('/api/v1/guilds/war/matchmaking', {})
+    return { status: r.data.status === 'matched' ? 'matched' : 'queued', warId: r.data.warId }
+  },
+
+  leaveMatchmaking: async (): Promise<void> => {
+    await apiClient.delete('/api/v1/guilds/war/matchmaking')
+  },
+
+  getMatchmakingStatus: async (): Promise<{ inQueue: boolean; joinedAt?: string }> => {
+    try {
+      const r = await apiClient.get<{ inQueue?: boolean; joinedAt?: string }>('/api/v1/guilds/war/matchmaking')
+      return { inQueue: r.data.inQueue ?? false, joinedAt: r.data.joinedAt }
+    } catch {
+      return { inQueue: false }
+    }
+  },
+}
+
+export interface WarChallenge {
+  id: string
+  fromGuildId: string
+  fromName: string
+  expiresAt: string
+}
+
+type BackendWarChallenge = {
+  id?: string
+  fromGuildId?: string
+  fromName?: string
+  expiresAt?: string
+}
+
+function normalizeWarChallenge(c: BackendWarChallenge): WarChallenge {
+  return {
+    id: c.id ?? '',
+    fromGuildId: c.fromGuildId ?? '',
+    fromName: c.fromName ?? '',
+    expiresAt: c.expiresAt ?? '',
+  }
 }
 
 export interface GuildTerritory {
@@ -200,9 +276,20 @@ type BackendTerritory = {
 
 // ── Guild war ──────────────────────────────────────────────────────────
 
+// Derive interview focus topic from a front's display name so we can
+// navigate directly to the matching live-session scenario.
+export function frontTopic(name: string): string {
+  const n = name.toLowerCase()
+  if (n.includes('system')) return 'system_design'
+  if (n.includes('sql'))    return 'sql'
+  if (n.includes('behav'))  return 'behavioral'
+  return 'algorithms'
+}
+
 export interface GuildWarFront {
   id?: string  // empty string = legacy demo front (contribute disabled)
   name: string
+  topic: string  // derived from name — maps to interview ?focus= param
   ourRounds: number
   theirRounds: number
   durationLabel: string
@@ -277,6 +364,7 @@ function normalizeGuildWar(w: BackendGuildWar): GuildWar {
     front: (w.front ?? []).map((f) => ({
       id: f.id ?? '',
       name: f.name ?? '',
+      topic: frontTopic(f.name ?? ''),
       ourRounds: f.ourRounds ?? 0,
       theirRounds: f.theirRounds ?? 0,
       durationLabel: f.durationLabel ?? '',

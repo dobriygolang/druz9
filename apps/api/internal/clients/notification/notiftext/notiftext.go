@@ -59,7 +59,7 @@ func ChallengeCreatedBody(templateKey string, targetValue int32) string {
 func GuildDigestTitle() string { return "Недельный digest" }
 
 func GuildDigestBody(guildName string, memberCount int) string {
-	return fmt.Sprintf("Круг \"%s\" — итоги недели\nУчастников: %d", guildName, memberCount)
+	return fmt.Sprintf("Круг %q — итоги недели\nУчастников: %d", guildName, memberCount)
 }
 
 // ── Interview Prep ───────────────────────────────────────────────

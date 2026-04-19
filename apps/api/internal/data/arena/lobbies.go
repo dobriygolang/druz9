@@ -24,8 +24,10 @@ type LobbyRow struct {
 
 const lobbyMaxSize = 2 // team_2v2; loosen to 3 when team_3v3 ships
 
-var ErrLobbyNotFound = errors.New("lobby not found")
-var ErrLobbyFull = errors.New("lobby is full")
+var (
+	ErrLobbyNotFound = errors.New("lobby not found")
+	ErrLobbyFull     = errors.New("lobby is full")
+)
 
 // CreateLobby inserts an open lobby with the creator as its first member.
 // The invite_code is a short base32 string (8 chars, ~40 bits) — small

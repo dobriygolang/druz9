@@ -18,10 +18,10 @@ func (i *SettingsImplementation) UpdateNotificationSettings(ctx context.Context,
 	}
 
 	upd := notifclient.SettingsUpdate{
-		DuelsEnabled:          req.DuelsEnabled,
-		ProgressEnabled:       req.ProgressEnabled,
-		GuildsEnabled:         req.GuildsEnabled,
-		DailyChallengeEnabled: req.DailyChallengeEnabled,
+		DuelsEnabled:          req.DuelsEnabled,          //nolint:protogetter // proto generated bool is comparable
+		ProgressEnabled:       req.ProgressEnabled,       //nolint:protogetter // proto generated bool is comparable
+		GuildsEnabled:         req.GuildsEnabled,         //nolint:protogetter // proto generated bool is comparable
+		DailyChallengeEnabled: req.DailyChallengeEnabled, //nolint:protogetter // proto generated bool is comparable
 	}
 
 	if err := i.sender.UpdateNotificationSettings(ctx, user.ID.String(), upd); err != nil {

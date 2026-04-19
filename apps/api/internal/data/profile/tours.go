@@ -2,10 +2,13 @@ package profile
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
 )
+
+var errTourIDRequired = errors.New("mark tour completed: tour_id required")
 
 // ListCompletedTours returns the tour_id values the user has finished.
 // Order: most-recently-completed first.
@@ -35,7 +38,7 @@ func (r *Repo) ListCompletedTours(ctx context.Context, userID uuid.UUID) ([]stri
 // the timestamp.
 func (r *Repo) MarkTourCompleted(ctx context.Context, userID uuid.UUID, tourID string) error {
 	if tourID == "" {
-		return fmt.Errorf("mark tour completed: tour_id required")
+		return fmt.Errorf("mark tour completed: tour_id required: %w", errTourIDRequired)
 	}
 	_, err := r.data.DB.Exec(ctx, `
         INSERT INTO user_tours (user_id, tour_id) VALUES ($1, $2)

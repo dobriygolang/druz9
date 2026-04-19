@@ -13,7 +13,10 @@ import (
 	"api/internal/storage/postgres"
 )
 
-var errEmptySlot = errors.New("set equipped: empty slot")
+var (
+	errEmptySlot     = errors.New("set equipped: empty slot")
+	ErrItemNotFound  = errors.New("shop: item not found")
+)
 
 type Repo struct {
 	data *postgres.Store
@@ -124,7 +127,7 @@ func (r *Repo) GetItemByID(ctx context.Context, id uuid.UUID) (*model.ShopItem, 
 	it, err := scanItem(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, ErrItemNotFound
 		}
 		return nil, fmt.Errorf("get item: %w", err)
 	}
@@ -136,7 +139,7 @@ func (r *Repo) GetItemBySlug(ctx context.Context, slug string) (*model.ShopItem,
 	it, err := scanItem(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, ErrItemNotFound
 		}
 		return nil, fmt.Errorf("get item by slug: %w", err)
 	}

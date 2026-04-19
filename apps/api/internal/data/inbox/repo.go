@@ -296,4 +296,3 @@ func (r *Repo) CreateDirectThread(ctx context.Context, senderID, recipientID uui
 	}
 	return thread, nil
 }
-

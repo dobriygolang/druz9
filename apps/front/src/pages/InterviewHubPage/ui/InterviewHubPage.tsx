@@ -9,6 +9,7 @@ import { journeyApi, type ReadinessResponse } from '@/features/Journey/api/journ
 import { useAuth } from '@/app/providers/AuthProvider'
 import type { FeedItem } from '@/entities/User/model/types'
 import { addToast } from '@/shared/lib/toasts'
+import { premiumApi } from '@/features/Premium/api/premiumApi'
 
 const BREAKDOWN_KEYS = ['algorithms', 'systemDesign', 'communication', 'behavioral'] as const
 
@@ -59,6 +60,7 @@ export function InterviewHubPage() {
   const [mentors, setMentors] = useState<MockBlueprint[]>([])
   const [aiMentors, setAiMentors] = useState<AIMentor[]>([])
   const [selectedAiMentorId, setSelectedAiMentorId] = useState<string | null>(null)
+  const [isPremium, setIsPremium] = useState(false)
   const [past, setPast] = useState<FeedItem[]>([])
   const [weakest, setWeakest] = useState<Array<{ key: string; label: string; score: number }>>([])
   const [readiness, setReadiness] = useState<ReadinessResponse | null>(null)
@@ -70,6 +72,7 @@ export function InterviewHubPage() {
     Promise.all([
       interviewPrepApi.listMockBlueprints().catch(() => []),
       interviewPrepApi.listAIMentors().catch(() => []),
+      premiumApi.getStatus().catch(() => ({ active: false })),
       user?.id
         ? authApi.getProfileFeed(user.id, 20).catch(() => []).then((items) =>
             items.filter((it) => it.type === 'mock_stage'),
@@ -87,11 +90,15 @@ export function InterviewHubPage() {
       user?.id
         ? journeyApi.getReadiness(user.id).catch(() => null)
         : Promise.resolve(null),
-    ]).then(([blueprints, ais, feed, weak, rd]) => {
+    ]).then(([blueprints, ais, premStatus, feed, weak, rd]) => {
       if (!alive) return
       setMentors(blueprints)
       setAiMentors(ais)
-      if (ais.length > 0) setSelectedAiMentorId(ais[0].id)
+      setIsPremium((premStatus as any)?.active === true)
+      // Auto-select first free mentor so premium ones aren't pre-selected for free users
+      const firstFree = (ais as AIMentor[]).find(m => m.tier === 0)
+      const first = firstFree ?? (ais as AIMentor[])[0]
+      if (first) setSelectedAiMentorId(first.id)
       setPast(feed)
       setWeakest(weak)
       setReadiness(rd)
@@ -141,12 +148,20 @@ export function InterviewHubPage() {
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {aiMentors.map((m) => {
               const isFree = m.tier === 0
+              const locked = !isFree && !isPremium
               const isSelected = selectedAiMentorId === m.id
               return (
                 <button
                   key={m.id}
                   className="rpg-btn"
-                  onClick={() => setSelectedAiMentorId(m.id)}
+                  title={locked ? 'Требуется Boosty Premium — подключи в Настройках → Premium' : undefined}
+                  onClick={() => {
+                    if (locked) {
+                      navigate('/settings')
+                      return
+                    }
+                    setSelectedAiMentorId(m.id)
+                  }}
                   style={{
                     padding: '8px 14px',
                     outline: isSelected ? '2px solid var(--ember-3)' : '2px solid transparent',
@@ -154,9 +169,11 @@ export function InterviewHubPage() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: 6,
+                    opacity: locked ? 0.55 : 1,
+                    cursor: locked ? 'not-allowed' : 'pointer',
                   }}
                 >
-                  <span>{m.name}</span>
+                  <span>{locked ? '🔒 ' : ''}{m.name}</span>
                   {isFree ? (
                     <Badge variant="moss" style={{ fontSize: 9 }}>Free</Badge>
                   ) : (
@@ -611,7 +628,7 @@ export function InterviewHubPage() {
                 gap: 10,
                 cursor: 'pointer',
               }}
-              onClick={() => navigate(`/interview/live/new?focus=${s.key}`)}
+              onClick={() => navigate(`/interview/live/new?mode=solo&focus=${s.key}`)}
             >
               <div style={{ flex: 1 }}>
                 <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13 }}>{s.title}</div>

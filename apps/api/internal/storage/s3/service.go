@@ -20,9 +20,9 @@ import (
 )
 
 var (
-	errConfigRequired      = errors.New("s3 config is required")
-	errEndpointRequired    = errors.New("s3 endpoint is required")
-	errObjectKeyRequired   = errors.New("object key is required")
+	errConfigRequired        = errors.New("s3 config is required")
+	errEndpointRequired      = errors.New("s3 endpoint is required")
+	errObjectKeyRequired     = errors.New("object key is required")
 	errPublicEndpointInvalid = errors.New("S3_PUBLIC_ENDPOINT must include scheme and host")
 )
 
@@ -57,7 +57,7 @@ func New(cfg *config.S3) (*Service, error) {
 	}
 	if cfg.SkipVerify {
 		clientOpts.Transport = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec // SkipVerify is for local dev/testing only
 		}
 	}
 	client, err := minio.New(endpoint, clientOpts)
@@ -73,7 +73,7 @@ func New(cfg *config.S3) (*Service, error) {
 		}
 		if cfg.SkipVerify {
 			presignOpts.Transport = &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec // SkipVerify is for local dev/testing only
 			}
 		}
 		presignClient, err = minio.New(publicEndpoint.Host, presignOpts)

@@ -11,28 +11,28 @@ import (
 )
 
 type TradeRow struct {
-	ID                  uuid.UUID
-	InitiatorID         uuid.UUID
-	InitiatorName       string
-	CounterpartyID      uuid.UUID
-	InitiatorItemID     uuid.UUID
-	InitiatorItemName   string
-	InitiatorItemIcon   string
-	CounterpartyItemID  uuid.UUID
+	ID                   uuid.UUID
+	InitiatorID          uuid.UUID
+	InitiatorName        string
+	CounterpartyID       uuid.UUID
+	InitiatorItemID      uuid.UUID
+	InitiatorItemName    string
+	InitiatorItemIcon    string
+	CounterpartyItemID   uuid.UUID
 	CounterpartyItemName string
 	CounterpartyItemIcon string
-	Note                string
-	Status              string
-	ProposedAt          time.Time
-	DecidedAt           *time.Time
+	Note                 string
+	Status               string
+	ProposedAt           time.Time
+	DecidedAt            *time.Time
 }
 
 var (
-	ErrTradeNotFound        = errors.New("trade: not found")
-	ErrTradeNotPending      = errors.New("trade: not pending")
-	ErrTradeItemNotOwned    = errors.New("trade: item not owned by required side")
-	ErrTradeItemEquipped    = errors.New("trade: item is currently equipped")
-	ErrTradeSelf            = errors.New("trade: cannot trade with yourself")
+	ErrTradeNotFound     = errors.New("trade: not found")
+	ErrTradeNotPending   = errors.New("trade: not pending")
+	ErrTradeItemNotOwned = errors.New("trade: item not owned by required side")
+	ErrTradeItemEquipped = errors.New("trade: item is currently equipped")
+	ErrTradeSelf         = errors.New("trade: cannot trade with yourself")
 )
 
 // ProposeTrade verifies initiator owns initiator_item and counterparty

@@ -10,6 +10,7 @@ import (
 	"api/internal/clients/geocoder"
 	"api/internal/closer"
 	aimdata "api/internal/data/ai_mentor"
+	premiumdata "api/internal/data/premium"
 	arenadata "api/internal/data/arena"
 	challengedata "api/internal/data/challenge"
 	codeeditordata "api/internal/data/code_editor"
@@ -19,10 +20,10 @@ import (
 	geodata "api/internal/data/geo"
 	guilddata "api/internal/data/guild"
 	inboxdata "api/internal/data/inbox"
+	insightsdata "api/internal/data/insights"
 	interviewprepdata "api/internal/data/interviewprep"
 	missiondata "api/internal/data/mission"
 	peermockdata "api/internal/data/peer_mock"
-	insightsdata "api/internal/data/insights"
 	podcastdata "api/internal/data/podcast"
 	profiledata "api/internal/data/profile"
 	referraldata "api/internal/data/referral"
@@ -74,6 +75,7 @@ type storageContext struct {
 	skillsRepo           *skillsdata.Repo
 	peerMockRepo         *peermockdata.Repo
 	aiMentorRepo         *aimdata.Repo
+	premiumRepo          *premiumdata.Repo
 }
 
 func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
@@ -98,7 +100,7 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 
 	store, cleanup, err := postgres.New(bootstrap.cfg.Data, poolCfg)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create postgres store: %w", err)
 	}
 	closer.AddSync(func() error {
 		cleanup()
@@ -107,10 +109,10 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 
 	storageClient, err := s3storage.New(bootstrap.cfg.External.S3)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create s3 client: %w", err)
 	}
 	if err := storageClient.EnsureBucket(context.Background()); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ensure s3 bucket: %w", err)
 	}
 
 	return &storageContext{
@@ -143,10 +145,10 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 			pr := profiledata.NewRepo(store, bootstrap.kratosLogger)
 			u, err := pr.FindUserByUsername(ctx, username)
 			if err != nil {
-				return uuid.Nil, "", err
+				return uuid.Nil, "", fmt.Errorf("find user by username: %w", err)
 			}
 			if u == nil {
-				return uuid.Nil, "", fmt.Errorf("%w: %s", errUserNotFound, username)
+				return uuid.Nil, "", fmt.Errorf("user not found: %s: %w", username, errUserNotFound)
 			}
 			return u.ID, u.Username, nil
 		}),
@@ -154,6 +156,7 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 		skillsRepo:   skillsdata.NewRepo(store),
 		peerMockRepo: peermockdata.NewRepo(store),
 		aiMentorRepo: aimdata.NewRepo(store),
+		premiumRepo:  premiumdata.NewRepo(store.DB),
 	}, nil
 }
 
@@ -167,13 +170,25 @@ func newGeoResolver(geocoderClient *geocoder.Client, repo *geodata.Repo) geodoma
 }
 
 func (r *geoResolver) Resolve(ctx context.Context, query string, limit int) ([]*model.GeoCandidate, error) {
-	return r.geocoder.Resolve(ctx, query, limit)
+	res, err := r.geocoder.Resolve(ctx, query, limit)
+	if err != nil {
+		return nil, fmt.Errorf("geocoder resolve: %w", err)
+	}
+	return res, nil
 }
 
 func (r *geoResolver) ListCommunityPoints(ctx context.Context, currentUserID string) ([]*model.CommunityMapPoint, error) {
-	return r.repo.ListCommunityPoints(ctx, currentUserID)
+	res, err := r.repo.ListCommunityPoints(ctx, currentUserID)
+	if err != nil {
+		return nil, fmt.Errorf("list community points: %w", err)
+	}
+	return res, nil
 }
 
 func (r *geoResolver) ListWorldPins(ctx context.Context) ([]*model.WorldPin, error) {
-	return r.repo.ListWorldPins(ctx)
+	res, err := r.repo.ListWorldPins(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("list world pins: %w", err)
+	}
+	return res, nil
 }

@@ -35,12 +35,7 @@ export function HeroStrip({
     user.name
   const [tweaks] = useTweaks()
   const navigate = useNavigate()
-  const { t, i18n } = useTranslation()
-
-  const currentLang = i18n.resolvedLanguage?.startsWith('en') ? 'en' : 'ru'
-  const toggleLang = () => {
-    void i18n.changeLanguage(currentLang === 'en' ? 'ru' : 'en')
-  }
+  const { t } = useTranslation()
 
   return (
     <div
@@ -308,16 +303,6 @@ export function HeroStrip({
               </span>
             </div>
           </div>
-          {/* Language toggle */}
-          <RpgButton
-            size="sm"
-            onClick={toggleLang}
-            aria-label={t('common.switchLanguage')}
-            title={t('common.switchLanguage')}
-            style={{ padding: '10px 10px', minWidth: 44, fontFamily: 'Silkscreen, monospace', fontSize: 11, letterSpacing: '0.08em' }}
-          >
-            {currentLang === 'en' ? 'EN' : 'RU'}
-          </RpgButton>
           <RpgButton
             size="sm"
             onClick={() => navigate('/settings')}

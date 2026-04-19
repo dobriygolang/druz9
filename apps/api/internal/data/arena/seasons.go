@@ -22,7 +22,7 @@ func (r *Repo) GetActiveSeason(ctx context.Context) (*model.ArenaSeason, error) 
 	`).Scan(&s.SeasonNumber, &s.StartsAt, &s.EndsAt, &s.IsActive)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, ErrSeasonNotFound
 		}
 		return nil, fmt.Errorf("get active season: %w", err)
 	}

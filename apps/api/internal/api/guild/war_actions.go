@@ -2,11 +2,14 @@ package guild
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 	goerr "errors"
+	"fmt"
+	"net/http"
 
 	kerrs "github.com/go-kratos/kratos/v2/errors"
 	klog "github.com/go-kratos/kratos/v2/log"
+	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"api/internal/apihelpers"
@@ -25,15 +28,15 @@ var defaultFrontNames = []string{
 	"Algo Plaza",
 }
 
-// ensureActiveWar returns an active war for the caller's guild,
-// bootstrapping one if missing. Returns nil if the caller isn't in any
-// guild.
-func (i *Implementation) ensureActiveWar(ctx context.Context, userID any) (*guilddata.WarRow, *model.Guild, error) {
+// getActiveWar looks up the caller's guild and its active war.
+// Returns (nil, guild, nil) when the guild exists but has no active war.
+// Returns (nil, nil, nil) when the caller is not in any guild.
+// Never creates a war — use the declaration endpoints for that.
+func (i *Implementation) getActiveWar(ctx context.Context) (*guilddata.WarRow, *model.Guild, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, nil, fmt.Errorf("require user: %w", err)
 	}
-	_ = userID
 	list, err := i.service.ListGuilds(ctx, user.ID, model.ListGuildsOptions{Limit: 50})
 	if err != nil {
 		return nil, nil, fmt.Errorf("list guilds: %w", err)
@@ -45,33 +48,23 @@ func (i *Implementation) ensureActiveWar(ctx context.Context, userID any) (*guil
 			break
 		}
 	}
-	if ours == nil {
-		return nil, nil, nil
-	}
-	theirName := "Red Ravens"
-	for _, g := range list.Guilds {
-		if g == nil || g.ID == ours.ID {
-			continue
-		}
-		theirName = g.Name
-		break
-	}
-	if i.warRepo == nil {
+	if ours == nil || i.warRepo == nil {
 		return nil, ours, nil
 	}
 	war, err := i.warRepo.GetActiveWarForGuild(ctx, ours.ID)
-	if err == nil {
-		return war, ours, nil
-	}
-	if !guilddata.IsNoRows(err) {
+	if err != nil {
+		if guilddata.IsNoRows(err) {
+			return nil, ours, nil
+		}
 		return nil, ours, fmt.Errorf("get active war: %w", err)
 	}
-	// No war yet — bootstrap one that lasts 7 days.
-	war, _, err = i.warRepo.CreateWarWithFronts(ctx, ours.ID, theirName, defaultFrontNames, 7*24*60*60*1e9) // 7 days in ns
-	if err != nil {
-		return nil, ours, fmt.Errorf("create war: %w", err)
-	}
 	return war, ours, nil
+}
+
+// ensureActiveWar is kept as an alias of getActiveWar for backward compat
+// with ContributeToFront and GetWarQuota (both require a war to exist).
+func (i *Implementation) ensureActiveWar(ctx context.Context, _ any) (*guilddata.WarRow, *model.Guild, error) {
+	return i.getActiveWar(ctx)
 }
 
 // ContributeToFront is the core "play the war" RPC — a member adds
@@ -116,6 +109,9 @@ func (i *Implementation) ContributeToFront(ctx context.Context, req *v1.Contribu
 		if goerr.Is(err, guilddata.ErrFrontAlreadyCaptured) {
 			return nil, kerrs.Conflict("FRONT_CAPTURED", "front already captured")
 		}
+		if goerr.Is(err, guilddata.ErrDailyLimitExceeded) {
+			return nil, kerrs.Forbidden("DAILY_LIMIT", "daily contribution limit reached")
+		}
 		klog.Errorf("guild_war: contribute front=%s: %v", frontID, err)
 		return nil, kerrs.InternalServer("INTERNAL", "failed to contribute")
 	}
@@ -152,6 +148,45 @@ func (i *Implementation) ListTerritories(ctx context.Context, req *v1.ListTerrit
 		})
 	}
 	return &v1.ListTerritoriesResponse{Territories: out}, nil
+}
+
+// GetWarQuota is a plain JSON endpoint (not a proto RPC) that returns
+// how many war-front contributions the calling user has made today and
+// what the daily limit is. Used by the frontend energy bar.
+func (i *Implementation) GetWarQuota(ctx kratoshttp.Context) error {
+	stdCtx := ctx.Request().Context()
+	user, err := apihelpers.RequireUser(stdCtx)
+	if err != nil {
+		ctx.Response().Header().Set("Content-Type", "application/json")
+		ctx.Response().WriteHeader(http.StatusUnauthorized)
+		_ = json.NewEncoder(ctx.Response()).Encode(map[string]string{"code": "UNAUTHORIZED", "message": "authentication required"})
+		return nil
+	}
+	if i.warRepo == nil {
+		writeWarQuota(ctx, 0, int(guilddata.DailyContributionLimit))
+		return nil
+	}
+	war, _, err := i.ensureActiveWar(stdCtx, user.ID)
+	if err != nil || war == nil {
+		writeWarQuota(ctx, 0, int(guilddata.DailyContributionLimit))
+		return nil
+	}
+	count, err := i.warRepo.CountUserTodayContributions(stdCtx, user.ID, war.ID)
+	if err != nil {
+		klog.Errorf("guild_war: count today contributions user=%s: %v", user.ID, err)
+		count = 0
+	}
+	writeWarQuota(ctx, int(count), int(guilddata.DailyContributionLimit))
+	return nil
+}
+
+func writeWarQuota(ctx kratoshttp.Context, used, limit int) {
+	ctx.Response().Header().Set("Content-Type", "application/json")
+	ctx.Response().WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(ctx.Response()).Encode(map[string]int{
+		"used":  used,
+		"limit": limit,
+	})
 }
 
 func mapFrontRow(f *guilddata.FrontRow) *v1.GuildWarFront {

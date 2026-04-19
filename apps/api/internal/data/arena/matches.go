@@ -15,6 +15,12 @@ import (
 	"api/internal/model"
 )
 
+var (
+	ErrMatchNotFound  = errors.New("arena: match not found")
+	ErrPlayerNotFound = errors.New("arena: player not found")
+	ErrSeasonNotFound = errors.New("arena: season not found")
+)
+
 func (r *Repo) CreateMatch(ctx context.Context, match *domain.Match, creator *domain.Player, starterCode string) (*domain.Match, error) {
 	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -72,7 +78,7 @@ func (r *Repo) GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, 
 	`, matchID), &match, &task, &executionProfile, &runnerMode)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, ErrMatchNotFound
 		}
 		return nil, fmt.Errorf("get arena match: %w", err)
 	}

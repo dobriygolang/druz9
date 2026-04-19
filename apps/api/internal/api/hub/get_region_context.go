@@ -59,6 +59,7 @@ func regionMetaFor(regionID string) regionMeta {
 		return regionMeta{"Западные пещеры", "Тихий регион для глубокой практики, менторских комнат и скрытых находок."}
 	default:
 		title := strings.ReplaceAll(regionID, "_", " ")
+		//nolint:staticcheck
 		return regionMeta{strings.Title(title), "Регион атласа druz9. Контент появится здесь после привязки guilds/events/podcasts через region_tag."}
 	}
 }

@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	hubservice "api/internal/api/hub"
-
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	hubservice "api/internal/api/hub"
 )
 
 type hubRegionStatsAdapter struct {

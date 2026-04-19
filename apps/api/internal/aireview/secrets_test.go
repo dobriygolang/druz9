@@ -8,6 +8,7 @@ import (
 )
 
 func TestKeyVault_NilIsPassThrough(t *testing.T) {
+	t.Parallel()
 	var v *KeyVault
 	plain := []byte("sk-prod-abc123")
 	ct, nonce, err := v.Seal(plain)

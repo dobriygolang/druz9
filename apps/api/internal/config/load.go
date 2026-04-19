@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	errDatabaseURLRequired    = errors.New("DATABASE_URL is required")
-	errS3ConfigRequired       = errors.New("S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY and S3_SECRET_KEY are required")
+	errDatabaseURLRequired = errors.New("DATABASE_URL is required")
+	errS3ConfigRequired    = errors.New("S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY and S3_SECRET_KEY are required")
 )
 
 func Load(manager *rtc.Manager) (*Bootstrap, error) {
@@ -381,6 +381,39 @@ func overrideSecretConfigFromEnv(cfg *Bootstrap) {
 			cfg.External.NotificationService = &NotificationService{}
 		}
 		cfg.External.NotificationService.Addr = strings.TrimSpace(value)
+	}
+
+	if value, ok := lookupEnvValue("BOOSTY_ACCESS_TOKEN"); ok {
+		if cfg.External.Boosty == nil {
+			cfg.External.Boosty = &Boosty{}
+		}
+		cfg.External.Boosty.AccessToken = strings.TrimSpace(value)
+	}
+	if value, ok := lookupEnvValue("BOOSTY_REFRESH_TOKEN"); ok {
+		if cfg.External.Boosty == nil {
+			cfg.External.Boosty = &Boosty{}
+		}
+		cfg.External.Boosty.RefreshToken = strings.TrimSpace(value)
+	}
+	if value, ok := lookupEnvValue("BOOSTY_DEVICE_ID"); ok {
+		if cfg.External.Boosty == nil {
+			cfg.External.Boosty = &Boosty{}
+		}
+		cfg.External.Boosty.DeviceID = strings.TrimSpace(value)
+	}
+	if value, ok := lookupEnvValue("BOOSTY_BLOG_NAME"); ok {
+		if cfg.External.Boosty == nil {
+			cfg.External.Boosty = &Boosty{}
+		}
+		cfg.External.Boosty.BlogName = strings.TrimSpace(value)
+	}
+	if value, ok := lookupEnvValue("BOOSTY_TIMEOUT"); ok {
+		if cfg.External.Boosty == nil {
+			cfg.External.Boosty = &Boosty{}
+		}
+		if parsed, err := time.ParseDuration(value); err == nil {
+			cfg.External.Boosty.Timeout = parsed
+		}
 	}
 }
 
