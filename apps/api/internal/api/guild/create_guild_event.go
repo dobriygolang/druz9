@@ -16,12 +16,12 @@ import (
 func (i *Implementation) CreateGuildEvent(ctx context.Context, req *guildv1.CreateGuildEventRequest) (*guildv1.CreateGuildEventResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	guildID, err := apihelpers.ParseUUID(req.GetGuildId(), "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse guild_id: %w", err)
 	}
 
 	isMember, err := i.service.IsMember(ctx, guildID, user.ID)

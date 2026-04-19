@@ -116,6 +116,13 @@ func (r *Repo) buildListEventsQueries(opts model.ListEventsOptions) (string, str
 			conditions = append(conditions, "COALESCE(e.status, 'approved') = 'approved'")
 		}
 	}
+
+	// ADR-004 — system_kind events (e.g. "guild_war_started") are surfaced
+	// in the dedicated guild feed, not the public events list. Hide them
+	// here unconditionally; legacy rows have system_kind IS NULL so the
+	// filter is identity for existing data.
+	conditions = append(conditions, "e.system_kind IS NULL")
+
 	_ = argNum
 
 	whereClause := ""

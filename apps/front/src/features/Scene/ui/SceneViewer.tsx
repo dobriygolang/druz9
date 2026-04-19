@@ -12,11 +12,16 @@ interface SceneViewerProps {
   itemAssets?: Record<string, { src?: string; label?: string }>
   // Override the canvas height; width is responsive (100% of container).
   maxHeight?: number
+  // Optional render slot: when provided, SceneViewer hands this layout
+  // (and canEdit) to a child editor instead of rendering the read-only
+  // canvas. Used by ProfilePage to flip the panel into edit mode.
+  renderEditor?: (resp: SceneLayoutResponse, refresh: () => void) => React.ReactNode
 }
 
-export function SceneViewer({ scope, ownerId, itemAssets, maxHeight = 480 }: SceneViewerProps) {
+export function SceneViewer({ scope, ownerId, itemAssets, maxHeight = 480, renderEditor }: SceneViewerProps) {
   const [resp, setResp] = useState<SceneLayoutResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [reloadTick, setReloadTick] = useState(0)
 
   useEffect(() => {
     let cancelled = false
@@ -25,10 +30,15 @@ export function SceneViewer({ scope, ownerId, itemAssets, maxHeight = 480 }: Sce
       .then((r) => { if (!cancelled) setResp(r) })
       .catch(() => { if (!cancelled) setError('Не удалось загрузить сцену') })
     return () => { cancelled = true }
-  }, [scope, ownerId])
+  }, [scope, ownerId, reloadTick])
 
   if (error) return <SceneEmpty title="Ошибка" hint={error} />
   if (!resp) return <SceneEmpty title="Загрузка..." hint="" />
+
+  if (renderEditor) {
+    return <>{renderEditor(resp, () => setReloadTick((n) => n + 1))}</>
+  }
+
   const layout = resp.layout
   if (!layout || layout.items.length === 0) {
     return (

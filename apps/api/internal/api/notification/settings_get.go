@@ -2,6 +2,7 @@ package notification
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -12,7 +13,7 @@ import (
 func (i *SettingsImplementation) GetNotificationSettings(ctx context.Context, _ *v1.GetNotificationSettingsRequest) (*v1.NotificationSettings, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	settings, err := i.sender.GetNotificationSettings(ctx, user.ID.String())

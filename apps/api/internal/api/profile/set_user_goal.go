@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -23,7 +24,7 @@ func (i *Implementation) SetUserGoal(ctx context.Context, req *v1.SetUserGoalReq
 	}
 
 	if err := i.progressRepo.SaveUserGoal(ctx, userFromCtx.ID, goal); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("save user goal: %w", err)
 	}
 
 	return &v1.SetUserGoalResponse{

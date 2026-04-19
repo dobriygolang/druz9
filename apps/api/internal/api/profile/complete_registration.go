@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -34,7 +35,7 @@ func (i *Implementation) CompleteRegistration(ctx context.Context, req *v1.Compl
 				return nil, errors.BadRequest("INVALID_PAYLOAD", "invalid payload")
 			}
 		}
-		return nil, err
+		return nil, fmt.Errorf("complete registration: %w", err)
 	}
 
 	i.cookie.SetSessionCookie(ctx, rawToken, expiresAt)

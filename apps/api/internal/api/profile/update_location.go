@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -29,7 +30,7 @@ func (i *Implementation) UpdateLocation(ctx context.Context, req *v1.UpdateLocat
 				return nil, errors.BadRequest("INVALID_PAYLOAD", "invalid payload")
 			}
 		}
-		return nil, err
+		return nil, fmt.Errorf("update location: %w", err)
 	}
 
 	return mapProfileResponse(response), nil

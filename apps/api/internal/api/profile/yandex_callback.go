@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 
 	"api/internal/metrics"
 	v1 "api/pkg/api/profile/v1"
@@ -10,7 +11,7 @@ import (
 func (i *Implementation) YandexAuth(ctx context.Context, req *v1.YandexAuthRequest) (*v1.ProfileResponse, error) {
 	response, rawToken, expiresAt, err := i.service.YandexAuth(ctx, req.GetState(), req.GetCode())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("yandex auth: %w", err)
 	}
 
 	i.cookie.SetSessionCookie(ctx, rawToken, expiresAt)

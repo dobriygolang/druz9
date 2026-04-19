@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -18,7 +19,7 @@ func (i *Implementation) BindTelegram(ctx context.Context, req *v1.BindTelegramR
 
 	_, telegramID, err := i.service.BindTelegram(ctx, user.ID, req.GetToken(), req.GetCode())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("bind telegram: %w", err)
 	}
 	if i.notif != nil && telegramID != 0 {
 		i.notif.LinkTelegram(ctx, user.ID.String(), telegramID)

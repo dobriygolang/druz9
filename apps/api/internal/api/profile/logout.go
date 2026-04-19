@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -17,7 +18,7 @@ func (i *Implementation) Logout(ctx context.Context, _ *v1.LogoutRequest) (*v1.P
 	}
 
 	if err := i.service.Logout(ctx, session.TokenHash); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("logout: %w", err)
 	}
 
 	i.cookie.ClearSessionCookie(ctx)

@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -17,7 +18,7 @@ func (i *Implementation) GetProfile(ctx context.Context, _ *v1.GetProfileRequest
 
 	resp, err := i.service.GetProfileByID(ctx, userFromCtx.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get profile by id: %w", err)
 	}
 	return mapProfileResponse(resp), nil
 }

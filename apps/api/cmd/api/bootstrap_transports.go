@@ -108,13 +108,14 @@ func registerBackgroundWorkers(bootstrap *bootstrapContext, storage *storageCont
 func registerManualHTTPRoutes(
 	httpServer *kratoshttp.Server,
 	_ *bootstrapContext,
-	_ *storageContext,
+	storage *storageContext,
 	services *serviceContext,
 ) {
 	// Realtime WebSocket endpoints (cannot be expressed as proto RPCs).
 	wshandler.Register(httpServer, services.realtimeHub, services.arenaRealtimeHub, services.profileServiceDomain)
 
-	liveChatHandler := interviewlive.New(services.aiReviewer)
+	liveChatHandler := interviewlive.New(services.aiReviewer).
+		WithMentorResolver(mentorResolverAdapter{repo: storage.aiMentorRepo})
 	adminapi.RegisterDockerLogsHTTPRoute(httpServer, services.adminService)
 
 	r := httpServer.Route("/")

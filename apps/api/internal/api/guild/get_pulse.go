@@ -2,6 +2,7 @@ package guild
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -12,17 +13,17 @@ import (
 func (i *Implementation) GetGuildPulse(ctx context.Context, req *v1.GetGuildPulseRequest) (*v1.GetGuildPulseResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	guildID, err := apihelpers.ParseUUID(req.GetGuildId(), "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse guild_id: %w", err)
 	}
 
 	pulse, err := i.service.GetPulse(ctx, guildID, user.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get guild pulse: %w", err)
 	}
 
 	weekActivity := make([]*v1.GuildDayActivity, 0, len(pulse.WeekActivity))

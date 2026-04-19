@@ -8,6 +8,7 @@ package duel_replay
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/google/uuid"
@@ -62,7 +63,7 @@ var (
 func (s *Service) GetReplay(ctx context.Context, replayID uuid.UUID, viewer *uuid.UUID) (*model.ReplayWithEvents, error) {
 	summary, err := s.repo.GetSummary(ctx, replayID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get replay summary: %w", err)
 	}
 	if summary == nil {
 		return nil, ErrReplayNotFound
@@ -72,7 +73,7 @@ func (s *Service) GetReplay(ctx context.Context, replayID uuid.UUID, viewer *uui
 	}
 	events, err := s.repo.ListEvents(ctx, replayID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list replay events: %w", err)
 	}
 	if events == nil {
 		events = []*model.DuelReplayEvent{}
@@ -93,7 +94,7 @@ func (s *Service) ListMyReplays(ctx context.Context, userID uuid.UUID, limit, of
 	}
 	replays, total, err := s.repo.ListForUser(ctx, userID, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list replays for user: %w", err)
 	}
 	if replays == nil {
 		replays = []*model.DuelReplaySummary{}
@@ -114,7 +115,7 @@ func (s *Service) RecordEvent(ctx context.Context, in model.RecordEventInput) (*
 
 	summary, err := s.repo.GetSummary(ctx, in.ReplayID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get replay summary: %w", err)
 	}
 	if summary == nil {
 		return nil, ErrReplayNotFound
@@ -133,7 +134,7 @@ func (s *Service) RecordEvent(ctx context.Context, in model.RecordEventInput) (*
 		LinesCount: in.LinesCount,
 	}
 	if err := s.repo.InsertEvent(ctx, ev); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("insert replay event: %w", err)
 	}
 	return ev, nil
 }
@@ -145,5 +146,8 @@ func (s *Service) CreateReplay(ctx context.Context, r *model.DuelReplaySummary) 
 	if r.ID == uuid.Nil {
 		r.ID = uuid.New()
 	}
-	return s.repo.CreateReplay(ctx, r)
+	if err := s.repo.CreateReplay(ctx, r); err != nil {
+		return fmt.Errorf("create replay: %w", err)
+	}
+	return nil
 }

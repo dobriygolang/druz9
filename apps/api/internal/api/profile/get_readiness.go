@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 
 	"api/internal/apihelpers"
 	profiledomain "api/internal/domain/profile"
@@ -12,12 +13,12 @@ import (
 func (i *Implementation) GetReadiness(ctx context.Context, req *v1.GetReadinessRequest) (*v1.GetReadinessResponse, error) {
 	userID, err := apihelpers.ParseUUID(req.GetUserId(), "INVALID_USER_ID", "user_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse user_id: %w", err)
 	}
 
 	progress, err := i.progressRepo.GetProfileProgress(ctx, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get profile progress: %w", err)
 	}
 
 	readiness := profiledomain.ComputeReadiness(progress)

@@ -2,6 +2,7 @@ package guild
 
 import (
 	"context"
+	"fmt"
 
 	"api/internal/apihelpers"
 	"api/internal/clients/notification/notiftext"
@@ -12,21 +13,21 @@ import (
 func (i *Implementation) InviteToGuild(ctx context.Context, req *v1.InviteToGuildRequest) (*v1.InviteToGuildResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	guildID, err := apihelpers.ParseUUID(req.GetGuildId(), "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse guild_id: %w", err)
 	}
 
 	inviteeID, err := apihelpers.ParseUUID(req.GetUserId(), "INVALID_USER_ID", "user_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse user_id: %w", err)
 	}
 
 	if err := i.service.InviteToGuild(ctx, guildID, user.ID, inviteeID); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("invite to guild: %w", err)
 	}
 
 	// Notify: guild_invite — send to the invitee.

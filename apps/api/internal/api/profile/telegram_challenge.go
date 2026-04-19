@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -11,7 +12,7 @@ import (
 func (i *Implementation) CreateTelegramAuthChallenge(ctx context.Context, _ *v1.CreateTelegramAuthChallengeRequest) (*v1.CreateTelegramAuthChallengeResponse, error) {
 	challenge, err := i.service.CreateTelegramAuthChallenge(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create telegram auth challenge: %w", err)
 	}
 
 	return &v1.CreateTelegramAuthChallengeResponse{

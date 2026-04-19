@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -16,7 +17,7 @@ func (i *Implementation) UpdateProfile(ctx context.Context, req *v1.UpdateProfil
 	}
 	resp, err := i.service.UpdateProfile(ctx, user.ID, req.GetCurrentWorkplace())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("update profile: %w", err)
 	}
 	return mapProfileResponse(resp), nil
 }

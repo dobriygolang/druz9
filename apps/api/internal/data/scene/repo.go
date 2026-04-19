@@ -102,7 +102,10 @@ func (r *Repo) listItems(ctx context.Context, layoutID uuid.UUID) ([]PlacedItem,
 		}
 		out = append(out, it)
 	}
-	return out, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate items: %w", err)
+	}
+	return out, nil
 }
 
 // Upsert replaces the layout atomically: layout row is upserted by
@@ -207,11 +210,14 @@ func (r *Repo) UserOwnsItems(ctx context.Context, userID uuid.UUID, itemIDs []uu
 	for rows.Next() {
 		var id uuid.UUID
 		if err := rows.Scan(&id); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("scan user ownership: %w", err)
 		}
 		owned[id] = true
 	}
-	return owned, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate user ownership: %w", err)
+	}
+	return owned, nil
 }
 
 // GuildOwnsItems mirrors UserOwnsItems for guild_inventory (added in 00024).
@@ -230,9 +236,12 @@ func (r *Repo) GuildOwnsItems(ctx context.Context, guildID uuid.UUID, itemIDs []
 	for rows.Next() {
 		var id uuid.UUID
 		if err := rows.Scan(&id); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("scan guild ownership: %w", err)
 		}
 		owned[id] = true
 	}
-	return owned, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate guild ownership: %w", err)
+	}
+	return owned, nil
 }

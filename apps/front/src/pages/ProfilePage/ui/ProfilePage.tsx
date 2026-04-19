@@ -28,6 +28,7 @@ import { ItemCategory, type OwnedItem, rarityLabel } from '@/features/Shop/model
 import { InventoryModal } from '@/features/Shop/ui/InventoryModal'
 import type { ProfileProgress } from '@/entities/User/model/types'
 import { SceneViewer } from '@/features/Scene/ui/SceneViewer'
+import { SceneEditor } from '@/features/Scene/ui/SceneEditor'
 
 export function ProfilePage() {
   const { t } = useTranslation()
@@ -283,18 +284,29 @@ export function ProfilePage() {
         </RoomScene>
       </Panel>
 
-      {/* ADR-003: persisted Hero Room layout. Empty for new users until
-          the SceneEditor (drag-and-drop) ships. Visible to anyone, edit
-          gated to the owner via canEdit on the response. */}
+      {/* ADR-003: persisted Hero Room. Owner sees an "Edit" toggle that
+          flips the panel into SceneEditor (drag-and-drop). Visitors see
+          the read-only canvas. Server enforces canEdit. */}
       {user?.id && (
         <Panel nailed style={{ padding: 12, marginBottom: 18 }}>
           <div
-            className="font-silkscreen uppercase"
-            style={{ fontSize: 10, letterSpacing: '0.1em', color: 'var(--ember-1)', marginBottom: 8 }}
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}
           >
-            {t('profile.savedScene', { defaultValue: 'твоя сцена' })}
+            <div
+              className="font-silkscreen uppercase"
+              style={{ fontSize: 10, letterSpacing: '0.1em', color: 'var(--ember-1)' }}
+            >
+              {t('profile.savedScene', { defaultValue: 'твоя сцена' })}
+            </div>
           </div>
-          <SceneViewer scope="user_room" ownerId={user.id} maxHeight={360} />
+          <SceneViewer
+            scope="user_room"
+            ownerId={user.id}
+            maxHeight={360}
+            renderEditor={(resp, refresh) => (
+              <SceneRoomToggle resp={resp} ownerId={user.id} refresh={refresh} />
+            )}
+          />
         </Panel>
       )}
 
@@ -656,6 +668,95 @@ function buildCosmetics(t: (key: string) => string) {
       ),
     },
   ]
+}
+
+// SceneRoomToggle — local helper that flips the saved-scene panel
+// between read-only (SceneViewer) and edit (SceneEditor) for the owner.
+// Visitor sessions never see the toggle (canEdit comes from the server).
+function SceneRoomToggle({
+  resp,
+  ownerId,
+  refresh,
+}: {
+  resp: import('@/features/Scene/api/sceneApi').SceneLayoutResponse
+  ownerId: string
+  refresh: () => void
+}) {
+  const [editing, setEditing] = useState(false)
+  if (editing && resp.canEdit) {
+    return (
+      <SceneEditor
+        scope="user_room"
+        ownerId={ownerId}
+        initial={resp.layout}
+        onSaved={() => { setEditing(false); refresh() }}
+        onCancel={() => setEditing(false)}
+        maxHeight={360}
+      />
+    )
+  }
+  return (
+    <div>
+      <SceneCanvasInline layout={resp.layout} maxHeight={360} />
+      {resp.canEdit && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
+          <button className="rpg-btn rpg-btn--sm rpg-btn--primary" onClick={() => setEditing(true)}>
+            Редактировать сцену
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// SceneCanvasInline duplicates SceneViewer's internal canvas markup so
+// the toggle can render the read-only view without re-fetching the layout
+// (we already have `resp` in hand). When SceneViewer is refactored to
+// expose its canvas as a standalone component, this can be deleted.
+function SceneCanvasInline({
+  layout,
+  maxHeight,
+}: { layout: import('@/features/Scene/api/sceneApi').SceneLayout; maxHeight: number }) {
+  if (!layout.items || layout.items.length === 0) {
+    return (
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        padding: 24, minHeight: 180,
+        background: 'var(--parch-1, #f6e9c8)', border: '3px dashed var(--ink-1, #5b4331)',
+        color: 'var(--ink-2, #7d6850)', fontFamily: 'Pixelify Sans, monospace',
+      }}>
+        Комната пуста — нажми «Редактировать сцену», чтобы расставить предметы.
+      </div>
+    )
+  }
+  const aspect = layout.width / Math.max(1, layout.height)
+  return (
+    <div style={{
+      position: 'relative', width: '100%', maxHeight,
+      aspectRatio: `${layout.width} / ${layout.height}`,
+      background: 'var(--parch-1, #f6e9c8)', border: '3px solid var(--ink-0, #2a1a0c)',
+      overflow: 'hidden', boxShadow: '4px 4px 0 var(--ink-0, #2a1a0c)',
+    }}>
+      {[...layout.items].sort((a, b) => a.zIndex - b.zIndex).map((it, idx) => {
+        const xPct = (it.x / layout.width) * 100
+        const yPct = (it.y / layout.height) * 100
+        const sizePct = 12 * it.scale
+        return (
+          <div key={`${it.itemId}-${idx}`} style={{
+            position: 'absolute',
+            left: `${xPct}%`, top: `${yPct}%`,
+            width: `${sizePct * aspect}%`,
+            transform: `translate(-50%, -50%) rotate(${it.rotationDeg}deg) scaleX(${it.flipped ? -1 : 1})`,
+            zIndex: it.zIndex, transformOrigin: 'center', pointerEvents: 'none',
+            padding: '6px 10px', background: 'var(--parch-2, #efe1bf)',
+            border: '2px solid var(--ink-0, #2a1a0c)',
+            fontFamily: 'Pixelify Sans, monospace', fontSize: 11,
+            whiteSpace: 'nowrap', color: 'var(--ink-0, #2a1a0c)',
+          }}>{it.itemId.slice(0, 8)}</div>
+        )
+      })}
+    </div>
+  )
 }
 
 // ─── real-data builders ────────────────────────────────────────────────

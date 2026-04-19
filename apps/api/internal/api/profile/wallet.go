@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	klog "github.com/go-kratos/kratos/v2/log"
@@ -13,7 +14,7 @@ import (
 func (i *Implementation) GetWallet(ctx context.Context, _ *v1.GetWalletRequest) (*v1.GetWalletResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	balance, err := i.walletRepo.GetOrCreate(ctx, user.ID)
 	if err != nil {

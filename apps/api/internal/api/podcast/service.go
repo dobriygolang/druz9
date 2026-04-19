@@ -10,6 +10,7 @@ import (
 type Implementation struct {
 	v1.UnimplementedPodcastServiceServer
 	service Service
+	series  SeriesRepo
 }
 
 // New returns new instance of Implementation.

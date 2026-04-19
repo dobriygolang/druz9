@@ -1,6 +1,8 @@
 package scene
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -31,7 +33,7 @@ func mapItemsFromProto(items []*v1.PlacedItem) ([]scenedata.PlacedItem, error) {
 	for _, it := range items {
 		id, err := uuid.Parse(it.GetItemId())
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("parse item id: %w", err)
 		}
 		scale := it.GetScale()
 		if scale <= 0 {

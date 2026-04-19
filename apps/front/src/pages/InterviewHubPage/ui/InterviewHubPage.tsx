@@ -115,7 +115,14 @@ export function InterviewHubPage() {
             <RpgButton size="sm" onClick={() => navigate('/interview/peer')}>
               Peer mocks
             </RpgButton>
-            <RpgButton size="sm" variant="primary" onClick={() => navigate('/interview/live/new')}>
+            <RpgButton size="sm" variant="primary" onClick={() => {
+              // Carry the chosen mentor through to the live page so the
+              // backend can apply that persona's system prompt + model.
+              const target = selectedAiMentorId
+                ? `/interview/live/new?mentorId=${selectedAiMentorId}`
+                : '/interview/live/new'
+              navigate(target)
+            }}>
               {t('interviewHub.startSession')}
             </RpgButton>
           </div>
@@ -465,7 +472,10 @@ export function InterviewHubPage() {
             <button
               key={topic.key}
               className="rpg-btn"
-              onClick={() => navigate(`/interview/live/new?mode=solo&focus=${topic.key}`)}
+              onClick={() => {
+                const mentorQS = selectedAiMentorId ? `&mentorId=${selectedAiMentorId}` : ''
+                navigate(`/interview/live/new?mode=solo&focus=${topic.key}${mentorQS}`)
+              }}
               style={{
                 padding: '10px 16px',
                 fontFamily: 'Pixelify Sans, monospace',

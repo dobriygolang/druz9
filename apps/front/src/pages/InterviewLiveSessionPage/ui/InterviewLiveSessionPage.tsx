@@ -79,6 +79,9 @@ export function InterviewLiveSessionPage() {
   const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
   const soloFocus = searchParams?.get('focus') ?? null
   const soloMode = searchParams?.get('mode') === 'solo'
+  // ADR-001: mentor_id (UUID from /api/v1/interview-prep/ai-mentors). When
+  // present, the server applies that mentor's persona prompt + model.
+  const mentorIdParam = searchParams?.get('mentorId') ?? null
   const { toast } = usePixelToast()
   const { t } = useTranslation()
 
@@ -167,7 +170,7 @@ Guidelines:
       { role: 'user', content: userText },
     ]
 
-    const { reply } = await chatWithMentor(apiMessages)
+    const { reply } = await chatWithMentor(apiMessages, { mentorId: mentorIdParam ?? undefined })
     return reply
   }
 

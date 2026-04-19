@@ -49,6 +49,12 @@ service PodcastService {
     option (google.api.http) = { delete: "/api/admin/podcasts/{podcast_id}" };
   }
 
+  // ADR-005 — Series catalog. Read-only for now; admin CRUD lands in a
+  // follow-up wave (admin.proto endpoints).
+  rpc ListSeries(ListSeriesRequest) returns (ListSeriesResponse) {
+    option (google.api.http) = { get: "/api/v1/podcasts/series" };
+  }
+
   rpc PlayPodcast(PlayPodcastRequest) returns (PlayPodcastResponse) {
     option (google.api.http) = { get: "/api/v1/podcasts/{podcast_id}/play" };
   }
@@ -66,9 +72,22 @@ enum MediaContentType {
 
 // ── Request messages ───────────────────────────────────────────────────────
 
+message ListSeriesRequest {
+  uint32 limit  = 1;
+  uint32 offset = 2;
+}
+
+message ListSeriesResponse {
+  repeated PodcastSeries series = 1;
+  uint32                 total  = 2;
+}
+
 message ListPodcastsRequest {
   int32 limit  = 1;
   int32 offset = 2;
+  // ADR-005: optional filters. Empty/false = no filter applied.
+  string series_id     = 3;  // only episodes in this series
+  bool   featured_only = 4;  // only podcasts with featured_at set
 }
 
 message GetPodcastRequest {
@@ -152,4 +171,22 @@ message Podcast {
   MediaContentType          content_type     = 8;
   bool                      is_uploaded      = 9;
   google.protobuf.Timestamp created_at       = 10;
+  // ADR-005: optional grouping. UNSET = standalone episode. Editorial
+  // surfaces (Featured tab) sort by `featured_at` DESC NULLS LAST.
+  string                    series_id        = 11;
+  uint32                    episode_number   = 12;
+  google.protobuf.Timestamp featured_at      = 13;
+}
+
+// ADR-005 — A named collection of podcast episodes (e.g. "DDIA Reading
+// Club"). Episodes are linked via Podcast.series_id; rendering order is
+// `episode_number ASC`.
+message PodcastSeries {
+  string                    id              = 1;
+  string                    slug            = 2;
+  string                    title           = 3;
+  string                    description     = 4;
+  string                    cover_ref       = 5;
+  uint32                    episode_count   = 6;
+  google.protobuf.Timestamp created_at      = 7;
 }

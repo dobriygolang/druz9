@@ -15,6 +15,7 @@ import {
 } from '@/widgets/Overlays'
 import { useApplySeasonToHtml, useGameUser } from '@/shared/lib/gameState'
 import { useKeyboardShortcuts } from '@/shared/lib/useKeyboardShortcuts'
+import { AudioPlayerBar } from '@/features/Podcast/ui/AudioPlayerBar'
 
 // `useGameUser` here feeds demo-only overlay props (level-up demo, streak
 // demo) — those modals accept numeric inputs so we don't need real profile
@@ -61,6 +62,12 @@ export function PageLayout() {
           <Outlet />
         </main>
       </div>
+
+      {/* ADR-005 — Global persistent podcast mini-bar. Renders only when
+          something is playing (and hides on /podcasts where the page has
+          its own full player). Sits above the toast stack so it doesn't
+          steal focus from notifications. */}
+      <AudioPlayerBar />
 
       {/* global overlays — NotificationBell now lives inside HeroStrip.
           TweaksPanel was retired: all knobs live in /settings → Flavour & tweaks. */}

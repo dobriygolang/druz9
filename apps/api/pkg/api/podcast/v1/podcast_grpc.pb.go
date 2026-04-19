@@ -26,6 +26,7 @@ const (
 	PodcastService_PreparePodcastUpload_FullMethodName  = "/podcast.v1.PodcastService/PreparePodcastUpload"
 	PodcastService_CompletePodcastUpload_FullMethodName = "/podcast.v1.PodcastService/CompletePodcastUpload"
 	PodcastService_DeletePodcast_FullMethodName         = "/podcast.v1.PodcastService/DeletePodcast"
+	PodcastService_ListSeries_FullMethodName            = "/podcast.v1.PodcastService/ListSeries"
 	PodcastService_PlayPodcast_FullMethodName           = "/podcast.v1.PodcastService/PlayPodcast"
 )
 
@@ -40,6 +41,9 @@ type PodcastServiceClient interface {
 	PreparePodcastUpload(ctx context.Context, in *PreparePodcastUploadRequest, opts ...grpc.CallOption) (*PreparePodcastUploadResponse, error)
 	CompletePodcastUpload(ctx context.Context, in *CompletePodcastUploadRequest, opts ...grpc.CallOption) (*PodcastResponse, error)
 	DeletePodcast(ctx context.Context, in *DeletePodcastRequest, opts ...grpc.CallOption) (*PodcastStatusResponse, error)
+	// ADR-005 — Series catalog. Read-only for now; admin CRUD lands in a
+	// follow-up wave (admin.proto endpoints).
+	ListSeries(ctx context.Context, in *ListSeriesRequest, opts ...grpc.CallOption) (*ListSeriesResponse, error)
 	PlayPodcast(ctx context.Context, in *PlayPodcastRequest, opts ...grpc.CallOption) (*PlayPodcastResponse, error)
 }
 
@@ -121,6 +125,16 @@ func (c *podcastServiceClient) DeletePodcast(ctx context.Context, in *DeletePodc
 	return out, nil
 }
 
+func (c *podcastServiceClient) ListSeries(ctx context.Context, in *ListSeriesRequest, opts ...grpc.CallOption) (*ListSeriesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListSeriesResponse)
+	err := c.cc.Invoke(ctx, PodcastService_ListSeries_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *podcastServiceClient) PlayPodcast(ctx context.Context, in *PlayPodcastRequest, opts ...grpc.CallOption) (*PlayPodcastResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PlayPodcastResponse)
@@ -142,6 +156,9 @@ type PodcastServiceServer interface {
 	PreparePodcastUpload(context.Context, *PreparePodcastUploadRequest) (*PreparePodcastUploadResponse, error)
 	CompletePodcastUpload(context.Context, *CompletePodcastUploadRequest) (*PodcastResponse, error)
 	DeletePodcast(context.Context, *DeletePodcastRequest) (*PodcastStatusResponse, error)
+	// ADR-005 — Series catalog. Read-only for now; admin CRUD lands in a
+	// follow-up wave (admin.proto endpoints).
+	ListSeries(context.Context, *ListSeriesRequest) (*ListSeriesResponse, error)
 	PlayPodcast(context.Context, *PlayPodcastRequest) (*PlayPodcastResponse, error)
 	mustEmbedUnimplementedPodcastServiceServer()
 }
@@ -173,6 +190,9 @@ func (UnimplementedPodcastServiceServer) CompletePodcastUpload(context.Context, 
 }
 func (UnimplementedPodcastServiceServer) DeletePodcast(context.Context, *DeletePodcastRequest) (*PodcastStatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeletePodcast not implemented")
+}
+func (UnimplementedPodcastServiceServer) ListSeries(context.Context, *ListSeriesRequest) (*ListSeriesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListSeries not implemented")
 }
 func (UnimplementedPodcastServiceServer) PlayPodcast(context.Context, *PlayPodcastRequest) (*PlayPodcastResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method PlayPodcast not implemented")
@@ -324,6 +344,24 @@ func _PodcastService_DeletePodcast_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PodcastService_ListSeries_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListSeriesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PodcastServiceServer).ListSeries(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PodcastService_ListSeries_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PodcastServiceServer).ListSeries(ctx, req.(*ListSeriesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _PodcastService_PlayPodcast_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PlayPodcastRequest)
 	if err := dec(in); err != nil {
@@ -376,6 +414,10 @@ var PodcastService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeletePodcast",
 			Handler:    _PodcastService_DeletePodcast_Handler,
+		},
+		{
+			MethodName: "ListSeries",
+			Handler:    _PodcastService_ListSeries_Handler,
 		},
 		{
 			MethodName: "PlayPodcast",

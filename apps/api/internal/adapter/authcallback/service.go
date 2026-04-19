@@ -2,6 +2,7 @@ package authcallback
 
 import (
 	"context"
+	"fmt"
 
 	kratosgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 
@@ -35,7 +36,7 @@ func (s *Server) ConfirmTelegramAuth(ctx context.Context, req *v1.ConfirmTelegra
 		PhotoURL:  req.GetPhotoUrl(),
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("confirm telegram auth: %w", err)
 	}
 
 	return &v1.ConfirmTelegramAuthResponse{

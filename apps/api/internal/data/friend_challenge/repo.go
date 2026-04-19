@@ -224,5 +224,8 @@ func scanList(rows pgx.Rows) ([]*model.FriendChallenge, error) {
 		}
 		items = append(items, ch)
 	}
-	return items, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate challenges: %w", err)
+	}
+	return items, nil
 }

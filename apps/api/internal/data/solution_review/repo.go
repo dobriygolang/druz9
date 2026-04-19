@@ -190,7 +190,10 @@ func (r *Repo) ListByUser(ctx context.Context, userID uuid.UUID, limit int) ([]*
 		}
 		reviews = append(reviews, rev)
 	}
-	return reviews, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate reviews: %w", err)
+	}
+	return reviews, nil
 }
 
 const reviewColumns = `

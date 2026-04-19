@@ -31,7 +31,7 @@ import (
 func (i *Implementation) GetGuildWar(ctx context.Context, _ *v1.GetGuildWarRequest) (*v1.GetGuildWarResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	// Find the user's guild. ListGuilds returns is_joined=true for them.

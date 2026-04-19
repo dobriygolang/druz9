@@ -1,23 +1,52 @@
 package interview_live
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 
 	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/google/uuid"
 
 	"api/internal/aireview"
 	"api/internal/model"
 )
 
+// MentorResolver fetches an active mentor's persona by ID. Returns
+// (nil, nil) when the mentor is missing or inactive — the handler then
+// falls back to the bootstrap reviewer.
+type MentorResolver interface {
+	GetActiveByID(ctx context.Context, id uuid.UUID) (*MentorPersona, error)
+}
+
+// MentorPersona is the slice of an ai_mentors row that the chat handler
+// consumes. Defined here so we don't import data/ai_mentor into the
+// handler package.
+type MentorPersona struct {
+	ID             uuid.UUID
+	Name           string
+	Provider       string
+	ModelID        string
+	PromptTemplate string
+	Tier           int32
+}
+
 type Handler struct {
 	reviewer aireview.Reviewer
+	mentors  MentorResolver
 }
 
 func New(reviewer aireview.Reviewer) *Handler {
 	return &Handler{reviewer: reviewer}
+}
+
+// WithMentorResolver wires per-mentor persona lookup. Optional — when
+// nil, the handler ignores `mentor_id` and uses the bootstrap reviewer.
+func (h *Handler) WithMentorResolver(r MentorResolver) *Handler {
+	h.mentors = r
+	return h
 }
 
 type inboundMessage struct {
@@ -28,6 +57,10 @@ type inboundMessage struct {
 type chatRequest struct {
 	Messages []inboundMessage `json:"messages"`
 	Model    string           `json:"model"`
+	// MentorID — when set, the server applies that mentor's prompt template
+	// as the system message (prepended) and overrides the model. Frontend
+	// passes the value picked in /interview's mentor selector.
+	MentorID string `json:"mentor_id"`
 }
 
 type chatResponse struct {
@@ -53,7 +86,25 @@ func (h *Handler) Chat(ctx kratoshttp.Context) error {
 		return nil
 	}
 
-	messages := make([]aireview.ChatMessage, 0, len(req.Messages))
+	messages := make([]aireview.ChatMessage, 0, len(req.Messages)+1)
+
+	// Apply mentor persona (ADR-001). Failures are non-fatal — we fall back
+	// to the bootstrap reviewer so a stale/deleted mentor_id never bricks
+	// an in-progress chat.
+	modelOverride := req.Model
+	if req.MentorID != "" && h.mentors != nil {
+		if id, err := uuid.Parse(req.MentorID); err == nil {
+			if persona, lookupErr := h.mentors.GetActiveByID(stdCtx, id); lookupErr == nil && persona != nil {
+				if prompt := persona.PromptTemplate; prompt != "" {
+					messages = append(messages, aireview.ChatMessage{Role: "system", Content: prompt})
+				}
+				if modelOverride == "" {
+					modelOverride = persona.ModelID
+				}
+			}
+		}
+	}
+
 	for _, m := range req.Messages {
 		content := m.Content
 		if len(content) > 4000 {
@@ -66,7 +117,7 @@ func (h *Handler) Chat(ctx kratoshttp.Context) error {
 	}
 
 	reply, err := h.reviewer.Chat(stdCtx, aireview.LiveChatRequest{
-		ModelOverride: req.Model,
+		ModelOverride: modelOverride,
 		Messages:      messages,
 	})
 	if err != nil {

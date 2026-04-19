@@ -2,9 +2,11 @@ package ai_mentor
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 
 	"api/internal/storage/postgres"
 )
@@ -106,4 +108,23 @@ func (r *Repo) Delete(ctx context.Context, id uuid.UUID) error {
 		return fmt.Errorf("delete ai_mentor: %w", err)
 	}
 	return nil
+}
+
+// GetActiveByID returns a single active mentor by ID. Returns nil, nil if
+// the mentor doesn't exist or is inactive — caller should treat that as
+// "use the bootstrap-default reviewer".
+func (r *Repo) GetActiveByID(ctx context.Context, id uuid.UUID) (*Row, error) {
+	row := r.data.DB.QueryRow(ctx, `
+        SELECT id, name, provider, model_id, tier, prompt_template, is_active
+        FROM ai_mentors
+        WHERE id = $1 AND is_active = TRUE
+    `, id)
+	m := &Row{}
+	if err := row.Scan(&m.ID, &m.Name, &m.Provider, &m.ModelID, &m.Tier, &m.PromptTemplate, &m.IsActive); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("get ai_mentor by id: %w", err)
+	}
+	return m, nil
 }

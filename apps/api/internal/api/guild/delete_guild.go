@@ -12,12 +12,12 @@ import (
 func (i *Implementation) DeleteGuild(ctx context.Context, req *v1.DeleteGuildRequest) (*v1.DeleteGuildResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	guildID, err := apihelpers.ParseUUID(req.GetGuildId(), "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse guild_id: %w", err)
 	}
 
 	if err := i.service.DeleteGuild(ctx, guildID, user.ID); err != nil {

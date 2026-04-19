@@ -142,9 +142,23 @@ func New(cfg Config) Reviewer {
 			model:   strings.TrimSpace(cfg.Model),
 			client:  &http.Client{Timeout: timeoutOrDefault(cfg.Timeout)},
 		}
-	case "openai_compatible":
+	case "openai_compatible", "openai":
 		return &openAICompatibleReviewer{
 			baseURL: strings.TrimRight(strings.TrimSpace(cfg.BaseURL), "/"),
+			apiKey:  strings.TrimSpace(cfg.APIKey),
+			model:   strings.TrimSpace(cfg.Model),
+			client:  &http.Client{Timeout: timeoutOrDefault(cfg.Timeout)},
+		}
+	case "openrouter":
+		// OpenRouter is fully OpenAI-compatible — only the base URL differs.
+		// Empty BaseURL falls back to the canonical endpoint. Default model
+		// suggested by docs: "openai/gpt-4o-mini" (cheap + reliable).
+		baseURL := strings.TrimRight(strings.TrimSpace(cfg.BaseURL), "/")
+		if baseURL == "" {
+			baseURL = "https://openrouter.ai/api/v1"
+		}
+		return &openAICompatibleReviewer{
+			baseURL: baseURL,
 			apiKey:  strings.TrimSpace(cfg.APIKey),
 			model:   strings.TrimSpace(cfg.Model),
 			client:  &http.Client{Timeout: timeoutOrDefault(cfg.Timeout)},

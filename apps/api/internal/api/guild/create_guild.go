@@ -11,7 +11,7 @@ import (
 func (i *Implementation) CreateGuild(ctx context.Context, req *v1.CreateGuildRequest) (*v1.GuildResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	guild, err := i.service.CreateGuild(ctx, user.ID, req.GetName(), req.GetDescription(), req.GetTags(), req.GetIsPublic())

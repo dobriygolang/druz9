@@ -3261,6 +3261,15 @@ paths:
                   schema:
                     type: integer
                     format: int32
+                - name: seriesId
+                  in: query
+                  description: 'ADR-005: optional filters. Empty/false = no filter applied.'
+                  schema:
+                    type: string
+                - name: featuredOnly
+                  in: query
+                  schema:
+                    type: boolean
             responses:
                 "200":
                     description: OK
@@ -3268,6 +3277,32 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/podcast.v1.ListPodcastsResponse'
+    /api/v1/podcasts/series:
+        get:
+            tags:
+                - PodcastService
+            description: |-
+                ADR-005 — Series catalog. Read-only for now; admin CRUD lands in a
+                 follow-up wave (admin.proto endpoints).
+            operationId: PodcastService_ListSeries
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.ListSeriesResponse'
     /api/v1/podcasts/{podcastId}:
         get:
             tags:
@@ -8030,6 +8065,16 @@ components:
                     format: int32
                 hasNextPage:
                     type: boolean
+        podcast.v1.ListSeriesResponse:
+            type: object
+            properties:
+                series:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/podcast.v1.PodcastSeries'
+                total:
+                    type: integer
+                    format: uint32
         podcast.v1.PlayPodcastResponse:
             type: object
             properties:
@@ -8063,11 +8108,45 @@ components:
                 createdAt:
                     type: string
                     format: date-time
+                seriesId:
+                    type: string
+                    description: |-
+                        ADR-005: optional grouping. UNSET = standalone episode. Editorial
+                         surfaces (Featured tab) sort by `featured_at` DESC NULLS LAST.
+                episodeNumber:
+                    type: integer
+                    format: uint32
+                featuredAt:
+                    type: string
+                    format: date-time
         podcast.v1.PodcastResponse:
             type: object
             properties:
                 podcast:
                     $ref: '#/components/schemas/podcast.v1.Podcast'
+        podcast.v1.PodcastSeries:
+            type: object
+            properties:
+                id:
+                    type: string
+                slug:
+                    type: string
+                title:
+                    type: string
+                description:
+                    type: string
+                coverRef:
+                    type: string
+                episodeCount:
+                    type: integer
+                    format: uint32
+                createdAt:
+                    type: string
+                    format: date-time
+            description: |-
+                ADR-005 — A named collection of podcast episodes (e.g. "DDIA Reading
+                 Club"). Episodes are linked via Podcast.series_id; rendering order is
+                 `episode_number ASC`.
         podcast.v1.PodcastStatusResponse:
             type: object
             properties:

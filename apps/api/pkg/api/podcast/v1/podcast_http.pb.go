@@ -24,6 +24,7 @@ const OperationPodcastServiceCreatePodcast = "/podcast.v1.PodcastService/CreateP
 const OperationPodcastServiceDeletePodcast = "/podcast.v1.PodcastService/DeletePodcast"
 const OperationPodcastServiceGetPodcast = "/podcast.v1.PodcastService/GetPodcast"
 const OperationPodcastServiceListPodcasts = "/podcast.v1.PodcastService/ListPodcasts"
+const OperationPodcastServiceListSeries = "/podcast.v1.PodcastService/ListSeries"
 const OperationPodcastServicePlayPodcast = "/podcast.v1.PodcastService/PlayPodcast"
 const OperationPodcastServicePreparePodcastUpload = "/podcast.v1.PodcastService/PreparePodcastUpload"
 const OperationPodcastServiceUploadPodcast = "/podcast.v1.PodcastService/UploadPodcast"
@@ -34,6 +35,9 @@ type PodcastServiceHTTPServer interface {
 	DeletePodcast(context.Context, *DeletePodcastRequest) (*PodcastStatusResponse, error)
 	GetPodcast(context.Context, *GetPodcastRequest) (*PodcastResponse, error)
 	ListPodcasts(context.Context, *ListPodcastsRequest) (*ListPodcastsResponse, error)
+	// ListSeries ADR-005 — Series catalog. Read-only for now; admin CRUD lands in a
+	// follow-up wave (admin.proto endpoints).
+	ListSeries(context.Context, *ListSeriesRequest) (*ListSeriesResponse, error)
 	PlayPodcast(context.Context, *PlayPodcastRequest) (*PlayPodcastResponse, error)
 	PreparePodcastUpload(context.Context, *PreparePodcastUploadRequest) (*PreparePodcastUploadResponse, error)
 	UploadPodcast(context.Context, *UploadPodcastRequest) (*PodcastResponse, error)
@@ -48,6 +52,7 @@ func RegisterPodcastServiceHTTPServer(s *http.Server, srv PodcastServiceHTTPServ
 	r.POST("/api/admin/podcasts/{podcast_id}/upload/prepare", _PodcastService_PreparePodcastUpload0_HTTP_Handler(srv))
 	r.POST("/api/admin/podcasts/{podcast_id}/upload/complete", _PodcastService_CompletePodcastUpload0_HTTP_Handler(srv))
 	r.DELETE("/api/admin/podcasts/{podcast_id}", _PodcastService_DeletePodcast0_HTTP_Handler(srv))
+	r.GET("/api/v1/podcasts/series", _PodcastService_ListSeries0_HTTP_Handler(srv))
 	r.GET("/api/v1/podcasts/{podcast_id}/play", _PodcastService_PlayPodcast0_HTTP_Handler(srv))
 }
 
@@ -211,6 +216,25 @@ func _PodcastService_DeletePodcast0_HTTP_Handler(srv PodcastServiceHTTPServer) f
 	}
 }
 
+func _PodcastService_ListSeries0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListSeriesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPodcastServiceListSeries)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListSeries(ctx, req.(*ListSeriesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListSeriesResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _PodcastService_PlayPodcast0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in PlayPodcastRequest
@@ -239,6 +263,9 @@ type PodcastServiceHTTPClient interface {
 	DeletePodcast(ctx context.Context, req *DeletePodcastRequest, opts ...http.CallOption) (rsp *PodcastStatusResponse, err error)
 	GetPodcast(ctx context.Context, req *GetPodcastRequest, opts ...http.CallOption) (rsp *PodcastResponse, err error)
 	ListPodcasts(ctx context.Context, req *ListPodcastsRequest, opts ...http.CallOption) (rsp *ListPodcastsResponse, err error)
+	// ListSeries ADR-005 — Series catalog. Read-only for now; admin CRUD lands in a
+	// follow-up wave (admin.proto endpoints).
+	ListSeries(ctx context.Context, req *ListSeriesRequest, opts ...http.CallOption) (rsp *ListSeriesResponse, err error)
 	PlayPodcast(ctx context.Context, req *PlayPodcastRequest, opts ...http.CallOption) (rsp *PlayPodcastResponse, err error)
 	PreparePodcastUpload(ctx context.Context, req *PreparePodcastUploadRequest, opts ...http.CallOption) (rsp *PreparePodcastUploadResponse, err error)
 	UploadPodcast(ctx context.Context, req *UploadPodcastRequest, opts ...http.CallOption) (rsp *PodcastResponse, err error)
@@ -309,6 +336,21 @@ func (c *PodcastServiceHTTPClientImpl) ListPodcasts(ctx context.Context, in *Lis
 	pattern := "/api/v1/podcasts"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationPodcastServiceListPodcasts))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListSeries ADR-005 — Series catalog. Read-only for now; admin CRUD lands in a
+// follow-up wave (admin.proto endpoints).
+func (c *PodcastServiceHTTPClientImpl) ListSeries(ctx context.Context, in *ListSeriesRequest, opts ...http.CallOption) (*ListSeriesResponse, error) {
+	var out ListSeriesResponse
+	pattern := "/api/v1/podcasts/series"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationPodcastServiceListSeries))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

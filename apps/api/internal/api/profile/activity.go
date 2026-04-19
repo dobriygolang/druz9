@@ -13,7 +13,7 @@ import (
 func (i *Implementation) ListProfileActivity(ctx context.Context, req *v1.ListProfileActivityRequest) (*v1.ListProfileActivityResponse, error) {
 	userID, err := apihelpers.ParseUUID(req.GetUserId(), "INVALID_USER_ID", "user_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse user_id: %w", err)
 	}
 
 	limit := int(req.GetLimit())
@@ -26,7 +26,7 @@ func (i *Implementation) ListProfileActivity(ctx context.Context, req *v1.ListPr
 
 	items, err := i.progressRepo.GetProfileFeed(ctx, userID, limit)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get profile feed: %w", err)
 	}
 
 	out := make([]*v1.ProfileActivityEntry, 0, len(items))

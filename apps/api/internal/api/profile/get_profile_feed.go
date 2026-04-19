@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -12,7 +13,7 @@ import (
 func (i *Implementation) GetProfileFeed(ctx context.Context, req *v1.GetProfileFeedRequest) (*v1.GetProfileFeedResponse, error) {
 	userID, err := apihelpers.ParseUUID(req.GetUserId(), "INVALID_USER_ID", "user_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse user_id: %w", err)
 	}
 	limit := int(req.GetLimit())
 	if limit <= 0 {
@@ -23,7 +24,7 @@ func (i *Implementation) GetProfileFeed(ctx context.Context, req *v1.GetProfileF
 	}
 	items, err := i.progressRepo.GetProfileFeed(ctx, userID, limit)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get profile feed: %w", err)
 	}
 	out := make([]*v1.FeedItem, 0, len(items))
 	for _, item := range items {

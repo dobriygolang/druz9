@@ -14,12 +14,12 @@ import (
 func (i *Implementation) CreateGuildChallenge(ctx context.Context, req *v1.CreateGuildChallengeRequest) (*v1.CreateGuildChallengeResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	guildID, err := apihelpers.ParseUUID(req.GetGuildId(), "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse guild_id: %w", err)
 	}
 
 	challenge, err := i.service.CreateChallenge(ctx, guildID, user.ID, req.GetTemplateKey(), req.GetTargetValue())

@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -33,7 +34,7 @@ func (c *CachedProgressRepository) GetProfileProgress(ctx context.Context, userI
 
 	progress, err := c.inner.GetProfileProgress(ctx, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get profile progress: %w", err)
 	}
 
 	c.cache.Set(key, progress)

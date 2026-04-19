@@ -17,7 +17,7 @@ func (i *Implementation) GetOverview(ctx context.Context, req *v1.GetOverviewReq
 
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	fullUser, err := i.service.profiles.FindUserByID(ctx, user.ID)
