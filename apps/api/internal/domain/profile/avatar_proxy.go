@@ -87,7 +87,7 @@ func (s *Service) resolveTelegramAvatarFileURL(ctx context.Context, userID uuid.
 
 	user, err := s.repo.FindUserByID(ctx, userID)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("find user by id: %w", err)
 	}
 	if user == nil || user.TelegramID == 0 {
 		return "", errTelegramAvatarNA

@@ -128,3 +128,37 @@ func (r *Repo) CountActiveUsers(ctx context.Context, activeSince time.Time) (int
 	}
 	return count, nil
 }
+
+// ListActiveUserIDs enumerates users with a non-expired session that has
+// been touched since `activeSince`. Used by background workers (insights
+// refresh, etc.) so we don't burn LLM cycles on inactive accounts.
+// `limit` caps the batch — pass 0 for "no limit" but prefer a chunked
+// loop over an unbounded scan in production.
+func (r *Repo) ListActiveUserIDs(ctx context.Context, activeSince time.Time, limit int) ([]uuid.UUID, error) {
+	q := `
+		SELECT DISTINCT user_id
+		FROM sessions
+		WHERE expires_at > NOW()
+		  AND last_seen_at >= $1
+		ORDER BY user_id
+	`
+	args := []any{activeSince}
+	if limit > 0 {
+		q += " LIMIT $2"
+		args = append(args, limit)
+	}
+	rows, err := r.data.DB.Query(ctx, q, args...)
+	if err != nil {
+		return nil, fmt.Errorf("list active user ids: %w", err)
+	}
+	defer rows.Close()
+	out := make([]uuid.UUID, 0, 64)
+	for rows.Next() {
+		var id uuid.UUID
+		if err := rows.Scan(&id); err != nil {
+			return nil, fmt.Errorf("scan active user id: %w", err)
+		}
+		out = append(out, id)
+	}
+	return out, rows.Err()
+}

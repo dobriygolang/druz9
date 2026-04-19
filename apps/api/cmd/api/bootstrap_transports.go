@@ -32,6 +32,7 @@ import (
 	podcastv1 "api/pkg/api/podcast/v1"
 	profilev1 "api/pkg/api/profile/v1"
 	referralv1 "api/pkg/api/referral/v1"
+	insightsv1 "api/pkg/api/insights/v1"
 	scenev1 "api/pkg/api/scene/v1"
 	seasonpassv1 "api/pkg/api/season_pass/v1"
 	shopv1 "api/pkg/api/shop/v1"
@@ -103,6 +104,7 @@ func registerBackgroundWorkers(bootstrap *bootstrapContext, storage *storageCont
 	closer.AddSync(startStreakWarningWorker(services.notificationSender, storage.store.DB))
 	closer.AddSync(startGuildDigestWorker(services.notificationSender, storage.store.DB))
 	closer.AddSync(startGuildWarCronWorker(storage.guildRepo))
+	closer.AddSync(startInsightsCronWorker(storage.profileRepo, storage.insightsRepo))
 }
 
 func registerManualHTTPRoutes(
@@ -176,6 +178,9 @@ func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.S
 
 	scenev1.RegisterSceneServiceHTTPServer(httpServer, services.sceneService)
 	scenev1.RegisterSceneServiceServer(grpcServer, services.sceneService)
+
+	insightsv1.RegisterInsightsServiceHTTPServer(httpServer, services.insightsService)
+	insightsv1.RegisterInsightsServiceServer(grpcServer, services.insightsService)
 
 	eventv1.RegisterEventServiceHTTPServer(httpServer, services.eventService)
 	eventv1.RegisterEventServiceServer(grpcServer, services.eventService)

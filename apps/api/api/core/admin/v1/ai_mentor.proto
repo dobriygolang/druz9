@@ -19,6 +19,15 @@ service AIMentorService {
   rpc DeleteAIMentor(DeleteAIMentorRequest) returns (DeleteAIMentorResponse) {
     option (google.api.http) = { delete: "/api/v1/admin/ai-mentors/{id}" };
   }
+
+  // ADR-001 — Per-mentor API key management. The plain key is sealed with
+  // AI_MENTOR_KEY_KMS at write time; the mentor row never stores it.
+  rpc UpsertMentorSecret(UpsertMentorSecretRequest) returns (UpsertMentorSecretResponse) {
+    option (google.api.http) = { post: "/api/v1/admin/ai-mentors/{mentor_id}/secret", body: "*" };
+  }
+  rpc DeleteMentorSecret(DeleteMentorSecretRequest) returns (DeleteAIMentorResponse) {
+    option (google.api.http) = { delete: "/api/v1/admin/ai-mentors/{mentor_id}/secret" };
+  }
 }
 
 message AIMentor {
@@ -61,4 +70,20 @@ message DeleteAIMentorRequest {
 
 message DeleteAIMentorResponse {
   bool ok = 1;
+}
+
+message UpsertMentorSecretRequest {
+  string mentor_id = 1;
+  // Plain API key as provided by the admin in the form. The server seals
+  // it before storing — the cleartext is never logged or echoed back.
+  string api_key   = 2;
+}
+
+message UpsertMentorSecretResponse {
+  // Last 4 chars of the stored key for display/audit (e.g. "••••1234").
+  string masked_suffix = 1;
+}
+
+message DeleteMentorSecretRequest {
+  string mentor_id = 1;
 }

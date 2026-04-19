@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -14,7 +15,7 @@ import (
 func (s *Service) TelegramAuth(ctx context.Context, challengeToken, loginCode string) (*model.ProfileResponse, string, time.Time, int64, error) {
 	payload, err := s.consumeConfirmedTelegramAuthChallenge(challengeToken, loginCode)
 	if err != nil {
-		return nil, "", time.Time{}, 0, err
+		return nil, "", time.Time{}, 0, fmt.Errorf("consume telegram auth challenge: %w", err)
 	}
 
 	user, err := s.repo.UpsertUserByIdentity(ctx, model.IdentityAuthPayload{
@@ -26,12 +27,12 @@ func (s *Service) TelegramAuth(ctx context.Context, challengeToken, loginCode st
 		AvatarURL:      normalizeAvatarURL(payload.PhotoURL),
 	})
 	if err != nil {
-		return nil, "", time.Time{}, 0, err
+		return nil, "", time.Time{}, 0, fmt.Errorf("upsert user by identity: %w", err)
 	}
 
 	rawToken, session, err := s.NewSession(ctx, user.ID)
 	if err != nil {
-		return nil, "", time.Time{}, 0, err
+		return nil, "", time.Time{}, 0, fmt.Errorf("create session: %w", err)
 	}
 
 	return &model.ProfileResponse{
@@ -49,7 +50,7 @@ func (s *Service) AuthenticateByToken(ctx context.Context, rawToken string) (*mo
 
 	authState, err := s.sessions.FindSessionByHash(ctx, hashToken(rawToken))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("find session by hash: %w", err)
 	}
 
 	now := s.Now()
@@ -66,7 +67,7 @@ func (s *Service) AuthenticateByToken(ctx context.Context, rawToken string) (*mo
 	authState.User.ActivityStatus = model.ResolveActivityStatus(authState.User.LastActiveAt, now)
 	if shouldRefresh {
 		if err := s.sessions.TouchSession(ctx, authState.User.ID, authState.Session.ID, authState.Session.ExpiresAt, authState.Session.LastSeenAt); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("touch session: %w", err)
 		}
 		authState.SessionExtended = true
 	}

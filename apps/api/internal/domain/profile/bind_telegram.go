@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	"github.com/google/uuid"
@@ -13,7 +14,7 @@ import (
 func (s *Service) BindTelegram(ctx context.Context, userID uuid.UUID, challengeToken, loginCode string) (*model.ProfileResponse, int64, error) {
 	payload, err := s.consumeConfirmedTelegramAuthChallenge(challengeToken, loginCode)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("consume telegram auth challenge: %w", err)
 	}
 
 	user, err := s.repo.BindIdentity(ctx, userID, model.IdentityAuthPayload{
@@ -25,7 +26,7 @@ func (s *Service) BindTelegram(ctx context.Context, userID uuid.UUID, challengeT
 		AvatarURL:      normalizeAvatarURL(payload.PhotoURL),
 	})
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("bind identity: %w", err)
 	}
 
 	return &model.ProfileResponse{

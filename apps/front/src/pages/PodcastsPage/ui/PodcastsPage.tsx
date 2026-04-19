@@ -60,13 +60,52 @@ export function PodcastsPage() {
   const [totalCatalog, setTotalCatalog] = useState(0)
   const [playing, setPlaying] = useState<{ title: string; host: string; ep: string; pos: number } | null>(null)
   const [history, setHistory] = useState<Episode[]>([])
-  const [saved, _setSaved] = useState<Set<string>>(() => {
+  // ADR-005: saved list now lives on the server (cross-device). The
+  // localStorage cache is hydrated on first paint to avoid a flash, then
+  // overwritten by /api/v1/podcasts/saved.
+  const [saved, setSaved] = useState<Set<string>>(() => {
     try {
       return new Set(JSON.parse(localStorage.getItem('podcast:saved') ?? '[]'))
     } catch { return new Set() }
   })
+  const [savedEpisodes, setSavedEpisodes] = useState<Episode[]>([])
   const [queue, _setQueue] = useState<QueueItem[]>([])
-  void _setSaved; void _setQueue
+  void _setQueue
+
+  useEffect(() => {
+    let cancelled = false
+    podcastApi.listSaved({ limit: 100 })
+      .then((r) => {
+        if (cancelled) return
+        const eps = r.podcasts.map((p, idx) => toEpisode(p, idx))
+        setSavedEpisodes(eps)
+        setSaved(new Set(r.podcasts.map((p) => p.id)))
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
+
+  const toggleSaved = async (podcastId: string) => {
+    const next = new Set(saved)
+    const wasSaved = next.has(podcastId)
+    if (wasSaved) {
+      next.delete(podcastId)
+      setSavedEpisodes((arr) => arr.filter((e) => e.id !== podcastId))
+    } else {
+      next.add(podcastId)
+      const episode = episodes.find((e) => e.id === podcastId)
+      if (episode) setSavedEpisodes((arr) => [episode, ...arr])
+    }
+    setSaved(next)
+    try {
+      if (wasSaved) await podcastApi.unsave(podcastId)
+      else await podcastApi.save(podcastId)
+    } catch {
+      // Roll back on failure so UI matches server state.
+      setSaved(saved)
+    }
+  }
+  void toggleSaved
 
   useEffect(() => {
     let cancelled = false
@@ -259,7 +298,7 @@ export function PodcastsPage() {
             {tab === 'saved' && 'Saved for later'}
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            {(tab === 'history' ? history : tab === 'saved' ? episodes.filter((e) => saved.has(e.id)) : episodes).map((p) => (
+            {(tab === 'history' ? history : tab === 'saved' ? savedEpisodes : episodes).map((p) => (
               <Panel
                 key={p.ep}
                 variant="tight"

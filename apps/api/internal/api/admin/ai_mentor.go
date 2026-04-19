@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 
+	"api/internal/aireview"
 	"api/internal/apihelpers"
 	aimdata "api/internal/data/ai_mentor"
 	v1 "api/pkg/api/admin/v1"
@@ -17,11 +18,20 @@ import (
 // AIMentorImpl implements the gRPC AIMentorService.
 type AIMentorImpl struct {
 	v1.UnimplementedAIMentorServiceServer
-	repo *aimdata.Repo
+	repo  *aimdata.Repo
+	vault *aireview.KeyVault
 }
 
 func NewAIMentorImpl(repo *aimdata.Repo) *AIMentorImpl {
 	return &AIMentorImpl{repo: repo}
+}
+
+// WithKeyVault wires the symmetric-key sealer used by UpsertMentorSecret
+// (ADR-001). When the vault is nil, secrets are stored as plaintext —
+// fine for local dev, never set in prod.
+func (i *AIMentorImpl) WithKeyVault(v *aireview.KeyVault) *AIMentorImpl {
+	i.vault = v
+	return i
 }
 
 func (i *AIMentorImpl) GetDescription() grpc.ServiceDesc {

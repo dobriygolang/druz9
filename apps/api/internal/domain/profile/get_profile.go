@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -25,7 +26,7 @@ func (s *Service) GetProfileByID(ctx context.Context, userID uuid.UUID) (*model.
 
 	user, err := s.repo.FindUserByID(ctx, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("find user by id: %w", err)
 	}
 
 	// Cache the profile
@@ -47,7 +48,7 @@ func (s *Service) GetProfileByID(ctx context.Context, userID uuid.UUID) (*model.
 func (s *Service) UpdateProfile(ctx context.Context, userID uuid.UUID, name string) (*model.ProfileResponse, error) {
 	user, err := s.repo.UpdateProfile(ctx, userID, name)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("update profile: %w", err)
 	}
 
 	// Invalidate and update cache

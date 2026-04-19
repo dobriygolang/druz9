@@ -21,14 +21,20 @@ const _ = http.SupportPackageIsVersion1
 
 const OperationAIMentorServiceCreateAIMentor = "/admin.v1.AIMentorService/CreateAIMentor"
 const OperationAIMentorServiceDeleteAIMentor = "/admin.v1.AIMentorService/DeleteAIMentor"
+const OperationAIMentorServiceDeleteMentorSecret = "/admin.v1.AIMentorService/DeleteMentorSecret"
 const OperationAIMentorServiceListAIMentors = "/admin.v1.AIMentorService/ListAIMentors"
 const OperationAIMentorServiceUpdateAIMentor = "/admin.v1.AIMentorService/UpdateAIMentor"
+const OperationAIMentorServiceUpsertMentorSecret = "/admin.v1.AIMentorService/UpsertMentorSecret"
 
 type AIMentorServiceHTTPServer interface {
 	CreateAIMentor(context.Context, *CreateAIMentorRequest) (*AIMentor, error)
 	DeleteAIMentor(context.Context, *DeleteAIMentorRequest) (*DeleteAIMentorResponse, error)
+	DeleteMentorSecret(context.Context, *DeleteMentorSecretRequest) (*DeleteAIMentorResponse, error)
 	ListAIMentors(context.Context, *ListAIMentorsRequest) (*ListAIMentorsResponse, error)
 	UpdateAIMentor(context.Context, *UpdateAIMentorRequest) (*AIMentor, error)
+	// UpsertMentorSecret ADR-001 — Per-mentor API key management. The plain key is sealed with
+	// AI_MENTOR_KEY_KMS at write time; the mentor row never stores it.
+	UpsertMentorSecret(context.Context, *UpsertMentorSecretRequest) (*UpsertMentorSecretResponse, error)
 }
 
 func RegisterAIMentorServiceHTTPServer(s *http.Server, srv AIMentorServiceHTTPServer) {
@@ -37,6 +43,8 @@ func RegisterAIMentorServiceHTTPServer(s *http.Server, srv AIMentorServiceHTTPSe
 	r.POST("/api/v1/admin/ai-mentors", _AIMentorService_CreateAIMentor0_HTTP_Handler(srv))
 	r.PUT("/api/v1/admin/ai-mentors/{id}", _AIMentorService_UpdateAIMentor0_HTTP_Handler(srv))
 	r.DELETE("/api/v1/admin/ai-mentors/{id}", _AIMentorService_DeleteAIMentor0_HTTP_Handler(srv))
+	r.POST("/api/v1/admin/ai-mentors/{mentor_id}/secret", _AIMentorService_UpsertMentorSecret0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/admin/ai-mentors/{mentor_id}/secret", _AIMentorService_DeleteMentorSecret0_HTTP_Handler(srv))
 }
 
 func _AIMentorService_ListAIMentors0_HTTP_Handler(srv AIMentorServiceHTTPServer) func(ctx http.Context) error {
@@ -127,11 +135,62 @@ func _AIMentorService_DeleteAIMentor0_HTTP_Handler(srv AIMentorServiceHTTPServer
 	}
 }
 
+func _AIMentorService_UpsertMentorSecret0_HTTP_Handler(srv AIMentorServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpsertMentorSecretRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAIMentorServiceUpsertMentorSecret)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpsertMentorSecret(ctx, req.(*UpsertMentorSecretRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpsertMentorSecretResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AIMentorService_DeleteMentorSecret0_HTTP_Handler(srv AIMentorServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteMentorSecretRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAIMentorServiceDeleteMentorSecret)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteMentorSecret(ctx, req.(*DeleteMentorSecretRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DeleteAIMentorResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type AIMentorServiceHTTPClient interface {
 	CreateAIMentor(ctx context.Context, req *CreateAIMentorRequest, opts ...http.CallOption) (rsp *AIMentor, err error)
 	DeleteAIMentor(ctx context.Context, req *DeleteAIMentorRequest, opts ...http.CallOption) (rsp *DeleteAIMentorResponse, err error)
+	DeleteMentorSecret(ctx context.Context, req *DeleteMentorSecretRequest, opts ...http.CallOption) (rsp *DeleteAIMentorResponse, err error)
 	ListAIMentors(ctx context.Context, req *ListAIMentorsRequest, opts ...http.CallOption) (rsp *ListAIMentorsResponse, err error)
 	UpdateAIMentor(ctx context.Context, req *UpdateAIMentorRequest, opts ...http.CallOption) (rsp *AIMentor, err error)
+	// UpsertMentorSecret ADR-001 — Per-mentor API key management. The plain key is sealed with
+	// AI_MENTOR_KEY_KMS at write time; the mentor row never stores it.
+	UpsertMentorSecret(ctx context.Context, req *UpsertMentorSecretRequest, opts ...http.CallOption) (rsp *UpsertMentorSecretResponse, err error)
 }
 
 type AIMentorServiceHTTPClientImpl struct {
@@ -168,6 +227,19 @@ func (c *AIMentorServiceHTTPClientImpl) DeleteAIMentor(ctx context.Context, in *
 	return &out, nil
 }
 
+func (c *AIMentorServiceHTTPClientImpl) DeleteMentorSecret(ctx context.Context, in *DeleteMentorSecretRequest, opts ...http.CallOption) (*DeleteAIMentorResponse, error) {
+	var out DeleteAIMentorResponse
+	pattern := "/api/v1/admin/ai-mentors/{mentor_id}/secret"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationAIMentorServiceDeleteMentorSecret))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *AIMentorServiceHTTPClientImpl) ListAIMentors(ctx context.Context, in *ListAIMentorsRequest, opts ...http.CallOption) (*ListAIMentorsResponse, error) {
 	var out ListAIMentorsResponse
 	pattern := "/api/v1/admin/ai-mentors"
@@ -188,6 +260,21 @@ func (c *AIMentorServiceHTTPClientImpl) UpdateAIMentor(ctx context.Context, in *
 	opts = append(opts, http.Operation(OperationAIMentorServiceUpdateAIMentor))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// UpsertMentorSecret ADR-001 — Per-mentor API key management. The plain key is sealed with
+// AI_MENTOR_KEY_KMS at write time; the mentor row never stores it.
+func (c *AIMentorServiceHTTPClientImpl) UpsertMentorSecret(ctx context.Context, in *UpsertMentorSecretRequest, opts ...http.CallOption) (*UpsertMentorSecretResponse, error) {
+	var out UpsertMentorSecretResponse
+	pattern := "/api/v1/admin/ai-mentors/{mentor_id}/secret"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAIMentorServiceUpsertMentorSecret))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

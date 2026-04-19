@@ -255,19 +255,33 @@ func (s *Service) AdminCreatePass(ctx context.Context, p *model.SeasonPass) (*mo
 }
 
 func (s *Service) AdminUpdatePass(ctx context.Context, p *model.SeasonPass) (*model.SeasonPass, error) {
-	return s.repo.AdminUpdatePass(ctx, p)
+	res, err := s.repo.AdminUpdatePass(ctx, p)
+	if err != nil {
+		return nil, fmt.Errorf("admin update pass: %w", err)
+	}
+	return res, nil
 }
 
 func (s *Service) AdminDeletePass(ctx context.Context, id uuid.UUID) error {
-	return s.repo.AdminDeletePass(ctx, id)
+	if err := s.repo.AdminDeletePass(ctx, id); err != nil {
+		return fmt.Errorf("admin delete pass: %w", err)
+	}
+	return nil
 }
 
 func (s *Service) AdminUpsertTier(ctx context.Context, seasonPassID uuid.UUID, t *model.SeasonPassTier) (*model.SeasonPassTier, error) {
-	return s.repo.AdminUpsertTier(ctx, seasonPassID, t)
+	res, err := s.repo.AdminUpsertTier(ctx, seasonPassID, t)
+	if err != nil {
+		return nil, fmt.Errorf("admin upsert tier: %w", err)
+	}
+	return res, nil
 }
 
 func (s *Service) AdminDeleteTier(ctx context.Context, seasonPassID uuid.UUID, tier int32) error {
-	return s.repo.AdminDeleteTier(ctx, seasonPassID, tier)
+	if err := s.repo.AdminDeleteTier(ctx, seasonPassID, tier); err != nil {
+		return fmt.Errorf("admin delete tier: %w", err)
+	}
+	return nil
 }
 
 // AddXP is called by arena/interview/training when the user earns pass XP.
@@ -279,12 +293,15 @@ func (s *Service) AddXP(ctx context.Context, userID uuid.UUID, delta int32) erro
 	}
 	pass, err := s.repo.GetActive(ctx, s.clock.Now())
 	if err != nil {
-		return err
+		return fmt.Errorf("get active pass: %w", err)
 	}
 	if pass == nil {
 		return nil // no active pass → no-op, don't error out callers
 	}
-	return s.repo.AddXP(ctx, userID, pass.ID, delta)
+	if err := s.repo.AddXP(ctx, userID, pass.ID, delta); err != nil {
+		return fmt.Errorf("add xp: %w", err)
+	}
+	return nil
 }
 
 // ---------- pure helpers ----------

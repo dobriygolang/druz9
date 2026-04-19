@@ -56,7 +56,10 @@ func (r *Repo) loadPlayersForMatches(ctx context.Context, matches []*domain.Matc
 		}
 	}
 
-	return rows.Err()
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("iterate arena players batch: %w", err)
+	}
+	return nil
 }
 
 func (r *Repo) SavePlayerCode(ctx context.Context, matchID, userID uuid.UUID, code string) error {

@@ -118,7 +118,7 @@ func ScanTask(scanner Scanner, task *model.CodeTask) error {
 		&task.CreatedAt,
 		&task.UpdatedAt,
 	); err != nil {
-		return err
+		return fmt.Errorf("scan code task: %w", err)
 	}
 
 	task.Difficulty = model.TaskDifficulty(difficultyValue)

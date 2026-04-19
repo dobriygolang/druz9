@@ -5,6 +5,7 @@ import maplibregl, { Map as MaplibreMap, Marker as MaplibreMarker } from 'maplib
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { Panel, RpgButton, Badge, PageHeader } from '@/shared/ui/pixel'
 import { geoApi, WorldPinKind, type WorldPin, type CommunityPoint } from '@/features/Geo/api/geoApi'
+import { InsightCard } from '@/features/Insights/ui/InsightCard'
 
 // ---------- pin styling ----------
 
@@ -203,6 +204,11 @@ export function MapPage() {
           </div>
         }
       />
+
+      {/* ADR-002 — personalized recommendations strip. Renders empty for
+          anonymous viewers; for signed-in users it lazily fetches from
+          /api/v1/insights/me and shows top strengths / gaps / next steps. */}
+      <InsightCard />
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 18 }}>
         {/* Map */}

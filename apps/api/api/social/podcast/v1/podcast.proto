@@ -49,10 +49,47 @@ service PodcastService {
     option (google.api.http) = { delete: "/api/admin/podcasts/{podcast_id}" };
   }
 
-  // ADR-005 — Series catalog. Read-only for now; admin CRUD lands in a
-  // follow-up wave (admin.proto endpoints).
+  // ADR-005 — Series catalog. Read-only public endpoint; admin CRUD
+  // (CreateSeries/UpdateSeries/DeleteSeries/ToggleFeatured) lives below.
   rpc ListSeries(ListSeriesRequest) returns (ListSeriesResponse) {
     option (google.api.http) = { get: "/api/v1/podcasts/series" };
+  }
+
+  // ── Admin: Series CRUD + Featured editorial flag ─────────────────────────
+  rpc AdminCreateSeries(AdminCreateSeriesRequest) returns (PodcastSeries) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/podcasts/series"
+      body: "*"
+    };
+  }
+  rpc AdminUpdateSeries(AdminUpdateSeriesRequest) returns (PodcastSeries) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/podcasts/series/{series_id}"
+      body: "*"
+    };
+  }
+  rpc AdminDeleteSeries(AdminDeleteSeriesRequest) returns (PodcastStatusResponse) {
+    option (google.api.http) = { delete: "/api/v1/admin/podcasts/series/{series_id}" };
+  }
+  rpc AdminToggleFeatured(AdminToggleFeaturedRequest) returns (Podcast) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/podcasts/{podcast_id}/featured"
+      body: "*"
+    };
+  }
+
+  // ── User-scoped: saved podcasts (cross-device list) ──────────────────────
+  rpc ListSavedPodcasts(ListSavedPodcastsRequest) returns (ListPodcastsResponse) {
+    option (google.api.http) = { get: "/api/v1/podcasts/saved" };
+  }
+  rpc SavePodcast(SavePodcastRequest) returns (PodcastStatusResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/podcasts/{podcast_id}/save"
+      body: "*"
+    };
+  }
+  rpc UnsavePodcast(UnsavePodcastRequest) returns (PodcastStatusResponse) {
+    option (google.api.http) = { delete: "/api/v1/podcasts/{podcast_id}/save" };
   }
 
   rpc PlayPodcast(PlayPodcastRequest) returns (PlayPodcastResponse) {
@@ -80,6 +117,43 @@ message ListSeriesRequest {
 message ListSeriesResponse {
   repeated PodcastSeries series = 1;
   uint32                 total  = 2;
+}
+
+message AdminCreateSeriesRequest {
+  string slug        = 1;
+  string title       = 2;
+  string description = 3;
+  string cover_ref   = 4;
+}
+
+message AdminUpdateSeriesRequest {
+  string series_id   = 1;
+  string title       = 2;
+  string description = 3;
+  string cover_ref   = 4;
+}
+
+message AdminDeleteSeriesRequest {
+  string series_id = 1;
+}
+
+message AdminToggleFeaturedRequest {
+  string podcast_id = 1;
+  // True → set featured_at = NOW(); false → set featured_at = NULL.
+  bool   featured   = 2;
+}
+
+message ListSavedPodcastsRequest {
+  uint32 limit  = 1;
+  uint32 offset = 2;
+}
+
+message SavePodcastRequest {
+  string podcast_id = 1;
+}
+
+message UnsavePodcastRequest {
+  string podcast_id = 1;
 }
 
 message ListPodcastsRequest {

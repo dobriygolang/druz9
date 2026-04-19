@@ -3,6 +3,7 @@ package inbox
 import (
 	"context"
 	goerr "errors"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -43,7 +44,7 @@ func (i *Implementation) SendMessage(ctx context.Context, req *v1.SendMessageReq
 		case goerr.Is(err, inboxdomain.ErrMessageTooLong):
 			return nil, errors.BadRequest("BODY_TOO_LONG", "body exceeds 4000 characters")
 		default:
-			return nil, errors.InternalServer("INTERNAL", "failed to send message")
+			return nil, errors.InternalServer("INTERNAL", fmt.Sprintf("failed to send message: %v", err))
 		}
 	}
 	return &v1.SendMessageResponse{Message: mapMessage(msg)}, nil

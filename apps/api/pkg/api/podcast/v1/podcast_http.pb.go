@@ -19,27 +19,43 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationPodcastServiceAdminCreateSeries = "/podcast.v1.PodcastService/AdminCreateSeries"
+const OperationPodcastServiceAdminDeleteSeries = "/podcast.v1.PodcastService/AdminDeleteSeries"
+const OperationPodcastServiceAdminToggleFeatured = "/podcast.v1.PodcastService/AdminToggleFeatured"
+const OperationPodcastServiceAdminUpdateSeries = "/podcast.v1.PodcastService/AdminUpdateSeries"
 const OperationPodcastServiceCompletePodcastUpload = "/podcast.v1.PodcastService/CompletePodcastUpload"
 const OperationPodcastServiceCreatePodcast = "/podcast.v1.PodcastService/CreatePodcast"
 const OperationPodcastServiceDeletePodcast = "/podcast.v1.PodcastService/DeletePodcast"
 const OperationPodcastServiceGetPodcast = "/podcast.v1.PodcastService/GetPodcast"
 const OperationPodcastServiceListPodcasts = "/podcast.v1.PodcastService/ListPodcasts"
+const OperationPodcastServiceListSavedPodcasts = "/podcast.v1.PodcastService/ListSavedPodcasts"
 const OperationPodcastServiceListSeries = "/podcast.v1.PodcastService/ListSeries"
 const OperationPodcastServicePlayPodcast = "/podcast.v1.PodcastService/PlayPodcast"
 const OperationPodcastServicePreparePodcastUpload = "/podcast.v1.PodcastService/PreparePodcastUpload"
+const OperationPodcastServiceSavePodcast = "/podcast.v1.PodcastService/SavePodcast"
+const OperationPodcastServiceUnsavePodcast = "/podcast.v1.PodcastService/UnsavePodcast"
 const OperationPodcastServiceUploadPodcast = "/podcast.v1.PodcastService/UploadPodcast"
 
 type PodcastServiceHTTPServer interface {
+	// AdminCreateSeries ── Admin: Series CRUD + Featured editorial flag ─────────────────────────
+	AdminCreateSeries(context.Context, *AdminCreateSeriesRequest) (*PodcastSeries, error)
+	AdminDeleteSeries(context.Context, *AdminDeleteSeriesRequest) (*PodcastStatusResponse, error)
+	AdminToggleFeatured(context.Context, *AdminToggleFeaturedRequest) (*Podcast, error)
+	AdminUpdateSeries(context.Context, *AdminUpdateSeriesRequest) (*PodcastSeries, error)
 	CompletePodcastUpload(context.Context, *CompletePodcastUploadRequest) (*PodcastResponse, error)
 	CreatePodcast(context.Context, *CreatePodcastRequest) (*PodcastResponse, error)
 	DeletePodcast(context.Context, *DeletePodcastRequest) (*PodcastStatusResponse, error)
 	GetPodcast(context.Context, *GetPodcastRequest) (*PodcastResponse, error)
 	ListPodcasts(context.Context, *ListPodcastsRequest) (*ListPodcastsResponse, error)
-	// ListSeries ADR-005 — Series catalog. Read-only for now; admin CRUD lands in a
-	// follow-up wave (admin.proto endpoints).
+	// ListSavedPodcasts ── User-scoped: saved podcasts (cross-device list) ──────────────────────
+	ListSavedPodcasts(context.Context, *ListSavedPodcastsRequest) (*ListPodcastsResponse, error)
+	// ListSeries ADR-005 — Series catalog. Read-only public endpoint; admin CRUD
+	// (CreateSeries/UpdateSeries/DeleteSeries/ToggleFeatured) lives below.
 	ListSeries(context.Context, *ListSeriesRequest) (*ListSeriesResponse, error)
 	PlayPodcast(context.Context, *PlayPodcastRequest) (*PlayPodcastResponse, error)
 	PreparePodcastUpload(context.Context, *PreparePodcastUploadRequest) (*PreparePodcastUploadResponse, error)
+	SavePodcast(context.Context, *SavePodcastRequest) (*PodcastStatusResponse, error)
+	UnsavePodcast(context.Context, *UnsavePodcastRequest) (*PodcastStatusResponse, error)
 	UploadPodcast(context.Context, *UploadPodcastRequest) (*PodcastResponse, error)
 }
 
@@ -53,6 +69,13 @@ func RegisterPodcastServiceHTTPServer(s *http.Server, srv PodcastServiceHTTPServ
 	r.POST("/api/admin/podcasts/{podcast_id}/upload/complete", _PodcastService_CompletePodcastUpload0_HTTP_Handler(srv))
 	r.DELETE("/api/admin/podcasts/{podcast_id}", _PodcastService_DeletePodcast0_HTTP_Handler(srv))
 	r.GET("/api/v1/podcasts/series", _PodcastService_ListSeries0_HTTP_Handler(srv))
+	r.POST("/api/v1/admin/podcasts/series", _PodcastService_AdminCreateSeries0_HTTP_Handler(srv))
+	r.POST("/api/v1/admin/podcasts/series/{series_id}", _PodcastService_AdminUpdateSeries0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/admin/podcasts/series/{series_id}", _PodcastService_AdminDeleteSeries0_HTTP_Handler(srv))
+	r.POST("/api/v1/admin/podcasts/{podcast_id}/featured", _PodcastService_AdminToggleFeatured0_HTTP_Handler(srv))
+	r.GET("/api/v1/podcasts/saved", _PodcastService_ListSavedPodcasts0_HTTP_Handler(srv))
+	r.POST("/api/v1/podcasts/{podcast_id}/save", _PodcastService_SavePodcast0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/podcasts/{podcast_id}/save", _PodcastService_UnsavePodcast0_HTTP_Handler(srv))
 	r.GET("/api/v1/podcasts/{podcast_id}/play", _PodcastService_PlayPodcast0_HTTP_Handler(srv))
 }
 
@@ -235,6 +258,166 @@ func _PodcastService_ListSeries0_HTTP_Handler(srv PodcastServiceHTTPServer) func
 	}
 }
 
+func _PodcastService_AdminCreateSeries0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminCreateSeriesRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPodcastServiceAdminCreateSeries)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminCreateSeries(ctx, req.(*AdminCreateSeriesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*PodcastSeries)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _PodcastService_AdminUpdateSeries0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminUpdateSeriesRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPodcastServiceAdminUpdateSeries)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminUpdateSeries(ctx, req.(*AdminUpdateSeriesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*PodcastSeries)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _PodcastService_AdminDeleteSeries0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminDeleteSeriesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPodcastServiceAdminDeleteSeries)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminDeleteSeries(ctx, req.(*AdminDeleteSeriesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*PodcastStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _PodcastService_AdminToggleFeatured0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminToggleFeaturedRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPodcastServiceAdminToggleFeatured)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminToggleFeatured(ctx, req.(*AdminToggleFeaturedRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Podcast)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _PodcastService_ListSavedPodcasts0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListSavedPodcastsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPodcastServiceListSavedPodcasts)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListSavedPodcasts(ctx, req.(*ListSavedPodcastsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListPodcastsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _PodcastService_SavePodcast0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SavePodcastRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPodcastServiceSavePodcast)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SavePodcast(ctx, req.(*SavePodcastRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*PodcastStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _PodcastService_UnsavePodcast0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UnsavePodcastRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPodcastServiceUnsavePodcast)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UnsavePodcast(ctx, req.(*UnsavePodcastRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*PodcastStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _PodcastService_PlayPodcast0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in PlayPodcastRequest
@@ -258,16 +441,25 @@ func _PodcastService_PlayPodcast0_HTTP_Handler(srv PodcastServiceHTTPServer) fun
 }
 
 type PodcastServiceHTTPClient interface {
+	// AdminCreateSeries ── Admin: Series CRUD + Featured editorial flag ─────────────────────────
+	AdminCreateSeries(ctx context.Context, req *AdminCreateSeriesRequest, opts ...http.CallOption) (rsp *PodcastSeries, err error)
+	AdminDeleteSeries(ctx context.Context, req *AdminDeleteSeriesRequest, opts ...http.CallOption) (rsp *PodcastStatusResponse, err error)
+	AdminToggleFeatured(ctx context.Context, req *AdminToggleFeaturedRequest, opts ...http.CallOption) (rsp *Podcast, err error)
+	AdminUpdateSeries(ctx context.Context, req *AdminUpdateSeriesRequest, opts ...http.CallOption) (rsp *PodcastSeries, err error)
 	CompletePodcastUpload(ctx context.Context, req *CompletePodcastUploadRequest, opts ...http.CallOption) (rsp *PodcastResponse, err error)
 	CreatePodcast(ctx context.Context, req *CreatePodcastRequest, opts ...http.CallOption) (rsp *PodcastResponse, err error)
 	DeletePodcast(ctx context.Context, req *DeletePodcastRequest, opts ...http.CallOption) (rsp *PodcastStatusResponse, err error)
 	GetPodcast(ctx context.Context, req *GetPodcastRequest, opts ...http.CallOption) (rsp *PodcastResponse, err error)
 	ListPodcasts(ctx context.Context, req *ListPodcastsRequest, opts ...http.CallOption) (rsp *ListPodcastsResponse, err error)
-	// ListSeries ADR-005 — Series catalog. Read-only for now; admin CRUD lands in a
-	// follow-up wave (admin.proto endpoints).
+	// ListSavedPodcasts ── User-scoped: saved podcasts (cross-device list) ──────────────────────
+	ListSavedPodcasts(ctx context.Context, req *ListSavedPodcastsRequest, opts ...http.CallOption) (rsp *ListPodcastsResponse, err error)
+	// ListSeries ADR-005 — Series catalog. Read-only public endpoint; admin CRUD
+	// (CreateSeries/UpdateSeries/DeleteSeries/ToggleFeatured) lives below.
 	ListSeries(ctx context.Context, req *ListSeriesRequest, opts ...http.CallOption) (rsp *ListSeriesResponse, err error)
 	PlayPodcast(ctx context.Context, req *PlayPodcastRequest, opts ...http.CallOption) (rsp *PlayPodcastResponse, err error)
 	PreparePodcastUpload(ctx context.Context, req *PreparePodcastUploadRequest, opts ...http.CallOption) (rsp *PreparePodcastUploadResponse, err error)
+	SavePodcast(ctx context.Context, req *SavePodcastRequest, opts ...http.CallOption) (rsp *PodcastStatusResponse, err error)
+	UnsavePodcast(ctx context.Context, req *UnsavePodcastRequest, opts ...http.CallOption) (rsp *PodcastStatusResponse, err error)
 	UploadPodcast(ctx context.Context, req *UploadPodcastRequest, opts ...http.CallOption) (rsp *PodcastResponse, err error)
 }
 
@@ -277,6 +469,59 @@ type PodcastServiceHTTPClientImpl struct {
 
 func NewPodcastServiceHTTPClient(client *http.Client) PodcastServiceHTTPClient {
 	return &PodcastServiceHTTPClientImpl{client}
+}
+
+// AdminCreateSeries ── Admin: Series CRUD + Featured editorial flag ─────────────────────────
+func (c *PodcastServiceHTTPClientImpl) AdminCreateSeries(ctx context.Context, in *AdminCreateSeriesRequest, opts ...http.CallOption) (*PodcastSeries, error) {
+	var out PodcastSeries
+	pattern := "/api/v1/admin/podcasts/series"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationPodcastServiceAdminCreateSeries))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *PodcastServiceHTTPClientImpl) AdminDeleteSeries(ctx context.Context, in *AdminDeleteSeriesRequest, opts ...http.CallOption) (*PodcastStatusResponse, error) {
+	var out PodcastStatusResponse
+	pattern := "/api/v1/admin/podcasts/series/{series_id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationPodcastServiceAdminDeleteSeries))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *PodcastServiceHTTPClientImpl) AdminToggleFeatured(ctx context.Context, in *AdminToggleFeaturedRequest, opts ...http.CallOption) (*Podcast, error) {
+	var out Podcast
+	pattern := "/api/v1/admin/podcasts/{podcast_id}/featured"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationPodcastServiceAdminToggleFeatured))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *PodcastServiceHTTPClientImpl) AdminUpdateSeries(ctx context.Context, in *AdminUpdateSeriesRequest, opts ...http.CallOption) (*PodcastSeries, error) {
+	var out PodcastSeries
+	pattern := "/api/v1/admin/podcasts/series/{series_id}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationPodcastServiceAdminUpdateSeries))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *PodcastServiceHTTPClientImpl) CompletePodcastUpload(ctx context.Context, in *CompletePodcastUploadRequest, opts ...http.CallOption) (*PodcastResponse, error) {
@@ -344,8 +589,22 @@ func (c *PodcastServiceHTTPClientImpl) ListPodcasts(ctx context.Context, in *Lis
 	return &out, nil
 }
 
-// ListSeries ADR-005 — Series catalog. Read-only for now; admin CRUD lands in a
-// follow-up wave (admin.proto endpoints).
+// ListSavedPodcasts ── User-scoped: saved podcasts (cross-device list) ──────────────────────
+func (c *PodcastServiceHTTPClientImpl) ListSavedPodcasts(ctx context.Context, in *ListSavedPodcastsRequest, opts ...http.CallOption) (*ListPodcastsResponse, error) {
+	var out ListPodcastsResponse
+	pattern := "/api/v1/podcasts/saved"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationPodcastServiceListSavedPodcasts))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListSeries ADR-005 — Series catalog. Read-only public endpoint; admin CRUD
+// (CreateSeries/UpdateSeries/DeleteSeries/ToggleFeatured) lives below.
 func (c *PodcastServiceHTTPClientImpl) ListSeries(ctx context.Context, in *ListSeriesRequest, opts ...http.CallOption) (*ListSeriesResponse, error) {
 	var out ListSeriesResponse
 	pattern := "/api/v1/podcasts/series"
@@ -379,6 +638,32 @@ func (c *PodcastServiceHTTPClientImpl) PreparePodcastUpload(ctx context.Context,
 	opts = append(opts, http.Operation(OperationPodcastServicePreparePodcastUpload))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *PodcastServiceHTTPClientImpl) SavePodcast(ctx context.Context, in *SavePodcastRequest, opts ...http.CallOption) (*PodcastStatusResponse, error) {
+	var out PodcastStatusResponse
+	pattern := "/api/v1/podcasts/{podcast_id}/save"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationPodcastServiceSavePodcast))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *PodcastServiceHTTPClientImpl) UnsavePodcast(ctx context.Context, in *UnsavePodcastRequest, opts ...http.CallOption) (*PodcastStatusResponse, error) {
+	var out PodcastStatusResponse
+	pattern := "/api/v1/podcasts/{podcast_id}/save"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationPodcastServiceUnsavePodcast))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

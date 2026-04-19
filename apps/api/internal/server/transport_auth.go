@@ -72,12 +72,16 @@ var adminExactOperations = map[string]struct{}{
 	"/code_editor.v1.CodeEditorService/UpdateTask": {},
 	"/code_editor.v1.CodeEditorService/DeleteTask": {},
 
-	// Podcast admin (upload/delete)
+	// Podcast admin (upload/delete + ADR-005 series CRUD + featured flag)
 	"/podcast.v1.PodcastService/CreatePodcast":         {},
 	"/podcast.v1.PodcastService/UploadPodcast":         {},
 	"/podcast.v1.PodcastService/PreparePodcastUpload":  {},
 	"/podcast.v1.PodcastService/CompletePodcastUpload": {},
 	"/podcast.v1.PodcastService/DeletePodcast":         {},
+	"/podcast.v1.PodcastService/AdminCreateSeries":     {},
+	"/podcast.v1.PodcastService/AdminUpdateSeries":     {},
+	"/podcast.v1.PodcastService/AdminDeleteSeries":     {},
+	"/podcast.v1.PodcastService/AdminToggleFeatured":   {},
 
 	// Interview prep admin (task + question pool CRUD)
 	"/interview_prep.v1.InterviewPrepService/ListAdminTasks":          {},

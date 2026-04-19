@@ -73,7 +73,7 @@ func (r *Repo) ListTiers(ctx context.Context, seasonPassID uuid.UUID) ([]*model.
 		t.PremiumRewardKind = model.RewardKind(premKind)
 		tiers = append(tiers, &t)
 	}
-	return tiers, rows.Err()
+	return tiers, fmt.Errorf("list tiers: %w", rows.Err())
 }
 
 func (r *Repo) GetTier(ctx context.Context, seasonPassID uuid.UUID, tier int32) (*model.SeasonPassTier, error) {
@@ -198,7 +198,7 @@ func (r *Repo) AdminListPasses(ctx context.Context) ([]*model.SeasonPass, error)
 		}
 		out = append(out, &p)
 	}
-	return out, rows.Err()
+	return out, fmt.Errorf("admin list passes: %w", rows.Err())
 }
 
 func (r *Repo) AdminCreatePass(ctx context.Context, p *model.SeasonPass) (*model.SeasonPass, error) {

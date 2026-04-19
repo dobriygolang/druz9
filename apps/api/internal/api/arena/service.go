@@ -57,6 +57,7 @@ type Implementation struct {
 	reviewService    ReviewService
 	notif            notif.Sender
 	matchmaker       *Matchmaker
+	lobbies          LobbyRepo
 }
 
 func New(service *apparena.Service, realtime RealtimePublisher, allowGuestAccess func() bool, reviewService ReviewService, n notif.Sender) *Implementation {

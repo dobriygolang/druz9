@@ -733,6 +733,50 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/admin.v1.DeleteAIMentorResponse'
+    /api/v1/admin/ai-mentors/{mentorId}/secret:
+        post:
+            tags:
+                - AIMentorService
+            description: |-
+                ADR-001 — Per-mentor API key management. The plain key is sealed with
+                 AI_MENTOR_KEY_KMS at write time; the mentor row never stores it.
+            operationId: AIMentorService_UpsertMentorSecret
+            parameters:
+                - name: mentorId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/admin.v1.UpsertMentorSecretRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.UpsertMentorSecretResponse'
+        delete:
+            tags:
+                - AIMentorService
+            operationId: AIMentorService_DeleteMentorSecret
+            parameters:
+                - name: mentorId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.DeleteAIMentorResponse'
     /api/v1/admin/notifications/broadcast:
         post:
             tags:
@@ -755,6 +799,90 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/notification.v1.AdminBroadcastResponse'
+    /api/v1/admin/podcasts/series:
+        post:
+            tags:
+                - PodcastService
+            description: '── Admin: Series CRUD + Featured editorial flag ─────────────────────────'
+            operationId: PodcastService_AdminCreateSeries
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/podcast.v1.AdminCreateSeriesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.PodcastSeries'
+    /api/v1/admin/podcasts/series/{seriesId}:
+        post:
+            tags:
+                - PodcastService
+            operationId: PodcastService_AdminUpdateSeries
+            parameters:
+                - name: seriesId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/podcast.v1.AdminUpdateSeriesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.PodcastSeries'
+        delete:
+            tags:
+                - PodcastService
+            operationId: PodcastService_AdminDeleteSeries
+            parameters:
+                - name: seriesId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.PodcastStatusResponse'
+    /api/v1/admin/podcasts/{podcastId}/featured:
+        post:
+            tags:
+                - PodcastService
+            operationId: PodcastService_AdminToggleFeatured
+            parameters:
+                - name: podcastId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/podcast.v1.AdminToggleFeaturedRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.Podcast'
     /api/v1/admin/season-pass:
         get:
             tags:
@@ -1051,6 +1179,91 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/arena.v1.SeasonXPLeaderboardResponse'
+    /api/v1/arena/lobbies:
+        post:
+            tags:
+                - ArenaService
+            description: ── ADR-004 — 2v2 lobby formation ─────────────────────────────────────
+            operationId: ArenaService_CreateLobby
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/arena.v1.CreateLobbyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.LobbyResponse'
+    /api/v1/arena/lobbies/join:
+        post:
+            tags:
+                - ArenaService
+            operationId: ArenaService_JoinLobby
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/arena.v1.JoinLobbyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.LobbyResponse'
+    /api/v1/arena/lobbies/{lobbyId}/enqueue:
+        post:
+            tags:
+                - ArenaService
+            operationId: ArenaService_EnqueueLobby
+            parameters:
+                - name: lobbyId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/arena.v1.EnqueueLobbyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.ArenaStatusResponse'
+    /api/v1/arena/lobbies/{lobbyId}/leave:
+        post:
+            tags:
+                - ArenaService
+            operationId: ArenaService_LeaveLobby
+            parameters:
+                - name: lobbyId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/arena.v1.LeaveLobbyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.ArenaStatusResponse'
     /api/v1/arena/matches:
         post:
             tags:
@@ -2606,6 +2819,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/inbox.v1.GetUnreadCountResponse'
+    /api/v1/insights/me:
+        get:
+            tags:
+                - InsightsService
+            operationId: InsightsService_GetMyInsight
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/insights.v1.Insight'
     /api/v1/interview-board:
         get:
             tags:
@@ -3277,13 +3502,37 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/podcast.v1.ListPodcastsResponse'
+    /api/v1/podcasts/saved:
+        get:
+            tags:
+                - PodcastService
+            description: '── User-scoped: saved podcasts (cross-device list) ──────────────────────'
+            operationId: PodcastService_ListSavedPodcasts
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.ListPodcastsResponse'
     /api/v1/podcasts/series:
         get:
             tags:
                 - PodcastService
             description: |-
-                ADR-005 — Series catalog. Read-only for now; admin CRUD lands in a
-                 follow-up wave (admin.proto endpoints).
+                ADR-005 — Series catalog. Read-only public endpoint; admin CRUD
+                 (CreateSeries/UpdateSeries/DeleteSeries/ToggleFeatured) lives below.
             operationId: PodcastService_ListSeries
             parameters:
                 - name: limit
@@ -3339,6 +3588,47 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/podcast.v1.PlayPodcastResponse'
+    /api/v1/podcasts/{podcastId}/save:
+        post:
+            tags:
+                - PodcastService
+            operationId: PodcastService_SavePodcast
+            parameters:
+                - name: podcastId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/podcast.v1.SavePodcastRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.PodcastStatusResponse'
+        delete:
+            tags:
+                - PodcastService
+            operationId: PodcastService_UnsavePodcast
+            parameters:
+                - name: podcastId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.PodcastStatusResponse'
     /api/v1/profile:
         get:
             tags:
@@ -4526,6 +4816,22 @@ components:
                     type: string
                 isTrusted:
                     type: boolean
+        admin.v1.UpsertMentorSecretRequest:
+            type: object
+            properties:
+                mentorId:
+                    type: string
+                apiKey:
+                    type: string
+                    description: |-
+                        Plain API key as provided by the admin in the form. The server seals
+                         it before storing — the cleartext is never logged or echoed back.
+        admin.v1.UpsertMentorSecretResponse:
+            type: object
+            properties:
+                maskedSuffix:
+                    type: string
+                    description: Last 4 chars of the stored key for display/audit (e.g. "••••1234").
         arena.v1.ArenaLeaderboardEntry:
             type: object
             properties:
@@ -4556,6 +4862,23 @@ components:
                 peakRating:
                     type: integer
                     format: int32
+        arena.v1.ArenaLobby:
+            type: object
+            properties:
+                id:
+                    type: string
+                mode:
+                    type: string
+                inviteCode:
+                    type: string
+                createdBy:
+                    type: string
+                status:
+                    type: string
+                memberUserIds:
+                    type: array
+                    items:
+                        type: string
         arena.v1.ArenaMatch:
             type: object
             properties:
@@ -4711,6 +5034,11 @@ components:
                 status:
                     type: integer
                     format: enum
+        arena.v1.CreateLobbyRequest:
+            type: object
+            properties:
+                mode:
+                    type: string
         arena.v1.CreateMatchRequest:
             type: object
             properties:
@@ -4738,6 +5066,11 @@ components:
                 estimatedWaitSeconds:
                     type: integer
                     format: int32
+        arena.v1.EnqueueLobbyRequest:
+            type: object
+            properties:
+                lobbyId:
+                    type: string
         arena.v1.GetLeaderboardResponse:
             type: object
             properties:
@@ -4788,10 +5121,20 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/arena.v1.GuildLeaderboardEntry'
+        arena.v1.JoinLobbyRequest:
+            type: object
+            properties:
+                inviteCode:
+                    type: string
         arena.v1.JoinMatchRequest:
             type: object
             properties:
                 matchId:
+                    type: string
+        arena.v1.LeaveLobbyRequest:
+            type: object
+            properties:
+                lobbyId:
                     type: string
         arena.v1.LeaveMatchRequest:
             type: object
@@ -4803,6 +5146,11 @@ components:
             properties:
                 queueId:
                     type: string
+        arena.v1.LobbyResponse:
+            type: object
+            properties:
+                lobby:
+                    $ref: '#/components/schemas/arena.v1.ArenaLobby'
         arena.v1.ReportAntiCheatEventRequest:
             type: object
             properties:
@@ -6748,6 +7096,39 @@ components:
             properties:
                 message:
                     $ref: '#/components/schemas/inbox.v1.InboxMessage'
+        insights.v1.Insight:
+            type: object
+            properties:
+                summary:
+                    type: string
+                topStrengths:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/insights.v1.InsightItem'
+                topGaps:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/insights.v1.InsightItem'
+                nextSteps:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/insights.v1.InsightItem'
+                generatedAt:
+                    type: string
+                    format: date-time
+                source:
+                    type: string
+                    description: '''deterministic'' or ''llm:<model_id>''.'
+        insights.v1.InsightItem:
+            type: object
+            properties:
+                title:
+                    type: string
+                description:
+                    type: string
+                actionUrl:
+                    type: string
+                    description: Optional href the frontend can render as a CTA (e.g. "/training/dp").
         interview_prep.v1.AIMentor:
             type: object
             properties:
@@ -8027,6 +8408,36 @@ components:
             properties:
                 booking:
                     $ref: '#/components/schemas/peer_mock.v1.Booking'
+        podcast.v1.AdminCreateSeriesRequest:
+            type: object
+            properties:
+                slug:
+                    type: string
+                title:
+                    type: string
+                description:
+                    type: string
+                coverRef:
+                    type: string
+        podcast.v1.AdminToggleFeaturedRequest:
+            type: object
+            properties:
+                podcastId:
+                    type: string
+                featured:
+                    type: boolean
+                    description: True → set featured_at = NOW(); false → set featured_at = NULL.
+        podcast.v1.AdminUpdateSeriesRequest:
+            type: object
+            properties:
+                seriesId:
+                    type: string
+                title:
+                    type: string
+                description:
+                    type: string
+                coverRef:
+                    type: string
         podcast.v1.CompletePodcastUploadRequest:
             type: object
             properties:
@@ -8175,6 +8586,11 @@ components:
                     type: string
                 podcast:
                     $ref: '#/components/schemas/podcast.v1.Podcast'
+        podcast.v1.SavePodcastRequest:
+            type: object
+            properties:
+                podcastId:
+                    type: string
         podcast.v1.UploadPodcastRequest:
             type: object
             properties:
@@ -9877,6 +10293,11 @@ tags:
          their own thread list: mentor feedback, guild notices, system events,
          duel chat, friend-challenge conversations. Threads are per-user and own
          their message list; cross-user threads are modeled by mirroring messages.
+    - name: InsightsService
+      description: |-
+        InsightsService — ADR-002. Personalized recommendations derived from
+         the user's progress, mock interviews and recent activity. Read-only;
+         generation runs out-of-band on a cron schedule (see insights_worker.go).
     - name: InterviewPrepService
     - name: MissionService
     - name: NotificationSettingsService

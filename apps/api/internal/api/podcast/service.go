@@ -11,6 +11,7 @@ type Implementation struct {
 	v1.UnimplementedPodcastServiceServer
 	service Service
 	series  SeriesRepo
+	saved   SavedRepo
 }
 
 // New returns new instance of Implementation.

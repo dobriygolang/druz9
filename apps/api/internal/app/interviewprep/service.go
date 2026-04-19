@@ -206,7 +206,7 @@ func (s *Service) reviewInterviewSolutionWithRetry(
 			return review, nil
 		}
 		if !isTransientAIReviewError(err) {
-			return nil, err
+			return nil, fmt.Errorf("review interview solution: %w", err)
 		}
 		lastErr = err
 		if ctx.Err() != nil {
@@ -234,7 +234,7 @@ func (s *Service) reviewInterviewAnswerWithRetry(
 			return review, nil
 		}
 		if !isTransientAIReviewError(err) {
-			return nil, err
+			return nil, fmt.Errorf("review interview answer: %w", err)
 		}
 		lastErr = err
 		if ctx.Err() != nil {
@@ -262,7 +262,7 @@ func (s *Service) reviewSystemDesignWithRetry(
 			return review, nil
 		}
 		if !isTransientAIReviewError(err) {
-			return nil, err
+			return nil, fmt.Errorf("review system design: %w", err)
 		}
 		lastErr = err
 		if ctx.Err() != nil {
@@ -329,7 +329,7 @@ func (s *Service) ListTasks(ctx context.Context, user *model.User) ([]*model.Int
 	}
 	items, err := s.repo.ListActiveTasks(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list active tasks: %w", err)
 	}
 	if s.taskListCache != nil {
 		s.taskListCache.Set("active", items)
@@ -348,7 +348,7 @@ func (s *Service) ListMockBlueprints(ctx context.Context) ([]*model.InterviewMoc
 func (s *Service) StartSession(ctx context.Context, user *model.User, taskID uuid.UUID) (*model.InterviewPrepSession, error) {
 	task, err := s.repo.GetTask(ctx, taskID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get task: %w", err)
 	}
 	if task == nil || !task.IsActive {
 		return nil, ErrTaskNotFound
@@ -356,7 +356,7 @@ func (s *Service) StartSession(ctx context.Context, user *model.User, taskID uui
 
 	existing, err := s.repo.GetActiveSessionByUserAndTask(ctx, user.ID, taskID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get active session: %w", err)
 	}
 	if existing != nil {
 		return s.GetSession(ctx, user, existing.ID)
@@ -389,7 +389,7 @@ func (s *Service) StartSession(ctx context.Context, user *model.User, taskID uui
 		if getErr == nil && existing != nil {
 			return s.GetSession(ctx, user, existing.ID)
 		}
-		return nil, err
+		return nil, fmt.Errorf("create session: %w", err)
 	}
 
 	return s.GetSession(ctx, user, session.ID)
@@ -398,7 +398,7 @@ func (s *Service) StartSession(ctx context.Context, user *model.User, taskID uui
 func (s *Service) GetSession(ctx context.Context, user *model.User, sessionID uuid.UUID) (*model.InterviewPrepSession, error) {
 	session, err := s.repo.GetSession(ctx, sessionID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get session: %w", err)
 	}
 	if session == nil || session.UserID != user.ID {
 		return nil, ErrSessionNotFound
@@ -406,7 +406,7 @@ func (s *Service) GetSession(ctx context.Context, user *model.User, sessionID uu
 
 	task, err := s.repo.GetTask(ctx, session.TaskID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get task: %w", err)
 	}
 	if task == nil {
 		return nil, ErrTaskNotFound
@@ -420,14 +420,14 @@ func (s *Service) GetSession(ctx context.Context, user *model.User, sessionID uu
 	if session.Status != model.InterviewPrepSessionStatusFinished && session.CurrentQuestionPosition > 0 {
 		current, err := s.repo.GetQuestionByTaskAndPosition(ctx, session.TaskID, session.CurrentQuestionPosition)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("get question by task and position: %w", err)
 		}
 		session.CurrentQuestion = current
 	}
 
 	results, err := s.repo.ListQuestionResults(ctx, session.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list question results: %w", err)
 	}
 	session.Results = results
 
@@ -493,7 +493,7 @@ func firstNonEmptyLanguage(values ...string) string {
 func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.UUID, code string, solveLanguage string) (*SubmitResult, error) {
 	session, err := s.repo.GetSession(ctx, sessionID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get session: %w", err)
 	}
 	if session == nil || session.UserID != user.ID {
 		return nil, ErrSessionNotFound
@@ -504,7 +504,7 @@ func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.U
 	if session.Task == nil {
 		session.Task, err = s.repo.GetTask(ctx, session.TaskID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("get task: %w", err)
 		}
 	}
 	if session.Task == nil {
@@ -533,7 +533,7 @@ func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.U
 		if !cacheHit {
 			codeTask, err = s.repo.GetCodeTask(ctx, *session.Task.CodeTaskID)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("get code task: %w", err)
 			}
 			if s.codeTaskCache != nil && codeTask != nil {
 				s.codeTaskCache.Set(codeTaskID, codeTask)
@@ -544,30 +544,30 @@ func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.U
 		}
 		judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, codeTask, code, solveLanguage)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("evaluate code task: %w", err)
 		}
 
 		if err := s.repo.UpdateSessionCode(ctx, session.ID, solveLanguage, code, judgeResult.Passed); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("update session code: %w", err)
 		}
 
 		if judgeResult.Passed && session.CurrentQuestionPosition == 0 {
 			nextQuestion, err := s.repo.GetQuestionByTaskAndPosition(ctx, session.TaskID, 1)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("get question by task and position: %w", err)
 			}
 			if nextQuestion == nil {
 				if err := s.repo.FinishSession(ctx, session.ID); err != nil {
-					return nil, err
+					return nil, fmt.Errorf("finish session: %w", err)
 				}
 			} else if err := s.repo.AdvanceSessionQuestion(ctx, session.ID, 1); err != nil {
-				return nil, err
+				return nil, fmt.Errorf("advance session question: %w", err)
 			}
 		}
 
 		nextSession, err := s.GetSession(ctx, user, session.ID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("get session: %w", err)
 		}
 		return &SubmitResult{
 			Passed:          judgeResult.Passed,
@@ -587,7 +587,7 @@ func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.U
 func (s *Service) ReviewSystemDesign(ctx context.Context, user *model.User, sessionID uuid.UUID, fileName, contentType string, imageBytes []byte, req SystemDesignReviewInput) (*SystemDesignReviewResult, error) {
 	session, err := s.repo.GetSession(ctx, sessionID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get session: %w", err)
 	}
 	if session == nil || session.UserID != user.ID {
 		return nil, ErrSessionNotFound
@@ -595,7 +595,7 @@ func (s *Service) ReviewSystemDesign(ctx context.Context, user *model.User, sess
 	if session.Task == nil {
 		session.Task, err = s.repo.GetTask(ctx, session.TaskID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("get task: %w", err)
 		}
 	}
 	if session.Task == nil {
@@ -611,7 +611,7 @@ func (s *Service) ReviewSystemDesign(ctx context.Context, user *model.User, sess
 		}
 		normalizedType, err = normalizeReviewImageType(contentType, fileName)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("normalize review image type: %w", err)
 		}
 	}
 	if s.reviewer == nil {
@@ -636,7 +636,7 @@ func (s *Service) ReviewSystemDesign(ctx context.Context, user *model.User, sess
 func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionID, questionID uuid.UUID, assessment string, answer string) (*QuestionAnswerResult, error) {
 	session, err := s.GetSession(ctx, user, sessionID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get session: %w", err)
 	}
 	if session.Status == model.InterviewPrepSessionStatusFinished {
 		return nil, ErrSessionFinished
@@ -669,19 +669,19 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 			if isTransientAIReviewError(err) {
 				nextSession, sessionErr := s.GetSession(ctx, user, session.ID)
 				if sessionErr != nil {
-					return nil, sessionErr
+					return nil, fmt.Errorf("get session: %w", sessionErr)
 				}
 				return &QuestionAnswerResult{
 					Review:  timeoutInterviewAnswerReview(),
 					Session: nextSession,
 				}, nil
 			}
-			return nil, fmt.Errorf("reviewer.ReviewInterviewAnswer: %w", err)
+			return nil, fmt.Errorf("review interview answer: %w", err)
 		}
 		if !passesMockQuestionReview(review) {
 			nextSession, sessionErr := s.GetSession(ctx, user, session.ID)
 			if sessionErr != nil {
-				return nil, sessionErr
+				return nil, fmt.Errorf("get session: %w", sessionErr)
 			}
 			return &QuestionAnswerResult{
 				Review:  review,
@@ -703,21 +703,21 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 		AnsweredAt:     nowTime,
 	}
 	if err := s.repo.UpsertQuestionResult(ctx, result); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("upsert question result: %w", err)
 	}
 
 	nextPosition := session.CurrentQuestionPosition + 1
 	nextQuestion, err := s.repo.GetQuestionByTaskAndPosition(ctx, session.TaskID, nextPosition)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get question by task and position: %w", err)
 	}
 	if nextQuestion == nil {
 		if err := s.repo.FinishSession(ctx, session.ID); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("finish session: %w", err)
 		}
 		nextSession, err := s.GetSession(ctx, user, session.ID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("get session: %w", err)
 		}
 		return &QuestionAnswerResult{
 			AnsweredQuestion: answeredQuestion,
@@ -727,11 +727,11 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 	}
 
 	if err := s.repo.AdvanceSessionQuestion(ctx, session.ID, nextPosition); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("advance session question: %w", err)
 	}
 	nextSession, err := s.GetSession(ctx, user, session.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get session: %w", err)
 	}
 	return &QuestionAnswerResult{
 		AnsweredQuestion: answeredQuestion,

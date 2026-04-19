@@ -458,6 +458,149 @@ func (x *DeleteAIMentorResponse) GetOk() bool {
 	return false
 }
 
+type UpsertMentorSecretRequest struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	MentorId string                 `protobuf:"bytes,1,opt,name=mentor_id,json=mentorId,proto3" json:"mentor_id,omitempty"`
+	// Plain API key as provided by the admin in the form. The server seals
+	// it before storing — the cleartext is never logged or echoed back.
+	ApiKey        string `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpsertMentorSecretRequest) Reset() {
+	*x = UpsertMentorSecretRequest{}
+	mi := &file_core_admin_v1_ai_mentor_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpsertMentorSecretRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpsertMentorSecretRequest) ProtoMessage() {}
+
+func (x *UpsertMentorSecretRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_core_admin_v1_ai_mentor_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpsertMentorSecretRequest.ProtoReflect.Descriptor instead.
+func (*UpsertMentorSecretRequest) Descriptor() ([]byte, []int) {
+	return file_core_admin_v1_ai_mentor_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *UpsertMentorSecretRequest) GetMentorId() string {
+	if x != nil {
+		return x.MentorId
+	}
+	return ""
+}
+
+func (x *UpsertMentorSecretRequest) GetApiKey() string {
+	if x != nil {
+		return x.ApiKey
+	}
+	return ""
+}
+
+type UpsertMentorSecretResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Last 4 chars of the stored key for display/audit (e.g. "••••1234").
+	MaskedSuffix  string `protobuf:"bytes,1,opt,name=masked_suffix,json=maskedSuffix,proto3" json:"masked_suffix,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpsertMentorSecretResponse) Reset() {
+	*x = UpsertMentorSecretResponse{}
+	mi := &file_core_admin_v1_ai_mentor_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpsertMentorSecretResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpsertMentorSecretResponse) ProtoMessage() {}
+
+func (x *UpsertMentorSecretResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_core_admin_v1_ai_mentor_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpsertMentorSecretResponse.ProtoReflect.Descriptor instead.
+func (*UpsertMentorSecretResponse) Descriptor() ([]byte, []int) {
+	return file_core_admin_v1_ai_mentor_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *UpsertMentorSecretResponse) GetMaskedSuffix() string {
+	if x != nil {
+		return x.MaskedSuffix
+	}
+	return ""
+}
+
+type DeleteMentorSecretRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MentorId      string                 `protobuf:"bytes,1,opt,name=mentor_id,json=mentorId,proto3" json:"mentor_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteMentorSecretRequest) Reset() {
+	*x = DeleteMentorSecretRequest{}
+	mi := &file_core_admin_v1_ai_mentor_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteMentorSecretRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteMentorSecretRequest) ProtoMessage() {}
+
+func (x *DeleteMentorSecretRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_core_admin_v1_ai_mentor_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteMentorSecretRequest.ProtoReflect.Descriptor instead.
+func (*DeleteMentorSecretRequest) Descriptor() ([]byte, []int) {
+	return file_core_admin_v1_ai_mentor_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *DeleteMentorSecretRequest) GetMentorId() string {
+	if x != nil {
+		return x.MentorId
+	}
+	return ""
+}
+
 var File_core_admin_v1_ai_mentor_proto protoreflect.FileDescriptor
 
 const file_core_admin_v1_ai_mentor_proto_rawDesc = "" +
@@ -492,12 +635,21 @@ const file_core_admin_v1_ai_mentor_proto_rawDesc = "" +
 	"\x15DeleteAIMentorRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"(\n" +
 	"\x16DeleteAIMentorResponse\x12\x0e\n" +
-	"\x02ok\x18\x01 \x01(\bR\x02ok2\xde\x03\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok\"Q\n" +
+	"\x19UpsertMentorSecretRequest\x12\x1b\n" +
+	"\tmentor_id\x18\x01 \x01(\tR\bmentorId\x12\x17\n" +
+	"\aapi_key\x18\x02 \x01(\tR\x06apiKey\"A\n" +
+	"\x1aUpsertMentorSecretResponse\x12#\n" +
+	"\rmasked_suffix\x18\x01 \x01(\tR\fmaskedSuffix\"8\n" +
+	"\x19DeleteMentorSecretRequest\x12\x1b\n" +
+	"\tmentor_id\x18\x01 \x01(\tR\bmentorId2\x8b\x06\n" +
 	"\x0fAIMentorService\x12r\n" +
 	"\rListAIMentors\x12\x1e.admin.v1.ListAIMentorsRequest\x1a\x1f.admin.v1.ListAIMentorsResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/api/v1/admin/ai-mentors\x12j\n" +
 	"\x0eCreateAIMentor\x12\x1f.admin.v1.CreateAIMentorRequest\x1a\x12.admin.v1.AIMentor\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/v1/admin/ai-mentors\x12o\n" +
 	"\x0eUpdateAIMentor\x12\x1f.admin.v1.UpdateAIMentorRequest\x1a\x12.admin.v1.AIMentor\"(\x82\xd3\xe4\x93\x02\":\x01*\x1a\x1d/api/v1/admin/ai-mentors/{id}\x12z\n" +
-	"\x0eDeleteAIMentor\x12\x1f.admin.v1.DeleteAIMentorRequest\x1a .admin.v1.DeleteAIMentorResponse\"%\x82\xd3\xe4\x93\x02\x1f*\x1d/api/v1/admin/ai-mentors/{id}B\x19Z\x17api/pkg/api/admin/v1;v1b\x06proto3"
+	"\x0eDeleteAIMentor\x12\x1f.admin.v1.DeleteAIMentorRequest\x1a .admin.v1.DeleteAIMentorResponse\"%\x82\xd3\xe4\x93\x02\x1f*\x1d/api/v1/admin/ai-mentors/{id}\x12\x97\x01\n" +
+	"\x12UpsertMentorSecret\x12#.admin.v1.UpsertMentorSecretRequest\x1a$.admin.v1.UpsertMentorSecretResponse\"6\x82\xd3\xe4\x93\x020:\x01*\"+/api/v1/admin/ai-mentors/{mentor_id}/secret\x12\x90\x01\n" +
+	"\x12DeleteMentorSecret\x12#.admin.v1.DeleteMentorSecretRequest\x1a .admin.v1.DeleteAIMentorResponse\"3\x82\xd3\xe4\x93\x02-*+/api/v1/admin/ai-mentors/{mentor_id}/secretB\x19Z\x17api/pkg/api/admin/v1;v1b\x06proto3"
 
 var (
 	file_core_admin_v1_ai_mentor_proto_rawDescOnce sync.Once
@@ -511,15 +663,18 @@ func file_core_admin_v1_ai_mentor_proto_rawDescGZIP() []byte {
 	return file_core_admin_v1_ai_mentor_proto_rawDescData
 }
 
-var file_core_admin_v1_ai_mentor_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_core_admin_v1_ai_mentor_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_core_admin_v1_ai_mentor_proto_goTypes = []any{
-	(*AIMentor)(nil),               // 0: admin.v1.AIMentor
-	(*ListAIMentorsRequest)(nil),   // 1: admin.v1.ListAIMentorsRequest
-	(*ListAIMentorsResponse)(nil),  // 2: admin.v1.ListAIMentorsResponse
-	(*CreateAIMentorRequest)(nil),  // 3: admin.v1.CreateAIMentorRequest
-	(*UpdateAIMentorRequest)(nil),  // 4: admin.v1.UpdateAIMentorRequest
-	(*DeleteAIMentorRequest)(nil),  // 5: admin.v1.DeleteAIMentorRequest
-	(*DeleteAIMentorResponse)(nil), // 6: admin.v1.DeleteAIMentorResponse
+	(*AIMentor)(nil),                   // 0: admin.v1.AIMentor
+	(*ListAIMentorsRequest)(nil),       // 1: admin.v1.ListAIMentorsRequest
+	(*ListAIMentorsResponse)(nil),      // 2: admin.v1.ListAIMentorsResponse
+	(*CreateAIMentorRequest)(nil),      // 3: admin.v1.CreateAIMentorRequest
+	(*UpdateAIMentorRequest)(nil),      // 4: admin.v1.UpdateAIMentorRequest
+	(*DeleteAIMentorRequest)(nil),      // 5: admin.v1.DeleteAIMentorRequest
+	(*DeleteAIMentorResponse)(nil),     // 6: admin.v1.DeleteAIMentorResponse
+	(*UpsertMentorSecretRequest)(nil),  // 7: admin.v1.UpsertMentorSecretRequest
+	(*UpsertMentorSecretResponse)(nil), // 8: admin.v1.UpsertMentorSecretResponse
+	(*DeleteMentorSecretRequest)(nil),  // 9: admin.v1.DeleteMentorSecretRequest
 }
 var file_core_admin_v1_ai_mentor_proto_depIdxs = []int32{
 	0, // 0: admin.v1.ListAIMentorsResponse.mentors:type_name -> admin.v1.AIMentor
@@ -527,12 +682,16 @@ var file_core_admin_v1_ai_mentor_proto_depIdxs = []int32{
 	3, // 2: admin.v1.AIMentorService.CreateAIMentor:input_type -> admin.v1.CreateAIMentorRequest
 	4, // 3: admin.v1.AIMentorService.UpdateAIMentor:input_type -> admin.v1.UpdateAIMentorRequest
 	5, // 4: admin.v1.AIMentorService.DeleteAIMentor:input_type -> admin.v1.DeleteAIMentorRequest
-	2, // 5: admin.v1.AIMentorService.ListAIMentors:output_type -> admin.v1.ListAIMentorsResponse
-	0, // 6: admin.v1.AIMentorService.CreateAIMentor:output_type -> admin.v1.AIMentor
-	0, // 7: admin.v1.AIMentorService.UpdateAIMentor:output_type -> admin.v1.AIMentor
-	6, // 8: admin.v1.AIMentorService.DeleteAIMentor:output_type -> admin.v1.DeleteAIMentorResponse
-	5, // [5:9] is the sub-list for method output_type
-	1, // [1:5] is the sub-list for method input_type
+	7, // 5: admin.v1.AIMentorService.UpsertMentorSecret:input_type -> admin.v1.UpsertMentorSecretRequest
+	9, // 6: admin.v1.AIMentorService.DeleteMentorSecret:input_type -> admin.v1.DeleteMentorSecretRequest
+	2, // 7: admin.v1.AIMentorService.ListAIMentors:output_type -> admin.v1.ListAIMentorsResponse
+	0, // 8: admin.v1.AIMentorService.CreateAIMentor:output_type -> admin.v1.AIMentor
+	0, // 9: admin.v1.AIMentorService.UpdateAIMentor:output_type -> admin.v1.AIMentor
+	6, // 10: admin.v1.AIMentorService.DeleteAIMentor:output_type -> admin.v1.DeleteAIMentorResponse
+	8, // 11: admin.v1.AIMentorService.UpsertMentorSecret:output_type -> admin.v1.UpsertMentorSecretResponse
+	6, // 12: admin.v1.AIMentorService.DeleteMentorSecret:output_type -> admin.v1.DeleteAIMentorResponse
+	7, // [7:13] is the sub-list for method output_type
+	1, // [1:7] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -549,7 +708,7 @@ func file_core_admin_v1_ai_mentor_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_core_admin_v1_ai_mentor_proto_rawDesc), len(file_core_admin_v1_ai_mentor_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

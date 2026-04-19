@@ -158,7 +158,7 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 	}
 
 	if err := s.repo.CreateMockSession(ctx, session, stages, questionResults); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create mock session: %w", err)
 	}
 	return s.GetMockSession(ctx, user, session.ID)
 }
@@ -169,7 +169,7 @@ func (s *Service) GetMockSession(ctx context.Context, user *model.User, sessionI
 	}
 	session, err := s.repo.GetMockSession(ctx, sessionID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get mock session: %w", err)
 	}
 	if session == nil || session.UserID != user.ID {
 		return nil, ErrMockSessionNotFound
@@ -178,7 +178,7 @@ func (s *Service) GetMockSession(ctx context.Context, user *model.User, sessionI
 	for _, stage := range session.Stages {
 		task, taskErr := s.repo.GetTask(ctx, stage.TaskID)
 		if taskErr != nil {
-			return nil, taskErr
+			return nil, fmt.Errorf("get task: %w", taskErr)
 		}
 		stage.Task = task
 		if stage.Status == model.InterviewPrepMockStageStatusQuestions {
@@ -208,7 +208,7 @@ func (s *Service) SubmitMockStage(
 ) (*MockSubmitResult, error) {
 	session, stage, err := s.getCurrentMockStage(ctx, user, sessionID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get current mock stage: %w", err)
 	}
 	if submittedKind := strings.TrimSpace(stageKind); submittedKind != "" && submittedKind != stage.Kind.String() {
 		return nil, ErrMockStageKindMismatch
@@ -231,14 +231,14 @@ func (s *Service) SubmitMockStage(
 		}
 		codeTask, err := s.repo.GetCodeTask(ctx, *stage.Task.CodeTaskID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("get code task: %w", err)
 		}
 		if codeTask == nil {
 			return nil, ErrExecutableTaskNotConfigured
 		}
 		judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, codeTask, code, solveLanguage)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("evaluate code task: %w", err)
 		}
 
 		nextStatus := model.InterviewPrepMockStageStatusSolving
@@ -246,17 +246,17 @@ func (s *Service) SubmitMockStage(
 			nextStatus = nextMockStageStatus(stage)
 		}
 		if err := s.repo.UpdateMockStageSubmission(ctx, stage.ID, solveLanguage, code, judgeResult.Passed, 0, "", nextStatus); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("update mock stage submission: %w", err)
 		}
 		if judgeResult.Passed {
 			if err := s.advanceMockSessionIfStageReady(ctx, session, stage); err != nil {
-				return nil, err
+				return nil, fmt.Errorf("advance mock session if stage ready: %w", err)
 			}
 		}
 
 		nextSession, err := s.GetMockSession(ctx, user, session.ID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("get mock session: %w", err)
 		}
 		return &MockSubmitResult{
 			Passed:          judgeResult.Passed,
@@ -295,10 +295,10 @@ func (s *Service) SubmitMockStage(
 				stage.ReviewSummary,
 				stage.Status,
 			); updateErr != nil {
-				return nil, updateErr
+				return nil, fmt.Errorf("update mock stage submission on timeout: %w", updateErr)
 			}
 		}
-		return nil, err
+		return nil, fmt.Errorf("review interview solution: %w", err)
 	}
 	passed := passesMockStageReview(review)
 	nextStatus := model.InterviewPrepMockStageStatusSolving
@@ -306,17 +306,17 @@ func (s *Service) SubmitMockStage(
 		nextStatus = nextMockStageStatus(stage)
 	}
 	if err := s.repo.UpdateMockStageSubmission(ctx, stage.ID, solveLanguage, code, passed, int32(review.Score), review.Summary, nextStatus); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("update mock stage submission: %w", err)
 	}
 	if passed {
 		if err := s.advanceMockSessionIfStageReady(ctx, session, stage); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("advance mock session if stage ready: %w", err)
 		}
 	}
 
 	nextSession, err := s.GetMockSession(ctx, user, session.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get mock session: %w", err)
 	}
 	return &MockSubmitResult{
 		Passed:  passed,
@@ -336,7 +336,7 @@ func (s *Service) ReviewMockSystemDesign(
 ) (*MockSystemDesignReviewResult, error) {
 	session, stage, err := s.getCurrentMockStage(ctx, user, sessionID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get current mock stage: %w", err)
 	}
 	if stage.Status != model.InterviewPrepMockStageStatusSolving || stage.Kind != model.InterviewPrepMockStageKindSystemDesign {
 		return nil, ErrMockStageSubmitNotAllowed
@@ -373,18 +373,18 @@ func (s *Service) ReviewMockSystemDesign(
 		if isTransientAIReviewError(err) {
 			review = timeoutSystemDesignReview()
 			if updateErr := s.repo.UpdateMockStageSubmission(ctx, stage.ID, "", "", false, int32(review.Score), review.Summary, model.InterviewPrepMockStageStatusSolving); updateErr != nil {
-				return nil, updateErr
+				return nil, fmt.Errorf("update mock stage submission on timeout: %w", updateErr)
 			}
 			nextSession, sessionErr := s.GetMockSession(ctx, user, session.ID)
 			if sessionErr != nil {
-				return nil, sessionErr
+				return nil, fmt.Errorf("get mock session: %w", sessionErr)
 			}
 			return &MockSystemDesignReviewResult{
 				Review:  review,
 				Session: nextSession,
 			}, nil
 		}
-		return nil, err
+		return nil, fmt.Errorf("review system design: %w", err)
 	}
 	passed := passesMockSystemDesignReview(review)
 	nextStatus := model.InterviewPrepMockStageStatusSolving
@@ -392,17 +392,17 @@ func (s *Service) ReviewMockSystemDesign(
 		nextStatus = nextMockStageStatus(stage)
 	}
 	if err := s.repo.UpdateMockStageSubmission(ctx, stage.ID, "", "", passed, int32(review.Score), review.Summary, nextStatus); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("update mock stage submission: %w", err)
 	}
 	if passed {
 		if err := s.advanceMockSessionIfStageReady(ctx, session, stage); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("advance mock session if stage ready: %w", err)
 		}
 	}
 
 	nextSession, err := s.GetMockSession(ctx, user, session.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get mock session: %w", err)
 	}
 	return &MockSystemDesignReviewResult{
 		Review:  review,
@@ -413,7 +413,7 @@ func (s *Service) ReviewMockSystemDesign(
 func (s *Service) AnswerMockQuestion(ctx context.Context, user *model.User, sessionID uuid.UUID, answer string) (*MockQuestionAnswerResult, error) {
 	session, stage, err := s.getCurrentMockStage(ctx, user, sessionID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get current mock stage: %w", err)
 	}
 	if stage.Status != model.InterviewPrepMockStageStatusQuestions || stage.CurrentQuestion == nil {
 		return nil, ErrMockQuestionNotReady
@@ -447,7 +447,7 @@ func (s *Service) AnswerMockQuestion(ctx context.Context, user *model.User, sess
 				Session: updatedSession,
 			}, nil
 		}
-		return nil, err
+		return nil, fmt.Errorf("review interview answer: %w", err)
 	}
 	passed := passesMockQuestionReview(review)
 
@@ -455,20 +455,20 @@ func (s *Service) AnswerMockQuestion(ctx context.Context, user *model.User, sess
 	if passed {
 		nowTime := time.Now().UTC()
 		if err := s.repo.CompleteMockQuestion(ctx, stage.CurrentQuestion.ID, int32(review.Score), review.Summary, nowTime); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("complete mock question: %w", err)
 		}
 
 		updatedSession, err = s.GetMockSession(ctx, user, session.ID)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("get mock session: %w", err)
 		}
 		if updatedSession.CurrentStage != nil && updatedSession.CurrentStage.CurrentQuestion == nil {
 			if err := s.completeAndAdvanceMockStage(ctx, updatedSession, updatedSession.CurrentStage); err != nil {
-				return nil, err
+				return nil, fmt.Errorf("complete and advance mock stage: %w", err)
 			}
 			updatedSession, err = s.GetMockSession(ctx, user, session.ID)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("get mock session: %w", err)
 			}
 		}
 	}
@@ -487,11 +487,11 @@ func (s *Service) buildMockStageQuestions(
 ) ([]*model.InterviewPrepMockQuestionResult, error) {
 	taskQuestions, err := s.repo.ListQuestionsByTask(ctx, task.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list questions by task: %w", err)
 	}
 	templates, err := taskSpecificMockQuestions(task, stage, taskQuestions, maxFollowupCount)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get task specific mock questions: %w", err)
 	}
 
 	nowTime := time.Now().UTC()
@@ -536,13 +536,13 @@ func (s *Service) advanceMockSessionIfStageReady(ctx context.Context, session *m
 
 func (s *Service) completeAndAdvanceMockStage(ctx context.Context, session *model.InterviewPrepMockSession, stage *model.InterviewPrepMockStage) error {
 	if err := s.repo.CompleteMockStage(ctx, stage.ID); err != nil {
-		return err
+		return fmt.Errorf("complete mock stage: %w", err)
 	}
 
 	nextIndex := stage.StageIndex + 1
 	if int(nextIndex) >= len(session.Stages) {
 		if err := s.repo.FinishMockSession(ctx, session.ID); err != nil {
-			return err
+			return fmt.Errorf("finish mock session: %w", err)
 		}
 		// Credit Season Pass XP for completing a full mock interview.
 		// Fire-and-forget — pass errors must not rollback session finish.
@@ -552,9 +552,12 @@ func (s *Service) completeAndAdvanceMockStage(ctx context.Context, session *mode
 		return nil
 	}
 	if err := s.repo.SetMockStageStatus(ctx, session.Stages[nextIndex].ID, model.InterviewPrepMockStageStatusSolving); err != nil {
-		return err
+		return fmt.Errorf("set mock stage status: %w", err)
 	}
-	return s.repo.AdvanceMockSession(ctx, session.ID, nextIndex)
+	if err := s.repo.AdvanceMockSession(ctx, session.ID, nextIndex); err != nil {
+		return fmt.Errorf("advance mock session: %w", err)
+	}
+	return nil
 }
 
 func nextMockStageStatus(stage *model.InterviewPrepMockStage) model.InterviewPrepMockStageStatus {
@@ -848,11 +851,11 @@ func defaultMockQuestionTemplates(task *model.InterviewPrepTask, stage *model.In
 // All pending stages remain in their current state (not completed → not counted).
 func (s *Service) AbortMockSession(ctx context.Context, user *model.User, sessionID uuid.UUID) error {
 	if err := ensureTrusted(user); err != nil {
-		return err
+		return fmt.Errorf("ensure trusted: %w", err)
 	}
 	session, err := s.repo.GetMockSession(ctx, sessionID)
 	if err != nil {
-		return err
+		return fmt.Errorf("get mock session: %w", err)
 	}
 	if session == nil || session.UserID != user.ID {
 		return ErrMockSessionNotFound
@@ -861,5 +864,8 @@ func (s *Service) AbortMockSession(ctx context.Context, user *model.User, sessio
 		session.Status == model.InterviewPrepMockSessionStatusAborted {
 		return nil
 	}
-	return s.repo.AbortMockSession(ctx, session.ID)
+	if err := s.repo.AbortMockSession(ctx, session.ID); err != nil {
+		return fmt.Errorf("abort mock session: %w", err)
+	}
+	return nil
 }

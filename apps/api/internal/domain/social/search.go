@@ -2,6 +2,7 @@ package social
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/google/uuid"
@@ -20,5 +21,9 @@ func (s *Service) SearchUsers(ctx context.Context, viewerID uuid.UUID, query str
 	if limit <= 0 || limit > 20 {
 		limit = 20
 	}
-	return s.repo.SearchUsers(ctx, viewerID, query, limit)
+	results, err := s.repo.SearchUsers(ctx, viewerID, query, limit)
+	if err != nil {
+		return nil, fmt.Errorf("search users: %w", err)
+	}
+	return results, nil
 }

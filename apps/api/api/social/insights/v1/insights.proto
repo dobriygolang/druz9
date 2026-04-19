@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package insights.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "api/pkg/api/insights/v1;v1";
+
+// InsightsService — ADR-002. Personalized recommendations derived from
+// the user's progress, mock interviews and recent activity. Read-only;
+// generation runs out-of-band on a cron schedule (see insights_worker.go).
+service InsightsService {
+  rpc GetMyInsight(GetMyInsightRequest) returns (Insight) {
+    option (google.api.http) = { get: "/api/v1/insights/me" };
+  }
+}
+
+message InsightItem {
+  string title       = 1;
+  string description = 2;
+  // Optional href the frontend can render as a CTA (e.g. "/training/dp").
+  string action_url  = 3;
+}
+
+message Insight {
+  string                    summary       = 1;
+  repeated InsightItem      top_strengths = 2;
+  repeated InsightItem      top_gaps      = 3;
+  repeated InsightItem      next_steps    = 4;
+  google.protobuf.Timestamp generated_at  = 5;
+  // 'deterministic' or 'llm:<model_id>'.
+  string                    source        = 6;
+}
+
+message GetMyInsightRequest {}

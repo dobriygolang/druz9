@@ -19,10 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AIMentorService_ListAIMentors_FullMethodName  = "/admin.v1.AIMentorService/ListAIMentors"
-	AIMentorService_CreateAIMentor_FullMethodName = "/admin.v1.AIMentorService/CreateAIMentor"
-	AIMentorService_UpdateAIMentor_FullMethodName = "/admin.v1.AIMentorService/UpdateAIMentor"
-	AIMentorService_DeleteAIMentor_FullMethodName = "/admin.v1.AIMentorService/DeleteAIMentor"
+	AIMentorService_ListAIMentors_FullMethodName      = "/admin.v1.AIMentorService/ListAIMentors"
+	AIMentorService_CreateAIMentor_FullMethodName     = "/admin.v1.AIMentorService/CreateAIMentor"
+	AIMentorService_UpdateAIMentor_FullMethodName     = "/admin.v1.AIMentorService/UpdateAIMentor"
+	AIMentorService_DeleteAIMentor_FullMethodName     = "/admin.v1.AIMentorService/DeleteAIMentor"
+	AIMentorService_UpsertMentorSecret_FullMethodName = "/admin.v1.AIMentorService/UpsertMentorSecret"
+	AIMentorService_DeleteMentorSecret_FullMethodName = "/admin.v1.AIMentorService/DeleteMentorSecret"
 )
 
 // AIMentorServiceClient is the client API for AIMentorService service.
@@ -33,6 +35,10 @@ type AIMentorServiceClient interface {
 	CreateAIMentor(ctx context.Context, in *CreateAIMentorRequest, opts ...grpc.CallOption) (*AIMentor, error)
 	UpdateAIMentor(ctx context.Context, in *UpdateAIMentorRequest, opts ...grpc.CallOption) (*AIMentor, error)
 	DeleteAIMentor(ctx context.Context, in *DeleteAIMentorRequest, opts ...grpc.CallOption) (*DeleteAIMentorResponse, error)
+	// ADR-001 — Per-mentor API key management. The plain key is sealed with
+	// AI_MENTOR_KEY_KMS at write time; the mentor row never stores it.
+	UpsertMentorSecret(ctx context.Context, in *UpsertMentorSecretRequest, opts ...grpc.CallOption) (*UpsertMentorSecretResponse, error)
+	DeleteMentorSecret(ctx context.Context, in *DeleteMentorSecretRequest, opts ...grpc.CallOption) (*DeleteAIMentorResponse, error)
 }
 
 type aIMentorServiceClient struct {
@@ -83,6 +89,26 @@ func (c *aIMentorServiceClient) DeleteAIMentor(ctx context.Context, in *DeleteAI
 	return out, nil
 }
 
+func (c *aIMentorServiceClient) UpsertMentorSecret(ctx context.Context, in *UpsertMentorSecretRequest, opts ...grpc.CallOption) (*UpsertMentorSecretResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpsertMentorSecretResponse)
+	err := c.cc.Invoke(ctx, AIMentorService_UpsertMentorSecret_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *aIMentorServiceClient) DeleteMentorSecret(ctx context.Context, in *DeleteMentorSecretRequest, opts ...grpc.CallOption) (*DeleteAIMentorResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteAIMentorResponse)
+	err := c.cc.Invoke(ctx, AIMentorService_DeleteMentorSecret_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AIMentorServiceServer is the server API for AIMentorService service.
 // All implementations must embed UnimplementedAIMentorServiceServer
 // for forward compatibility.
@@ -91,6 +117,10 @@ type AIMentorServiceServer interface {
 	CreateAIMentor(context.Context, *CreateAIMentorRequest) (*AIMentor, error)
 	UpdateAIMentor(context.Context, *UpdateAIMentorRequest) (*AIMentor, error)
 	DeleteAIMentor(context.Context, *DeleteAIMentorRequest) (*DeleteAIMentorResponse, error)
+	// ADR-001 — Per-mentor API key management. The plain key is sealed with
+	// AI_MENTOR_KEY_KMS at write time; the mentor row never stores it.
+	UpsertMentorSecret(context.Context, *UpsertMentorSecretRequest) (*UpsertMentorSecretResponse, error)
+	DeleteMentorSecret(context.Context, *DeleteMentorSecretRequest) (*DeleteAIMentorResponse, error)
 	mustEmbedUnimplementedAIMentorServiceServer()
 }
 
@@ -112,6 +142,12 @@ func (UnimplementedAIMentorServiceServer) UpdateAIMentor(context.Context, *Updat
 }
 func (UnimplementedAIMentorServiceServer) DeleteAIMentor(context.Context, *DeleteAIMentorRequest) (*DeleteAIMentorResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteAIMentor not implemented")
+}
+func (UnimplementedAIMentorServiceServer) UpsertMentorSecret(context.Context, *UpsertMentorSecretRequest) (*UpsertMentorSecretResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpsertMentorSecret not implemented")
+}
+func (UnimplementedAIMentorServiceServer) DeleteMentorSecret(context.Context, *DeleteMentorSecretRequest) (*DeleteAIMentorResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteMentorSecret not implemented")
 }
 func (UnimplementedAIMentorServiceServer) mustEmbedUnimplementedAIMentorServiceServer() {}
 func (UnimplementedAIMentorServiceServer) testEmbeddedByValue()                         {}
@@ -206,6 +242,42 @@ func _AIMentorService_DeleteAIMentor_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AIMentorService_UpsertMentorSecret_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertMentorSecretRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AIMentorServiceServer).UpsertMentorSecret(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AIMentorService_UpsertMentorSecret_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AIMentorServiceServer).UpsertMentorSecret(ctx, req.(*UpsertMentorSecretRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AIMentorService_DeleteMentorSecret_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteMentorSecretRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AIMentorServiceServer).DeleteMentorSecret(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AIMentorService_DeleteMentorSecret_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AIMentorServiceServer).DeleteMentorSecret(ctx, req.(*DeleteMentorSecretRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AIMentorService_ServiceDesc is the grpc.ServiceDesc for AIMentorService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -228,6 +300,14 @@ var AIMentorService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteAIMentor",
 			Handler:    _AIMentorService_DeleteAIMentor_Handler,
+		},
+		{
+			MethodName: "UpsertMentorSecret",
+			Handler:    _AIMentorService_UpsertMentorSecret_Handler,
+		},
+		{
+			MethodName: "DeleteMentorSecret",
+			Handler:    _AIMentorService_DeleteMentorSecret_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

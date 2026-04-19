@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"api/internal/aireview"
@@ -23,6 +24,7 @@ import (
 	podcastservice "api/internal/api/podcast"
 	profileservice "api/internal/api/profile"
 	referralservice "api/internal/api/referral"
+	insightsservice "api/internal/api/insights"
 	sceneservice "api/internal/api/scene"
 	seasonpassservice "api/internal/api/season_pass"
 	shopservice "api/internal/api/shop"
@@ -32,6 +34,7 @@ import (
 	trainingservice "api/internal/api/training"
 	apparena "api/internal/app/arena"
 	appcodeeditor "api/internal/app/codeeditor"
+	insightsapp "api/internal/app/insights"
 	appinterviewprep "api/internal/app/interviewprep"
 	"api/internal/app/solutionreview"
 	"api/internal/clients/notification"
@@ -98,6 +101,7 @@ type serviceContext struct {
 	streakService          *streakservice.Implementation
 	shopService            *shopservice.Implementation
 	sceneService           *sceneservice.Implementation
+	insightsService        *insightsservice.Implementation
 	socialService          *socialservice.Implementation
 	peerMockService        *peermockservice.Implementation
 	aiMentorService        *adminservice.AIMentorImpl
@@ -114,6 +118,13 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		})
 	} else {
 		sandboxService = sandbox.New()
+	}
+
+	// ADR-001 — Optional symmetric-key vault for ai_mentor_secrets. Nil
+	// when AI_MENTOR_KEY_KMS isn't set (dev mode); production must set it.
+	mentorKeyVault, vaultErr := aireview.NewKeyVaultFromEnv()
+	if vaultErr != nil {
+		return nil, fmt.Errorf("init mentor key vault: %w", vaultErr)
 	}
 
 	aiReviewService := aireview.New(aireview.Config{
@@ -281,14 +292,16 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		hubService:        hubservice.New(storage.profileRepo, missionServiceDomain, eventServiceDomain, arenaServiceDomain, guildServiceDomain, seasonPassDomain),
 		guildService:      guildservice.New(guildServiceDomain, eventServiceDomain, notifSender).WithWarRepo(storage.guildRepo),
 		eventService:      eventservice.New(eventServiceDomain),
-		podcastService:    podcastservice.New(podcastServiceDomain),
+		podcastService: podcastservice.New(podcastServiceDomain).
+			WithSeriesRepo(podcastSeriesAdapter{repo: storage.podcastRepo}).
+			WithSavedRepo(podcastSavedAdapter{repo: storage.podcastRepo}),
 		referralService:   referralservice.New(referralServiceDomain),
 		skillsService:     skillsservice.New(skillsDomain),
 		trainingService:   trainingservice.New(trainingservice.NewService(storage.profileRepo, codeEditorServiceDomain, sandboxService, solutionReviewService, seasonPassDomain)),
 		codeEditorService: codeeditorservice.New(codeEditorServiceDomain, realtimeHub, aiReviewService, solutionReviewService),
 		arenaService: arenaservice.New(arenaServiceDomain, arenaRealtimeHub, func() bool {
 			return bootstrap.cfg.Arena != nil && !bootstrap.cfg.Arena.RequireAuth
-		}, solutionReviewService, notifSender),
+		}, solutionReviewService, notifSender).WithLobbyRepo(storage.arenaRepo),
 		interviewPrepService:   interviewprepservice.New(interviewPrepDomain, storage.interviewRepo, notifSender).WithAIMentorRepo(storage.aiMentorRepo),
 		missionService:         missionservice.New(missionServiceDomain),
 		notificationSettings:   notificationservice.NewSettings(notifSender),
@@ -300,8 +313,9 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		streakService:          streakservice.New(streakDomain),
 		shopService:            shopservice.New(shopDomain),
 		sceneService:           sceneservice.New(storage.sceneRepo, storage.guildRepo),
+		insightsService:        insightsservice.New(insightsapp.New(storage.profileRepo, storage.insightsRepo)),
 		socialService:          socialservice.New(socialDomain),
 		peerMockService:        peermockservice.New(storage.peerMockRepo),
-		aiMentorService:        adminservice.NewAIMentorImpl(storage.aiMentorRepo),
+		aiMentorService:        adminservice.NewAIMentorImpl(storage.aiMentorRepo).WithKeyVault(mentorKeyVault),
 	}, nil
 }

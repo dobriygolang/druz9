@@ -99,6 +99,61 @@ service ArenaService {
       body: "*"
     };
   }
+
+  // ── ADR-004 — 2v2 lobby formation ─────────────────────────────────────
+  rpc CreateLobby(CreateLobbyRequest) returns (LobbyResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/lobbies"
+      body: "*"
+    };
+  }
+  rpc JoinLobby(JoinLobbyRequest) returns (LobbyResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/lobbies/join"
+      body: "*"
+    };
+  }
+  rpc LeaveLobby(LeaveLobbyRequest) returns (ArenaStatusResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/lobbies/{lobby_id}/leave"
+      body: "*"
+    };
+  }
+  rpc EnqueueLobby(EnqueueLobbyRequest) returns (ArenaStatusResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/lobbies/{lobby_id}/enqueue"
+      body: "*"
+    };
+  }
+}
+
+message ArenaLobby {
+  string id          = 1;
+  string mode        = 2;  // "team_2v2" | "team_3v3"
+  string invite_code = 3;
+  string created_by  = 4;
+  string status      = 5;  // "open" | "queued" | "matched" | "expired"
+  repeated string member_user_ids = 6;
+}
+
+message LobbyResponse {
+  ArenaLobby lobby = 1;
+}
+
+message CreateLobbyRequest {
+  string mode = 1;
+}
+
+message JoinLobbyRequest {
+  string invite_code = 1;
+}
+
+message LeaveLobbyRequest {
+  string lobby_id = 1;
+}
+
+message EnqueueLobbyRequest {
+  string lobby_id = 1;
 }
 
 enum QueueStatus {

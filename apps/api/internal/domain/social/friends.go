@@ -2,6 +2,7 @@ package social
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -21,7 +22,7 @@ func (s *Service) ListFriends(ctx context.Context, userID uuid.UUID, limit, offs
 	}
 	friends, total, online, err := s.repo.ListFriends(ctx, userID, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list friends: %w", err)
 	}
 	if friends == nil {
 		friends = []*model.Friend{}
@@ -33,10 +34,13 @@ func (s *Service) ListFriends(ctx context.Context, userID uuid.UUID, limit, offs
 func (s *Service) RemoveFriend(ctx context.Context, viewerID, otherID uuid.UUID) error {
 	already, err := s.repo.AreFriends(ctx, viewerID, otherID)
 	if err != nil {
-		return err
+		return fmt.Errorf("check friends: %w", err)
 	}
 	if !already {
 		return ErrNotFriends
 	}
-	return s.repo.RemoveFriendship(ctx, viewerID, otherID)
+	if err := s.repo.RemoveFriendship(ctx, viewerID, otherID); err != nil {
+		return fmt.Errorf("remove friendship: %w", err)
+	}
+	return nil
 }

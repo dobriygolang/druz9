@@ -32,6 +32,10 @@ const (
 	ArenaService_EnqueueForMatch_FullMethodName      = "/arena.v1.ArenaService/EnqueueForMatch"
 	ArenaService_GetQueueStatus_FullMethodName       = "/arena.v1.ArenaService/GetQueueStatus"
 	ArenaService_LeaveQueue_FullMethodName           = "/arena.v1.ArenaService/LeaveQueue"
+	ArenaService_CreateLobby_FullMethodName          = "/arena.v1.ArenaService/CreateLobby"
+	ArenaService_JoinLobby_FullMethodName            = "/arena.v1.ArenaService/JoinLobby"
+	ArenaService_LeaveLobby_FullMethodName           = "/arena.v1.ArenaService/LeaveLobby"
+	ArenaService_EnqueueLobby_FullMethodName         = "/arena.v1.ArenaService/EnqueueLobby"
 )
 
 // ArenaServiceClient is the client API for ArenaService service.
@@ -63,6 +67,11 @@ type ArenaServiceClient interface {
 	// On TIMEOUT the client offers the solo-timed fallback UI.
 	GetQueueStatus(ctx context.Context, in *GetQueueStatusRequest, opts ...grpc.CallOption) (*GetQueueStatusResponse, error)
 	LeaveQueue(ctx context.Context, in *LeaveQueueRequest, opts ...grpc.CallOption) (*ArenaStatusResponse, error)
+	// ── ADR-004 — 2v2 lobby formation ─────────────────────────────────────
+	CreateLobby(ctx context.Context, in *CreateLobbyRequest, opts ...grpc.CallOption) (*LobbyResponse, error)
+	JoinLobby(ctx context.Context, in *JoinLobbyRequest, opts ...grpc.CallOption) (*LobbyResponse, error)
+	LeaveLobby(ctx context.Context, in *LeaveLobbyRequest, opts ...grpc.CallOption) (*ArenaStatusResponse, error)
+	EnqueueLobby(ctx context.Context, in *EnqueueLobbyRequest, opts ...grpc.CallOption) (*ArenaStatusResponse, error)
 }
 
 type arenaServiceClient struct {
@@ -203,6 +212,46 @@ func (c *arenaServiceClient) LeaveQueue(ctx context.Context, in *LeaveQueueReque
 	return out, nil
 }
 
+func (c *arenaServiceClient) CreateLobby(ctx context.Context, in *CreateLobbyRequest, opts ...grpc.CallOption) (*LobbyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LobbyResponse)
+	err := c.cc.Invoke(ctx, ArenaService_CreateLobby_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arenaServiceClient) JoinLobby(ctx context.Context, in *JoinLobbyRequest, opts ...grpc.CallOption) (*LobbyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LobbyResponse)
+	err := c.cc.Invoke(ctx, ArenaService_JoinLobby_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arenaServiceClient) LeaveLobby(ctx context.Context, in *LeaveLobbyRequest, opts ...grpc.CallOption) (*ArenaStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ArenaStatusResponse)
+	err := c.cc.Invoke(ctx, ArenaService_LeaveLobby_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arenaServiceClient) EnqueueLobby(ctx context.Context, in *EnqueueLobbyRequest, opts ...grpc.CallOption) (*ArenaStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ArenaStatusResponse)
+	err := c.cc.Invoke(ctx, ArenaService_EnqueueLobby_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArenaServiceServer is the server API for ArenaService service.
 // All implementations must embed UnimplementedArenaServiceServer
 // for forward compatibility.
@@ -232,6 +281,11 @@ type ArenaServiceServer interface {
 	// On TIMEOUT the client offers the solo-timed fallback UI.
 	GetQueueStatus(context.Context, *GetQueueStatusRequest) (*GetQueueStatusResponse, error)
 	LeaveQueue(context.Context, *LeaveQueueRequest) (*ArenaStatusResponse, error)
+	// ── ADR-004 — 2v2 lobby formation ─────────────────────────────────────
+	CreateLobby(context.Context, *CreateLobbyRequest) (*LobbyResponse, error)
+	JoinLobby(context.Context, *JoinLobbyRequest) (*LobbyResponse, error)
+	LeaveLobby(context.Context, *LeaveLobbyRequest) (*ArenaStatusResponse, error)
+	EnqueueLobby(context.Context, *EnqueueLobbyRequest) (*ArenaStatusResponse, error)
 	mustEmbedUnimplementedArenaServiceServer()
 }
 
@@ -280,6 +334,18 @@ func (UnimplementedArenaServiceServer) GetQueueStatus(context.Context, *GetQueue
 }
 func (UnimplementedArenaServiceServer) LeaveQueue(context.Context, *LeaveQueueRequest) (*ArenaStatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method LeaveQueue not implemented")
+}
+func (UnimplementedArenaServiceServer) CreateLobby(context.Context, *CreateLobbyRequest) (*LobbyResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateLobby not implemented")
+}
+func (UnimplementedArenaServiceServer) JoinLobby(context.Context, *JoinLobbyRequest) (*LobbyResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method JoinLobby not implemented")
+}
+func (UnimplementedArenaServiceServer) LeaveLobby(context.Context, *LeaveLobbyRequest) (*ArenaStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method LeaveLobby not implemented")
+}
+func (UnimplementedArenaServiceServer) EnqueueLobby(context.Context, *EnqueueLobbyRequest) (*ArenaStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method EnqueueLobby not implemented")
 }
 func (UnimplementedArenaServiceServer) mustEmbedUnimplementedArenaServiceServer() {}
 func (UnimplementedArenaServiceServer) testEmbeddedByValue()                      {}
@@ -536,6 +602,78 @@ func _ArenaService_LeaveQueue_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArenaService_CreateLobby_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateLobbyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).CreateLobby(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_CreateLobby_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).CreateLobby(ctx, req.(*CreateLobbyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArenaService_JoinLobby_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JoinLobbyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).JoinLobby(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_JoinLobby_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).JoinLobby(ctx, req.(*JoinLobbyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArenaService_LeaveLobby_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LeaveLobbyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).LeaveLobby(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_LeaveLobby_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).LeaveLobby(ctx, req.(*LeaveLobbyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArenaService_EnqueueLobby_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EnqueueLobbyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).EnqueueLobby(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_EnqueueLobby_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).EnqueueLobby(ctx, req.(*EnqueueLobbyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArenaService_ServiceDesc is the grpc.ServiceDesc for ArenaService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -594,6 +732,22 @@ var ArenaService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LeaveQueue",
 			Handler:    _ArenaService_LeaveQueue_Handler,
+		},
+		{
+			MethodName: "CreateLobby",
+			Handler:    _ArenaService_CreateLobby_Handler,
+		},
+		{
+			MethodName: "JoinLobby",
+			Handler:    _ArenaService_JoinLobby_Handler,
+		},
+		{
+			MethodName: "LeaveLobby",
+			Handler:    _ArenaService_LeaveLobby_Handler,
+		},
+		{
+			MethodName: "EnqueueLobby",
+			Handler:    _ArenaService_EnqueueLobby_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

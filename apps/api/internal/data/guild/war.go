@@ -178,7 +178,7 @@ func (r *Repo) ContributeRounds(
         FROM guild_war_fronts WHERE id = $1 FOR UPDATE
     `, frontID).Scan(&f.ID, &f.WarID, &f.Name, &f.OurRounds, &f.TheirRounds, &f.CapturedBy, &f.SortOrder)
 	if err != nil {
-		return nil, false, err
+		return nil, false, fmt.Errorf("scan front: %w", err)
 	}
 	if f.CapturedBy != "" {
 		return &f, false, ErrFrontAlreadyCaptured

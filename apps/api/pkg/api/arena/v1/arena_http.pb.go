@@ -19,14 +19,18 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationArenaServiceCreateLobby = "/arena.v1.ArenaService/CreateLobby"
 const OperationArenaServiceCreateMatch = "/arena.v1.ArenaService/CreateMatch"
 const OperationArenaServiceEnqueueForMatch = "/arena.v1.ArenaService/EnqueueForMatch"
+const OperationArenaServiceEnqueueLobby = "/arena.v1.ArenaService/EnqueueLobby"
 const OperationArenaServiceGetLeaderboard = "/arena.v1.ArenaService/GetLeaderboard"
 const OperationArenaServiceGetMatch = "/arena.v1.ArenaService/GetMatch"
 const OperationArenaServiceGetPlayerStats = "/arena.v1.ArenaService/GetPlayerStats"
 const OperationArenaServiceGetQueueStatus = "/arena.v1.ArenaService/GetQueueStatus"
 const OperationArenaServiceGuildsLeaderboard = "/arena.v1.ArenaService/GuildsLeaderboard"
+const OperationArenaServiceJoinLobby = "/arena.v1.ArenaService/JoinLobby"
 const OperationArenaServiceJoinMatch = "/arena.v1.ArenaService/JoinMatch"
+const OperationArenaServiceLeaveLobby = "/arena.v1.ArenaService/LeaveLobby"
 const OperationArenaServiceLeaveMatch = "/arena.v1.ArenaService/LeaveMatch"
 const OperationArenaServiceLeaveQueue = "/arena.v1.ArenaService/LeaveQueue"
 const OperationArenaServiceReportAntiCheatEvent = "/arena.v1.ArenaService/ReportAntiCheatEvent"
@@ -34,6 +38,8 @@ const OperationArenaServiceSeasonXPLeaderboard = "/arena.v1.ArenaService/SeasonX
 const OperationArenaServiceSubmitCode = "/arena.v1.ArenaService/SubmitCode"
 
 type ArenaServiceHTTPServer interface {
+	// CreateLobby ── ADR-004 — 2v2 lobby formation ─────────────────────────────────────
+	CreateLobby(context.Context, *CreateLobbyRequest) (*LobbyResponse, error)
 	CreateMatch(context.Context, *CreateMatchRequest) (*ArenaMatchResponse, error)
 	// EnqueueForMatch EnqueueForMatch puts the caller into the matchmaking queue for `mode`.
 	// If another player is already waiting, a match is created immediately
@@ -41,6 +47,7 @@ type ArenaServiceHTTPServer interface {
 	// call. Queue state is in-memory per backend instance — fine for a
 	// single-replica deploy, needs Redis for multi-replica.
 	EnqueueForMatch(context.Context, *EnqueueForMatchRequest) (*EnqueueForMatchResponse, error)
+	EnqueueLobby(context.Context, *EnqueueLobbyRequest) (*ArenaStatusResponse, error)
 	GetLeaderboard(context.Context, *GetLeaderboardRequest) (*GetLeaderboardResponse, error)
 	GetMatch(context.Context, *GetMatchRequest) (*ArenaMatchResponse, error)
 	GetPlayerStats(context.Context, *GetPlayerStatsRequest) (*ArenaPlayerStatsResponse, error)
@@ -51,7 +58,9 @@ type ArenaServiceHTTPServer interface {
 	// GuildsLeaderboard GuildsLeaderboard ranks guilds by aggregate wins + member average
 	// rating. Powers the /leaderboards "guilds" tab.
 	GuildsLeaderboard(context.Context, *GuildsLeaderboardRequest) (*GuildsLeaderboardResponse, error)
+	JoinLobby(context.Context, *JoinLobbyRequest) (*LobbyResponse, error)
 	JoinMatch(context.Context, *JoinMatchRequest) (*ArenaMatchResponse, error)
+	LeaveLobby(context.Context, *LeaveLobbyRequest) (*ArenaStatusResponse, error)
 	LeaveMatch(context.Context, *LeaveMatchRequest) (*ArenaMatchResponse, error)
 	LeaveQueue(context.Context, *LeaveQueueRequest) (*ArenaStatusResponse, error)
 	ReportAntiCheatEvent(context.Context, *ReportAntiCheatEventRequest) (*ArenaStatusResponse, error)
@@ -76,6 +85,10 @@ func RegisterArenaServiceHTTPServer(s *http.Server, srv ArenaServiceHTTPServer) 
 	r.POST("/api/v1/arena/queue/enqueue", _ArenaService_EnqueueForMatch0_HTTP_Handler(srv))
 	r.GET("/api/v1/arena/queue/status/{queue_id}", _ArenaService_GetQueueStatus0_HTTP_Handler(srv))
 	r.POST("/api/v1/arena/queue/leave", _ArenaService_LeaveQueue0_HTTP_Handler(srv))
+	r.POST("/api/v1/arena/lobbies", _ArenaService_CreateLobby0_HTTP_Handler(srv))
+	r.POST("/api/v1/arena/lobbies/join", _ArenaService_JoinLobby0_HTTP_Handler(srv))
+	r.POST("/api/v1/arena/lobbies/{lobby_id}/leave", _ArenaService_LeaveLobby0_HTTP_Handler(srv))
+	r.POST("/api/v1/arena/lobbies/{lobby_id}/enqueue", _ArenaService_EnqueueLobby0_HTTP_Handler(srv))
 }
 
 func _ArenaService_CreateMatch0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
@@ -364,7 +377,103 @@ func _ArenaService_LeaveQueue0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx
 	}
 }
 
+func _ArenaService_CreateLobby0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateLobbyRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceCreateLobby)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateLobby(ctx, req.(*CreateLobbyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*LobbyResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ArenaService_JoinLobby0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in JoinLobbyRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceJoinLobby)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.JoinLobby(ctx, req.(*JoinLobbyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*LobbyResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ArenaService_LeaveLobby0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in LeaveLobbyRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceLeaveLobby)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.LeaveLobby(ctx, req.(*LeaveLobbyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ArenaStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ArenaService_EnqueueLobby0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in EnqueueLobbyRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceEnqueueLobby)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.EnqueueLobby(ctx, req.(*EnqueueLobbyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ArenaStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ArenaServiceHTTPClient interface {
+	// CreateLobby ── ADR-004 — 2v2 lobby formation ─────────────────────────────────────
+	CreateLobby(ctx context.Context, req *CreateLobbyRequest, opts ...http.CallOption) (rsp *LobbyResponse, err error)
 	CreateMatch(ctx context.Context, req *CreateMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
 	// EnqueueForMatch EnqueueForMatch puts the caller into the matchmaking queue for `mode`.
 	// If another player is already waiting, a match is created immediately
@@ -372,6 +481,7 @@ type ArenaServiceHTTPClient interface {
 	// call. Queue state is in-memory per backend instance — fine for a
 	// single-replica deploy, needs Redis for multi-replica.
 	EnqueueForMatch(ctx context.Context, req *EnqueueForMatchRequest, opts ...http.CallOption) (rsp *EnqueueForMatchResponse, err error)
+	EnqueueLobby(ctx context.Context, req *EnqueueLobbyRequest, opts ...http.CallOption) (rsp *ArenaStatusResponse, err error)
 	GetLeaderboard(ctx context.Context, req *GetLeaderboardRequest, opts ...http.CallOption) (rsp *GetLeaderboardResponse, err error)
 	GetMatch(ctx context.Context, req *GetMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
 	GetPlayerStats(ctx context.Context, req *GetPlayerStatsRequest, opts ...http.CallOption) (rsp *ArenaPlayerStatsResponse, err error)
@@ -382,7 +492,9 @@ type ArenaServiceHTTPClient interface {
 	// GuildsLeaderboard GuildsLeaderboard ranks guilds by aggregate wins + member average
 	// rating. Powers the /leaderboards "guilds" tab.
 	GuildsLeaderboard(ctx context.Context, req *GuildsLeaderboardRequest, opts ...http.CallOption) (rsp *GuildsLeaderboardResponse, err error)
+	JoinLobby(ctx context.Context, req *JoinLobbyRequest, opts ...http.CallOption) (rsp *LobbyResponse, err error)
 	JoinMatch(ctx context.Context, req *JoinMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
+	LeaveLobby(ctx context.Context, req *LeaveLobbyRequest, opts ...http.CallOption) (rsp *ArenaStatusResponse, err error)
 	LeaveMatch(ctx context.Context, req *LeaveMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
 	LeaveQueue(ctx context.Context, req *LeaveQueueRequest, opts ...http.CallOption) (rsp *ArenaStatusResponse, err error)
 	ReportAntiCheatEvent(ctx context.Context, req *ReportAntiCheatEventRequest, opts ...http.CallOption) (rsp *ArenaStatusResponse, err error)
@@ -398,6 +510,20 @@ type ArenaServiceHTTPClientImpl struct {
 
 func NewArenaServiceHTTPClient(client *http.Client) ArenaServiceHTTPClient {
 	return &ArenaServiceHTTPClientImpl{client}
+}
+
+// CreateLobby ── ADR-004 — 2v2 lobby formation ─────────────────────────────────────
+func (c *ArenaServiceHTTPClientImpl) CreateLobby(ctx context.Context, in *CreateLobbyRequest, opts ...http.CallOption) (*LobbyResponse, error) {
+	var out LobbyResponse
+	pattern := "/api/v1/arena/lobbies"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationArenaServiceCreateLobby))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *ArenaServiceHTTPClientImpl) CreateMatch(ctx context.Context, in *CreateMatchRequest, opts ...http.CallOption) (*ArenaMatchResponse, error) {
@@ -423,6 +549,19 @@ func (c *ArenaServiceHTTPClientImpl) EnqueueForMatch(ctx context.Context, in *En
 	pattern := "/api/v1/arena/queue/enqueue"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationArenaServiceEnqueueForMatch))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ArenaServiceHTTPClientImpl) EnqueueLobby(ctx context.Context, in *EnqueueLobbyRequest, opts ...http.CallOption) (*ArenaStatusResponse, error) {
+	var out ArenaStatusResponse
+	pattern := "/api/v1/arena/lobbies/{lobby_id}/enqueue"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationArenaServiceEnqueueLobby))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -501,11 +640,37 @@ func (c *ArenaServiceHTTPClientImpl) GuildsLeaderboard(ctx context.Context, in *
 	return &out, nil
 }
 
+func (c *ArenaServiceHTTPClientImpl) JoinLobby(ctx context.Context, in *JoinLobbyRequest, opts ...http.CallOption) (*LobbyResponse, error) {
+	var out LobbyResponse
+	pattern := "/api/v1/arena/lobbies/join"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationArenaServiceJoinLobby))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *ArenaServiceHTTPClientImpl) JoinMatch(ctx context.Context, in *JoinMatchRequest, opts ...http.CallOption) (*ArenaMatchResponse, error) {
 	var out ArenaMatchResponse
 	pattern := "/api/v1/arena/matches/{match_id}/join"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationArenaServiceJoinMatch))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ArenaServiceHTTPClientImpl) LeaveLobby(ctx context.Context, in *LeaveLobbyRequest, opts ...http.CallOption) (*ArenaStatusResponse, error) {
+	var out ArenaStatusResponse
+	pattern := "/api/v1/arena/lobbies/{lobby_id}/leave"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationArenaServiceLeaveLobby))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

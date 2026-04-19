@@ -483,7 +483,7 @@ func effectiveExecutionTimeout(ctx context.Context, requested time.Duration) (ti
 	}
 
 	if err := ctx.Err(); err != nil {
-		return 0, err
+		return 0, fmt.Errorf("context already cancelled: %w", err)
 	}
 
 	deadline, ok := ctx.Deadline()
@@ -505,7 +505,7 @@ func buildExecutionEnv(root string, base, extra []string) ([]string, error) {
 	homeDir := filepath.Join(root, ".home")
 	cacheDir, err := sharedGoCacheDir()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get go cache dir: %w", err)
 	}
 	xdgCacheDir := filepath.Join(homeDir, ".cache")
 
