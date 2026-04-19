@@ -43,9 +43,6 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 	if err != nil {
 		return nil, nil, fmt.Errorf("evaluate code: %w", err)
 	}
-	if err != nil {
-		return nil, nil, err
-	}
 
 	submission := &domain.Submission{
 		ID:          uuid.New(),

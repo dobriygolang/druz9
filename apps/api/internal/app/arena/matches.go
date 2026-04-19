@@ -55,7 +55,7 @@ func (s *Service) CreateMatch(ctx context.Context, creator *domain.User, topic s
 		UpdatedAt:   nowTime,
 	}
 
-	match, err := s.repo.CreateMatch(ctx, match, player, task.StarterCode)
+	match, err = s.repo.CreateMatch(ctx, match, player, task.StarterCode)
 	if err != nil {
 		return nil, fmt.Errorf("create match: %w", err)
 	}
@@ -151,7 +151,7 @@ func (s *Service) JoinMatch(ctx context.Context, matchID uuid.UUID, user *domain
 	if match.Task != nil {
 		starterCode = match.Task.StarterCode
 	}
-	match, err := s.repo.JoinMatch(ctx, matchID, player, starterCode)
+	match, err = s.repo.JoinMatch(ctx, matchID, player, starterCode)
 	if err != nil {
 		return nil, fmt.Errorf("join match: %w", err)
 	}

@@ -2,6 +2,7 @@ package arena
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -203,9 +204,17 @@ func (s *Service) observeMatchFinished(match *domain.Match, finishedAt time.Time
 }
 
 func (s *Service) GetActiveSeason(ctx context.Context) (*model.ArenaSeason, error) {
-	return s.repo.GetActiveSeason(ctx)
+	season, err := s.repo.GetActiveSeason(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("get active season: %w", err)
+	}
+	return season, nil
 }
 
 func (s *Service) GetLeaguePosition(ctx context.Context, userID string, rating int32) (int32, int32, error) {
-	return s.repo.GetLeaguePosition(ctx, userID, rating)
+	position, rating, err := s.repo.GetLeaguePosition(ctx, userID, rating)
+	if err != nil {
+		return 0, 0, fmt.Errorf("get league position: %w", err)
+	}
+	return position, rating, nil
 }

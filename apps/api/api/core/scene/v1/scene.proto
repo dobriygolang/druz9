@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package scene.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "api/pkg/api/scene/v1;v1";
+
+// SceneService — ADR-003. Composition layouts for Hero Room (per user) and
+// Guild Hall (per guild). Same model + permissions enforced server-side.
+service SceneService {
+  rpc GetUserRoom(GetUserRoomRequest) returns (SceneLayoutResponse) {
+    option (google.api.http) = { get: "/api/v1/scene/users/{user_id}/room" };
+  }
+
+  rpc UpdateUserRoom(UpdateUserRoomRequest) returns (SceneLayoutResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/scene/users/{user_id}/room"
+      body: "*"
+    };
+  }
+
+  rpc GetGuildHall(GetGuildHallRequest) returns (SceneLayoutResponse) {
+    option (google.api.http) = { get: "/api/v1/scene/guilds/{guild_id}/hall" };
+  }
+
+  rpc UpdateGuildHall(UpdateGuildHallRequest) returns (SceneLayoutResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/scene/guilds/{guild_id}/hall"
+      body: "*"
+    };
+  }
+}
+
+message PlacedItem {
+  // shop_items.id of the cosmetic placed on the canvas.
+  string item_id = 1;
+  double x = 2;
+  double y = 3;
+  // 1.0 = native size. Must be > 0.
+  double scale = 4;
+  double rotation_deg = 5;
+  int32  z_index = 6;
+  bool   flipped = 7;
+}
+
+message SceneLayout {
+  string id = 1;
+  // "user_room" or "guild_hall".
+  string scope = 2;
+  string owner_id = 3;
+  int32  width = 4;
+  int32  height = 5;
+  string background_ref = 6;
+  repeated PlacedItem items = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+message SceneLayoutResponse {
+  SceneLayout layout = 1;
+  // True if the caller is allowed to update this layout. UI uses this to
+  // toggle edit mode without making a separate permission call.
+  bool can_edit = 2;
+}
+
+message GetUserRoomRequest  { string user_id  = 1; }
+message GetGuildHallRequest { string guild_id = 1; }
+
+message UpdateUserRoomRequest {
+  string user_id = 1;
+  int32  width = 2;
+  int32  height = 3;
+  string background_ref = 4;
+  repeated PlacedItem items = 5;
+}
+
+message UpdateGuildHallRequest {
+  string guild_id = 1;
+  int32  width = 2;
+  int32  height = 3;
+  string background_ref = 4;
+  repeated PlacedItem items = 5;
+}

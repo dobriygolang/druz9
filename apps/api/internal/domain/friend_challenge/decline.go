@@ -2,6 +2,7 @@ package friend_challenge
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -13,7 +14,7 @@ import (
 func (s *Service) Decline(ctx context.Context, userID, challengeID uuid.UUID) (*model.FriendChallenge, error) {
 	ch, err := s.repo.GetByID(ctx, challengeID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get challenge: %w", err)
 	}
 	if ch == nil {
 		return nil, ErrChallengeNotFound
@@ -38,7 +39,7 @@ func (s *Service) Decline(ctx context.Context, userID, challengeID uuid.UUID) (*
 	winner := ch.ChallengerID
 	ch.WinnerID = &winner
 	if err := s.repo.Update(ctx, ch); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("update challenge: %w", err)
 	}
 	return ch, nil
 }

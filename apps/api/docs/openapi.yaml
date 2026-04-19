@@ -3692,6 +3692,88 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/referral.v1.ReferralStatusResponse'
+    /api/v1/scene/guilds/{guildId}/hall:
+        get:
+            tags:
+                - SceneService
+            operationId: SceneService_GetGuildHall
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/scene.v1.SceneLayoutResponse'
+        post:
+            tags:
+                - SceneService
+            operationId: SceneService_UpdateGuildHall
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/scene.v1.UpdateGuildHallRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/scene.v1.SceneLayoutResponse'
+    /api/v1/scene/users/{userId}/room:
+        get:
+            tags:
+                - SceneService
+            operationId: SceneService_GetUserRoom
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/scene.v1.SceneLayoutResponse'
+        post:
+            tags:
+                - SceneService
+            operationId: SceneService_UpdateUserRoom
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/scene.v1.UpdateUserRoomRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/scene.v1.SceneLayoutResponse'
     /api/v1/season-pass/active:
         get:
             tags:
@@ -8544,6 +8626,99 @@ components:
                     type: string
                 referral:
                     $ref: '#/components/schemas/referral.v1.ReferralPayload'
+        scene.v1.PlacedItem:
+            type: object
+            properties:
+                itemId:
+                    type: string
+                    description: shop_items.id of the cosmetic placed on the canvas.
+                x:
+                    type: number
+                    format: double
+                y:
+                    type: number
+                    format: double
+                scale:
+                    type: number
+                    description: 1.0 = native size. Must be > 0.
+                    format: double
+                rotationDeg:
+                    type: number
+                    format: double
+                zIndex:
+                    type: integer
+                    format: int32
+                flipped:
+                    type: boolean
+        scene.v1.SceneLayout:
+            type: object
+            properties:
+                id:
+                    type: string
+                scope:
+                    type: string
+                    description: '"user_room" or "guild_hall".'
+                ownerId:
+                    type: string
+                width:
+                    type: integer
+                    format: int32
+                height:
+                    type: integer
+                    format: int32
+                backgroundRef:
+                    type: string
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/scene.v1.PlacedItem'
+                updatedAt:
+                    type: string
+                    format: date-time
+        scene.v1.SceneLayoutResponse:
+            type: object
+            properties:
+                layout:
+                    $ref: '#/components/schemas/scene.v1.SceneLayout'
+                canEdit:
+                    type: boolean
+                    description: |-
+                        True if the caller is allowed to update this layout. UI uses this to
+                         toggle edit mode without making a separate permission call.
+        scene.v1.UpdateGuildHallRequest:
+            type: object
+            properties:
+                guildId:
+                    type: string
+                width:
+                    type: integer
+                    format: int32
+                height:
+                    type: integer
+                    format: int32
+                backgroundRef:
+                    type: string
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/scene.v1.PlacedItem'
+        scene.v1.UpdateUserRoomRequest:
+            type: object
+            properties:
+                userId:
+                    type: string
+                width:
+                    type: integer
+                    format: int32
+                height:
+                    type: integer
+                    format: int32
+                backgroundRef:
+                    type: string
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/scene.v1.PlacedItem'
         season_pass.v1.AdminCreatePassRequest:
             type: object
             properties:
@@ -9552,6 +9727,10 @@ tags:
     - name: PodcastService
     - name: ProfileService
     - name: ReferralService
+    - name: SceneService
+      description: |-
+        SceneService — ADR-003. Composition layouts for Hero Room (per user) and
+         Guild Hall (per guild). Same model + permissions enforced server-side.
     - name: SeasonPassService
       description: |-
         SeasonPassService exposes the current season's tiered-reward track. Each
