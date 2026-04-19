@@ -2350,6 +2350,90 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/guild.v1.GetGuildWarResponse'
+    /api/v1/guilds/war/challenge:
+        post:
+            tags:
+                - GuildService
+            description: SendWarChallenge declares war on another guild by guild ID.
+            operationId: GuildService_SendWarChallenge
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/guild.v1.SendWarChallengeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.SendWarChallengeResponse'
+    /api/v1/guilds/war/challenge/{challengeId}/accept:
+        post:
+            tags:
+                - GuildService
+            description: AcceptWarChallenge starts a war by accepting a pending challenge.
+            operationId: GuildService_AcceptWarChallenge
+            parameters:
+                - name: challengeId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/guild.v1.AcceptWarChallengeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.AcceptWarChallengeResponse'
+    /api/v1/guilds/war/challenge/{challengeId}/decline:
+        post:
+            tags:
+                - GuildService
+            description: DeclineWarChallenge rejects a pending challenge.
+            operationId: GuildService_DeclineWarChallenge
+            parameters:
+                - name: challengeId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/guild.v1.DeclineWarChallengeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.DeclineWarChallengeResponse'
+    /api/v1/guilds/war/challenges/incoming:
+        get:
+            tags:
+                - GuildService
+            description: |-
+                ListIncomingWarChallenges returns pending war challenges directed at
+                 the caller's guild.
+            operationId: GuildService_ListIncomingWarChallenges
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.ListIncomingWarChallengesResponse'
     /api/v1/guilds/war/fronts/{frontId}/contribute:
         post:
             tags:
@@ -2379,6 +2463,69 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/guild.v1.ContributeToFrontResponse'
+    /api/v1/guilds/war/matchmaking:
+        get:
+            tags:
+                - GuildService
+            description: |-
+                GetWarMatchmakingStatus reports whether the guild is currently in the
+                 matchmaking queue.
+            operationId: GuildService_GetWarMatchmakingStatus
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.GetWarMatchmakingStatusResponse'
+        post:
+            tags:
+                - GuildService
+            description: |-
+                JoinWarMatchmaking enters the guild into the war matchmaking queue.
+                 Returns immediately with status "queued" or "matched" (if a partner
+                 was found right away).
+            operationId: GuildService_JoinWarMatchmaking
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/guild.v1.JoinWarMatchmakingRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.JoinWarMatchmakingResponse'
+        delete:
+            tags:
+                - GuildService
+            description: LeaveWarMatchmaking removes the guild from the matchmaking queue.
+            operationId: GuildService_LeaveWarMatchmaking
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.LeaveWarMatchmakingResponse'
+    /api/v1/guilds/war/quota:
+        get:
+            tags:
+                - GuildService
+            description: |-
+                GetWarQuota returns the number of front contributions the caller has
+                 made today and the daily cap (used by the energy bar in the UI).
+            operationId: GuildService_GetWarQuota
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.GetWarQuotaResponse'
     /api/v1/guilds/{guildId}:
         delete:
             tags:
@@ -6666,6 +6813,18 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/geo.v1.WorldPin'
+        guild.v1.AcceptWarChallengeRequest:
+            type: object
+            properties:
+                challengeId:
+                    type: string
+        guild.v1.AcceptWarChallengeResponse:
+            type: object
+            properties:
+                warId:
+                    type: string
+                status:
+                    type: string
         guild.v1.ChallengeMemberProgress:
             type: object
             properties:
@@ -6745,6 +6904,16 @@ components:
                         type: string
                 isPublic:
                     type: boolean
+        guild.v1.DeclineWarChallengeRequest:
+            type: object
+            properties:
+                challengeId:
+                    type: string
+        guild.v1.DeclineWarChallengeResponse:
+            type: object
+            properties:
+                status:
+                    type: string
         guild.v1.DeleteGuildResponse:
             type: object
             properties:
@@ -6791,6 +6960,22 @@ components:
                 role:
                     type: integer
                     format: enum
+        guild.v1.GetWarMatchmakingStatusResponse:
+            type: object
+            properties:
+                inQueue:
+                    type: boolean
+                joinedAt:
+                    type: string
+        guild.v1.GetWarQuotaResponse:
+            type: object
+            properties:
+                used:
+                    type: integer
+                    format: int32
+                limit:
+                    type: integer
+                    format: int32
         guild.v1.Guild:
             type: object
             properties:
@@ -7061,6 +7246,16 @@ components:
                 status:
                     type: integer
                     format: enum
+        guild.v1.JoinWarMatchmakingRequest:
+            type: object
+            properties: {}
+        guild.v1.JoinWarMatchmakingResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+                warId:
+                    type: string
         guild.v1.LeaveGuildRequest:
             type: object
             properties:
@@ -7072,6 +7267,11 @@ components:
                 status:
                     type: integer
                     format: enum
+        guild.v1.LeaveWarMatchmakingResponse:
+            type: object
+            properties:
+                status:
+                    type: string
         guild.v1.ListGuildEventsResponse:
             type: object
             properties:
@@ -7096,6 +7296,13 @@ components:
                 totalCount:
                     type: integer
                     format: int32
+        guild.v1.ListIncomingWarChallengesResponse:
+            type: object
+            properties:
+                challenges:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/guild.v1.WarChallengeItem'
         guild.v1.ListTerritoriesResponse:
             type: object
             properties:
@@ -7103,6 +7310,18 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/guild.v1.GuildTerritory'
+        guild.v1.SendWarChallengeRequest:
+            type: object
+            properties:
+                toGuildId:
+                    type: string
+        guild.v1.SendWarChallengeResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                status:
+                    type: string
         guild.v1.SetMemberRoleRequest:
             type: object
             properties:
@@ -7135,6 +7354,17 @@ components:
             properties:
                 guild:
                     $ref: '#/components/schemas/guild.v1.Guild'
+        guild.v1.WarChallengeItem:
+            type: object
+            properties:
+                id:
+                    type: string
+                fromGuildId:
+                    type: string
+                fromName:
+                    type: string
+                expiresAt:
+                    type: string
         hub.v1.GetOverviewResponse:
             type: object
             properties:

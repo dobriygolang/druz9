@@ -548,7 +548,7 @@ func (r *Repo) GetAnyActiveMockSessionByUser(ctx context.Context, userID uuid.UU
 	session, err := scanMockSession(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, nil //nolint:nilnil // no active session is valid state
 		}
 		return nil, fmt.Errorf("get any active mock session: %w", err)
 	}
@@ -593,7 +593,7 @@ func (r *Repo) GetActiveMockSessionByUserAndCompany(ctx context.Context, userID 
 	session, err := scanMockSession(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, nil //nolint:nilnil // no active session is valid state
 		}
 		return nil, fmt.Errorf("get active mock session: %w", err)
 	}

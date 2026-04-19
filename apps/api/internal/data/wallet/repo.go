@@ -14,6 +14,8 @@ import (
 	"api/internal/storage/postgres"
 )
 
+const colGold = "gold"
+
 type Repo struct {
 	data *postgres.Store
 	log  *log.Helper
@@ -113,15 +115,15 @@ func (r *Repo) ChangeBalance(
 func columnFor(c walletdomain.Currency) string {
 	switch c {
 	case walletdomain.CurrencyUnspecified:
-		return "gold"
+		return colGold
 	case walletdomain.CurrencyGold:
-		return "gold"
+		return colGold
 	case walletdomain.CurrencyGems:
 		return "gems"
 	case walletdomain.CurrencyShards:
 		return "shards"
 	}
-	return "gold" // unreachable due to validation upstream
+	return colGold // unreachable due to validation upstream
 }
 
 func nullIfEmpty(s string) any {

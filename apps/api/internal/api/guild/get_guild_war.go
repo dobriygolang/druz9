@@ -128,5 +128,5 @@ func (i *Implementation) myGuild(ctx context.Context, _ interface{}) (*model.Gui
 			return g, nil
 		}
 	}
-	return nil, nil
+	return nil, nil //nolint:nilnil // no joined guild is valid state, caller checks both values
 }

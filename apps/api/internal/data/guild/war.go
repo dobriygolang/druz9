@@ -284,17 +284,19 @@ func IsNoRows(err error) bool { return errors.Is(err, pgx.ErrNoRows) }
 // ── War declaration ────────────────────────────────────────────────────────
 
 type ChallengeRow struct {
-	ID           uuid.UUID
-	FromGuildID  uuid.UUID
-	FromName     string
-	ToGuildID    uuid.UUID
-	Status       string // pending | accepted | declined | expired
-	CreatedAt    time.Time
-	ExpiresAt    time.Time
+	ID          uuid.UUID
+	FromGuildID uuid.UUID
+	FromName    string
+	ToGuildID   uuid.UUID
+	Status      string // pending | accepted | declined | expired
+	CreatedAt   time.Time
+	ExpiresAt   time.Time
 }
 
-var ErrChallengeNotFound = errors.New("guild_war: challenge not found")
-var ErrAlreadyAtWar      = errors.New("guild_war: guild already has an active war")
+var (
+	ErrChallengeNotFound = errors.New("guild_war: challenge not found")
+	ErrAlreadyAtWar      = errors.New("guild_war: guild already has an active war")
+)
 
 // SendChallenge inserts a new pending challenge from fromGuildID to toGuildID.
 // Returns ErrAlreadyAtWar if either guild is already in an active war.

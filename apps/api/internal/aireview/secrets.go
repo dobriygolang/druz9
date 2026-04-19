@@ -41,7 +41,7 @@ func NewKeyVaultFromEnv() (*KeyVault, error) {
 		return nil, fmt.Errorf("ai_mentor key vault: %w", err)
 	}
 	if raw == "" {
-		return nil, nil
+		return nil, nil //nolint:nilnil // empty key means optional vault, nil vault is valid
 	}
 	keyBytes, err := decodeMasterKey(raw)
 	if err != nil {

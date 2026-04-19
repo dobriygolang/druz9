@@ -2,14 +2,11 @@ package guild
 
 import (
 	"context"
-	"encoding/json"
 	goerr "errors"
 	"fmt"
-	"net/http"
 
 	kerrs "github.com/go-kratos/kratos/v2/errors"
 	klog "github.com/go-kratos/kratos/v2/log"
-	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"api/internal/apihelpers"
@@ -150,43 +147,28 @@ func (i *Implementation) ListTerritories(ctx context.Context, req *v1.ListTerrit
 	return &v1.ListTerritoriesResponse{Territories: out}, nil
 }
 
-// GetWarQuota is a plain JSON endpoint (not a proto RPC) that returns
-// how many war-front contributions the calling user has made today and
-// what the daily limit is. Used by the frontend energy bar.
-func (i *Implementation) GetWarQuota(ctx kratoshttp.Context) error {
-	stdCtx := ctx.Request().Context()
-	user, err := apihelpers.RequireUser(stdCtx)
+// GetWarQuota returns how many war-front contributions the caller has made today and the daily limit.
+func (i *Implementation) GetWarQuota(ctx context.Context, _ *v1.GetWarQuotaRequest) (*v1.GetWarQuotaResponse, error) {
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		ctx.Response().Header().Set("Content-Type", "application/json")
-		ctx.Response().WriteHeader(http.StatusUnauthorized)
-		_ = json.NewEncoder(ctx.Response()).Encode(map[string]string{"code": "UNAUTHORIZED", "message": "authentication required"})
-		return nil
+		return nil, kerrs.Unauthorized("UNAUTHORIZED", "authentication required")
 	}
 	if i.warRepo == nil {
-		writeWarQuota(ctx, 0, int(guilddata.DailyContributionLimit))
-		return nil
+		return &v1.GetWarQuotaResponse{Used: 0, Limit: int32(guilddata.DailyContributionLimit)}, nil
 	}
-	war, _, err := i.ensureActiveWar(stdCtx, user.ID)
+	war, _, err := i.ensureActiveWar(ctx, user.ID)
 	if err != nil || war == nil {
-		writeWarQuota(ctx, 0, int(guilddata.DailyContributionLimit))
-		return nil
+		return &v1.GetWarQuotaResponse{Used: 0, Limit: int32(guilddata.DailyContributionLimit)}, nil //nolint:nilerr // no active war is valid
 	}
-	count, err := i.warRepo.CountUserTodayContributions(stdCtx, user.ID, war.ID)
+	count, err := i.warRepo.CountUserTodayContributions(ctx, user.ID, war.ID)
 	if err != nil {
 		klog.Errorf("guild_war: count today contributions user=%s: %v", user.ID, err)
 		count = 0
 	}
-	writeWarQuota(ctx, int(count), int(guilddata.DailyContributionLimit))
-	return nil
-}
-
-func writeWarQuota(ctx kratoshttp.Context, used, limit int) {
-	ctx.Response().Header().Set("Content-Type", "application/json")
-	ctx.Response().WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(ctx.Response()).Encode(map[string]int{
-		"used":  used,
-		"limit": limit,
-	})
+	return &v1.GetWarQuotaResponse{
+		Used:  int32(count),
+		Limit: int32(guilddata.DailyContributionLimit),
+	}, nil
 }
 
 func mapFrontRow(f *guilddata.FrontRow) *v1.GuildWarFront {

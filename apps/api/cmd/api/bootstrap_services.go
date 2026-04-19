@@ -7,8 +7,6 @@ import (
 
 	"api/internal/aireview"
 	adminservice "api/internal/api/admin"
-	premiumapi "api/internal/api/premium"
-	"api/internal/boosty"
 	arenaservice "api/internal/api/arena"
 	challengeservice "api/internal/api/challenge"
 	codeeditorservice "api/internal/api/code_editor"
@@ -25,6 +23,7 @@ import (
 	notificationservice "api/internal/api/notification"
 	peermockservice "api/internal/api/peer_mock"
 	podcastservice "api/internal/api/podcast"
+	premiumapi "api/internal/api/premium"
 	profileservice "api/internal/api/profile"
 	referralservice "api/internal/api/referral"
 	sceneservice "api/internal/api/scene"
@@ -39,6 +38,7 @@ import (
 	insightsapp "api/internal/app/insights"
 	appinterviewprep "api/internal/app/interviewprep"
 	"api/internal/app/solutionreview"
+	"api/internal/boosty"
 	"api/internal/clients/notification"
 	"api/internal/closer"
 	admindomainservice "api/internal/domain/admin"
@@ -329,8 +329,8 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		insightsService:        insightsservice.New(insightsapp.New(storage.profileRepo, storage.insightsRepo)),
 		socialService:          socialservice.New(socialDomain),
 		peerMockService:        peermockservice.New(storage.peerMockRepo),
-		aiMentorService: adminservice.NewAIMentorImpl(storage.aiMentorRepo).WithKeyVault(mentorKeyVault),
-		premiumHandler:  newPremiumHandler(bootstrap, storage),
+		aiMentorService:        adminservice.NewAIMentorImpl(storage.aiMentorRepo).WithKeyVault(mentorKeyVault),
+		premiumHandler:         newPremiumHandler(bootstrap, storage),
 	}, nil
 }
 

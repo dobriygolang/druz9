@@ -36,7 +36,7 @@ func (s *Service) GetTask(ctx context.Context, taskID uuid.UUID) (*domain.Task, 
 		return nil, fmt.Errorf("get task: %w", err)
 	}
 	if task == nil {
-		return nil, nil
+		return nil, nil //nolint:nilnil // task not found is valid state
 	}
 	s.taskCache.Set(cacheKey, *task)
 	return task, nil

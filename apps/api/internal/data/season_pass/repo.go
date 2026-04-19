@@ -15,8 +15,8 @@ import (
 )
 
 var (
-	ErrTierNotFound   = errors.New("season pass tier not found")
-	ErrNoActivePass   = errors.New("no active season pass")
+	ErrTierNotFound = errors.New("season pass tier not found")
+	ErrNoActivePass = errors.New("no active season pass")
 )
 
 type Repo struct {

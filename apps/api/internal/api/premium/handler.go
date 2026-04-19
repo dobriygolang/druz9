@@ -33,6 +33,7 @@ func (h *Handler) BoostyClient() *boosty.Client {
 func writeJSON(ctx kratoshttp.Context, status int, v any) {
 	ctx.Response().Header().Set("Content-Type", "application/json")
 	ctx.Response().WriteHeader(status)
+	//nolint:errchkjson // encoding error after response started cannot be handled
 	_ = json.NewEncoder(ctx.Response()).Encode(v)
 }
 
@@ -45,7 +46,7 @@ func (h *Handler) GetStatus(ctx kratoshttp.Context) error {
 	user, err := apihelpers.RequireUser(ctx.Request().Context())
 	if err != nil {
 		writeErr(ctx, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
-		return nil
+		return nil //nolint:nilerr // error written to response
 	}
 
 	row, err := h.repo.Get(ctx.Request().Context(), user.ID)
@@ -60,7 +61,7 @@ func (h *Handler) GetStatus(ctx kratoshttp.Context) error {
 	}
 	if err != nil {
 		writeErr(ctx, http.StatusInternalServerError, "INTERNAL", "failed to load status")
-		return nil
+		return nil //nolint:nilerr // error written to response
 	}
 
 	writeJSON(ctx, http.StatusOK, map[string]any{
@@ -78,7 +79,7 @@ func (h *Handler) LinkBoosty(ctx kratoshttp.Context) error {
 	user, err := apihelpers.RequireUser(ctx.Request().Context())
 	if err != nil {
 		writeErr(ctx, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
-		return nil
+		return nil //nolint:nilerr // error written to response
 	}
 
 	if h.client == nil {
@@ -91,7 +92,7 @@ func (h *Handler) LinkBoosty(ctx kratoshttp.Context) error {
 	}
 	if err := json.NewDecoder(ctx.Request().Body).Decode(&body); err != nil || body.Email == "" {
 		writeErr(ctx, http.StatusBadRequest, "BAD_REQUEST", "email required")
-		return nil
+		return nil //nolint:nilerr // error written to response
 	}
 
 	info, err := h.client.CheckSubscriber(ctx.Request().Context(), body.Email)
@@ -147,13 +148,13 @@ func (h *Handler) UnlinkBoosty(ctx kratoshttp.Context) error {
 	user, err := apihelpers.RequireUser(ctx.Request().Context())
 	if err != nil {
 		writeErr(ctx, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
-		return nil
+		return nil //nolint:nilerr // error written to response
 	}
 
 	if err := h.repo.Delete(ctx.Request().Context(), user.ID); err != nil {
 		klog.Errorf("premium: unlink: %v", err)
 		writeErr(ctx, http.StatusInternalServerError, "INTERNAL", "failed to unlink")
-		return nil
+		return nil //nolint:nilerr // error written to response
 	}
 
 	writeJSON(ctx, http.StatusOK, map[string]string{"status": "unlinked"})

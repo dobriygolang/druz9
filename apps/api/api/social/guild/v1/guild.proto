@@ -90,6 +90,65 @@ service GuildService {
     option (google.api.http) = { get: "/api/v1/guilds/war" };
   }
 
+  // GetWarQuota returns the number of front contributions the caller has
+  // made today and the daily cap (used by the energy bar in the UI).
+  rpc GetWarQuota(GetWarQuotaRequest) returns (GetWarQuotaResponse) {
+    option (google.api.http) = { get: "/api/v1/guilds/war/quota" };
+  }
+
+  // SendWarChallenge declares war on another guild by guild ID.
+  rpc SendWarChallenge(SendWarChallengeRequest) returns (SendWarChallengeResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/guilds/war/challenge"
+      body: "*"
+    };
+  }
+
+  // ListIncomingWarChallenges returns pending war challenges directed at
+  // the caller's guild.
+  rpc ListIncomingWarChallenges(ListIncomingWarChallengesRequest) returns (ListIncomingWarChallengesResponse) {
+    option (google.api.http) = { get: "/api/v1/guilds/war/challenges/incoming" };
+  }
+
+  // AcceptWarChallenge starts a war by accepting a pending challenge.
+  rpc AcceptWarChallenge(AcceptWarChallengeRequest) returns (AcceptWarChallengeResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/guilds/war/challenge/{challenge_id}/accept"
+      body: "*"
+    };
+  }
+
+  // DeclineWarChallenge rejects a pending challenge.
+  rpc DeclineWarChallenge(DeclineWarChallengeRequest) returns (DeclineWarChallengeResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/guilds/war/challenge/{challenge_id}/decline"
+      body: "*"
+    };
+  }
+
+  // JoinWarMatchmaking enters the guild into the war matchmaking queue.
+  // Returns immediately with status "queued" or "matched" (if a partner
+  // was found right away).
+  rpc JoinWarMatchmaking(JoinWarMatchmakingRequest) returns (JoinWarMatchmakingResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/guilds/war/matchmaking"
+      body: "*"
+    };
+  }
+
+  // LeaveWarMatchmaking removes the guild from the matchmaking queue.
+  rpc LeaveWarMatchmaking(LeaveWarMatchmakingRequest) returns (LeaveWarMatchmakingResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/guilds/war/matchmaking"
+    };
+  }
+
+  // GetWarMatchmakingStatus reports whether the guild is currently in the
+  // matchmaking queue.
+  rpc GetWarMatchmakingStatus(GetWarMatchmakingStatusRequest) returns (GetWarMatchmakingStatusResponse) {
+    option (google.api.http) = { get: "/api/v1/guilds/war/matchmaking" };
+  }
+
   // ContributeToFront adds rounds to a front's our_rounds counter. The
   // caller must be a member of the war's owning guild; the backend
   // records the contribution for later MVP queries. When a front's
@@ -449,3 +508,42 @@ message SetMemberRoleRequest {
 message SetMemberRoleResponse {
   GuildMemberRole role = 1;
 }
+
+// ── War quota ──────────────────────────────────────────────────────────────
+
+message GetWarQuotaRequest {}
+message GetWarQuotaResponse {
+  int32 used  = 1;
+  int32 limit = 2;
+}
+
+// ── War challenge declarations ─────────────────────────────────────────────
+
+message SendWarChallengeRequest  { string to_guild_id = 1; }
+message SendWarChallengeResponse { string id = 1; string status = 2; }
+
+message WarChallengeItem {
+  string id           = 1;
+  string from_guild_id = 2;
+  string from_name    = 3;
+  string expires_at   = 4;
+}
+message ListIncomingWarChallengesRequest  {}
+message ListIncomingWarChallengesResponse { repeated WarChallengeItem challenges = 1; }
+
+message AcceptWarChallengeRequest  { string challenge_id = 1; }
+message AcceptWarChallengeResponse { string war_id = 1; string status = 2; }
+
+message DeclineWarChallengeRequest  { string challenge_id = 1; }
+message DeclineWarChallengeResponse { string status = 1; }
+
+// ── War matchmaking ────────────────────────────────────────────────────────
+
+message JoinWarMatchmakingRequest  {}
+message JoinWarMatchmakingResponse { string status = 1; string war_id = 2; }
+
+message LeaveWarMatchmakingRequest  {}
+message LeaveWarMatchmakingResponse { string status = 1; }
+
+message GetWarMatchmakingStatusRequest  {}
+message GetWarMatchmakingStatusResponse { bool in_queue = 1; string joined_at = 2; }

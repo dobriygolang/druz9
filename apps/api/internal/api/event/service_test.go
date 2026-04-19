@@ -471,6 +471,7 @@ func (m *MockService) ListEvents(ctx context.Context, userID uuid.UUID, opts mod
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
+	//nolint:forcetypeassert // mock returns controlled types
 	return args.Get(0).(*model.ListEventsResponse), args.Error(1)
 }
 
@@ -479,6 +480,7 @@ func (m *MockService) CreateEvent(ctx context.Context, userID uuid.UUID, isAdmin
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
+	//nolint:forcetypeassert // mock returns controlled types
 	return args.Get(0).(*model.Event), args.Error(1)
 }
 
@@ -487,6 +489,7 @@ func (m *MockService) JoinEvent(ctx context.Context, eventID, userID uuid.UUID) 
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
+	//nolint:forcetypeassert // mock returns controlled types
 	return args.Get(0).(*model.Event), args.Error(1)
 }
 

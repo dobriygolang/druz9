@@ -19,25 +19,33 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	GuildService_ListGuilds_FullMethodName              = "/guild.v1.GuildService/ListGuilds"
-	GuildService_CreateGuild_FullMethodName             = "/guild.v1.GuildService/CreateGuild"
-	GuildService_JoinGuild_FullMethodName               = "/guild.v1.GuildService/JoinGuild"
-	GuildService_LeaveGuild_FullMethodName              = "/guild.v1.GuildService/LeaveGuild"
-	GuildService_InviteToGuild_FullMethodName           = "/guild.v1.GuildService/InviteToGuild"
-	GuildService_ListGuildMembers_FullMethodName        = "/guild.v1.GuildService/ListGuildMembers"
-	GuildService_ListGuildEvents_FullMethodName         = "/guild.v1.GuildService/ListGuildEvents"
-	GuildService_CreateGuildEvent_FullMethodName        = "/guild.v1.GuildService/CreateGuildEvent"
-	GuildService_DeleteGuild_FullMethodName             = "/guild.v1.GuildService/DeleteGuild"
-	GuildService_GetGuildPulse_FullMethodName           = "/guild.v1.GuildService/GetGuildPulse"
-	GuildService_GetGuildMemberStats_FullMethodName     = "/guild.v1.GuildService/GetGuildMemberStats"
-	GuildService_GetActiveGuildChallenge_FullMethodName = "/guild.v1.GuildService/GetActiveGuildChallenge"
-	GuildService_CreateGuildChallenge_FullMethodName    = "/guild.v1.GuildService/CreateGuildChallenge"
-	GuildService_GetGuildWar_FullMethodName             = "/guild.v1.GuildService/GetGuildWar"
-	GuildService_ContributeToFront_FullMethodName       = "/guild.v1.GuildService/ContributeToFront"
-	GuildService_ListTerritories_FullMethodName         = "/guild.v1.GuildService/ListTerritories"
-	GuildService_GetMyGuildRole_FullMethodName          = "/guild.v1.GuildService/GetMyGuildRole"
-	GuildService_UpdateGuildSettings_FullMethodName     = "/guild.v1.GuildService/UpdateGuildSettings"
-	GuildService_SetMemberRole_FullMethodName           = "/guild.v1.GuildService/SetMemberRole"
+	GuildService_ListGuilds_FullMethodName                = "/guild.v1.GuildService/ListGuilds"
+	GuildService_CreateGuild_FullMethodName               = "/guild.v1.GuildService/CreateGuild"
+	GuildService_JoinGuild_FullMethodName                 = "/guild.v1.GuildService/JoinGuild"
+	GuildService_LeaveGuild_FullMethodName                = "/guild.v1.GuildService/LeaveGuild"
+	GuildService_InviteToGuild_FullMethodName             = "/guild.v1.GuildService/InviteToGuild"
+	GuildService_ListGuildMembers_FullMethodName          = "/guild.v1.GuildService/ListGuildMembers"
+	GuildService_ListGuildEvents_FullMethodName           = "/guild.v1.GuildService/ListGuildEvents"
+	GuildService_CreateGuildEvent_FullMethodName          = "/guild.v1.GuildService/CreateGuildEvent"
+	GuildService_DeleteGuild_FullMethodName               = "/guild.v1.GuildService/DeleteGuild"
+	GuildService_GetGuildPulse_FullMethodName             = "/guild.v1.GuildService/GetGuildPulse"
+	GuildService_GetGuildMemberStats_FullMethodName       = "/guild.v1.GuildService/GetGuildMemberStats"
+	GuildService_GetActiveGuildChallenge_FullMethodName   = "/guild.v1.GuildService/GetActiveGuildChallenge"
+	GuildService_CreateGuildChallenge_FullMethodName      = "/guild.v1.GuildService/CreateGuildChallenge"
+	GuildService_GetGuildWar_FullMethodName               = "/guild.v1.GuildService/GetGuildWar"
+	GuildService_GetWarQuota_FullMethodName               = "/guild.v1.GuildService/GetWarQuota"
+	GuildService_SendWarChallenge_FullMethodName          = "/guild.v1.GuildService/SendWarChallenge"
+	GuildService_ListIncomingWarChallenges_FullMethodName = "/guild.v1.GuildService/ListIncomingWarChallenges"
+	GuildService_AcceptWarChallenge_FullMethodName        = "/guild.v1.GuildService/AcceptWarChallenge"
+	GuildService_DeclineWarChallenge_FullMethodName       = "/guild.v1.GuildService/DeclineWarChallenge"
+	GuildService_JoinWarMatchmaking_FullMethodName        = "/guild.v1.GuildService/JoinWarMatchmaking"
+	GuildService_LeaveWarMatchmaking_FullMethodName       = "/guild.v1.GuildService/LeaveWarMatchmaking"
+	GuildService_GetWarMatchmakingStatus_FullMethodName   = "/guild.v1.GuildService/GetWarMatchmakingStatus"
+	GuildService_ContributeToFront_FullMethodName         = "/guild.v1.GuildService/ContributeToFront"
+	GuildService_ListTerritories_FullMethodName           = "/guild.v1.GuildService/ListTerritories"
+	GuildService_GetMyGuildRole_FullMethodName            = "/guild.v1.GuildService/GetMyGuildRole"
+	GuildService_UpdateGuildSettings_FullMethodName       = "/guild.v1.GuildService/UpdateGuildSettings"
+	GuildService_SetMemberRole_FullMethodName             = "/guild.v1.GuildService/SetMemberRole"
 )
 
 // GuildServiceClient is the client API for GuildService service.
@@ -62,6 +70,27 @@ type GuildServiceClient interface {
 	// nil war field so the client can render a "no active war" state rather
 	// than 404.
 	GetGuildWar(ctx context.Context, in *GetGuildWarRequest, opts ...grpc.CallOption) (*GetGuildWarResponse, error)
+	// GetWarQuota returns the number of front contributions the caller has
+	// made today and the daily cap (used by the energy bar in the UI).
+	GetWarQuota(ctx context.Context, in *GetWarQuotaRequest, opts ...grpc.CallOption) (*GetWarQuotaResponse, error)
+	// SendWarChallenge declares war on another guild by guild ID.
+	SendWarChallenge(ctx context.Context, in *SendWarChallengeRequest, opts ...grpc.CallOption) (*SendWarChallengeResponse, error)
+	// ListIncomingWarChallenges returns pending war challenges directed at
+	// the caller's guild.
+	ListIncomingWarChallenges(ctx context.Context, in *ListIncomingWarChallengesRequest, opts ...grpc.CallOption) (*ListIncomingWarChallengesResponse, error)
+	// AcceptWarChallenge starts a war by accepting a pending challenge.
+	AcceptWarChallenge(ctx context.Context, in *AcceptWarChallengeRequest, opts ...grpc.CallOption) (*AcceptWarChallengeResponse, error)
+	// DeclineWarChallenge rejects a pending challenge.
+	DeclineWarChallenge(ctx context.Context, in *DeclineWarChallengeRequest, opts ...grpc.CallOption) (*DeclineWarChallengeResponse, error)
+	// JoinWarMatchmaking enters the guild into the war matchmaking queue.
+	// Returns immediately with status "queued" or "matched" (if a partner
+	// was found right away).
+	JoinWarMatchmaking(ctx context.Context, in *JoinWarMatchmakingRequest, opts ...grpc.CallOption) (*JoinWarMatchmakingResponse, error)
+	// LeaveWarMatchmaking removes the guild from the matchmaking queue.
+	LeaveWarMatchmaking(ctx context.Context, in *LeaveWarMatchmakingRequest, opts ...grpc.CallOption) (*LeaveWarMatchmakingResponse, error)
+	// GetWarMatchmakingStatus reports whether the guild is currently in the
+	// matchmaking queue.
+	GetWarMatchmakingStatus(ctx context.Context, in *GetWarMatchmakingStatusRequest, opts ...grpc.CallOption) (*GetWarMatchmakingStatusResponse, error)
 	// ContributeToFront adds rounds to a front's our_rounds counter. The
 	// caller must be a member of the war's owning guild; the backend
 	// records the contribution for later MVP queries. When a front's
@@ -224,6 +253,86 @@ func (c *guildServiceClient) GetGuildWar(ctx context.Context, in *GetGuildWarReq
 	return out, nil
 }
 
+func (c *guildServiceClient) GetWarQuota(ctx context.Context, in *GetWarQuotaRequest, opts ...grpc.CallOption) (*GetWarQuotaResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetWarQuotaResponse)
+	err := c.cc.Invoke(ctx, GuildService_GetWarQuota_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *guildServiceClient) SendWarChallenge(ctx context.Context, in *SendWarChallengeRequest, opts ...grpc.CallOption) (*SendWarChallengeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SendWarChallengeResponse)
+	err := c.cc.Invoke(ctx, GuildService_SendWarChallenge_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *guildServiceClient) ListIncomingWarChallenges(ctx context.Context, in *ListIncomingWarChallengesRequest, opts ...grpc.CallOption) (*ListIncomingWarChallengesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListIncomingWarChallengesResponse)
+	err := c.cc.Invoke(ctx, GuildService_ListIncomingWarChallenges_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *guildServiceClient) AcceptWarChallenge(ctx context.Context, in *AcceptWarChallengeRequest, opts ...grpc.CallOption) (*AcceptWarChallengeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AcceptWarChallengeResponse)
+	err := c.cc.Invoke(ctx, GuildService_AcceptWarChallenge_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *guildServiceClient) DeclineWarChallenge(ctx context.Context, in *DeclineWarChallengeRequest, opts ...grpc.CallOption) (*DeclineWarChallengeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeclineWarChallengeResponse)
+	err := c.cc.Invoke(ctx, GuildService_DeclineWarChallenge_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *guildServiceClient) JoinWarMatchmaking(ctx context.Context, in *JoinWarMatchmakingRequest, opts ...grpc.CallOption) (*JoinWarMatchmakingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(JoinWarMatchmakingResponse)
+	err := c.cc.Invoke(ctx, GuildService_JoinWarMatchmaking_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *guildServiceClient) LeaveWarMatchmaking(ctx context.Context, in *LeaveWarMatchmakingRequest, opts ...grpc.CallOption) (*LeaveWarMatchmakingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LeaveWarMatchmakingResponse)
+	err := c.cc.Invoke(ctx, GuildService_LeaveWarMatchmaking_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *guildServiceClient) GetWarMatchmakingStatus(ctx context.Context, in *GetWarMatchmakingStatusRequest, opts ...grpc.CallOption) (*GetWarMatchmakingStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetWarMatchmakingStatusResponse)
+	err := c.cc.Invoke(ctx, GuildService_GetWarMatchmakingStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *guildServiceClient) ContributeToFront(ctx context.Context, in *ContributeToFrontRequest, opts ...grpc.CallOption) (*ContributeToFrontResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ContributeToFrontResponse)
@@ -296,6 +405,27 @@ type GuildServiceServer interface {
 	// nil war field so the client can render a "no active war" state rather
 	// than 404.
 	GetGuildWar(context.Context, *GetGuildWarRequest) (*GetGuildWarResponse, error)
+	// GetWarQuota returns the number of front contributions the caller has
+	// made today and the daily cap (used by the energy bar in the UI).
+	GetWarQuota(context.Context, *GetWarQuotaRequest) (*GetWarQuotaResponse, error)
+	// SendWarChallenge declares war on another guild by guild ID.
+	SendWarChallenge(context.Context, *SendWarChallengeRequest) (*SendWarChallengeResponse, error)
+	// ListIncomingWarChallenges returns pending war challenges directed at
+	// the caller's guild.
+	ListIncomingWarChallenges(context.Context, *ListIncomingWarChallengesRequest) (*ListIncomingWarChallengesResponse, error)
+	// AcceptWarChallenge starts a war by accepting a pending challenge.
+	AcceptWarChallenge(context.Context, *AcceptWarChallengeRequest) (*AcceptWarChallengeResponse, error)
+	// DeclineWarChallenge rejects a pending challenge.
+	DeclineWarChallenge(context.Context, *DeclineWarChallengeRequest) (*DeclineWarChallengeResponse, error)
+	// JoinWarMatchmaking enters the guild into the war matchmaking queue.
+	// Returns immediately with status "queued" or "matched" (if a partner
+	// was found right away).
+	JoinWarMatchmaking(context.Context, *JoinWarMatchmakingRequest) (*JoinWarMatchmakingResponse, error)
+	// LeaveWarMatchmaking removes the guild from the matchmaking queue.
+	LeaveWarMatchmaking(context.Context, *LeaveWarMatchmakingRequest) (*LeaveWarMatchmakingResponse, error)
+	// GetWarMatchmakingStatus reports whether the guild is currently in the
+	// matchmaking queue.
+	GetWarMatchmakingStatus(context.Context, *GetWarMatchmakingStatusRequest) (*GetWarMatchmakingStatusResponse, error)
 	// ContributeToFront adds rounds to a front's our_rounds counter. The
 	// caller must be a member of the war's owning guild; the backend
 	// records the contribution for later MVP queries. When a front's
@@ -359,6 +489,30 @@ func (UnimplementedGuildServiceServer) CreateGuildChallenge(context.Context, *Cr
 }
 func (UnimplementedGuildServiceServer) GetGuildWar(context.Context, *GetGuildWarRequest) (*GetGuildWarResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetGuildWar not implemented")
+}
+func (UnimplementedGuildServiceServer) GetWarQuota(context.Context, *GetWarQuotaRequest) (*GetWarQuotaResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetWarQuota not implemented")
+}
+func (UnimplementedGuildServiceServer) SendWarChallenge(context.Context, *SendWarChallengeRequest) (*SendWarChallengeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SendWarChallenge not implemented")
+}
+func (UnimplementedGuildServiceServer) ListIncomingWarChallenges(context.Context, *ListIncomingWarChallengesRequest) (*ListIncomingWarChallengesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListIncomingWarChallenges not implemented")
+}
+func (UnimplementedGuildServiceServer) AcceptWarChallenge(context.Context, *AcceptWarChallengeRequest) (*AcceptWarChallengeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AcceptWarChallenge not implemented")
+}
+func (UnimplementedGuildServiceServer) DeclineWarChallenge(context.Context, *DeclineWarChallengeRequest) (*DeclineWarChallengeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeclineWarChallenge not implemented")
+}
+func (UnimplementedGuildServiceServer) JoinWarMatchmaking(context.Context, *JoinWarMatchmakingRequest) (*JoinWarMatchmakingResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method JoinWarMatchmaking not implemented")
+}
+func (UnimplementedGuildServiceServer) LeaveWarMatchmaking(context.Context, *LeaveWarMatchmakingRequest) (*LeaveWarMatchmakingResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method LeaveWarMatchmaking not implemented")
+}
+func (UnimplementedGuildServiceServer) GetWarMatchmakingStatus(context.Context, *GetWarMatchmakingStatusRequest) (*GetWarMatchmakingStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetWarMatchmakingStatus not implemented")
 }
 func (UnimplementedGuildServiceServer) ContributeToFront(context.Context, *ContributeToFrontRequest) (*ContributeToFrontResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ContributeToFront not implemented")
@@ -648,6 +802,150 @@ func _GuildService_GetGuildWar_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GuildService_GetWarQuota_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWarQuotaRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GuildServiceServer).GetWarQuota(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GuildService_GetWarQuota_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GuildServiceServer).GetWarQuota(ctx, req.(*GetWarQuotaRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GuildService_SendWarChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendWarChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GuildServiceServer).SendWarChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GuildService_SendWarChallenge_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GuildServiceServer).SendWarChallenge(ctx, req.(*SendWarChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GuildService_ListIncomingWarChallenges_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListIncomingWarChallengesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GuildServiceServer).ListIncomingWarChallenges(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GuildService_ListIncomingWarChallenges_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GuildServiceServer).ListIncomingWarChallenges(ctx, req.(*ListIncomingWarChallengesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GuildService_AcceptWarChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AcceptWarChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GuildServiceServer).AcceptWarChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GuildService_AcceptWarChallenge_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GuildServiceServer).AcceptWarChallenge(ctx, req.(*AcceptWarChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GuildService_DeclineWarChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeclineWarChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GuildServiceServer).DeclineWarChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GuildService_DeclineWarChallenge_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GuildServiceServer).DeclineWarChallenge(ctx, req.(*DeclineWarChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GuildService_JoinWarMatchmaking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JoinWarMatchmakingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GuildServiceServer).JoinWarMatchmaking(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GuildService_JoinWarMatchmaking_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GuildServiceServer).JoinWarMatchmaking(ctx, req.(*JoinWarMatchmakingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GuildService_LeaveWarMatchmaking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LeaveWarMatchmakingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GuildServiceServer).LeaveWarMatchmaking(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GuildService_LeaveWarMatchmaking_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GuildServiceServer).LeaveWarMatchmaking(ctx, req.(*LeaveWarMatchmakingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GuildService_GetWarMatchmakingStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWarMatchmakingStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GuildServiceServer).GetWarMatchmakingStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GuildService_GetWarMatchmakingStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GuildServiceServer).GetWarMatchmakingStatus(ctx, req.(*GetWarMatchmakingStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _GuildService_ContributeToFront_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ContributeToFrontRequest)
 	if err := dec(in); err != nil {
@@ -800,6 +1098,38 @@ var GuildService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetGuildWar",
 			Handler:    _GuildService_GetGuildWar_Handler,
+		},
+		{
+			MethodName: "GetWarQuota",
+			Handler:    _GuildService_GetWarQuota_Handler,
+		},
+		{
+			MethodName: "SendWarChallenge",
+			Handler:    _GuildService_SendWarChallenge_Handler,
+		},
+		{
+			MethodName: "ListIncomingWarChallenges",
+			Handler:    _GuildService_ListIncomingWarChallenges_Handler,
+		},
+		{
+			MethodName: "AcceptWarChallenge",
+			Handler:    _GuildService_AcceptWarChallenge_Handler,
+		},
+		{
+			MethodName: "DeclineWarChallenge",
+			Handler:    _GuildService_DeclineWarChallenge_Handler,
+		},
+		{
+			MethodName: "JoinWarMatchmaking",
+			Handler:    _GuildService_JoinWarMatchmaking_Handler,
+		},
+		{
+			MethodName: "LeaveWarMatchmaking",
+			Handler:    _GuildService_LeaveWarMatchmaking_Handler,
+		},
+		{
+			MethodName: "GetWarMatchmakingStatus",
+			Handler:    _GuildService_GetWarMatchmakingStatus_Handler,
 		},
 		{
 			MethodName: "ContributeToFront",

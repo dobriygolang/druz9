@@ -19,27 +19,37 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationGuildServiceAcceptWarChallenge = "/guild.v1.GuildService/AcceptWarChallenge"
 const OperationGuildServiceContributeToFront = "/guild.v1.GuildService/ContributeToFront"
 const OperationGuildServiceCreateGuild = "/guild.v1.GuildService/CreateGuild"
 const OperationGuildServiceCreateGuildChallenge = "/guild.v1.GuildService/CreateGuildChallenge"
 const OperationGuildServiceCreateGuildEvent = "/guild.v1.GuildService/CreateGuildEvent"
+const OperationGuildServiceDeclineWarChallenge = "/guild.v1.GuildService/DeclineWarChallenge"
 const OperationGuildServiceDeleteGuild = "/guild.v1.GuildService/DeleteGuild"
 const OperationGuildServiceGetActiveGuildChallenge = "/guild.v1.GuildService/GetActiveGuildChallenge"
 const OperationGuildServiceGetGuildMemberStats = "/guild.v1.GuildService/GetGuildMemberStats"
 const OperationGuildServiceGetGuildPulse = "/guild.v1.GuildService/GetGuildPulse"
 const OperationGuildServiceGetGuildWar = "/guild.v1.GuildService/GetGuildWar"
 const OperationGuildServiceGetMyGuildRole = "/guild.v1.GuildService/GetMyGuildRole"
+const OperationGuildServiceGetWarMatchmakingStatus = "/guild.v1.GuildService/GetWarMatchmakingStatus"
+const OperationGuildServiceGetWarQuota = "/guild.v1.GuildService/GetWarQuota"
 const OperationGuildServiceInviteToGuild = "/guild.v1.GuildService/InviteToGuild"
 const OperationGuildServiceJoinGuild = "/guild.v1.GuildService/JoinGuild"
+const OperationGuildServiceJoinWarMatchmaking = "/guild.v1.GuildService/JoinWarMatchmaking"
 const OperationGuildServiceLeaveGuild = "/guild.v1.GuildService/LeaveGuild"
+const OperationGuildServiceLeaveWarMatchmaking = "/guild.v1.GuildService/LeaveWarMatchmaking"
 const OperationGuildServiceListGuildEvents = "/guild.v1.GuildService/ListGuildEvents"
 const OperationGuildServiceListGuildMembers = "/guild.v1.GuildService/ListGuildMembers"
 const OperationGuildServiceListGuilds = "/guild.v1.GuildService/ListGuilds"
+const OperationGuildServiceListIncomingWarChallenges = "/guild.v1.GuildService/ListIncomingWarChallenges"
 const OperationGuildServiceListTerritories = "/guild.v1.GuildService/ListTerritories"
+const OperationGuildServiceSendWarChallenge = "/guild.v1.GuildService/SendWarChallenge"
 const OperationGuildServiceSetMemberRole = "/guild.v1.GuildService/SetMemberRole"
 const OperationGuildServiceUpdateGuildSettings = "/guild.v1.GuildService/UpdateGuildSettings"
 
 type GuildServiceHTTPServer interface {
+	// AcceptWarChallenge AcceptWarChallenge starts a war by accepting a pending challenge.
+	AcceptWarChallenge(context.Context, *AcceptWarChallengeRequest) (*AcceptWarChallengeResponse, error)
 	// ContributeToFront ContributeToFront adds rounds to a front's our_rounds counter. The
 	// caller must be a member of the war's owning guild; the backend
 	// records the contribution for later MVP queries. When a front's
@@ -48,6 +58,8 @@ type GuildServiceHTTPServer interface {
 	CreateGuild(context.Context, *CreateGuildRequest) (*GuildResponse, error)
 	CreateGuildChallenge(context.Context, *CreateGuildChallengeRequest) (*CreateGuildChallengeResponse, error)
 	CreateGuildEvent(context.Context, *CreateGuildEventRequest) (*CreateGuildEventResponse, error)
+	// DeclineWarChallenge DeclineWarChallenge rejects a pending challenge.
+	DeclineWarChallenge(context.Context, *DeclineWarChallengeRequest) (*DeclineWarChallengeResponse, error)
 	DeleteGuild(context.Context, *DeleteGuildRequest) (*DeleteGuildResponse, error)
 	GetActiveGuildChallenge(context.Context, *GetActiveGuildChallengeRequest) (*GetActiveGuildChallengeResponse, error)
 	GetGuildMemberStats(context.Context, *GetGuildMemberStatsRequest) (*GetGuildMemberStatsResponse, error)
@@ -59,13 +71,30 @@ type GuildServiceHTTPServer interface {
 	GetGuildWar(context.Context, *GetGuildWarRequest) (*GetGuildWarResponse, error)
 	// GetMyGuildRole GetMyGuildRole returns the caller's role in the given guild.
 	GetMyGuildRole(context.Context, *GetMyGuildRoleRequest) (*GetMyGuildRoleResponse, error)
+	// GetWarMatchmakingStatus GetWarMatchmakingStatus reports whether the guild is currently in the
+	// matchmaking queue.
+	GetWarMatchmakingStatus(context.Context, *GetWarMatchmakingStatusRequest) (*GetWarMatchmakingStatusResponse, error)
+	// GetWarQuota GetWarQuota returns the number of front contributions the caller has
+	// made today and the daily cap (used by the energy bar in the UI).
+	GetWarQuota(context.Context, *GetWarQuotaRequest) (*GetWarQuotaResponse, error)
 	InviteToGuild(context.Context, *InviteToGuildRequest) (*InviteToGuildResponse, error)
 	JoinGuild(context.Context, *JoinGuildRequest) (*JoinGuildResponse, error)
+	// JoinWarMatchmaking JoinWarMatchmaking enters the guild into the war matchmaking queue.
+	// Returns immediately with status "queued" or "matched" (if a partner
+	// was found right away).
+	JoinWarMatchmaking(context.Context, *JoinWarMatchmakingRequest) (*JoinWarMatchmakingResponse, error)
 	LeaveGuild(context.Context, *LeaveGuildRequest) (*LeaveGuildResponse, error)
+	// LeaveWarMatchmaking LeaveWarMatchmaking removes the guild from the matchmaking queue.
+	LeaveWarMatchmaking(context.Context, *LeaveWarMatchmakingRequest) (*LeaveWarMatchmakingResponse, error)
 	ListGuildEvents(context.Context, *ListGuildEventsRequest) (*ListGuildEventsResponse, error)
 	ListGuildMembers(context.Context, *ListGuildMembersRequest) (*ListGuildMembersResponse, error)
 	ListGuilds(context.Context, *ListGuildsRequest) (*ListGuildsResponse, error)
+	// ListIncomingWarChallenges ListIncomingWarChallenges returns pending war challenges directed at
+	// the caller's guild.
+	ListIncomingWarChallenges(context.Context, *ListIncomingWarChallengesRequest) (*ListIncomingWarChallengesResponse, error)
 	ListTerritories(context.Context, *ListTerritoriesRequest) (*ListTerritoriesResponse, error)
+	// SendWarChallenge SendWarChallenge declares war on another guild by guild ID.
+	SendWarChallenge(context.Context, *SendWarChallengeRequest) (*SendWarChallengeResponse, error)
 	// SetMemberRole SetMemberRole promotes or demotes a guild member (creator/officer only).
 	SetMemberRole(context.Context, *SetMemberRoleRequest) (*SetMemberRoleResponse, error)
 	// UpdateGuildSettings UpdateGuildSettings lets a guild creator/officer rename and configure the guild.
@@ -88,6 +117,14 @@ func RegisterGuildServiceHTTPServer(s *http.Server, srv GuildServiceHTTPServer) 
 	r.GET("/api/v1/guilds/{guild_id}/challenge", _GuildService_GetActiveGuildChallenge0_HTTP_Handler(srv))
 	r.POST("/api/v1/guilds/{guild_id}/challenge", _GuildService_CreateGuildChallenge0_HTTP_Handler(srv))
 	r.GET("/api/v1/guilds/war", _GuildService_GetGuildWar0_HTTP_Handler(srv))
+	r.GET("/api/v1/guilds/war/quota", _GuildService_GetWarQuota0_HTTP_Handler(srv))
+	r.POST("/api/v1/guilds/war/challenge", _GuildService_SendWarChallenge0_HTTP_Handler(srv))
+	r.GET("/api/v1/guilds/war/challenges/incoming", _GuildService_ListIncomingWarChallenges0_HTTP_Handler(srv))
+	r.POST("/api/v1/guilds/war/challenge/{challenge_id}/accept", _GuildService_AcceptWarChallenge0_HTTP_Handler(srv))
+	r.POST("/api/v1/guilds/war/challenge/{challenge_id}/decline", _GuildService_DeclineWarChallenge0_HTTP_Handler(srv))
+	r.POST("/api/v1/guilds/war/matchmaking", _GuildService_JoinWarMatchmaking0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/guilds/war/matchmaking", _GuildService_LeaveWarMatchmaking0_HTTP_Handler(srv))
+	r.GET("/api/v1/guilds/war/matchmaking", _GuildService_GetWarMatchmakingStatus0_HTTP_Handler(srv))
 	r.POST("/api/v1/guilds/war/fronts/{front_id}/contribute", _GuildService_ContributeToFront0_HTTP_Handler(srv))
 	r.GET("/api/v1/guilds/{guild_id}/territories", _GuildService_ListTerritories0_HTTP_Handler(srv))
 	r.GET("/api/v1/guilds/{guild_id}/my-role", _GuildService_GetMyGuildRole0_HTTP_Handler(srv))
@@ -412,6 +449,176 @@ func _GuildService_GetGuildWar0_HTTP_Handler(srv GuildServiceHTTPServer) func(ct
 	}
 }
 
+func _GuildService_GetWarQuota0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetWarQuotaRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGuildServiceGetWarQuota)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetWarQuota(ctx, req.(*GetWarQuotaRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetWarQuotaResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _GuildService_SendWarChallenge0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SendWarChallengeRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGuildServiceSendWarChallenge)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SendWarChallenge(ctx, req.(*SendWarChallengeRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SendWarChallengeResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _GuildService_ListIncomingWarChallenges0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListIncomingWarChallengesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGuildServiceListIncomingWarChallenges)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListIncomingWarChallenges(ctx, req.(*ListIncomingWarChallengesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListIncomingWarChallengesResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _GuildService_AcceptWarChallenge0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AcceptWarChallengeRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGuildServiceAcceptWarChallenge)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AcceptWarChallenge(ctx, req.(*AcceptWarChallengeRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AcceptWarChallengeResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _GuildService_DeclineWarChallenge0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeclineWarChallengeRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGuildServiceDeclineWarChallenge)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeclineWarChallenge(ctx, req.(*DeclineWarChallengeRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DeclineWarChallengeResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _GuildService_JoinWarMatchmaking0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in JoinWarMatchmakingRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGuildServiceJoinWarMatchmaking)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.JoinWarMatchmaking(ctx, req.(*JoinWarMatchmakingRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*JoinWarMatchmakingResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _GuildService_LeaveWarMatchmaking0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in LeaveWarMatchmakingRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGuildServiceLeaveWarMatchmaking)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.LeaveWarMatchmaking(ctx, req.(*LeaveWarMatchmakingRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*LeaveWarMatchmakingResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _GuildService_GetWarMatchmakingStatus0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetWarMatchmakingStatusRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGuildServiceGetWarMatchmakingStatus)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetWarMatchmakingStatus(ctx, req.(*GetWarMatchmakingStatusRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetWarMatchmakingStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _GuildService_ContributeToFront0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in ContributeToFrontRequest
@@ -532,6 +739,8 @@ func _GuildService_SetMemberRole0_HTTP_Handler(srv GuildServiceHTTPServer) func(
 }
 
 type GuildServiceHTTPClient interface {
+	// AcceptWarChallenge AcceptWarChallenge starts a war by accepting a pending challenge.
+	AcceptWarChallenge(ctx context.Context, req *AcceptWarChallengeRequest, opts ...http.CallOption) (rsp *AcceptWarChallengeResponse, err error)
 	// ContributeToFront ContributeToFront adds rounds to a front's our_rounds counter. The
 	// caller must be a member of the war's owning guild; the backend
 	// records the contribution for later MVP queries. When a front's
@@ -540,6 +749,8 @@ type GuildServiceHTTPClient interface {
 	CreateGuild(ctx context.Context, req *CreateGuildRequest, opts ...http.CallOption) (rsp *GuildResponse, err error)
 	CreateGuildChallenge(ctx context.Context, req *CreateGuildChallengeRequest, opts ...http.CallOption) (rsp *CreateGuildChallengeResponse, err error)
 	CreateGuildEvent(ctx context.Context, req *CreateGuildEventRequest, opts ...http.CallOption) (rsp *CreateGuildEventResponse, err error)
+	// DeclineWarChallenge DeclineWarChallenge rejects a pending challenge.
+	DeclineWarChallenge(ctx context.Context, req *DeclineWarChallengeRequest, opts ...http.CallOption) (rsp *DeclineWarChallengeResponse, err error)
 	DeleteGuild(ctx context.Context, req *DeleteGuildRequest, opts ...http.CallOption) (rsp *DeleteGuildResponse, err error)
 	GetActiveGuildChallenge(ctx context.Context, req *GetActiveGuildChallengeRequest, opts ...http.CallOption) (rsp *GetActiveGuildChallengeResponse, err error)
 	GetGuildMemberStats(ctx context.Context, req *GetGuildMemberStatsRequest, opts ...http.CallOption) (rsp *GetGuildMemberStatsResponse, err error)
@@ -551,13 +762,30 @@ type GuildServiceHTTPClient interface {
 	GetGuildWar(ctx context.Context, req *GetGuildWarRequest, opts ...http.CallOption) (rsp *GetGuildWarResponse, err error)
 	// GetMyGuildRole GetMyGuildRole returns the caller's role in the given guild.
 	GetMyGuildRole(ctx context.Context, req *GetMyGuildRoleRequest, opts ...http.CallOption) (rsp *GetMyGuildRoleResponse, err error)
+	// GetWarMatchmakingStatus GetWarMatchmakingStatus reports whether the guild is currently in the
+	// matchmaking queue.
+	GetWarMatchmakingStatus(ctx context.Context, req *GetWarMatchmakingStatusRequest, opts ...http.CallOption) (rsp *GetWarMatchmakingStatusResponse, err error)
+	// GetWarQuota GetWarQuota returns the number of front contributions the caller has
+	// made today and the daily cap (used by the energy bar in the UI).
+	GetWarQuota(ctx context.Context, req *GetWarQuotaRequest, opts ...http.CallOption) (rsp *GetWarQuotaResponse, err error)
 	InviteToGuild(ctx context.Context, req *InviteToGuildRequest, opts ...http.CallOption) (rsp *InviteToGuildResponse, err error)
 	JoinGuild(ctx context.Context, req *JoinGuildRequest, opts ...http.CallOption) (rsp *JoinGuildResponse, err error)
+	// JoinWarMatchmaking JoinWarMatchmaking enters the guild into the war matchmaking queue.
+	// Returns immediately with status "queued" or "matched" (if a partner
+	// was found right away).
+	JoinWarMatchmaking(ctx context.Context, req *JoinWarMatchmakingRequest, opts ...http.CallOption) (rsp *JoinWarMatchmakingResponse, err error)
 	LeaveGuild(ctx context.Context, req *LeaveGuildRequest, opts ...http.CallOption) (rsp *LeaveGuildResponse, err error)
+	// LeaveWarMatchmaking LeaveWarMatchmaking removes the guild from the matchmaking queue.
+	LeaveWarMatchmaking(ctx context.Context, req *LeaveWarMatchmakingRequest, opts ...http.CallOption) (rsp *LeaveWarMatchmakingResponse, err error)
 	ListGuildEvents(ctx context.Context, req *ListGuildEventsRequest, opts ...http.CallOption) (rsp *ListGuildEventsResponse, err error)
 	ListGuildMembers(ctx context.Context, req *ListGuildMembersRequest, opts ...http.CallOption) (rsp *ListGuildMembersResponse, err error)
 	ListGuilds(ctx context.Context, req *ListGuildsRequest, opts ...http.CallOption) (rsp *ListGuildsResponse, err error)
+	// ListIncomingWarChallenges ListIncomingWarChallenges returns pending war challenges directed at
+	// the caller's guild.
+	ListIncomingWarChallenges(ctx context.Context, req *ListIncomingWarChallengesRequest, opts ...http.CallOption) (rsp *ListIncomingWarChallengesResponse, err error)
 	ListTerritories(ctx context.Context, req *ListTerritoriesRequest, opts ...http.CallOption) (rsp *ListTerritoriesResponse, err error)
+	// SendWarChallenge SendWarChallenge declares war on another guild by guild ID.
+	SendWarChallenge(ctx context.Context, req *SendWarChallengeRequest, opts ...http.CallOption) (rsp *SendWarChallengeResponse, err error)
 	// SetMemberRole SetMemberRole promotes or demotes a guild member (creator/officer only).
 	SetMemberRole(ctx context.Context, req *SetMemberRoleRequest, opts ...http.CallOption) (rsp *SetMemberRoleResponse, err error)
 	// UpdateGuildSettings UpdateGuildSettings lets a guild creator/officer rename and configure the guild.
@@ -570,6 +798,20 @@ type GuildServiceHTTPClientImpl struct {
 
 func NewGuildServiceHTTPClient(client *http.Client) GuildServiceHTTPClient {
 	return &GuildServiceHTTPClientImpl{client}
+}
+
+// AcceptWarChallenge AcceptWarChallenge starts a war by accepting a pending challenge.
+func (c *GuildServiceHTTPClientImpl) AcceptWarChallenge(ctx context.Context, in *AcceptWarChallengeRequest, opts ...http.CallOption) (*AcceptWarChallengeResponse, error) {
+	var out AcceptWarChallengeResponse
+	pattern := "/api/v1/guilds/war/challenge/{challenge_id}/accept"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationGuildServiceAcceptWarChallenge))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 // ContributeToFront ContributeToFront adds rounds to a front's our_rounds counter. The
@@ -620,6 +862,20 @@ func (c *GuildServiceHTTPClientImpl) CreateGuildEvent(ctx context.Context, in *C
 	pattern := "/api/v1/guilds/{guild_id}/events"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationGuildServiceCreateGuildEvent))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// DeclineWarChallenge DeclineWarChallenge rejects a pending challenge.
+func (c *GuildServiceHTTPClientImpl) DeclineWarChallenge(ctx context.Context, in *DeclineWarChallengeRequest, opts ...http.CallOption) (*DeclineWarChallengeResponse, error) {
+	var out DeclineWarChallengeResponse
+	pattern := "/api/v1/guilds/war/challenge/{challenge_id}/decline"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationGuildServiceDeclineWarChallenge))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -711,6 +967,36 @@ func (c *GuildServiceHTTPClientImpl) GetMyGuildRole(ctx context.Context, in *Get
 	return &out, nil
 }
 
+// GetWarMatchmakingStatus GetWarMatchmakingStatus reports whether the guild is currently in the
+// matchmaking queue.
+func (c *GuildServiceHTTPClientImpl) GetWarMatchmakingStatus(ctx context.Context, in *GetWarMatchmakingStatusRequest, opts ...http.CallOption) (*GetWarMatchmakingStatusResponse, error) {
+	var out GetWarMatchmakingStatusResponse
+	pattern := "/api/v1/guilds/war/matchmaking"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationGuildServiceGetWarMatchmakingStatus))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// GetWarQuota GetWarQuota returns the number of front contributions the caller has
+// made today and the daily cap (used by the energy bar in the UI).
+func (c *GuildServiceHTTPClientImpl) GetWarQuota(ctx context.Context, in *GetWarQuotaRequest, opts ...http.CallOption) (*GetWarQuotaResponse, error) {
+	var out GetWarQuotaResponse
+	pattern := "/api/v1/guilds/war/quota"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationGuildServiceGetWarQuota))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *GuildServiceHTTPClientImpl) InviteToGuild(ctx context.Context, in *InviteToGuildRequest, opts ...http.CallOption) (*InviteToGuildResponse, error) {
 	var out InviteToGuildResponse
 	pattern := "/api/v1/guilds/{guild_id}/invite"
@@ -737,6 +1023,22 @@ func (c *GuildServiceHTTPClientImpl) JoinGuild(ctx context.Context, in *JoinGuil
 	return &out, nil
 }
 
+// JoinWarMatchmaking JoinWarMatchmaking enters the guild into the war matchmaking queue.
+// Returns immediately with status "queued" or "matched" (if a partner
+// was found right away).
+func (c *GuildServiceHTTPClientImpl) JoinWarMatchmaking(ctx context.Context, in *JoinWarMatchmakingRequest, opts ...http.CallOption) (*JoinWarMatchmakingResponse, error) {
+	var out JoinWarMatchmakingResponse
+	pattern := "/api/v1/guilds/war/matchmaking"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationGuildServiceJoinWarMatchmaking))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *GuildServiceHTTPClientImpl) LeaveGuild(ctx context.Context, in *LeaveGuildRequest, opts ...http.CallOption) (*LeaveGuildResponse, error) {
 	var out LeaveGuildResponse
 	pattern := "/api/v1/guilds/{guild_id}/leave"
@@ -744,6 +1046,20 @@ func (c *GuildServiceHTTPClientImpl) LeaveGuild(ctx context.Context, in *LeaveGu
 	opts = append(opts, http.Operation(OperationGuildServiceLeaveGuild))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// LeaveWarMatchmaking LeaveWarMatchmaking removes the guild from the matchmaking queue.
+func (c *GuildServiceHTTPClientImpl) LeaveWarMatchmaking(ctx context.Context, in *LeaveWarMatchmakingRequest, opts ...http.CallOption) (*LeaveWarMatchmakingResponse, error) {
+	var out LeaveWarMatchmakingResponse
+	pattern := "/api/v1/guilds/war/matchmaking"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationGuildServiceLeaveWarMatchmaking))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -789,6 +1105,21 @@ func (c *GuildServiceHTTPClientImpl) ListGuilds(ctx context.Context, in *ListGui
 	return &out, nil
 }
 
+// ListIncomingWarChallenges ListIncomingWarChallenges returns pending war challenges directed at
+// the caller's guild.
+func (c *GuildServiceHTTPClientImpl) ListIncomingWarChallenges(ctx context.Context, in *ListIncomingWarChallengesRequest, opts ...http.CallOption) (*ListIncomingWarChallengesResponse, error) {
+	var out ListIncomingWarChallengesResponse
+	pattern := "/api/v1/guilds/war/challenges/incoming"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationGuildServiceListIncomingWarChallenges))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *GuildServiceHTTPClientImpl) ListTerritories(ctx context.Context, in *ListTerritoriesRequest, opts ...http.CallOption) (*ListTerritoriesResponse, error) {
 	var out ListTerritoriesResponse
 	pattern := "/api/v1/guilds/{guild_id}/territories"
@@ -796,6 +1127,20 @@ func (c *GuildServiceHTTPClientImpl) ListTerritories(ctx context.Context, in *Li
 	opts = append(opts, http.Operation(OperationGuildServiceListTerritories))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// SendWarChallenge SendWarChallenge declares war on another guild by guild ID.
+func (c *GuildServiceHTTPClientImpl) SendWarChallenge(ctx context.Context, in *SendWarChallengeRequest, opts ...http.CallOption) (*SendWarChallengeResponse, error) {
+	var out SendWarChallengeResponse
+	pattern := "/api/v1/guilds/war/challenge"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationGuildServiceSendWarChallenge))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

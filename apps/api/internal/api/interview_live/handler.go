@@ -119,7 +119,7 @@ func (h *Handler) Chat(ctx kratoshttp.Context) error {
 					if checkErr != nil || !isPremium {
 						writeErr(ctx.Response(), http.StatusPaymentRequired, "PREMIUM_REQUIRED",
 							"this mentor requires a Boosty premium subscription")
-						return nil
+						return nil //nolint:nilerr // error written to response
 					}
 				}
 				if prompt := persona.PromptTemplate; prompt != "" {
@@ -207,10 +207,12 @@ func (h *Handler) SaveSession(ctx kratoshttp.Context) error {
 
 	if h.db == nil {
 		ctx.Response().WriteHeader(http.StatusOK)
+		//nolint:errchkjson // encoding error after response started cannot be handled
 		_ = json.NewEncoder(ctx.Response()).Encode(map[string]string{"id": sessionID.String()})
 		return nil
 	}
 
+	//nolint:errchkjson // transcript is internal data, marshal failure is not critical
 	transcriptJSON, _ := json.Marshal(req.Transcript)
 
 	var frontID *uuid.UUID

@@ -133,22 +133,10 @@ func registerManualHTTPRoutes(
 	r.POST("/api/v1/interview/live/chat", liveChatHandler.Chat)
 	// POST /api/v1/interview/live/sessions — save completed live session.
 	r.POST("/api/v1/interview/live/sessions", liveChatHandler.SaveSession)
-	// GET /api/v1/guilds/war/quota — daily contribution energy for war fronts.
-	r.GET("/api/v1/guilds/war/quota", services.guildService.GetWarQuota)
-
 	// Premium subscription (Boosty).
 	r.GET("/api/v1/premium/status", services.premiumHandler.GetStatus)
 	r.POST("/api/v1/premium/boosty/link", services.premiumHandler.LinkBoosty)
 	r.DELETE("/api/v1/premium/boosty/link", services.premiumHandler.UnlinkBoosty)
-
-	// War declarations — direct challenge + matchmaking queue.
-	r.POST("/api/v1/guilds/war/challenge", services.guildService.SendChallenge)
-	r.GET("/api/v1/guilds/war/challenges/incoming", services.guildService.ListIncomingChallenges)
-	r.POST("/api/v1/guilds/war/challenge/{id}/accept", services.guildService.AcceptChallenge)
-	r.POST("/api/v1/guilds/war/challenge/{id}/decline", services.guildService.DeclineChallenge)
-	r.POST("/api/v1/guilds/war/matchmaking", services.guildService.JoinMatchmaking)
-	r.DELETE("/api/v1/guilds/war/matchmaking", services.guildService.LeaveMatchmaking)
-	r.GET("/api/v1/guilds/war/matchmaking", services.guildService.GetMatchmakingStatus)
 
 	// ADR-004 — Live guild-war fan-out. Subscribers connect over WS;
 	// the cron and ContributeToFront publish events into the hub.

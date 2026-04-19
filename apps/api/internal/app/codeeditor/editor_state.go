@@ -184,7 +184,7 @@ func (s *Service) getCachedTask(ctx context.Context, taskID uuid.UUID) (*domain.
 
 func (s *Service) getRoomTask(ctx context.Context, room *domain.Room) (*domain.Task, error) {
 	if room == nil || room.TaskID == nil {
-		return nil, nil
+		return nil, nil //nolint:nilnil // no task is valid state
 	}
 	return s.getCachedTask(ctx, *room.TaskID)
 }

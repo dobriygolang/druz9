@@ -69,7 +69,7 @@ func TestDefaultPolicy(t *testing.T) {
 		t.Parallel()
 
 		policy, err := DefaultPolicy(ProfilePure)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, ProfilePure, policy.Profile)
 	})
 
@@ -528,7 +528,7 @@ func TestValidatePolicy_InvalidMemoryLimit(t *testing.T) {
 	}
 
 	err := ValidatePolicy(policy)
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "memory_limit_mb")
 }
 
@@ -564,7 +564,7 @@ func TestValidatePolicy_NetworkConflict(t *testing.T) {
 		}
 
 		err := ValidatePolicy(policy)
-		assert.Error(t, err)
+		require.Error(t, err)
 		assert.Contains(t, err.Error(), "network.enabled=true requires")
 	})
 
@@ -598,7 +598,7 @@ func TestValidatePolicy_NetworkConflict(t *testing.T) {
 		}
 
 		err := ValidatePolicy(policy)
-		assert.Error(t, err)
+		require.Error(t, err)
 		assert.Contains(t, err.Error(), "network.enabled=false requires")
 	})
 }
@@ -725,7 +725,7 @@ func TestValidatePolicy_ImportConflict(t *testing.T) {
 	}
 
 	err := ValidatePolicy(policy)
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "cannot be both allowed and blocked")
 }
 
@@ -754,7 +754,7 @@ func TestValidatePolicy_RequireUnsafeBlocklist(t *testing.T) {
 	}
 
 	err := ValidatePolicy(policy)
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "unsafe must be blocklisted")
 }
 
