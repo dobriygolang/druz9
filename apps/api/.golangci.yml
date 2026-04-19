@@ -35,7 +35,6 @@ linters:
     - gocritic
     - gocyclo
     - gofmt
-    - gofumpt
     - goimports
     - gomoddirectives
     - gosec

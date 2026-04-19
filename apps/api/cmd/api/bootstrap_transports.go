@@ -46,7 +46,7 @@ func initializeTransports(
 	bootstrap *bootstrapContext,
 	storage *storageContext,
 	services *serviceContext,
-) (*kratos.App, error) {
+) *kratos.App {
 	registerBackgroundWorkers(bootstrap, storage, services)
 
 	httpServer := server.NewHTTPServer(
