@@ -283,6 +283,7 @@ services:
       S3_SECRET_KEY_FILE: /run/secrets/s3_secret_key
       S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-}
       AI_REVIEW_API_KEY_FILE: /run/secrets/ai_review_api_key
+      AI_MENTOR_KEY_KMS_FILE: /run/secrets/ai_mentor_key_kms
       YANDEX_OAUTH_CLIENT_SECRET: ${YANDEX_OAUTH_CLIENT_SECRET}
       SANDBOX_MODE: remote
       SANDBOX_RUNNER_URL: http://sandbox-runner:8098
@@ -299,6 +300,7 @@ services:
       - database_url
       - telegram_bot_token
       - ai_review_api_key
+      - ai_mentor_key_kms
       - s3_access_key
       - s3_secret_key
       - postgres_password
@@ -357,6 +359,8 @@ secrets:
     file: ./runtime/secrets/prod/telegram_alert_chat_id
   ai_review_api_key:
     file: ./runtime/secrets/prod/ai_review_api_key
+  ai_mentor_key_kms:
+    file: ./runtime/secrets/prod/ai_mentor_key_kms
   s3_access_key:
     file: ./runtime/secrets/prod/s3_access_key
   s3_secret_key:

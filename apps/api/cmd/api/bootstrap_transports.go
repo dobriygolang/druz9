@@ -87,7 +87,7 @@ func initializeTransports(
 		closer.AddSync(func() error { return opsServer.Close() })
 	}
 
-	return app, nil
+	return app
 }
 
 func registerBackgroundWorkers(bootstrap *bootstrapContext, storage *storageContext, services *serviceContext) {

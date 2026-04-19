@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"crypto/rand"
 	"encoding/hex"
+	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -51,6 +53,49 @@ func TestKeyVault_RoundTrip(t *testing.T) {
 		t.Fatal("nonce must be non-empty")
 	}
 
+	got, err := v.Open(ct, nonce)
+	if err != nil {
+		t.Fatalf("Open: %v", err)
+	}
+	if !bytes.Equal(got, plain) {
+		t.Fatalf("round trip: got %q want %q", got, plain)
+	}
+}
+
+func TestKeyVault_EmptyEnvDisablesVault(t *testing.T) {
+	t.Setenv("AI_MENTOR_KEY_KMS", "")
+	t.Setenv("AI_MENTOR_KEY_KMS_FILE", "")
+	v, err := NewKeyVaultFromEnv()
+	if err != nil {
+		t.Fatalf("NewKeyVaultFromEnv: %v", err)
+	}
+	if v != nil {
+		t.Fatal("expected nil vault when env is empty")
+	}
+}
+
+func TestKeyVault_RoundTripFromFile(t *testing.T) {
+	key := make([]byte, 32)
+	if _, err := rand.Read(key); err != nil {
+		t.Fatalf("rand: %v", err)
+	}
+	path := filepath.Join(t.TempDir(), "mentor_key")
+	if err := os.WriteFile(path, []byte(hex.EncodeToString(key)+"\n"), 0o600); err != nil {
+		t.Fatalf("write key file: %v", err)
+	}
+	t.Setenv("AI_MENTOR_KEY_KMS", "")
+	t.Setenv("AI_MENTOR_KEY_KMS_FILE", path)
+
+	v, err := NewKeyVaultFromEnv()
+	if err != nil || v == nil {
+		t.Fatalf("NewKeyVaultFromEnv: vault=%v err=%v", v, err)
+	}
+
+	plain := []byte("sk-file-secret")
+	ct, nonce, err := v.Seal(plain)
+	if err != nil {
+		t.Fatalf("Seal: %v", err)
+	}
 	got, err := v.Open(ct, nonce)
 	if err != nil {
 		t.Fatalf("Open: %v", err)

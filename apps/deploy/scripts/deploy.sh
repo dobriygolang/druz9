@@ -20,7 +20,8 @@ for secret_name in \
   s3_access_key \
   s3_secret_key \
   telegram_bot_token \
-  ai_review_api_key
+  ai_review_api_key \
+  ai_mentor_key_kms
 do
   if [[ ! -s "${SECRETS_DIR}/${secret_name}" ]]; then
     echo "Missing secret file: ${SECRETS_DIR}/${secret_name}" >&2

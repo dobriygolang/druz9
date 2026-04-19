@@ -28,10 +28,7 @@ func (r *Repo) ListEvents(
 		opts.Limit = defaultEventsLimit
 	}
 
-	baseQuery, countQuery, args, err := r.buildListEventsQueries(opts)
-	if err != nil {
-		return nil, err
-	}
+	baseQuery, countQuery, args := r.buildListEventsQueries(opts)
 
 	var totalCount int32
 	if err := r.data.DB.QueryRow(ctx, countQuery, args...).Scan(&totalCount); err != nil {
@@ -63,7 +60,7 @@ func (r *Repo) ListEvents(
 	}, nil
 }
 
-func (r *Repo) buildListEventsQueries(opts model.ListEventsOptions) (string, string, []any, error) {
+func (r *Repo) buildListEventsQueries(opts model.ListEventsOptions) (string, string, []any) {
 	hasExplicitWindow := opts.From != nil || opts.To != nil
 	opts = normalizeListEventsWindow(opts, time.Now())
 
@@ -164,7 +161,7 @@ JOIN users cu ON cu.id = e.creator_id
 %s
 `, whereClause)
 
-	return listQuery, strings.TrimSpace(countQuery), args, nil
+	return listQuery, strings.TrimSpace(countQuery), args
 }
 
 func normalizeListEventsWindow(opts model.ListEventsOptions, now time.Time) model.ListEventsOptions {

@@ -26,10 +26,7 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 		return nil, nil, err
 	}
 
-	app, err := initializeTransports(bootstrap, storage, services)
-	if err != nil {
-		return nil, nil, err
-	}
+	app := initializeTransports(bootstrap, storage, services)
 
 	return app, bootstrap.logger, nil
 }

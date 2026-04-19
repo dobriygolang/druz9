@@ -1,9 +1,9 @@
 // AES-GCM helpers for ai_mentor_secrets (ADR-001).
 //
-// Master key is read from the AI_MENTOR_KEY_KMS env at process start
-// (32 raw bytes, hex- or base64-encoded). When unset, encryption is a
-// no-op pass-through — useful for dev environments where keys live in
-// plain ENV vars rather than the DB.
+// Master key is read from AI_MENTOR_KEY_KMS or AI_MENTOR_KEY_KMS_FILE at
+// process start (32 raw bytes, hex- or base64-encoded). When unset,
+// encryption is a no-op pass-through — useful for dev environments where keys
+// live in plain ENV vars rather than the DB.
 package aireview
 
 import (
@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
 // KeyVault wraps a 32-byte symmetric key. Construct via NewKeyVaultFromEnv
@@ -31,13 +32,16 @@ var (
 	errInvalidNonceSize  = errors.New("invalid nonce size")
 )
 
-// NewKeyVaultFromEnv reads AI_MENTOR_KEY_KMS. Accepts hex (64 chars) or
-// base64 (44 chars including '='). Returns (nil, nil) when the env is
-// empty — caller should treat that as "encryption disabled".
+// NewKeyVaultFromEnv reads AI_MENTOR_KEY_KMS or AI_MENTOR_KEY_KMS_FILE. Accepts
+// hex (64 chars) or base64 (44 chars including '='). Returns (nil, nil) when
+// the env is empty — caller should treat that as "encryption disabled".
 func NewKeyVaultFromEnv() (*KeyVault, error) {
-	raw := os.Getenv("AI_MENTOR_KEY_KMS")
+	raw, err := lookupMentorMasterKey()
+	if err != nil {
+		return nil, fmt.Errorf("ai_mentor key vault: %w", err)
+	}
 	if raw == "" {
-		return nil, ErrNotConfigured
+		return nil, nil
 	}
 	keyBytes, err := decodeMasterKey(raw)
 	if err != nil {
@@ -57,7 +61,23 @@ func NewKeyVaultFromEnv() (*KeyVault, error) {
 	return &KeyVault{gcm: gcm}, nil
 }
 
+func lookupMentorMasterKey() (string, error) {
+	if raw := os.Getenv("AI_MENTOR_KEY_KMS"); raw != "" {
+		return raw, nil
+	}
+	path := os.Getenv("AI_MENTOR_KEY_KMS_FILE")
+	if path == "" {
+		return "", nil
+	}
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("read AI_MENTOR_KEY_KMS_FILE: %w", err)
+	}
+	return string(content), nil
+}
+
 func decodeMasterKey(raw string) ([]byte, error) {
+	raw = strings.TrimSpace(raw)
 	if b, err := hex.DecodeString(raw); err == nil {
 		return b, nil
 	}
