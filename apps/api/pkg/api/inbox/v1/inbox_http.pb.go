@@ -19,27 +19,40 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationInboxServiceClaimGift = "/inbox.v1.InboxService/ClaimGift"
 const OperationInboxServiceCreateDirectThread = "/inbox.v1.InboxService/CreateDirectThread"
+const OperationInboxServiceDeclineGift = "/inbox.v1.InboxService/DeclineGift"
 const OperationInboxServiceGetThread = "/inbox.v1.InboxService/GetThread"
 const OperationInboxServiceGetUnreadCount = "/inbox.v1.InboxService/GetUnreadCount"
+const OperationInboxServiceListReceivedGifts = "/inbox.v1.InboxService/ListReceivedGifts"
+const OperationInboxServiceListSentGifts = "/inbox.v1.InboxService/ListSentGifts"
 const OperationInboxServiceListThreads = "/inbox.v1.InboxService/ListThreads"
 const OperationInboxServiceMarkThreadRead = "/inbox.v1.InboxService/MarkThreadRead"
+const OperationInboxServiceSendGift = "/inbox.v1.InboxService/SendGift"
 const OperationInboxServiceSendMessage = "/inbox.v1.InboxService/SendMessage"
 
 type InboxServiceHTTPServer interface {
+	ClaimGift(context.Context, *ClaimGiftRequest) (*Gift, error)
 	// CreateDirectThread CreateDirectThread opens (or returns existing) a bidirectional friend-mail
 	// thread between the caller and the given recipient. Idempotent.
 	CreateDirectThread(context.Context, *CreateDirectThreadRequest) (*CreateDirectThreadResponse, error)
+	DeclineGift(context.Context, *DeclineGiftRequest) (*Gift, error)
 	// GetThread GetThread returns a single thread with its full message list.
 	// Does NOT implicitly mark messages as read; use MarkThreadRead for that.
 	GetThread(context.Context, *GetThreadRequest) (*GetThreadResponse, error)
 	// GetUnreadCount GetUnreadCount returns the total unread thread count for badge rendering.
 	GetUnreadCount(context.Context, *GetUnreadCountRequest) (*GetUnreadCountResponse, error)
+	ListReceivedGifts(context.Context, *ListReceivedGiftsRequest) (*ListGiftsResponse, error)
+	ListSentGifts(context.Context, *ListSentGiftsRequest) (*ListGiftsResponse, error)
 	// ListThreads ListThreads returns the authenticated user's threads, newest activity first.
 	ListThreads(context.Context, *ListThreadsRequest) (*ListThreadsResponse, error)
 	// MarkThreadRead MarkThreadRead zeroes the thread's unread counter and flags every message
 	// in it as read for the current user.
 	MarkThreadRead(context.Context, *MarkThreadReadRequest) (*MarkThreadReadResponse, error)
+	// SendGift ── #5 — Gift / trade flow (replaces text DMs in product narrative) ─
+	// SendGift moves an item from the sender's inventory into a pending
+	// gift; recipient claims to transfer ownership, declines to bounce.
+	SendGift(context.Context, *SendGiftRequest) (*Gift, error)
 	// SendMessage SendMessage appends a user-authored message to an interactive thread
 	// (mentor, challenge, duel). Non-interactive threads (system, guild-bot)
 	// reject this call.
@@ -54,6 +67,11 @@ func RegisterInboxServiceHTTPServer(s *http.Server, srv InboxServiceHTTPServer) 
 	r.POST("/api/v1/inbox/threads/{thread_id}/messages", _InboxService_SendMessage0_HTTP_Handler(srv))
 	r.GET("/api/v1/inbox/unread", _InboxService_GetUnreadCount0_HTTP_Handler(srv))
 	r.POST("/api/v1/inbox/threads", _InboxService_CreateDirectThread0_HTTP_Handler(srv))
+	r.POST("/api/v1/inbox/gifts", _InboxService_SendGift0_HTTP_Handler(srv))
+	r.GET("/api/v1/inbox/gifts/received", _InboxService_ListReceivedGifts0_HTTP_Handler(srv))
+	r.GET("/api/v1/inbox/gifts/sent", _InboxService_ListSentGifts0_HTTP_Handler(srv))
+	r.POST("/api/v1/inbox/gifts/{gift_id}/claim", _InboxService_ClaimGift0_HTTP_Handler(srv))
+	r.POST("/api/v1/inbox/gifts/{gift_id}/decline", _InboxService_DeclineGift0_HTTP_Handler(srv))
 }
 
 func _InboxService_ListThreads0_HTTP_Handler(srv InboxServiceHTTPServer) func(ctx http.Context) error {
@@ -188,20 +206,138 @@ func _InboxService_CreateDirectThread0_HTTP_Handler(srv InboxServiceHTTPServer) 
 	}
 }
 
+func _InboxService_SendGift0_HTTP_Handler(srv InboxServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SendGiftRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInboxServiceSendGift)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SendGift(ctx, req.(*SendGiftRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Gift)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _InboxService_ListReceivedGifts0_HTTP_Handler(srv InboxServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListReceivedGiftsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInboxServiceListReceivedGifts)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListReceivedGifts(ctx, req.(*ListReceivedGiftsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListGiftsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _InboxService_ListSentGifts0_HTTP_Handler(srv InboxServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListSentGiftsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInboxServiceListSentGifts)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListSentGifts(ctx, req.(*ListSentGiftsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListGiftsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _InboxService_ClaimGift0_HTTP_Handler(srv InboxServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ClaimGiftRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInboxServiceClaimGift)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ClaimGift(ctx, req.(*ClaimGiftRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Gift)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _InboxService_DeclineGift0_HTTP_Handler(srv InboxServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeclineGiftRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInboxServiceDeclineGift)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeclineGift(ctx, req.(*DeclineGiftRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Gift)
+		return ctx.Result(200, reply)
+	}
+}
+
 type InboxServiceHTTPClient interface {
+	ClaimGift(ctx context.Context, req *ClaimGiftRequest, opts ...http.CallOption) (rsp *Gift, err error)
 	// CreateDirectThread CreateDirectThread opens (or returns existing) a bidirectional friend-mail
 	// thread between the caller and the given recipient. Idempotent.
 	CreateDirectThread(ctx context.Context, req *CreateDirectThreadRequest, opts ...http.CallOption) (rsp *CreateDirectThreadResponse, err error)
+	DeclineGift(ctx context.Context, req *DeclineGiftRequest, opts ...http.CallOption) (rsp *Gift, err error)
 	// GetThread GetThread returns a single thread with its full message list.
 	// Does NOT implicitly mark messages as read; use MarkThreadRead for that.
 	GetThread(ctx context.Context, req *GetThreadRequest, opts ...http.CallOption) (rsp *GetThreadResponse, err error)
 	// GetUnreadCount GetUnreadCount returns the total unread thread count for badge rendering.
 	GetUnreadCount(ctx context.Context, req *GetUnreadCountRequest, opts ...http.CallOption) (rsp *GetUnreadCountResponse, err error)
+	ListReceivedGifts(ctx context.Context, req *ListReceivedGiftsRequest, opts ...http.CallOption) (rsp *ListGiftsResponse, err error)
+	ListSentGifts(ctx context.Context, req *ListSentGiftsRequest, opts ...http.CallOption) (rsp *ListGiftsResponse, err error)
 	// ListThreads ListThreads returns the authenticated user's threads, newest activity first.
 	ListThreads(ctx context.Context, req *ListThreadsRequest, opts ...http.CallOption) (rsp *ListThreadsResponse, err error)
 	// MarkThreadRead MarkThreadRead zeroes the thread's unread counter and flags every message
 	// in it as read for the current user.
 	MarkThreadRead(ctx context.Context, req *MarkThreadReadRequest, opts ...http.CallOption) (rsp *MarkThreadReadResponse, err error)
+	// SendGift ── #5 — Gift / trade flow (replaces text DMs in product narrative) ─
+	// SendGift moves an item from the sender's inventory into a pending
+	// gift; recipient claims to transfer ownership, declines to bounce.
+	SendGift(ctx context.Context, req *SendGiftRequest, opts ...http.CallOption) (rsp *Gift, err error)
 	// SendMessage SendMessage appends a user-authored message to an interactive thread
 	// (mentor, challenge, duel). Non-interactive threads (system, guild-bot)
 	// reject this call.
@@ -216,6 +352,19 @@ func NewInboxServiceHTTPClient(client *http.Client) InboxServiceHTTPClient {
 	return &InboxServiceHTTPClientImpl{client}
 }
 
+func (c *InboxServiceHTTPClientImpl) ClaimGift(ctx context.Context, in *ClaimGiftRequest, opts ...http.CallOption) (*Gift, error) {
+	var out Gift
+	pattern := "/api/v1/inbox/gifts/{gift_id}/claim"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationInboxServiceClaimGift))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 // CreateDirectThread CreateDirectThread opens (or returns existing) a bidirectional friend-mail
 // thread between the caller and the given recipient. Idempotent.
 func (c *InboxServiceHTTPClientImpl) CreateDirectThread(ctx context.Context, in *CreateDirectThreadRequest, opts ...http.CallOption) (*CreateDirectThreadResponse, error) {
@@ -223,6 +372,19 @@ func (c *InboxServiceHTTPClientImpl) CreateDirectThread(ctx context.Context, in 
 	pattern := "/api/v1/inbox/threads"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationInboxServiceCreateDirectThread))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *InboxServiceHTTPClientImpl) DeclineGift(ctx context.Context, in *DeclineGiftRequest, opts ...http.CallOption) (*Gift, error) {
+	var out Gift
+	pattern := "/api/v1/inbox/gifts/{gift_id}/decline"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationInboxServiceDeclineGift))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -260,6 +422,32 @@ func (c *InboxServiceHTTPClientImpl) GetUnreadCount(ctx context.Context, in *Get
 	return &out, nil
 }
 
+func (c *InboxServiceHTTPClientImpl) ListReceivedGifts(ctx context.Context, in *ListReceivedGiftsRequest, opts ...http.CallOption) (*ListGiftsResponse, error) {
+	var out ListGiftsResponse
+	pattern := "/api/v1/inbox/gifts/received"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationInboxServiceListReceivedGifts))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *InboxServiceHTTPClientImpl) ListSentGifts(ctx context.Context, in *ListSentGiftsRequest, opts ...http.CallOption) (*ListGiftsResponse, error) {
+	var out ListGiftsResponse
+	pattern := "/api/v1/inbox/gifts/sent"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationInboxServiceListSentGifts))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 // ListThreads ListThreads returns the authenticated user's threads, newest activity first.
 func (c *InboxServiceHTTPClientImpl) ListThreads(ctx context.Context, in *ListThreadsRequest, opts ...http.CallOption) (*ListThreadsResponse, error) {
 	var out ListThreadsResponse
@@ -281,6 +469,22 @@ func (c *InboxServiceHTTPClientImpl) MarkThreadRead(ctx context.Context, in *Mar
 	pattern := "/api/v1/inbox/threads/{thread_id}/read"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationInboxServiceMarkThreadRead))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// SendGift ── #5 — Gift / trade flow (replaces text DMs in product narrative) ─
+// SendGift moves an item from the sender's inventory into a pending
+// gift; recipient claims to transfer ownership, declines to bounce.
+func (c *InboxServiceHTTPClientImpl) SendGift(ctx context.Context, in *SendGiftRequest, opts ...http.CallOption) (*Gift, error) {
+	var out Gift
+	pattern := "/api/v1/inbox/gifts"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationInboxServiceSendGift))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

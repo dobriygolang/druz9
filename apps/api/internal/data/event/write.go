@@ -260,7 +260,10 @@ func (r *Repo) DeleteEvent(ctx context.Context, eventID uuid.UUID, actor *model.
 	if tag.RowsAffected() == 0 {
 		return kratoserrors.NotFound("EVENT_NOT_FOUND", "event not found")
 	}
-	return tx.Commit(ctx)
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("commit tx: %w", err)
+	}
+	return nil
 }
 
 func deleteEventByScope(
@@ -272,19 +275,39 @@ func deleteEventByScope(
 	scope string,
 ) (pgconn.CommandTag, error) {
 	if seriesID == nil {
-		return tx.Exec(ctx, `DELETE FROM events WHERE id = $1`, eventID)
+		tag, err := tx.Exec(ctx, `DELETE FROM events WHERE id = $1`, eventID)
+		if err != nil {
+			return pgconn.CommandTag{}, fmt.Errorf("delete event by id: %w", err)
+		}
+		return tag, nil
 	}
 
 	switch scope {
 	case "all":
-		return tx.Exec(ctx, `DELETE FROM events WHERE series_id = $1`, *seriesID)
+		tag, err := tx.Exec(ctx, `DELETE FROM events WHERE series_id = $1`, *seriesID)
+		if err != nil {
+			return pgconn.CommandTag{}, fmt.Errorf("delete events by series: %w", err)
+		}
+		return tag, nil
 	case "future":
 		if scheduledAt == nil {
-			return tx.Exec(ctx, `DELETE FROM events WHERE id = $1`, eventID)
+			tag, err := tx.Exec(ctx, `DELETE FROM events WHERE id = $1`, eventID)
+			if err != nil {
+				return pgconn.CommandTag{}, fmt.Errorf("delete event by id: %w", err)
+			}
+			return tag, nil
 		}
-		return tx.Exec(ctx, `DELETE FROM events WHERE series_id = $1 AND scheduled_at >= $2`, *seriesID, scheduledAt)
+		tag, err := tx.Exec(ctx, `DELETE FROM events WHERE series_id = $1 AND scheduled_at >= $2`, *seriesID, scheduledAt)
+		if err != nil {
+			return pgconn.CommandTag{}, fmt.Errorf("delete events by series and schedule: %w", err)
+		}
+		return tag, nil
 	default:
-		return tx.Exec(ctx, `DELETE FROM events WHERE id = $1`, eventID)
+		tag, err := tx.Exec(ctx, `DELETE FROM events WHERE id = $1`, eventID)
+		if err != nil {
+			return pgconn.CommandTag{}, fmt.Errorf("delete event by id: %w", err)
+		}
+		return tag, nil
 	}
 }
 

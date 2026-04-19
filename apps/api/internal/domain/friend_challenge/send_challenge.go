@@ -2,6 +2,7 @@ package friend_challenge
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/google/uuid"
@@ -55,7 +56,7 @@ func (s *Service) SendChallenge(
 		CreatedAt:          now,
 	}
 	if err := s.repo.Insert(ctx, ch); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("insert challenge: %w", err)
 	}
 	return ch, nil
 }

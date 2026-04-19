@@ -917,6 +917,412 @@ func (x *CreateDirectThreadResponse) GetThreadId() string {
 	return ""
 }
 
+type Gift struct {
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	SenderId    string                 `protobuf:"bytes,2,opt,name=sender_id,json=senderId,proto3" json:"sender_id,omitempty"`
+	SenderName  string                 `protobuf:"bytes,3,opt,name=sender_name,json=senderName,proto3" json:"sender_name,omitempty"`
+	RecipientId string                 `protobuf:"bytes,4,opt,name=recipient_id,json=recipientId,proto3" json:"recipient_id,omitempty"`
+	ItemId      string                 `protobuf:"bytes,5,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
+	ItemName    string                 `protobuf:"bytes,6,opt,name=item_name,json=itemName,proto3" json:"item_name,omitempty"`
+	ItemIconRef string                 `protobuf:"bytes,7,opt,name=item_icon_ref,json=itemIconRef,proto3" json:"item_icon_ref,omitempty"`
+	Note        string                 `protobuf:"bytes,8,opt,name=note,proto3" json:"note,omitempty"`
+	// pending | claimed | declined | expired
+	Status        string                 `protobuf:"bytes,9,opt,name=status,proto3" json:"status,omitempty"`
+	SentAt        *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=sent_at,json=sentAt,proto3" json:"sent_at,omitempty"`
+	DecidedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=decided_at,json=decidedAt,proto3" json:"decided_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Gift) Reset() {
+	*x = Gift{}
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Gift) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Gift) ProtoMessage() {}
+
+func (x *Gift) ProtoReflect() protoreflect.Message {
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Gift.ProtoReflect.Descriptor instead.
+func (*Gift) Descriptor() ([]byte, []int) {
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *Gift) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Gift) GetSenderId() string {
+	if x != nil {
+		return x.SenderId
+	}
+	return ""
+}
+
+func (x *Gift) GetSenderName() string {
+	if x != nil {
+		return x.SenderName
+	}
+	return ""
+}
+
+func (x *Gift) GetRecipientId() string {
+	if x != nil {
+		return x.RecipientId
+	}
+	return ""
+}
+
+func (x *Gift) GetItemId() string {
+	if x != nil {
+		return x.ItemId
+	}
+	return ""
+}
+
+func (x *Gift) GetItemName() string {
+	if x != nil {
+		return x.ItemName
+	}
+	return ""
+}
+
+func (x *Gift) GetItemIconRef() string {
+	if x != nil {
+		return x.ItemIconRef
+	}
+	return ""
+}
+
+func (x *Gift) GetNote() string {
+	if x != nil {
+		return x.Note
+	}
+	return ""
+}
+
+func (x *Gift) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *Gift) GetSentAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.SentAt
+	}
+	return nil
+}
+
+func (x *Gift) GetDecidedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DecidedAt
+	}
+	return nil
+}
+
+type SendGiftRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RecipientId   string                 `protobuf:"bytes,1,opt,name=recipient_id,json=recipientId,proto3" json:"recipient_id,omitempty"`
+	ItemId        string                 `protobuf:"bytes,2,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
+	Note          string                 `protobuf:"bytes,3,opt,name=note,proto3" json:"note,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SendGiftRequest) Reset() {
+	*x = SendGiftRequest{}
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SendGiftRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendGiftRequest) ProtoMessage() {}
+
+func (x *SendGiftRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendGiftRequest.ProtoReflect.Descriptor instead.
+func (*SendGiftRequest) Descriptor() ([]byte, []int) {
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *SendGiftRequest) GetRecipientId() string {
+	if x != nil {
+		return x.RecipientId
+	}
+	return ""
+}
+
+func (x *SendGiftRequest) GetItemId() string {
+	if x != nil {
+		return x.ItemId
+	}
+	return ""
+}
+
+func (x *SendGiftRequest) GetNote() string {
+	if x != nil {
+		return x.Note
+	}
+	return ""
+}
+
+type ListReceivedGiftsRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Optional status filter ("pending" | "claimed" | …); empty = all.
+	Status        string `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListReceivedGiftsRequest) Reset() {
+	*x = ListReceivedGiftsRequest{}
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListReceivedGiftsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListReceivedGiftsRequest) ProtoMessage() {}
+
+func (x *ListReceivedGiftsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListReceivedGiftsRequest.ProtoReflect.Descriptor instead.
+func (*ListReceivedGiftsRequest) Descriptor() ([]byte, []int) {
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ListReceivedGiftsRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type ListSentGiftsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListSentGiftsRequest) Reset() {
+	*x = ListSentGiftsRequest{}
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListSentGiftsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSentGiftsRequest) ProtoMessage() {}
+
+func (x *ListSentGiftsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListSentGiftsRequest.ProtoReflect.Descriptor instead.
+func (*ListSentGiftsRequest) Descriptor() ([]byte, []int) {
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *ListSentGiftsRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type ListGiftsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Gifts         []*Gift                `protobuf:"bytes,1,rep,name=gifts,proto3" json:"gifts,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListGiftsResponse) Reset() {
+	*x = ListGiftsResponse{}
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListGiftsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListGiftsResponse) ProtoMessage() {}
+
+func (x *ListGiftsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListGiftsResponse.ProtoReflect.Descriptor instead.
+func (*ListGiftsResponse) Descriptor() ([]byte, []int) {
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *ListGiftsResponse) GetGifts() []*Gift {
+	if x != nil {
+		return x.Gifts
+	}
+	return nil
+}
+
+type ClaimGiftRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GiftId        string                 `protobuf:"bytes,1,opt,name=gift_id,json=giftId,proto3" json:"gift_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ClaimGiftRequest) Reset() {
+	*x = ClaimGiftRequest{}
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClaimGiftRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClaimGiftRequest) ProtoMessage() {}
+
+func (x *ClaimGiftRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClaimGiftRequest.ProtoReflect.Descriptor instead.
+func (*ClaimGiftRequest) Descriptor() ([]byte, []int) {
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *ClaimGiftRequest) GetGiftId() string {
+	if x != nil {
+		return x.GiftId
+	}
+	return ""
+}
+
+type DeclineGiftRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GiftId        string                 `protobuf:"bytes,1,opt,name=gift_id,json=giftId,proto3" json:"gift_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeclineGiftRequest) Reset() {
+	*x = DeclineGiftRequest{}
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeclineGiftRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeclineGiftRequest) ProtoMessage() {}
+
+func (x *DeclineGiftRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeclineGiftRequest.ProtoReflect.Descriptor instead.
+func (*DeclineGiftRequest) Descriptor() ([]byte, []int) {
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *DeclineGiftRequest) GetGiftId() string {
+	if x != nil {
+		return x.GiftId
+	}
+	return ""
+}
+
 var File_social_inbox_v1_inbox_proto protoreflect.FileDescriptor
 
 const file_social_inbox_v1_inbox_proto_rawDesc = "" +
@@ -973,7 +1379,36 @@ const file_social_inbox_v1_inbox_proto_rawDesc = "" +
 	"\x19CreateDirectThreadRequest\x12!\n" +
 	"\frecipient_id\x18\x01 \x01(\tR\vrecipientId\"9\n" +
 	"\x1aCreateDirectThreadResponse\x12\x1b\n" +
-	"\tthread_id\x18\x01 \x01(\tR\bthreadId*\xb9\x01\n" +
+	"\tthread_id\x18\x01 \x01(\tR\bthreadId\"\xed\x02\n" +
+	"\x04Gift\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
+	"\tsender_id\x18\x02 \x01(\tR\bsenderId\x12\x1f\n" +
+	"\vsender_name\x18\x03 \x01(\tR\n" +
+	"senderName\x12!\n" +
+	"\frecipient_id\x18\x04 \x01(\tR\vrecipientId\x12\x17\n" +
+	"\aitem_id\x18\x05 \x01(\tR\x06itemId\x12\x1b\n" +
+	"\titem_name\x18\x06 \x01(\tR\bitemName\x12\"\n" +
+	"\ritem_icon_ref\x18\a \x01(\tR\vitemIconRef\x12\x12\n" +
+	"\x04note\x18\b \x01(\tR\x04note\x12\x16\n" +
+	"\x06status\x18\t \x01(\tR\x06status\x123\n" +
+	"\asent_at\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\x06sentAt\x129\n" +
+	"\n" +
+	"decided_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tdecidedAt\"a\n" +
+	"\x0fSendGiftRequest\x12!\n" +
+	"\frecipient_id\x18\x01 \x01(\tR\vrecipientId\x12\x17\n" +
+	"\aitem_id\x18\x02 \x01(\tR\x06itemId\x12\x12\n" +
+	"\x04note\x18\x03 \x01(\tR\x04note\"2\n" +
+	"\x18ListReceivedGiftsRequest\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\".\n" +
+	"\x14ListSentGiftsRequest\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\"9\n" +
+	"\x11ListGiftsResponse\x12$\n" +
+	"\x05gifts\x18\x01 \x03(\v2\x0e.inbox.v1.GiftR\x05gifts\"+\n" +
+	"\x10ClaimGiftRequest\x12\x17\n" +
+	"\agift_id\x18\x01 \x01(\tR\x06giftId\"-\n" +
+	"\x12DeclineGiftRequest\x12\x17\n" +
+	"\agift_id\x18\x01 \x01(\tR\x06giftId*\xb9\x01\n" +
 	"\n" +
 	"ThreadKind\x12\x1b\n" +
 	"\x17THREAD_KIND_UNSPECIFIED\x10\x00\x12\x16\n" +
@@ -989,14 +1424,20 @@ const file_social_inbox_v1_inbox_proto_rawDesc = "" +
 	"\x10SENDER_KIND_USER\x10\x01\x12\x16\n" +
 	"\x12SENDER_KIND_SYSTEM\x10\x02\x12\x1a\n" +
 	"\x16SENDER_KIND_MENTOR_BOT\x10\x03\x12\x19\n" +
-	"\x15SENDER_KIND_GUILD_BOT\x10\x042\xee\x05\n" +
+	"\x15SENDER_KIND_GUILD_BOT\x10\x042\x89\n" +
+	"\n" +
 	"\fInboxService\x12i\n" +
 	"\vListThreads\x12\x1c.inbox.v1.ListThreadsRequest\x1a\x1d.inbox.v1.ListThreadsResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v1/inbox/threads\x12o\n" +
 	"\tGetThread\x12\x1a.inbox.v1.GetThreadRequest\x1a\x1b.inbox.v1.GetThreadResponse\")\x82\xd3\xe4\x93\x02#\x12!/api/v1/inbox/threads/{thread_id}\x12\x86\x01\n" +
 	"\x0eMarkThreadRead\x12\x1f.inbox.v1.MarkThreadReadRequest\x1a .inbox.v1.MarkThreadReadResponse\"1\x82\xd3\xe4\x93\x02+:\x01*\"&/api/v1/inbox/threads/{thread_id}/read\x12\x81\x01\n" +
 	"\vSendMessage\x12\x1c.inbox.v1.SendMessageRequest\x1a\x1d.inbox.v1.SendMessageResponse\"5\x82\xd3\xe4\x93\x02/:\x01*\"*/api/v1/inbox/threads/{thread_id}/messages\x12q\n" +
 	"\x0eGetUnreadCount\x12\x1f.inbox.v1.GetUnreadCountRequest\x1a .inbox.v1.GetUnreadCountResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/inbox/unread\x12\x81\x01\n" +
-	"\x12CreateDirectThread\x12#.inbox.v1.CreateDirectThreadRequest\x1a$.inbox.v1.CreateDirectThreadResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/inbox/threadsB\x19Z\x17api/pkg/api/inbox/v1;v1b\x06proto3"
+	"\x12CreateDirectThread\x12#.inbox.v1.CreateDirectThreadRequest\x1a$.inbox.v1.CreateDirectThreadResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/inbox/threads\x12U\n" +
+	"\bSendGift\x12\x19.inbox.v1.SendGiftRequest\x1a\x0e.inbox.v1.Gift\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/inbox/gifts\x12z\n" +
+	"\x11ListReceivedGifts\x12\".inbox.v1.ListReceivedGiftsRequest\x1a\x1b.inbox.v1.ListGiftsResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/inbox/gifts/received\x12n\n" +
+	"\rListSentGifts\x12\x1e.inbox.v1.ListSentGiftsRequest\x1a\x1b.inbox.v1.ListGiftsResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/api/v1/inbox/gifts/sent\x12g\n" +
+	"\tClaimGift\x12\x1a.inbox.v1.ClaimGiftRequest\x1a\x0e.inbox.v1.Gift\".\x82\xd3\xe4\x93\x02(:\x01*\"#/api/v1/inbox/gifts/{gift_id}/claim\x12m\n" +
+	"\vDeclineGift\x12\x1c.inbox.v1.DeclineGiftRequest\x1a\x0e.inbox.v1.Gift\"0\x82\xd3\xe4\x93\x02*:\x01*\"%/api/v1/inbox/gifts/{gift_id}/declineB\x19Z\x17api/pkg/api/inbox/v1;v1b\x06proto3"
 
 var (
 	file_social_inbox_v1_inbox_proto_rawDescOnce sync.Once
@@ -1011,7 +1452,7 @@ func file_social_inbox_v1_inbox_proto_rawDescGZIP() []byte {
 }
 
 var file_social_inbox_v1_inbox_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_social_inbox_v1_inbox_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_social_inbox_v1_inbox_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_social_inbox_v1_inbox_proto_goTypes = []any{
 	(ThreadKind)(0),                    // 0: inbox.v1.ThreadKind
 	(SenderKind)(0),                    // 1: inbox.v1.SenderKind
@@ -1029,34 +1470,54 @@ var file_social_inbox_v1_inbox_proto_goTypes = []any{
 	(*GetUnreadCountResponse)(nil),     // 13: inbox.v1.GetUnreadCountResponse
 	(*CreateDirectThreadRequest)(nil),  // 14: inbox.v1.CreateDirectThreadRequest
 	(*CreateDirectThreadResponse)(nil), // 15: inbox.v1.CreateDirectThreadResponse
-	(*timestamppb.Timestamp)(nil),      // 16: google.protobuf.Timestamp
+	(*Gift)(nil),                       // 16: inbox.v1.Gift
+	(*SendGiftRequest)(nil),            // 17: inbox.v1.SendGiftRequest
+	(*ListReceivedGiftsRequest)(nil),   // 18: inbox.v1.ListReceivedGiftsRequest
+	(*ListSentGiftsRequest)(nil),       // 19: inbox.v1.ListSentGiftsRequest
+	(*ListGiftsResponse)(nil),          // 20: inbox.v1.ListGiftsResponse
+	(*ClaimGiftRequest)(nil),           // 21: inbox.v1.ClaimGiftRequest
+	(*DeclineGiftRequest)(nil),         // 22: inbox.v1.DeclineGiftRequest
+	(*timestamppb.Timestamp)(nil),      // 23: google.protobuf.Timestamp
 }
 var file_social_inbox_v1_inbox_proto_depIdxs = []int32{
 	0,  // 0: inbox.v1.InboxThread.kind:type_name -> inbox.v1.ThreadKind
-	16, // 1: inbox.v1.InboxThread.last_message_at:type_name -> google.protobuf.Timestamp
+	23, // 1: inbox.v1.InboxThread.last_message_at:type_name -> google.protobuf.Timestamp
 	1,  // 2: inbox.v1.InboxMessage.sender_kind:type_name -> inbox.v1.SenderKind
-	16, // 3: inbox.v1.InboxMessage.created_at:type_name -> google.protobuf.Timestamp
+	23, // 3: inbox.v1.InboxMessage.created_at:type_name -> google.protobuf.Timestamp
 	2,  // 4: inbox.v1.ListThreadsResponse.threads:type_name -> inbox.v1.InboxThread
 	2,  // 5: inbox.v1.GetThreadResponse.thread:type_name -> inbox.v1.InboxThread
 	3,  // 6: inbox.v1.GetThreadResponse.messages:type_name -> inbox.v1.InboxMessage
 	3,  // 7: inbox.v1.SendMessageResponse.message:type_name -> inbox.v1.InboxMessage
-	4,  // 8: inbox.v1.InboxService.ListThreads:input_type -> inbox.v1.ListThreadsRequest
-	6,  // 9: inbox.v1.InboxService.GetThread:input_type -> inbox.v1.GetThreadRequest
-	8,  // 10: inbox.v1.InboxService.MarkThreadRead:input_type -> inbox.v1.MarkThreadReadRequest
-	10, // 11: inbox.v1.InboxService.SendMessage:input_type -> inbox.v1.SendMessageRequest
-	12, // 12: inbox.v1.InboxService.GetUnreadCount:input_type -> inbox.v1.GetUnreadCountRequest
-	14, // 13: inbox.v1.InboxService.CreateDirectThread:input_type -> inbox.v1.CreateDirectThreadRequest
-	5,  // 14: inbox.v1.InboxService.ListThreads:output_type -> inbox.v1.ListThreadsResponse
-	7,  // 15: inbox.v1.InboxService.GetThread:output_type -> inbox.v1.GetThreadResponse
-	9,  // 16: inbox.v1.InboxService.MarkThreadRead:output_type -> inbox.v1.MarkThreadReadResponse
-	11, // 17: inbox.v1.InboxService.SendMessage:output_type -> inbox.v1.SendMessageResponse
-	13, // 18: inbox.v1.InboxService.GetUnreadCount:output_type -> inbox.v1.GetUnreadCountResponse
-	15, // 19: inbox.v1.InboxService.CreateDirectThread:output_type -> inbox.v1.CreateDirectThreadResponse
-	14, // [14:20] is the sub-list for method output_type
-	8,  // [8:14] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	23, // 8: inbox.v1.Gift.sent_at:type_name -> google.protobuf.Timestamp
+	23, // 9: inbox.v1.Gift.decided_at:type_name -> google.protobuf.Timestamp
+	16, // 10: inbox.v1.ListGiftsResponse.gifts:type_name -> inbox.v1.Gift
+	4,  // 11: inbox.v1.InboxService.ListThreads:input_type -> inbox.v1.ListThreadsRequest
+	6,  // 12: inbox.v1.InboxService.GetThread:input_type -> inbox.v1.GetThreadRequest
+	8,  // 13: inbox.v1.InboxService.MarkThreadRead:input_type -> inbox.v1.MarkThreadReadRequest
+	10, // 14: inbox.v1.InboxService.SendMessage:input_type -> inbox.v1.SendMessageRequest
+	12, // 15: inbox.v1.InboxService.GetUnreadCount:input_type -> inbox.v1.GetUnreadCountRequest
+	14, // 16: inbox.v1.InboxService.CreateDirectThread:input_type -> inbox.v1.CreateDirectThreadRequest
+	17, // 17: inbox.v1.InboxService.SendGift:input_type -> inbox.v1.SendGiftRequest
+	18, // 18: inbox.v1.InboxService.ListReceivedGifts:input_type -> inbox.v1.ListReceivedGiftsRequest
+	19, // 19: inbox.v1.InboxService.ListSentGifts:input_type -> inbox.v1.ListSentGiftsRequest
+	21, // 20: inbox.v1.InboxService.ClaimGift:input_type -> inbox.v1.ClaimGiftRequest
+	22, // 21: inbox.v1.InboxService.DeclineGift:input_type -> inbox.v1.DeclineGiftRequest
+	5,  // 22: inbox.v1.InboxService.ListThreads:output_type -> inbox.v1.ListThreadsResponse
+	7,  // 23: inbox.v1.InboxService.GetThread:output_type -> inbox.v1.GetThreadResponse
+	9,  // 24: inbox.v1.InboxService.MarkThreadRead:output_type -> inbox.v1.MarkThreadReadResponse
+	11, // 25: inbox.v1.InboxService.SendMessage:output_type -> inbox.v1.SendMessageResponse
+	13, // 26: inbox.v1.InboxService.GetUnreadCount:output_type -> inbox.v1.GetUnreadCountResponse
+	15, // 27: inbox.v1.InboxService.CreateDirectThread:output_type -> inbox.v1.CreateDirectThreadResponse
+	16, // 28: inbox.v1.InboxService.SendGift:output_type -> inbox.v1.Gift
+	20, // 29: inbox.v1.InboxService.ListReceivedGifts:output_type -> inbox.v1.ListGiftsResponse
+	20, // 30: inbox.v1.InboxService.ListSentGifts:output_type -> inbox.v1.ListGiftsResponse
+	16, // 31: inbox.v1.InboxService.ClaimGift:output_type -> inbox.v1.Gift
+	16, // 32: inbox.v1.InboxService.DeclineGift:output_type -> inbox.v1.Gift
+	22, // [22:33] is the sub-list for method output_type
+	11, // [11:22] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_social_inbox_v1_inbox_proto_init() }
@@ -1070,7 +1531,7 @@ func file_social_inbox_v1_inbox_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_social_inbox_v1_inbox_proto_rawDesc), len(file_social_inbox_v1_inbox_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   14,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

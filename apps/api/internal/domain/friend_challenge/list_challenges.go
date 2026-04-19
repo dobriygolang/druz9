@@ -2,6 +2,7 @@ package friend_challenge
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -15,7 +16,7 @@ func (s *Service) ListIncoming(ctx context.Context, userID uuid.UUID, limit, off
 	limit, offset = clampPaging(limit, offset)
 	items, total, err := s.repo.ListIncoming(ctx, userID, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list incoming challenges: %w", err)
 	}
 	return &model.ChallengeList{Challenges: items, Total: total}, nil
 }
@@ -25,7 +26,7 @@ func (s *Service) ListSent(ctx context.Context, userID uuid.UUID, limit, offset 
 	limit, offset = clampPaging(limit, offset)
 	items, total, err := s.repo.ListSent(ctx, userID, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list sent challenges: %w", err)
 	}
 	return &model.ChallengeList{Challenges: items, Total: total}, nil
 }
@@ -36,7 +37,7 @@ func (s *Service) ListHistory(ctx context.Context, userID uuid.UUID, limit, offs
 	limit, offset = clampPaging(limit, offset)
 	items, total, err := s.repo.ListHistory(ctx, userID, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list challenge history: %w", err)
 	}
 	return &model.ChallengeList{Challenges: items, Total: total}, nil
 }
@@ -44,7 +45,11 @@ func (s *Service) ListHistory(ctx context.Context, userID uuid.UUID, limit, offs
 // SweepExpired is called by a background worker (or the request path, lazily)
 // to mark rows whose deadline has passed. Returns count updated.
 func (s *Service) SweepExpired(ctx context.Context) (int, error) {
-	return s.repo.SweepExpired(ctx, s.clock.Now())
+	count, err := s.repo.SweepExpired(ctx, s.clock.Now())
+	if err != nil {
+		return 0, fmt.Errorf("sweep expired challenges: %w", err)
+	}
+	return count, nil
 }
 
 func clampPaging(limit, offset int32) (int32, int32) {

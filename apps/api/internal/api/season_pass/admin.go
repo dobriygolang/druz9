@@ -2,6 +2,7 @@ package season_pass
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	kerrs "github.com/go-kratos/kratos/v2/errors"
@@ -15,7 +16,7 @@ import (
 
 func (i *Implementation) AdminListPasses(ctx context.Context, _ *v1.AdminListPassesRequest) (*v1.AdminListPassesResponse, error) {
 	if _, err := apihelpers.RequireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require admin: %w", err)
 	}
 	passes, err := i.service.AdminListPasses(ctx)
 	if err != nil {
@@ -31,7 +32,7 @@ func (i *Implementation) AdminListPasses(ctx context.Context, _ *v1.AdminListPas
 
 func (i *Implementation) AdminCreatePass(ctx context.Context, req *v1.AdminCreatePassRequest) (*v1.SeasonPassAdminRow, error) {
 	if _, err := apihelpers.RequireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require admin: %w", err)
 	}
 	startsAt, err := time.Parse(time.RFC3339, req.GetStartsAt())
 	if err != nil {
@@ -61,11 +62,11 @@ func (i *Implementation) AdminCreatePass(ctx context.Context, req *v1.AdminCreat
 
 func (i *Implementation) AdminUpdatePass(ctx context.Context, req *v1.AdminUpdatePassRequest) (*v1.SeasonPassAdminRow, error) {
 	if _, err := apihelpers.RequireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require admin: %w", err)
 	}
 	id, err := apihelpers.ParseUUID(req.GetId(), "INVALID_ID", "id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse uuid: %w", err)
 	}
 	startsAt, err := time.Parse(time.RFC3339, req.GetStartsAt())
 	if err != nil {
@@ -95,11 +96,11 @@ func (i *Implementation) AdminUpdatePass(ctx context.Context, req *v1.AdminUpdat
 
 func (i *Implementation) AdminDeletePass(ctx context.Context, req *v1.AdminDeletePassRequest) (*v1.AdminSeasonPassDeleteResponse, error) {
 	if _, err := apihelpers.RequireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require admin: %w", err)
 	}
 	id, err := apihelpers.ParseUUID(req.GetId(), "INVALID_ID", "id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse uuid: %w", err)
 	}
 	if err := i.service.AdminDeletePass(ctx, id); err != nil {
 		klog.Errorf("admin season pass: delete %s: %v", id, err)
@@ -110,7 +111,7 @@ func (i *Implementation) AdminDeletePass(ctx context.Context, req *v1.AdminDelet
 
 func (i *Implementation) AdminUpsertTier(ctx context.Context, req *v1.AdminUpsertTierRequest) (*v1.SeasonPassTier, error) {
 	if _, err := apihelpers.RequireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require admin: %w", err)
 	}
 	passID, err := apihelpers.ParseUUID(req.GetSeasonPassId(), "INVALID_PASS_ID", "season_pass_id")
 	if err != nil {
@@ -135,7 +136,7 @@ func (i *Implementation) AdminUpsertTier(ctx context.Context, req *v1.AdminUpser
 
 func (i *Implementation) AdminDeleteTier(ctx context.Context, req *v1.AdminDeleteTierRequest) (*v1.AdminSeasonPassDeleteResponse, error) {
 	if _, err := apihelpers.RequireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require admin: %w", err)
 	}
 	passID, err := apihelpers.ParseUUID(req.GetSeasonPassId(), "INVALID_PASS_ID", "season_pass_id")
 	if err != nil {

@@ -2714,6 +2714,111 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/hub.v1.GetOverviewResponse'
+    /api/v1/inbox/gifts:
+        post:
+            tags:
+                - InboxService
+            description: |-
+                ── #5 — Gift / trade flow (replaces text DMs in product narrative) ─
+                 SendGift moves an item from the sender's inventory into a pending
+                 gift; recipient claims to transfer ownership, declines to bounce.
+            operationId: InboxService_SendGift
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/inbox.v1.SendGiftRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.Gift'
+    /api/v1/inbox/gifts/received:
+        get:
+            tags:
+                - InboxService
+            operationId: InboxService_ListReceivedGifts
+            parameters:
+                - name: status
+                  in: query
+                  description: Optional status filter ("pending" | "claimed" | …); empty = all.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.ListGiftsResponse'
+    /api/v1/inbox/gifts/sent:
+        get:
+            tags:
+                - InboxService
+            operationId: InboxService_ListSentGifts
+            parameters:
+                - name: status
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.ListGiftsResponse'
+    /api/v1/inbox/gifts/{giftId}/claim:
+        post:
+            tags:
+                - InboxService
+            operationId: InboxService_ClaimGift
+            parameters:
+                - name: giftId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/inbox.v1.ClaimGiftRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.Gift'
+    /api/v1/inbox/gifts/{giftId}/decline:
+        post:
+            tags:
+                - InboxService
+            operationId: InboxService_DeclineGift
+            parameters:
+                - name: giftId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/inbox.v1.DeclineGiftRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.Gift'
     /api/v1/inbox/threads:
         get:
             tags:
@@ -7067,6 +7172,11 @@ components:
             description: |-
                 HubSeason describes the currently-live season pass (number, title and
                  a short "days left" label). `number == 0` means no active season.
+        inbox.v1.ClaimGiftRequest:
+            type: object
+            properties:
+                giftId:
+                    type: string
         inbox.v1.CreateDirectThreadRequest:
             type: object
             properties:
@@ -7076,6 +7186,11 @@ components:
             type: object
             properties:
                 threadId:
+                    type: string
+        inbox.v1.DeclineGiftRequest:
+            type: object
+            properties:
+                giftId:
                     type: string
         inbox.v1.GetThreadResponse:
             type: object
@@ -7092,6 +7207,34 @@ components:
                 unreadTotal:
                     type: integer
                     format: int32
+        inbox.v1.Gift:
+            type: object
+            properties:
+                id:
+                    type: string
+                senderId:
+                    type: string
+                senderName:
+                    type: string
+                recipientId:
+                    type: string
+                itemId:
+                    type: string
+                itemName:
+                    type: string
+                itemIconRef:
+                    type: string
+                note:
+                    type: string
+                status:
+                    type: string
+                    description: pending | claimed | declined | expired
+                sentAt:
+                    type: string
+                    format: date-time
+                decidedAt:
+                    type: string
+                    format: date-time
         inbox.v1.InboxMessage:
             type: object
             properties:
@@ -7137,6 +7280,13 @@ components:
                     type: string
                 interactive:
                     type: boolean
+        inbox.v1.ListGiftsResponse:
+            type: object
+            properties:
+                gifts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/inbox.v1.Gift'
         inbox.v1.ListThreadsResponse:
             type: object
             properties:
@@ -7163,6 +7313,15 @@ components:
                 unreadTotal:
                     type: integer
                     format: int32
+        inbox.v1.SendGiftRequest:
+            type: object
+            properties:
+                recipientId:
+                    type: string
+                itemId:
+                    type: string
+                note:
+                    type: string
         inbox.v1.SendMessageRequest:
             type: object
             properties:

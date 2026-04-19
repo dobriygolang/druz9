@@ -50,6 +50,12 @@ const ICON_REGISTRY: Record<string, (props: { scale?: number }) => ReactNode> = 
 }
 
 function renderIcon(iconRef: string, scale = 2): ReactNode {
+  // Path-like icon_refs (avatars, future image-backed cosmetics) render
+  // as <img>. The sprite registry stays for code-drawn pixel art.
+  if (iconRef.startsWith('/') || iconRef.startsWith('http')) {
+    const px = 28 * scale
+    return <img src={iconRef} alt="" style={{ width: px, height: px, objectFit: 'contain' }} draggable={false} />
+  }
   const fn = ICON_REGISTRY[iconRef]
   if (fn) return fn({ scale })
   // Generic placeholder: a small coloured square so items without a sprite

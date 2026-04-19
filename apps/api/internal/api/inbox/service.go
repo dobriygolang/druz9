@@ -35,6 +35,7 @@ type Implementation struct {
 	v1.UnimplementedInboxServiceServer
 	service      Service
 	userResolver UserResolver
+	gifts        GiftsRepo
 }
 
 // New constructs the inbox service Implementation.

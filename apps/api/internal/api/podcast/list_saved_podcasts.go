@@ -2,6 +2,7 @@ package podcast
 
 import (
 	"context"
+	"fmt"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -29,7 +30,7 @@ func (i *Implementation) WithSavedRepo(r SavedRepo) *Implementation {
 func (i *Implementation) ListSavedPodcasts(ctx context.Context, req *v1.ListSavedPodcastsRequest) (*v1.ListPodcastsResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.saved == nil {
 		return &v1.ListPodcastsResponse{}, nil

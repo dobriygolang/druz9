@@ -71,6 +71,9 @@ const PodcastsPage = lazy(() =>
 const MapPage = lazy(() =>
   import('@/pages/MapPage/ui/MapPage').then((m) => ({ default: m.MapPage })),
 )
+const AtlasWorldPage = lazy(() =>
+  import('@/pages/AtlasWorldPage/ui/AtlasWorldPage').then((m) => ({ default: m.AtlasWorldPage })),
+)
 const ShopPage = lazy(() =>
   import('@/pages/ShopPage/ui/ShopPage').then((m) => ({ default: m.ShopPage })),
 )
@@ -188,6 +191,9 @@ const AdminSeasonPassPage = lazy(() =>
 )
 const AdminAIBotsPage = lazy(() =>
   import('@/pages/AdminAIBotsPage/ui/AdminAIBotsPage').then((m) => ({ default: m.AdminAIBotsPage })),
+)
+const AdminUsersPage = lazy(() =>
+  import('@/pages/AdminUsersPage/ui/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })),
 )
 
 const Fallback: React.FC = () => (
@@ -370,6 +376,8 @@ export const RouterProvider: React.FC = () => {
               element={gate ? <Navigate to="/login" replace /> : <PodcastsPage />}
             />
             <Route path="/map" element={gate ? <Navigate to="/login" replace /> : <MapPage />} />
+            {/* ADR-002 — stylised SVG world atlas */}
+            <Route path="/atlas/world" element={gate ? <Navigate to="/login" replace /> : <AtlasWorldPage />} />
             {/* /tavern is the new canonical path; /shop kept as a backward-compat redirect. */}
             <Route path="/tavern" element={gate ? <Navigate to="/login" replace /> : <ShopPage />} />
             <Route path="/shop" element={<Navigate to="/tavern" replace />} />
@@ -424,6 +432,7 @@ export const RouterProvider: React.FC = () => {
                 the corresponding admin RPCs ship. */}
             <Route path="/admin/podcasts"     element={<AdminPodcastsPage />} />
             <Route path="/admin/shop"         element={<AdminShopPage />} />
+            <Route path="/admin/users"        element={<AdminUsersPage />} />
             <Route path="/admin/seasonpass"   element={<AdminSeasonPassPage />} />
             <Route path="/admin/ai-bots"      element={<AdminAIBotsPage />} />
             <Route path="/admin/notifications" element={<AdminNotificationsPage />} />

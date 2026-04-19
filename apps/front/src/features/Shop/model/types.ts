@@ -6,6 +6,7 @@ export enum ItemCategory {
   PETS = 4,
   GUILD = 5,
   SEASONAL = 6,
+  AVATAR = 7,
 }
 
 export enum ItemRarity {
@@ -83,4 +84,5 @@ export const categoryLabel: Record<ItemCategory, string> = {
   [ItemCategory.PETS]: 'pets',
   [ItemCategory.GUILD]: 'guild',
   [ItemCategory.SEASONAL]: 'seasonal',
+  [ItemCategory.AVATAR]: 'avatar',
 }

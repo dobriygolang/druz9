@@ -20,18 +20,18 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	PodcastService_ListPodcasts_FullMethodName          = "/podcast.v1.PodcastService/ListPodcasts"
-	PodcastService_GetPodcast_FullMethodName            = "/podcast.v1.PodcastService/GetPodcast"
-	PodcastService_CreatePodcast_FullMethodName         = "/podcast.v1.PodcastService/CreatePodcast"
-	PodcastService_UploadPodcast_FullMethodName         = "/podcast.v1.PodcastService/UploadPodcast"
-	PodcastService_PreparePodcastUpload_FullMethodName  = "/podcast.v1.PodcastService/PreparePodcastUpload"
-	PodcastService_CompletePodcastUpload_FullMethodName = "/podcast.v1.PodcastService/CompletePodcastUpload"
-	PodcastService_DeletePodcast_FullMethodName         = "/podcast.v1.PodcastService/DeletePodcast"
 	PodcastService_ListSeries_FullMethodName            = "/podcast.v1.PodcastService/ListSeries"
 	PodcastService_AdminCreateSeries_FullMethodName     = "/podcast.v1.PodcastService/AdminCreateSeries"
 	PodcastService_AdminUpdateSeries_FullMethodName     = "/podcast.v1.PodcastService/AdminUpdateSeries"
 	PodcastService_AdminDeleteSeries_FullMethodName     = "/podcast.v1.PodcastService/AdminDeleteSeries"
 	PodcastService_AdminToggleFeatured_FullMethodName   = "/podcast.v1.PodcastService/AdminToggleFeatured"
 	PodcastService_ListSavedPodcasts_FullMethodName     = "/podcast.v1.PodcastService/ListSavedPodcasts"
+	PodcastService_GetPodcast_FullMethodName            = "/podcast.v1.PodcastService/GetPodcast"
+	PodcastService_CreatePodcast_FullMethodName         = "/podcast.v1.PodcastService/CreatePodcast"
+	PodcastService_UploadPodcast_FullMethodName         = "/podcast.v1.PodcastService/UploadPodcast"
+	PodcastService_PreparePodcastUpload_FullMethodName  = "/podcast.v1.PodcastService/PreparePodcastUpload"
+	PodcastService_CompletePodcastUpload_FullMethodName = "/podcast.v1.PodcastService/CompletePodcastUpload"
+	PodcastService_DeletePodcast_FullMethodName         = "/podcast.v1.PodcastService/DeletePodcast"
 	PodcastService_SavePodcast_FullMethodName           = "/podcast.v1.PodcastService/SavePodcast"
 	PodcastService_UnsavePodcast_FullMethodName         = "/podcast.v1.PodcastService/UnsavePodcast"
 	PodcastService_PlayPodcast_FullMethodName           = "/podcast.v1.PodcastService/PlayPodcast"
@@ -42,12 +42,6 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PodcastServiceClient interface {
 	ListPodcasts(ctx context.Context, in *ListPodcastsRequest, opts ...grpc.CallOption) (*ListPodcastsResponse, error)
-	GetPodcast(ctx context.Context, in *GetPodcastRequest, opts ...grpc.CallOption) (*PodcastResponse, error)
-	CreatePodcast(ctx context.Context, in *CreatePodcastRequest, opts ...grpc.CallOption) (*PodcastResponse, error)
-	UploadPodcast(ctx context.Context, in *UploadPodcastRequest, opts ...grpc.CallOption) (*PodcastResponse, error)
-	PreparePodcastUpload(ctx context.Context, in *PreparePodcastUploadRequest, opts ...grpc.CallOption) (*PreparePodcastUploadResponse, error)
-	CompletePodcastUpload(ctx context.Context, in *CompletePodcastUploadRequest, opts ...grpc.CallOption) (*PodcastResponse, error)
-	DeletePodcast(ctx context.Context, in *DeletePodcastRequest, opts ...grpc.CallOption) (*PodcastStatusResponse, error)
 	// ADR-005 — Series catalog. Read-only public endpoint; admin CRUD
 	// (CreateSeries/UpdateSeries/DeleteSeries/ToggleFeatured) lives below.
 	ListSeries(ctx context.Context, in *ListSeriesRequest, opts ...grpc.CallOption) (*ListSeriesResponse, error)
@@ -58,6 +52,12 @@ type PodcastServiceClient interface {
 	AdminToggleFeatured(ctx context.Context, in *AdminToggleFeaturedRequest, opts ...grpc.CallOption) (*Podcast, error)
 	// ── User-scoped: saved podcasts (cross-device list) ──────────────────────
 	ListSavedPodcasts(ctx context.Context, in *ListSavedPodcastsRequest, opts ...grpc.CallOption) (*ListPodcastsResponse, error)
+	GetPodcast(ctx context.Context, in *GetPodcastRequest, opts ...grpc.CallOption) (*PodcastResponse, error)
+	CreatePodcast(ctx context.Context, in *CreatePodcastRequest, opts ...grpc.CallOption) (*PodcastResponse, error)
+	UploadPodcast(ctx context.Context, in *UploadPodcastRequest, opts ...grpc.CallOption) (*PodcastResponse, error)
+	PreparePodcastUpload(ctx context.Context, in *PreparePodcastUploadRequest, opts ...grpc.CallOption) (*PreparePodcastUploadResponse, error)
+	CompletePodcastUpload(ctx context.Context, in *CompletePodcastUploadRequest, opts ...grpc.CallOption) (*PodcastResponse, error)
+	DeletePodcast(ctx context.Context, in *DeletePodcastRequest, opts ...grpc.CallOption) (*PodcastStatusResponse, error)
 	SavePodcast(ctx context.Context, in *SavePodcastRequest, opts ...grpc.CallOption) (*PodcastStatusResponse, error)
 	UnsavePodcast(ctx context.Context, in *UnsavePodcastRequest, opts ...grpc.CallOption) (*PodcastStatusResponse, error)
 	PlayPodcast(ctx context.Context, in *PlayPodcastRequest, opts ...grpc.CallOption) (*PlayPodcastResponse, error)
@@ -75,66 +75,6 @@ func (c *podcastServiceClient) ListPodcasts(ctx context.Context, in *ListPodcast
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListPodcastsResponse)
 	err := c.cc.Invoke(ctx, PodcastService_ListPodcasts_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *podcastServiceClient) GetPodcast(ctx context.Context, in *GetPodcastRequest, opts ...grpc.CallOption) (*PodcastResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PodcastResponse)
-	err := c.cc.Invoke(ctx, PodcastService_GetPodcast_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *podcastServiceClient) CreatePodcast(ctx context.Context, in *CreatePodcastRequest, opts ...grpc.CallOption) (*PodcastResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PodcastResponse)
-	err := c.cc.Invoke(ctx, PodcastService_CreatePodcast_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *podcastServiceClient) UploadPodcast(ctx context.Context, in *UploadPodcastRequest, opts ...grpc.CallOption) (*PodcastResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PodcastResponse)
-	err := c.cc.Invoke(ctx, PodcastService_UploadPodcast_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *podcastServiceClient) PreparePodcastUpload(ctx context.Context, in *PreparePodcastUploadRequest, opts ...grpc.CallOption) (*PreparePodcastUploadResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PreparePodcastUploadResponse)
-	err := c.cc.Invoke(ctx, PodcastService_PreparePodcastUpload_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *podcastServiceClient) CompletePodcastUpload(ctx context.Context, in *CompletePodcastUploadRequest, opts ...grpc.CallOption) (*PodcastResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PodcastResponse)
-	err := c.cc.Invoke(ctx, PodcastService_CompletePodcastUpload_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *podcastServiceClient) DeletePodcast(ctx context.Context, in *DeletePodcastRequest, opts ...grpc.CallOption) (*PodcastStatusResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PodcastStatusResponse)
-	err := c.cc.Invoke(ctx, PodcastService_DeletePodcast_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -201,6 +141,66 @@ func (c *podcastServiceClient) ListSavedPodcasts(ctx context.Context, in *ListSa
 	return out, nil
 }
 
+func (c *podcastServiceClient) GetPodcast(ctx context.Context, in *GetPodcastRequest, opts ...grpc.CallOption) (*PodcastResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PodcastResponse)
+	err := c.cc.Invoke(ctx, PodcastService_GetPodcast_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *podcastServiceClient) CreatePodcast(ctx context.Context, in *CreatePodcastRequest, opts ...grpc.CallOption) (*PodcastResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PodcastResponse)
+	err := c.cc.Invoke(ctx, PodcastService_CreatePodcast_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *podcastServiceClient) UploadPodcast(ctx context.Context, in *UploadPodcastRequest, opts ...grpc.CallOption) (*PodcastResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PodcastResponse)
+	err := c.cc.Invoke(ctx, PodcastService_UploadPodcast_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *podcastServiceClient) PreparePodcastUpload(ctx context.Context, in *PreparePodcastUploadRequest, opts ...grpc.CallOption) (*PreparePodcastUploadResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PreparePodcastUploadResponse)
+	err := c.cc.Invoke(ctx, PodcastService_PreparePodcastUpload_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *podcastServiceClient) CompletePodcastUpload(ctx context.Context, in *CompletePodcastUploadRequest, opts ...grpc.CallOption) (*PodcastResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PodcastResponse)
+	err := c.cc.Invoke(ctx, PodcastService_CompletePodcastUpload_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *podcastServiceClient) DeletePodcast(ctx context.Context, in *DeletePodcastRequest, opts ...grpc.CallOption) (*PodcastStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PodcastStatusResponse)
+	err := c.cc.Invoke(ctx, PodcastService_DeletePodcast_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *podcastServiceClient) SavePodcast(ctx context.Context, in *SavePodcastRequest, opts ...grpc.CallOption) (*PodcastStatusResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PodcastStatusResponse)
@@ -236,12 +236,6 @@ func (c *podcastServiceClient) PlayPodcast(ctx context.Context, in *PlayPodcastR
 // for forward compatibility.
 type PodcastServiceServer interface {
 	ListPodcasts(context.Context, *ListPodcastsRequest) (*ListPodcastsResponse, error)
-	GetPodcast(context.Context, *GetPodcastRequest) (*PodcastResponse, error)
-	CreatePodcast(context.Context, *CreatePodcastRequest) (*PodcastResponse, error)
-	UploadPodcast(context.Context, *UploadPodcastRequest) (*PodcastResponse, error)
-	PreparePodcastUpload(context.Context, *PreparePodcastUploadRequest) (*PreparePodcastUploadResponse, error)
-	CompletePodcastUpload(context.Context, *CompletePodcastUploadRequest) (*PodcastResponse, error)
-	DeletePodcast(context.Context, *DeletePodcastRequest) (*PodcastStatusResponse, error)
 	// ADR-005 — Series catalog. Read-only public endpoint; admin CRUD
 	// (CreateSeries/UpdateSeries/DeleteSeries/ToggleFeatured) lives below.
 	ListSeries(context.Context, *ListSeriesRequest) (*ListSeriesResponse, error)
@@ -252,6 +246,12 @@ type PodcastServiceServer interface {
 	AdminToggleFeatured(context.Context, *AdminToggleFeaturedRequest) (*Podcast, error)
 	// ── User-scoped: saved podcasts (cross-device list) ──────────────────────
 	ListSavedPodcasts(context.Context, *ListSavedPodcastsRequest) (*ListPodcastsResponse, error)
+	GetPodcast(context.Context, *GetPodcastRequest) (*PodcastResponse, error)
+	CreatePodcast(context.Context, *CreatePodcastRequest) (*PodcastResponse, error)
+	UploadPodcast(context.Context, *UploadPodcastRequest) (*PodcastResponse, error)
+	PreparePodcastUpload(context.Context, *PreparePodcastUploadRequest) (*PreparePodcastUploadResponse, error)
+	CompletePodcastUpload(context.Context, *CompletePodcastUploadRequest) (*PodcastResponse, error)
+	DeletePodcast(context.Context, *DeletePodcastRequest) (*PodcastStatusResponse, error)
 	SavePodcast(context.Context, *SavePodcastRequest) (*PodcastStatusResponse, error)
 	UnsavePodcast(context.Context, *UnsavePodcastRequest) (*PodcastStatusResponse, error)
 	PlayPodcast(context.Context, *PlayPodcastRequest) (*PlayPodcastResponse, error)
@@ -267,24 +267,6 @@ type UnimplementedPodcastServiceServer struct{}
 
 func (UnimplementedPodcastServiceServer) ListPodcasts(context.Context, *ListPodcastsRequest) (*ListPodcastsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListPodcasts not implemented")
-}
-func (UnimplementedPodcastServiceServer) GetPodcast(context.Context, *GetPodcastRequest) (*PodcastResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetPodcast not implemented")
-}
-func (UnimplementedPodcastServiceServer) CreatePodcast(context.Context, *CreatePodcastRequest) (*PodcastResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreatePodcast not implemented")
-}
-func (UnimplementedPodcastServiceServer) UploadPodcast(context.Context, *UploadPodcastRequest) (*PodcastResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UploadPodcast not implemented")
-}
-func (UnimplementedPodcastServiceServer) PreparePodcastUpload(context.Context, *PreparePodcastUploadRequest) (*PreparePodcastUploadResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method PreparePodcastUpload not implemented")
-}
-func (UnimplementedPodcastServiceServer) CompletePodcastUpload(context.Context, *CompletePodcastUploadRequest) (*PodcastResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CompletePodcastUpload not implemented")
-}
-func (UnimplementedPodcastServiceServer) DeletePodcast(context.Context, *DeletePodcastRequest) (*PodcastStatusResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method DeletePodcast not implemented")
 }
 func (UnimplementedPodcastServiceServer) ListSeries(context.Context, *ListSeriesRequest) (*ListSeriesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListSeries not implemented")
@@ -303,6 +285,24 @@ func (UnimplementedPodcastServiceServer) AdminToggleFeatured(context.Context, *A
 }
 func (UnimplementedPodcastServiceServer) ListSavedPodcasts(context.Context, *ListSavedPodcastsRequest) (*ListPodcastsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListSavedPodcasts not implemented")
+}
+func (UnimplementedPodcastServiceServer) GetPodcast(context.Context, *GetPodcastRequest) (*PodcastResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetPodcast not implemented")
+}
+func (UnimplementedPodcastServiceServer) CreatePodcast(context.Context, *CreatePodcastRequest) (*PodcastResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreatePodcast not implemented")
+}
+func (UnimplementedPodcastServiceServer) UploadPodcast(context.Context, *UploadPodcastRequest) (*PodcastResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UploadPodcast not implemented")
+}
+func (UnimplementedPodcastServiceServer) PreparePodcastUpload(context.Context, *PreparePodcastUploadRequest) (*PreparePodcastUploadResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method PreparePodcastUpload not implemented")
+}
+func (UnimplementedPodcastServiceServer) CompletePodcastUpload(context.Context, *CompletePodcastUploadRequest) (*PodcastResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CompletePodcastUpload not implemented")
+}
+func (UnimplementedPodcastServiceServer) DeletePodcast(context.Context, *DeletePodcastRequest) (*PodcastStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeletePodcast not implemented")
 }
 func (UnimplementedPodcastServiceServer) SavePodcast(context.Context, *SavePodcastRequest) (*PodcastStatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SavePodcast not implemented")
@@ -348,114 +348,6 @@ func _PodcastService_ListPodcasts_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PodcastServiceServer).ListPodcasts(ctx, req.(*ListPodcastsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PodcastService_GetPodcast_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetPodcastRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PodcastServiceServer).GetPodcast(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PodcastService_GetPodcast_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PodcastServiceServer).GetPodcast(ctx, req.(*GetPodcastRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PodcastService_CreatePodcast_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreatePodcastRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PodcastServiceServer).CreatePodcast(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PodcastService_CreatePodcast_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PodcastServiceServer).CreatePodcast(ctx, req.(*CreatePodcastRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PodcastService_UploadPodcast_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UploadPodcastRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PodcastServiceServer).UploadPodcast(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PodcastService_UploadPodcast_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PodcastServiceServer).UploadPodcast(ctx, req.(*UploadPodcastRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PodcastService_PreparePodcastUpload_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PreparePodcastUploadRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PodcastServiceServer).PreparePodcastUpload(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PodcastService_PreparePodcastUpload_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PodcastServiceServer).PreparePodcastUpload(ctx, req.(*PreparePodcastUploadRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PodcastService_CompletePodcastUpload_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CompletePodcastUploadRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PodcastServiceServer).CompletePodcastUpload(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PodcastService_CompletePodcastUpload_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PodcastServiceServer).CompletePodcastUpload(ctx, req.(*CompletePodcastUploadRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PodcastService_DeletePodcast_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeletePodcastRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PodcastServiceServer).DeletePodcast(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PodcastService_DeletePodcast_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PodcastServiceServer).DeletePodcast(ctx, req.(*DeletePodcastRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -568,6 +460,114 @@ func _PodcastService_ListSavedPodcasts_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PodcastService_GetPodcast_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPodcastRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PodcastServiceServer).GetPodcast(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PodcastService_GetPodcast_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PodcastServiceServer).GetPodcast(ctx, req.(*GetPodcastRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PodcastService_CreatePodcast_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePodcastRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PodcastServiceServer).CreatePodcast(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PodcastService_CreatePodcast_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PodcastServiceServer).CreatePodcast(ctx, req.(*CreatePodcastRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PodcastService_UploadPodcast_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UploadPodcastRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PodcastServiceServer).UploadPodcast(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PodcastService_UploadPodcast_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PodcastServiceServer).UploadPodcast(ctx, req.(*UploadPodcastRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PodcastService_PreparePodcastUpload_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PreparePodcastUploadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PodcastServiceServer).PreparePodcastUpload(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PodcastService_PreparePodcastUpload_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PodcastServiceServer).PreparePodcastUpload(ctx, req.(*PreparePodcastUploadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PodcastService_CompletePodcastUpload_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CompletePodcastUploadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PodcastServiceServer).CompletePodcastUpload(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PodcastService_CompletePodcastUpload_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PodcastServiceServer).CompletePodcastUpload(ctx, req.(*CompletePodcastUploadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PodcastService_DeletePodcast_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePodcastRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PodcastServiceServer).DeletePodcast(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PodcastService_DeletePodcast_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PodcastServiceServer).DeletePodcast(ctx, req.(*DeletePodcastRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _PodcastService_SavePodcast_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SavePodcastRequest)
 	if err := dec(in); err != nil {
@@ -634,30 +634,6 @@ var PodcastService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _PodcastService_ListPodcasts_Handler,
 		},
 		{
-			MethodName: "GetPodcast",
-			Handler:    _PodcastService_GetPodcast_Handler,
-		},
-		{
-			MethodName: "CreatePodcast",
-			Handler:    _PodcastService_CreatePodcast_Handler,
-		},
-		{
-			MethodName: "UploadPodcast",
-			Handler:    _PodcastService_UploadPodcast_Handler,
-		},
-		{
-			MethodName: "PreparePodcastUpload",
-			Handler:    _PodcastService_PreparePodcastUpload_Handler,
-		},
-		{
-			MethodName: "CompletePodcastUpload",
-			Handler:    _PodcastService_CompletePodcastUpload_Handler,
-		},
-		{
-			MethodName: "DeletePodcast",
-			Handler:    _PodcastService_DeletePodcast_Handler,
-		},
-		{
 			MethodName: "ListSeries",
 			Handler:    _PodcastService_ListSeries_Handler,
 		},
@@ -680,6 +656,30 @@ var PodcastService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListSavedPodcasts",
 			Handler:    _PodcastService_ListSavedPodcasts_Handler,
+		},
+		{
+			MethodName: "GetPodcast",
+			Handler:    _PodcastService_GetPodcast_Handler,
+		},
+		{
+			MethodName: "CreatePodcast",
+			Handler:    _PodcastService_CreatePodcast_Handler,
+		},
+		{
+			MethodName: "UploadPodcast",
+			Handler:    _PodcastService_UploadPodcast_Handler,
+		},
+		{
+			MethodName: "PreparePodcastUpload",
+			Handler:    _PodcastService_PreparePodcastUpload_Handler,
+		},
+		{
+			MethodName: "CompletePodcastUpload",
+			Handler:    _PodcastService_CompletePodcastUpload_Handler,
+		},
+		{
+			MethodName: "DeletePodcast",
+			Handler:    _PodcastService_DeletePodcast_Handler,
 		},
 		{
 			MethodName: "SavePodcast",

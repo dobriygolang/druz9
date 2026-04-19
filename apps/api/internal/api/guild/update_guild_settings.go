@@ -2,6 +2,7 @@ package guild
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -13,7 +14,7 @@ import (
 func (i *Implementation) UpdateGuildSettings(ctx context.Context, req *v1.UpdateGuildSettingsRequest) (*v1.UpdateGuildSettingsResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	guildID, err := uuid.Parse(req.GetGuildId())
 	if err != nil {

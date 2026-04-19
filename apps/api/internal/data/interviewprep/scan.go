@@ -85,7 +85,7 @@ func scanQuestion(s scanner) (*model.InterviewPrepQuestion, error) {
 		&item.CreatedAt,
 		&item.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan question: %w", err)
 	}
 	return &item, nil
 }
@@ -107,7 +107,7 @@ func scanSession(s scanner) (*model.InterviewPrepSession, error) {
 		&item.CreatedAt,
 		&item.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan session: %w", err)
 	}
 	item.Status = model.InterviewPrepSessionStatusFromString(status)
 	return &item, nil
@@ -126,7 +126,7 @@ func scanQuestionResult(s scanner) (*model.InterviewPrepQuestionResult, error) {
 		&assessment,
 		&item.AnsweredAt,
 	); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan question result: %w", err)
 	}
 	item.SelfAssessment = model.InterviewPrepSelfAssessmentFromString(assessment)
 	return &item, nil

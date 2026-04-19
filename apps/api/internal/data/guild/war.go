@@ -369,7 +369,10 @@ func (r *Repo) ListWarsInPhase(ctx context.Context, phase string) ([]WarSummary,
 		}
 		out = append(out, w)
 	}
-	return out, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate war rows: %w", err)
+	}
+	return out, nil
 }
 
 // GetGuildCreator returns the user_id of a guild's creator. Used by the

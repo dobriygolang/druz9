@@ -184,5 +184,8 @@ func (r *Repo) ListRoomsForUser(ctx context.Context, userID uuid.UUID) ([]*codee
 		}
 		result = append(result, room)
 	}
-	return result, fmt.Errorf("iterate rooms: %w", rows.Err())
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate rooms: %w", err)
+	}
+	return result, nil
 }

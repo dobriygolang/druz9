@@ -2,6 +2,7 @@ package insights
 
 import (
 	"context"
+	"fmt"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -14,7 +15,7 @@ import (
 func (i *Implementation) GetMyInsight(ctx context.Context, _ *v1.GetMyInsightRequest) (*v1.Insight, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.provider == nil {
 		return nil, kratoserrors.InternalServer("NOT_CONFIGURED", "insights provider missing")

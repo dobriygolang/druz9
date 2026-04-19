@@ -112,7 +112,7 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 	for index, round := range rounds {
 		task, poolID, taskErr := s.repo.SelectTaskForBlueprintRound(ctx, round, effectiveCompanyTag)
 		if taskErr != nil {
-			return nil, taskErr
+			return nil, fmt.Errorf("select task for blueprint round: %w", taskErr)
 		}
 		if task == nil {
 			return nil, ErrMockTaskPoolIncomplete

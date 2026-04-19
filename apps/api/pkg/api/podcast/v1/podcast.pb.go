@@ -1664,21 +1664,21 @@ const file_social_podcast_v1_podcast_proto_rawDesc = "" +
 	"\x1cMEDIA_CONTENT_TYPE_AUDIO_OGG\x10\x03\x12 \n" +
 	"\x1cMEDIA_CONTENT_TYPE_AUDIO_MP4\x10\x042\xc1\x10\n" +
 	"\x0ePodcastService\x12k\n" +
-	"\fListPodcasts\x12\x1f.podcast.v1.ListPodcastsRequest\x1a .podcast.v1.ListPodcastsResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/api/v1/podcasts\x12o\n" +
-	"\n" +
-	"GetPodcast\x12\x1d.podcast.v1.GetPodcastRequest\x1a\x1b.podcast.v1.PodcastResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/podcasts/{podcast_id}\x12n\n" +
-	"\rCreatePodcast\x12 .podcast.v1.CreatePodcastRequest\x1a\x1b.podcast.v1.PodcastResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/admin/podcasts\x12\x82\x01\n" +
-	"\rUploadPodcast\x12 .podcast.v1.UploadPodcastRequest\x1a\x1b.podcast.v1.PodcastResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/api/admin/podcasts/{podcast_id}/upload\x12\xa5\x01\n" +
-	"\x14PreparePodcastUpload\x12'.podcast.v1.PreparePodcastUploadRequest\x1a(.podcast.v1.PreparePodcastUploadResponse\":\x82\xd3\xe4\x93\x024:\x01*\"//api/admin/podcasts/{podcast_id}/upload/prepare\x12\x9b\x01\n" +
-	"\x15CompletePodcastUpload\x12(.podcast.v1.CompletePodcastUploadRequest\x1a\x1b.podcast.v1.PodcastResponse\";\x82\xd3\xe4\x93\x025:\x01*\"0/api/admin/podcasts/{podcast_id}/upload/complete\x12~\n" +
-	"\rDeletePodcast\x12 .podcast.v1.DeletePodcastRequest\x1a!.podcast.v1.PodcastStatusResponse\"(\x82\xd3\xe4\x93\x02\"* /api/admin/podcasts/{podcast_id}\x12l\n" +
+	"\fListPodcasts\x12\x1f.podcast.v1.ListPodcastsRequest\x1a .podcast.v1.ListPodcastsResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/api/v1/podcasts\x12l\n" +
 	"\n" +
 	"ListSeries\x12\x1d.podcast.v1.ListSeriesRequest\x1a\x1e.podcast.v1.ListSeriesResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/podcasts/series\x12~\n" +
 	"\x11AdminCreateSeries\x12$.podcast.v1.AdminCreateSeriesRequest\x1a\x19.podcast.v1.PodcastSeries\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/admin/podcasts/series\x12\x8a\x01\n" +
 	"\x11AdminUpdateSeries\x12$.podcast.v1.AdminUpdateSeriesRequest\x1a\x19.podcast.v1.PodcastSeries\"4\x82\xd3\xe4\x93\x02.:\x01*\")/api/v1/admin/podcasts/series/{series_id}\x12\x8f\x01\n" +
 	"\x11AdminDeleteSeries\x12$.podcast.v1.AdminDeleteSeriesRequest\x1a!.podcast.v1.PodcastStatusResponse\"1\x82\xd3\xe4\x93\x02+*)/api/v1/admin/podcasts/series/{series_id}\x12\x8b\x01\n" +
 	"\x13AdminToggleFeatured\x12&.podcast.v1.AdminToggleFeaturedRequest\x1a\x13.podcast.v1.Podcast\"7\x82\xd3\xe4\x93\x021:\x01*\",/api/v1/admin/podcasts/{podcast_id}/featured\x12{\n" +
-	"\x11ListSavedPodcasts\x12$.podcast.v1.ListSavedPodcastsRequest\x1a .podcast.v1.ListPodcastsResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/podcasts/saved\x12\x7f\n" +
+	"\x11ListSavedPodcasts\x12$.podcast.v1.ListSavedPodcastsRequest\x1a .podcast.v1.ListPodcastsResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/podcasts/saved\x12o\n" +
+	"\n" +
+	"GetPodcast\x12\x1d.podcast.v1.GetPodcastRequest\x1a\x1b.podcast.v1.PodcastResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/podcasts/{podcast_id}\x12n\n" +
+	"\rCreatePodcast\x12 .podcast.v1.CreatePodcastRequest\x1a\x1b.podcast.v1.PodcastResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/admin/podcasts\x12\x82\x01\n" +
+	"\rUploadPodcast\x12 .podcast.v1.UploadPodcastRequest\x1a\x1b.podcast.v1.PodcastResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/api/admin/podcasts/{podcast_id}/upload\x12\xa5\x01\n" +
+	"\x14PreparePodcastUpload\x12'.podcast.v1.PreparePodcastUploadRequest\x1a(.podcast.v1.PreparePodcastUploadResponse\":\x82\xd3\xe4\x93\x024:\x01*\"//api/admin/podcasts/{podcast_id}/upload/prepare\x12\x9b\x01\n" +
+	"\x15CompletePodcastUpload\x12(.podcast.v1.CompletePodcastUploadRequest\x1a\x1b.podcast.v1.PodcastResponse\";\x82\xd3\xe4\x93\x025:\x01*\"0/api/admin/podcasts/{podcast_id}/upload/complete\x12~\n" +
+	"\rDeletePodcast\x12 .podcast.v1.DeletePodcastRequest\x1a!.podcast.v1.PodcastStatusResponse\"(\x82\xd3\xe4\x93\x02\"* /api/admin/podcasts/{podcast_id}\x12\x7f\n" +
 	"\vSavePodcast\x12\x1e.podcast.v1.SavePodcastRequest\x1a!.podcast.v1.PodcastStatusResponse\"-\x82\xd3\xe4\x93\x02':\x01*\"\"/api/v1/podcasts/{podcast_id}/save\x12\x80\x01\n" +
 	"\rUnsavePodcast\x12 .podcast.v1.UnsavePodcastRequest\x1a!.podcast.v1.PodcastStatusResponse\"*\x82\xd3\xe4\x93\x02$*\"/api/v1/podcasts/{podcast_id}/save\x12z\n" +
 	"\vPlayPodcast\x12\x1e.podcast.v1.PlayPodcastRequest\x1a\x1f.podcast.v1.PlayPodcastResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/api/v1/podcasts/{podcast_id}/playB\x1bZ\x19api/pkg/api/podcast/v1;v1b\x06proto3"
@@ -1741,34 +1741,34 @@ var file_social_podcast_v1_podcast_proto_depIdxs = []int32{
 	26, // 11: podcast.v1.Podcast.featured_at:type_name -> google.protobuf.Timestamp
 	26, // 12: podcast.v1.PodcastSeries.created_at:type_name -> google.protobuf.Timestamp
 	10, // 13: podcast.v1.PodcastService.ListPodcasts:input_type -> podcast.v1.ListPodcastsRequest
-	11, // 14: podcast.v1.PodcastService.GetPodcast:input_type -> podcast.v1.GetPodcastRequest
-	12, // 15: podcast.v1.PodcastService.CreatePodcast:input_type -> podcast.v1.CreatePodcastRequest
-	13, // 16: podcast.v1.PodcastService.UploadPodcast:input_type -> podcast.v1.UploadPodcastRequest
-	14, // 17: podcast.v1.PodcastService.PreparePodcastUpload:input_type -> podcast.v1.PreparePodcastUploadRequest
-	15, // 18: podcast.v1.PodcastService.CompletePodcastUpload:input_type -> podcast.v1.CompletePodcastUploadRequest
-	16, // 19: podcast.v1.PodcastService.DeletePodcast:input_type -> podcast.v1.DeletePodcastRequest
-	1,  // 20: podcast.v1.PodcastService.ListSeries:input_type -> podcast.v1.ListSeriesRequest
-	3,  // 21: podcast.v1.PodcastService.AdminCreateSeries:input_type -> podcast.v1.AdminCreateSeriesRequest
-	4,  // 22: podcast.v1.PodcastService.AdminUpdateSeries:input_type -> podcast.v1.AdminUpdateSeriesRequest
-	5,  // 23: podcast.v1.PodcastService.AdminDeleteSeries:input_type -> podcast.v1.AdminDeleteSeriesRequest
-	6,  // 24: podcast.v1.PodcastService.AdminToggleFeatured:input_type -> podcast.v1.AdminToggleFeaturedRequest
-	7,  // 25: podcast.v1.PodcastService.ListSavedPodcasts:input_type -> podcast.v1.ListSavedPodcastsRequest
+	1,  // 14: podcast.v1.PodcastService.ListSeries:input_type -> podcast.v1.ListSeriesRequest
+	3,  // 15: podcast.v1.PodcastService.AdminCreateSeries:input_type -> podcast.v1.AdminCreateSeriesRequest
+	4,  // 16: podcast.v1.PodcastService.AdminUpdateSeries:input_type -> podcast.v1.AdminUpdateSeriesRequest
+	5,  // 17: podcast.v1.PodcastService.AdminDeleteSeries:input_type -> podcast.v1.AdminDeleteSeriesRequest
+	6,  // 18: podcast.v1.PodcastService.AdminToggleFeatured:input_type -> podcast.v1.AdminToggleFeaturedRequest
+	7,  // 19: podcast.v1.PodcastService.ListSavedPodcasts:input_type -> podcast.v1.ListSavedPodcastsRequest
+	11, // 20: podcast.v1.PodcastService.GetPodcast:input_type -> podcast.v1.GetPodcastRequest
+	12, // 21: podcast.v1.PodcastService.CreatePodcast:input_type -> podcast.v1.CreatePodcastRequest
+	13, // 22: podcast.v1.PodcastService.UploadPodcast:input_type -> podcast.v1.UploadPodcastRequest
+	14, // 23: podcast.v1.PodcastService.PreparePodcastUpload:input_type -> podcast.v1.PreparePodcastUploadRequest
+	15, // 24: podcast.v1.PodcastService.CompletePodcastUpload:input_type -> podcast.v1.CompletePodcastUploadRequest
+	16, // 25: podcast.v1.PodcastService.DeletePodcast:input_type -> podcast.v1.DeletePodcastRequest
 	8,  // 26: podcast.v1.PodcastService.SavePodcast:input_type -> podcast.v1.SavePodcastRequest
 	9,  // 27: podcast.v1.PodcastService.UnsavePodcast:input_type -> podcast.v1.UnsavePodcastRequest
 	17, // 28: podcast.v1.PodcastService.PlayPodcast:input_type -> podcast.v1.PlayPodcastRequest
 	18, // 29: podcast.v1.PodcastService.ListPodcasts:output_type -> podcast.v1.ListPodcastsResponse
-	19, // 30: podcast.v1.PodcastService.GetPodcast:output_type -> podcast.v1.PodcastResponse
-	19, // 31: podcast.v1.PodcastService.CreatePodcast:output_type -> podcast.v1.PodcastResponse
-	19, // 32: podcast.v1.PodcastService.UploadPodcast:output_type -> podcast.v1.PodcastResponse
-	21, // 33: podcast.v1.PodcastService.PreparePodcastUpload:output_type -> podcast.v1.PreparePodcastUploadResponse
-	19, // 34: podcast.v1.PodcastService.CompletePodcastUpload:output_type -> podcast.v1.PodcastResponse
-	20, // 35: podcast.v1.PodcastService.DeletePodcast:output_type -> podcast.v1.PodcastStatusResponse
-	2,  // 36: podcast.v1.PodcastService.ListSeries:output_type -> podcast.v1.ListSeriesResponse
-	24, // 37: podcast.v1.PodcastService.AdminCreateSeries:output_type -> podcast.v1.PodcastSeries
-	24, // 38: podcast.v1.PodcastService.AdminUpdateSeries:output_type -> podcast.v1.PodcastSeries
-	20, // 39: podcast.v1.PodcastService.AdminDeleteSeries:output_type -> podcast.v1.PodcastStatusResponse
-	23, // 40: podcast.v1.PodcastService.AdminToggleFeatured:output_type -> podcast.v1.Podcast
-	18, // 41: podcast.v1.PodcastService.ListSavedPodcasts:output_type -> podcast.v1.ListPodcastsResponse
+	2,  // 30: podcast.v1.PodcastService.ListSeries:output_type -> podcast.v1.ListSeriesResponse
+	24, // 31: podcast.v1.PodcastService.AdminCreateSeries:output_type -> podcast.v1.PodcastSeries
+	24, // 32: podcast.v1.PodcastService.AdminUpdateSeries:output_type -> podcast.v1.PodcastSeries
+	20, // 33: podcast.v1.PodcastService.AdminDeleteSeries:output_type -> podcast.v1.PodcastStatusResponse
+	23, // 34: podcast.v1.PodcastService.AdminToggleFeatured:output_type -> podcast.v1.Podcast
+	18, // 35: podcast.v1.PodcastService.ListSavedPodcasts:output_type -> podcast.v1.ListPodcastsResponse
+	19, // 36: podcast.v1.PodcastService.GetPodcast:output_type -> podcast.v1.PodcastResponse
+	19, // 37: podcast.v1.PodcastService.CreatePodcast:output_type -> podcast.v1.PodcastResponse
+	19, // 38: podcast.v1.PodcastService.UploadPodcast:output_type -> podcast.v1.PodcastResponse
+	21, // 39: podcast.v1.PodcastService.PreparePodcastUpload:output_type -> podcast.v1.PreparePodcastUploadResponse
+	19, // 40: podcast.v1.PodcastService.CompletePodcastUpload:output_type -> podcast.v1.PodcastResponse
+	20, // 41: podcast.v1.PodcastService.DeletePodcast:output_type -> podcast.v1.PodcastStatusResponse
 	20, // 42: podcast.v1.PodcastService.SavePodcast:output_type -> podcast.v1.PodcastStatusResponse
 	20, // 43: podcast.v1.PodcastService.UnsavePodcast:output_type -> podcast.v1.PodcastStatusResponse
 	22, // 44: podcast.v1.PodcastService.PlayPodcast:output_type -> podcast.v1.PlayPodcastResponse

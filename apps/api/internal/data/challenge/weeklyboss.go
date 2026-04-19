@@ -33,7 +33,10 @@ func (r *Repo) GetHardTaskIDs(ctx context.Context) ([]uuid.UUID, error) {
 		}
 		ids = append(ids, id)
 	}
-	return ids, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate hard task ids: %w", err)
+	}
+	return ids, nil
 }
 
 // GetTaskInfo returns the title and slug of a task by ID.
@@ -80,7 +83,10 @@ func (r *Repo) GetWeeklyLeaderboard(ctx context.Context, weekKey string, limit i
 		}
 		entries = append(entries, e)
 	}
-	return entries, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate weekly leaderboard: %w", err)
+	}
+	return entries, nil
 }
 
 // GetUserWeeklyEntry returns the user's entry for the current week (nil if none).

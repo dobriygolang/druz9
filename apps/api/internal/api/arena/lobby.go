@@ -3,6 +3,7 @@ package arena
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -32,7 +33,7 @@ func (i *Implementation) WithLobbyRepo(r LobbyRepo) *Implementation {
 func (i *Implementation) CreateLobby(ctx context.Context, req *v1.CreateLobbyRequest) (*v1.LobbyResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.lobbies == nil {
 		return nil, kratoserrors.InternalServer("NOT_CONFIGURED", "lobbies not wired")
@@ -47,7 +48,7 @@ func (i *Implementation) CreateLobby(ctx context.Context, req *v1.CreateLobbyReq
 func (i *Implementation) JoinLobby(ctx context.Context, req *v1.JoinLobbyRequest) (*v1.LobbyResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.lobbies == nil {
 		return nil, kratoserrors.InternalServer("NOT_CONFIGURED", "lobbies not wired")
@@ -71,7 +72,7 @@ func (i *Implementation) JoinLobby(ctx context.Context, req *v1.JoinLobbyRequest
 func (i *Implementation) LeaveLobby(ctx context.Context, req *v1.LeaveLobbyRequest) (*v1.ArenaStatusResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.lobbies == nil {
 		return nil, kratoserrors.InternalServer("NOT_CONFIGURED", "lobbies not wired")

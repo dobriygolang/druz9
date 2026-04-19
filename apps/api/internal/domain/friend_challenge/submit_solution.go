@@ -2,6 +2,7 @@ package friend_challenge
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -26,7 +27,7 @@ func (s *Service) SubmitSolution(
 
 	ch, err := s.repo.GetByID(ctx, challengeID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get challenge by id: %w", err)
 	}
 	if ch == nil {
 		return nil, ErrChallengeNotFound
@@ -49,7 +50,7 @@ func (s *Service) SubmitSolution(
 	if now.After(ch.DeadlineAt) {
 		ch.Status = model.ChallengeStatusExpired
 		if err := s.repo.Update(ctx, ch); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("update challenge: %w", err)
 		}
 		return nil, ErrAlreadyExpired
 	}
@@ -88,7 +89,7 @@ func (s *Service) SubmitSolution(
 	}
 
 	if err := s.repo.Update(ctx, ch); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("update challenge: %w", err)
 	}
 	return ch, nil
 }

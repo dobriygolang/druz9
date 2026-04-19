@@ -2,6 +2,7 @@ package challenge
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -28,11 +29,11 @@ func (i *Implementation) SubmitBlindReview(ctx context.Context, req *v1.SubmitBl
 	}
 	srcID, err := apihelpers.ParseUUID(req.GetSourceReviewId(), "INVALID_SOURCE_REVIEW_ID", "source_review_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse source review id: %w", err)
 	}
 	taskID, err := apihelpers.ParseUUID(req.GetTaskId(), "INVALID_TASK_ID", "task_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse task id: %w", err)
 	}
 	result, err := i.service.SubmitBlindReview(ctx, user.ID, srcID, taskID, req.GetSourceCode(), req.GetSourceLanguage(), req.GetUserReview())
 	if err != nil {

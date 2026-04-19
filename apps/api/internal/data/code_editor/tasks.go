@@ -44,7 +44,7 @@ func (r *Repo) ListTasks(ctx context.Context, filter codeeditordomain.TaskFilter
 
 	if len(tasks) > 0 {
 		if err := codetasks.LoadCasesMultiple(ctx, r.data.DB, tasks); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("load task cases: %w", err)
 		}
 	}
 	return tasks, nil
@@ -154,7 +154,7 @@ func (r *Repo) GetTask(ctx context.Context, taskID uuid.UUID) (*codeeditordomain
 		return nil, fmt.Errorf("get task: %w", err)
 	}
 	if err := codetasks.LoadCasesMultiple(ctx, r.data.DB, []*codeeditordomain.Task{&task}); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("load task cases: %w", err)
 	}
 	return &task, nil
 }
@@ -180,7 +180,7 @@ func (r *Repo) PickRandomTask(ctx context.Context, topic, difficulty string) (*c
 		return nil, fmt.Errorf("pick random task: %w", err)
 	}
 	if err := codetasks.LoadCasesMultiple(ctx, r.data.DB, []*codeeditordomain.Task{&task}); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("load task cases: %w", err)
 	}
 	return &task, nil
 }

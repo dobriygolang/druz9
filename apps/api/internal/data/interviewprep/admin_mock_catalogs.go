@@ -42,7 +42,10 @@ func (r *Repo) ListMockQuestionPools(ctx context.Context) ([]*model.InterviewPre
 		}
 		items = append(items, &item)
 	}
-	return items, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate mock question pools: %w", err)
+	}
+	return items, nil
 }
 
 func (r *Repo) CreateMockQuestionPool(ctx context.Context, item *model.InterviewPrepMockQuestionPoolItem) error {

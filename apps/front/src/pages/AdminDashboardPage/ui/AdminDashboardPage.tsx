@@ -70,6 +70,13 @@ const CARDS: Card[] = [
     icon: '▨',
     accent: '#4d6f4a',
   },
+  {
+    href: '/admin/users',
+    title: 'Users',
+    body: 'Поиск и редактирование пользователей. Выдача валюты, флаги доступа.',
+    icon: '☻',
+    accent: '#5b4331',
+  },
 ]
 
 export function AdminDashboardPage() {

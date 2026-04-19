@@ -210,7 +210,7 @@ func (s *Service) reviewInterviewSolutionWithRetry(
 		}
 		lastErr = err
 		if ctx.Err() != nil {
-			return nil, ctx.Err()
+			return nil, fmt.Errorf("context canceled: %w", ctx.Err())
 		}
 	}
 
@@ -238,7 +238,7 @@ func (s *Service) reviewInterviewAnswerWithRetry(
 		}
 		lastErr = err
 		if ctx.Err() != nil {
-			return nil, ctx.Err()
+			return nil, fmt.Errorf("context canceled: %w", ctx.Err())
 		}
 	}
 
@@ -266,7 +266,7 @@ func (s *Service) reviewSystemDesignWithRetry(
 		}
 		lastErr = err
 		if ctx.Err() != nil {
-			return nil, ctx.Err()
+			return nil, fmt.Errorf("context canceled: %w", ctx.Err())
 		}
 	}
 
@@ -338,11 +338,19 @@ func (s *Service) ListTasks(ctx context.Context, user *model.User) ([]*model.Int
 }
 
 func (s *Service) GetAvailableCompanies(ctx context.Context) ([]string, error) {
-	return s.repo.GetAvailableCompanies(ctx)
+	companies, err := s.repo.GetAvailableCompanies(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("get available companies: %w", err)
+	}
+	return companies, nil
 }
 
 func (s *Service) ListMockBlueprints(ctx context.Context) ([]*model.InterviewMockBlueprintSummary, error) {
-	return s.repo.ListMockBlueprints(ctx)
+	blueprints, err := s.repo.ListMockBlueprints(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("list mock blueprints: %w", err)
+	}
+	return blueprints, nil
 }
 
 func (s *Service) StartSession(ctx context.Context, user *model.User, taskID uuid.UUID) (*model.InterviewPrepSession, error) {
@@ -618,7 +626,7 @@ func (s *Service) ReviewSystemDesign(ctx context.Context, user *model.User, sess
 		return nil, aireview.ErrNotConfigured
 	}
 
-	return s.reviewer.ReviewSystemDesign(ctx, aireview.SystemDesignReviewRequest{
+	review, err := s.reviewer.ReviewSystemDesign(ctx, aireview.SystemDesignReviewRequest{
 		TaskTitle:      session.Task.Title,
 		Statement:      session.Task.Statement,
 		Notes:          req.Notes,
@@ -631,6 +639,10 @@ func (s *Service) ReviewSystemDesign(ctx context.Context, user *model.User, sess
 		ImageMIME:      normalizedType,
 		ImageName:      fileName,
 	})
+	if err != nil {
+		return nil, fmt.Errorf("review system design: %w", err)
+	}
+	return review, nil
 }
 
 func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionID, questionID uuid.UUID, assessment string, answer string) (*QuestionAnswerResult, error) {

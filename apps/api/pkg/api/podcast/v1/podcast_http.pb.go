@@ -62,18 +62,18 @@ type PodcastServiceHTTPServer interface {
 func RegisterPodcastServiceHTTPServer(s *http.Server, srv PodcastServiceHTTPServer) {
 	r := s.Route("/")
 	r.GET("/api/v1/podcasts", _PodcastService_ListPodcasts0_HTTP_Handler(srv))
-	r.GET("/api/v1/podcasts/{podcast_id}", _PodcastService_GetPodcast0_HTTP_Handler(srv))
-	r.POST("/api/admin/podcasts", _PodcastService_CreatePodcast0_HTTP_Handler(srv))
-	r.POST("/api/admin/podcasts/{podcast_id}/upload", _PodcastService_UploadPodcast0_HTTP_Handler(srv))
-	r.POST("/api/admin/podcasts/{podcast_id}/upload/prepare", _PodcastService_PreparePodcastUpload0_HTTP_Handler(srv))
-	r.POST("/api/admin/podcasts/{podcast_id}/upload/complete", _PodcastService_CompletePodcastUpload0_HTTP_Handler(srv))
-	r.DELETE("/api/admin/podcasts/{podcast_id}", _PodcastService_DeletePodcast0_HTTP_Handler(srv))
 	r.GET("/api/v1/podcasts/series", _PodcastService_ListSeries0_HTTP_Handler(srv))
 	r.POST("/api/v1/admin/podcasts/series", _PodcastService_AdminCreateSeries0_HTTP_Handler(srv))
 	r.POST("/api/v1/admin/podcasts/series/{series_id}", _PodcastService_AdminUpdateSeries0_HTTP_Handler(srv))
 	r.DELETE("/api/v1/admin/podcasts/series/{series_id}", _PodcastService_AdminDeleteSeries0_HTTP_Handler(srv))
 	r.POST("/api/v1/admin/podcasts/{podcast_id}/featured", _PodcastService_AdminToggleFeatured0_HTTP_Handler(srv))
 	r.GET("/api/v1/podcasts/saved", _PodcastService_ListSavedPodcasts0_HTTP_Handler(srv))
+	r.GET("/api/v1/podcasts/{podcast_id}", _PodcastService_GetPodcast0_HTTP_Handler(srv))
+	r.POST("/api/admin/podcasts", _PodcastService_CreatePodcast0_HTTP_Handler(srv))
+	r.POST("/api/admin/podcasts/{podcast_id}/upload", _PodcastService_UploadPodcast0_HTTP_Handler(srv))
+	r.POST("/api/admin/podcasts/{podcast_id}/upload/prepare", _PodcastService_PreparePodcastUpload0_HTTP_Handler(srv))
+	r.POST("/api/admin/podcasts/{podcast_id}/upload/complete", _PodcastService_CompletePodcastUpload0_HTTP_Handler(srv))
+	r.DELETE("/api/admin/podcasts/{podcast_id}", _PodcastService_DeletePodcast0_HTTP_Handler(srv))
 	r.POST("/api/v1/podcasts/{podcast_id}/save", _PodcastService_SavePodcast0_HTTP_Handler(srv))
 	r.DELETE("/api/v1/podcasts/{podcast_id}/save", _PodcastService_UnsavePodcast0_HTTP_Handler(srv))
 	r.GET("/api/v1/podcasts/{podcast_id}/play", _PodcastService_PlayPodcast0_HTTP_Handler(srv))
@@ -88,6 +88,138 @@ func _PodcastService_ListPodcasts0_HTTP_Handler(srv PodcastServiceHTTPServer) fu
 		http.SetOperation(ctx, OperationPodcastServiceListPodcasts)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.ListPodcasts(ctx, req.(*ListPodcastsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListPodcastsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _PodcastService_ListSeries0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListSeriesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPodcastServiceListSeries)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListSeries(ctx, req.(*ListSeriesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListSeriesResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _PodcastService_AdminCreateSeries0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminCreateSeriesRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPodcastServiceAdminCreateSeries)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminCreateSeries(ctx, req.(*AdminCreateSeriesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*PodcastSeries)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _PodcastService_AdminUpdateSeries0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminUpdateSeriesRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPodcastServiceAdminUpdateSeries)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminUpdateSeries(ctx, req.(*AdminUpdateSeriesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*PodcastSeries)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _PodcastService_AdminDeleteSeries0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminDeleteSeriesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPodcastServiceAdminDeleteSeries)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminDeleteSeries(ctx, req.(*AdminDeleteSeriesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*PodcastStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _PodcastService_AdminToggleFeatured0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminToggleFeaturedRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPodcastServiceAdminToggleFeatured)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminToggleFeatured(ctx, req.(*AdminToggleFeaturedRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Podcast)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _PodcastService_ListSavedPodcasts0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListSavedPodcastsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPodcastServiceListSavedPodcasts)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListSavedPodcasts(ctx, req.(*ListSavedPodcastsRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -235,138 +367,6 @@ func _PodcastService_DeletePodcast0_HTTP_Handler(srv PodcastServiceHTTPServer) f
 			return err
 		}
 		reply := out.(*PodcastStatusResponse)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _PodcastService_ListSeries0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in ListSeriesRequest
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationPodcastServiceListSeries)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.ListSeries(ctx, req.(*ListSeriesRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*ListSeriesResponse)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _PodcastService_AdminCreateSeries0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in AdminCreateSeriesRequest
-		if err := ctx.Bind(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationPodcastServiceAdminCreateSeries)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.AdminCreateSeries(ctx, req.(*AdminCreateSeriesRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*PodcastSeries)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _PodcastService_AdminUpdateSeries0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in AdminUpdateSeriesRequest
-		if err := ctx.Bind(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindVars(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationPodcastServiceAdminUpdateSeries)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.AdminUpdateSeries(ctx, req.(*AdminUpdateSeriesRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*PodcastSeries)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _PodcastService_AdminDeleteSeries0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in AdminDeleteSeriesRequest
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindVars(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationPodcastServiceAdminDeleteSeries)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.AdminDeleteSeries(ctx, req.(*AdminDeleteSeriesRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*PodcastStatusResponse)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _PodcastService_AdminToggleFeatured0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in AdminToggleFeaturedRequest
-		if err := ctx.Bind(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindVars(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationPodcastServiceAdminToggleFeatured)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.AdminToggleFeatured(ctx, req.(*AdminToggleFeaturedRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*Podcast)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _PodcastService_ListSavedPodcasts0_HTTP_Handler(srv PodcastServiceHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in ListSavedPodcastsRequest
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationPodcastServiceListSavedPodcasts)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.ListSavedPodcasts(ctx, req.(*ListSavedPodcastsRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*ListPodcastsResponse)
 		return ctx.Result(200, reply)
 	}
 }

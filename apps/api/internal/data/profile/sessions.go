@@ -160,5 +160,8 @@ func (r *Repo) ListActiveUserIDs(ctx context.Context, activeSince time.Time, lim
 		}
 		out = append(out, id)
 	}
-	return out, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate active user ids: %w", err)
+	}
+	return out, nil
 }

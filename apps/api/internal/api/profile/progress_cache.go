@@ -42,9 +42,16 @@ func (c *CachedProgressRepository) GetProfileProgress(ctx context.Context, userI
 }
 
 func (c *CachedProgressRepository) SaveUserGoal(ctx context.Context, userID uuid.UUID, goal *model.UserGoal) error {
-	return c.inner.SaveUserGoal(ctx, userID, goal)
+	if err := c.inner.SaveUserGoal(ctx, userID, goal); err != nil {
+		return fmt.Errorf("save user goal: %w", err)
+	}
+	return nil
 }
 
 func (c *CachedProgressRepository) GetProfileFeed(ctx context.Context, userID uuid.UUID, limit int) ([]*model.FeedItem, error) {
-	return c.inner.GetProfileFeed(ctx, userID, limit)
+	items, err := c.inner.GetProfileFeed(ctx, userID, limit)
+	if err != nil {
+		return nil, fmt.Errorf("get profile feed: %w", err)
+	}
+	return items, nil
 }

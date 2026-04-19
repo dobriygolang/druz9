@@ -35,7 +35,7 @@ func (s *Service) GetLeaderboard(ctx context.Context, limit int32) ([]*domain.Le
 
 	entries, err := s.repo.GetLeaderboard(ctx, limit)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get leaderboard: %w", err)
 	}
 
 	s.leaderboardMu.Lock()
@@ -69,8 +69,10 @@ func (s *Service) refreshMatchState(ctx context.Context, match *domain.Match) er
 			s.awardSeasonPassXP(ctx, winner.UserID, arenaWinXP)
 			winnerID := winner.UserID
 			s.recordReplaySummary(ctx, match, nowTime, &winnerID)
+		} else {
+			return fmt.Errorf("finish match: %w", err)
 		}
-		return err
+		return nil
 	}
 
 	if match.StartedAt != nil && nowTime.After(match.StartedAt.Add(time.Duration(match.DurationSeconds)*time.Second)) {
@@ -81,15 +83,19 @@ func (s *Service) refreshMatchState(ctx context.Context, match *domain.Match) er
 				s.awardSeasonPassXP(ctx, accepted[0].UserID, arenaWinXP)
 				winnerID := accepted[0].UserID
 				s.recordReplaySummary(ctx, match, nowTime, &winnerID)
+			} else {
+				return fmt.Errorf("finish match: %w", err)
 			}
-			return err
+			return nil
 		}
 
 		err := s.repo.FinishMatch(ctx, match.ID, nil, domain.WinnerReasonNone, nowTime)
 		if err == nil {
 			s.observeMatchFinished(match, nowTime)
+		} else {
+			return fmt.Errorf("finish match: %w", err)
 		}
-		return err
+		return nil
 	}
 
 	return nil

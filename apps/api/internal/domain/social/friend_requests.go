@@ -89,7 +89,11 @@ func (s *Service) AcceptFriendRequest(ctx context.Context, viewerID, requestID u
 	if err := s.repo.UpdateRequestStatus(ctx, req.ID, model.FriendRequestStatusAccepted, now); err != nil {
 		return nil, fmt.Errorf("update request status: %w", err)
 	}
-	return s.repo.GetFriendByID(ctx, viewerID, req.FromUserID)
+	friend, err := s.repo.GetFriendByID(ctx, viewerID, req.FromUserID)
+	if err != nil {
+		return nil, fmt.Errorf("get friend by id: %w", err)
+	}
+	return friend, nil
 }
 
 // DeclineFriendRequest flips to DECLINED without creating a friendship.
@@ -107,5 +111,8 @@ func (s *Service) DeclineFriendRequest(ctx context.Context, viewerID, requestID 
 	if req.Status != model.FriendRequestStatusPending {
 		return ErrAlreadyResolved
 	}
-	return s.repo.UpdateRequestStatus(ctx, req.ID, model.FriendRequestStatusDeclined, time.Now().UTC())
+	if err := s.repo.UpdateRequestStatus(ctx, req.ID, model.FriendRequestStatusDeclined, time.Now().UTC()); err != nil {
+		return fmt.Errorf("update request status: %w", err)
+	}
+	return nil
 }

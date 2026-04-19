@@ -31,7 +31,7 @@ var defaultFrontNames = []string{
 func (i *Implementation) ensureActiveWar(ctx context.Context, userID any) (*guilddata.WarRow, *model.Guild, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("require user: %w", err)
 	}
 	_ = userID
 	list, err := i.service.ListGuilds(ctx, user.ID, model.ListGuildsOptions{Limit: 50})
@@ -64,12 +64,12 @@ func (i *Implementation) ensureActiveWar(ctx context.Context, userID any) (*guil
 		return war, ours, nil
 	}
 	if !guilddata.IsNoRows(err) {
-		return nil, ours, err
+		return nil, ours, fmt.Errorf("get active war: %w", err)
 	}
 	// No war yet — bootstrap one that lasts 7 days.
 	war, _, err = i.warRepo.CreateWarWithFronts(ctx, ours.ID, theirName, defaultFrontNames, 7*24*60*60*1e9) // 7 days in ns
 	if err != nil {
-		return nil, ours, err
+		return nil, ours, fmt.Errorf("create war: %w", err)
 	}
 	return war, ours, nil
 }
@@ -80,14 +80,14 @@ func (i *Implementation) ensureActiveWar(ctx context.Context, userID any) (*guil
 func (i *Implementation) ContributeToFront(ctx context.Context, req *v1.ContributeToFrontRequest) (*v1.ContributeToFrontResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.warRepo == nil {
 		return nil, kerrs.InternalServer("INTERNAL", "guild war storage unavailable")
 	}
 	frontID, err := apihelpers.ParseUUID(req.GetFrontId(), "INVALID_FRONT_ID", "front_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse uuid: %w", err)
 	}
 	war, ours, err := i.ensureActiveWar(ctx, user.ID)
 	if err != nil {
@@ -127,14 +127,14 @@ func (i *Implementation) ContributeToFront(ctx context.Context, req *v1.Contribu
 
 func (i *Implementation) ListTerritories(ctx context.Context, req *v1.ListTerritoriesRequest) (*v1.ListTerritoriesResponse, error) {
 	if _, err := apihelpers.RequireUser(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.warRepo == nil {
 		return &v1.ListTerritoriesResponse{}, nil
 	}
 	guildID, err := apihelpers.ParseUUID(req.GetGuildId(), "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse guild id: %w", err)
 	}
 	rows, err := i.warRepo.ListTerritories(ctx, guildID)
 	if err != nil {

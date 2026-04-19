@@ -16,6 +16,7 @@ const (
 	ItemCategoryPets        ItemCategory = 4
 	ItemCategoryGuild       ItemCategory = 5
 	ItemCategorySeasonal    ItemCategory = 6
+	ItemCategoryAvatar      ItemCategory = 7
 )
 
 func (c ItemCategory) String() string {
@@ -34,6 +35,8 @@ func (c ItemCategory) String() string {
 		return "guild"
 	case ItemCategorySeasonal:
 		return "seasonal"
+	case ItemCategoryAvatar:
+		return "avatar"
 	}
 	return "misc"
 }

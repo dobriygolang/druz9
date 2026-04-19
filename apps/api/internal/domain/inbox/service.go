@@ -7,6 +7,7 @@ package inbox
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/google/uuid"
@@ -73,7 +74,7 @@ func (s *Service) ListThreads(ctx context.Context, userID uuid.UUID, limit, offs
 
 	threads, total, unreadTotal, err := s.repo.ListThreads(ctx, userID, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list threads: %w", err)
 	}
 	if threads == nil {
 		threads = []*model.InboxThread{}
@@ -89,7 +90,7 @@ func (s *Service) ListThreads(ctx context.Context, userID uuid.UUID, limit, offs
 func (s *Service) GetThread(ctx context.Context, userID, threadID uuid.UUID) (*model.ThreadWithMessages, error) {
 	thread, err := s.repo.GetThread(ctx, userID, threadID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get thread: %w", err)
 	}
 	if thread == nil {
 		return nil, ErrThreadNotFound
@@ -100,7 +101,7 @@ func (s *Service) GetThread(ctx context.Context, userID, threadID uuid.UUID) (*m
 
 	messages, err := s.repo.ListMessages(ctx, threadID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list messages: %w", err)
 	}
 	if messages == nil {
 		messages = []*model.InboxMessage{}
@@ -112,7 +113,7 @@ func (s *Service) GetThread(ctx context.Context, userID, threadID uuid.UUID) (*m
 func (s *Service) MarkThreadRead(ctx context.Context, userID, threadID uuid.UUID) (int32, error) {
 	thread, err := s.repo.GetThread(ctx, userID, threadID)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("get thread: %w", err)
 	}
 	if thread == nil {
 		return 0, ErrThreadNotFound
@@ -122,9 +123,13 @@ func (s *Service) MarkThreadRead(ctx context.Context, userID, threadID uuid.UUID
 	}
 
 	if err := s.repo.MarkThreadRead(ctx, userID, threadID); err != nil {
-		return 0, err
+		return 0, fmt.Errorf("mark thread read: %w", err)
 	}
-	return s.repo.GetUnreadTotal(ctx, userID)
+	unread, err := s.repo.GetUnreadTotal(ctx, userID)
+	if err != nil {
+		return 0, fmt.Errorf("get unread total: %w", err)
+	}
+	return unread, nil
 }
 
 // SendMessage appends a user-authored reply to an interactive thread.
@@ -144,7 +149,7 @@ func (s *Service) SendMessage(
 
 	thread, err := s.repo.GetThread(ctx, userID, threadID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get thread: %w", err)
 	}
 	if thread == nil {
 		return nil, ErrThreadNotFound
@@ -167,24 +172,32 @@ func (s *Service) SendMessage(
 		Read:       true, // author reads their own message by definition
 	}
 	if err := s.repo.InsertMessage(ctx, msg); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("insert message: %w", err)
 	}
 	// Bump thread metadata but don't increment unread (author's own reply).
 	if err := s.repo.BumpThread(ctx, threadID, previewOf(body), false); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("bump thread: %w", err)
 	}
 	return msg, nil
 }
 
 // GetUnreadCount returns the total across all threads for badge rendering.
 func (s *Service) GetUnreadCount(ctx context.Context, userID uuid.UUID) (int32, error) {
-	return s.repo.GetUnreadTotal(ctx, userID)
+	unread, err := s.repo.GetUnreadTotal(ctx, userID)
+	if err != nil {
+		return 0, fmt.Errorf("get unread total: %w", err)
+	}
+	return unread, nil
 }
 
 // CreateDirectThread opens (or returns existing) a bidirectional friend-mail
 // thread. Names are resolved by the caller before invoking this method.
 func (s *Service) CreateDirectThread(ctx context.Context, senderID, recipientID uuid.UUID, senderName, recipientName, subject string) (*model.InboxThread, error) {
-	return s.repo.CreateDirectThread(ctx, senderID, recipientID, senderName, recipientName, subject)
+	thread, err := s.repo.CreateDirectThread(ctx, senderID, recipientID, senderName, recipientName, subject)
+	if err != nil {
+		return nil, fmt.Errorf("create direct thread: %w", err)
+	}
+	return thread, nil
 }
 
 // previewOf collapses newlines and trims to previewLen for the thread preview.

@@ -2,6 +2,7 @@ package inbox
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -12,7 +13,7 @@ import (
 func (i *Implementation) ListThreads(ctx context.Context, req *v1.ListThreadsRequest) (*v1.ListThreadsResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	result, err := i.service.ListThreads(ctx, user.ID, req.GetLimit(), req.GetOffset())

@@ -7,6 +7,7 @@ import { useAuth } from '@/app/providers/AuthProvider'
 import { arenaApi, arenaMatchmaking, type ArenaLeaderboardEntry, type ArenaStats } from '@/features/Arena/api/arenaApi'
 import { duelReplayApi, type ReplaySummary } from '@/features/DuelReplay'
 import { useActiveSeason } from '@/features/Hub/api/useActiveSeason'
+import { Tour } from '@/features/Tour/ui/Tour'
 
 // Team slots are a pure UI concept for now: the authenticated user + one
 // invite placeholder. Wire to a real team API when available.
@@ -163,6 +164,29 @@ export function ArenaHubPage() {
 
   return (
     <>
+      {/* ADR-004 — first-time-on-arena tour. Server tracks dismissal in
+          user_tours; subsequent visits skip silently. */}
+      <Tour
+        tourId="arena_intro"
+        steps={[
+          {
+            selector: '[data-tour=arena-modes]',
+            title: 'Дуэли и режимы',
+            body: 'Здесь живут все режимы боёв: ranked 1v1, casual и командные дуэли 2v2. Начни с ranked, чтобы видеть свой ELO.',
+          },
+          {
+            selector: '[data-tour=arena-ladder]',
+            title: 'Топ игроков',
+            body: 'Лестница рангов сезона. Клик на любую строку — открывает профиль игрока.',
+          },
+          {
+            selector: '[data-tour=arena-replays]',
+            title: 'Реплеи',
+            body: 'Можно пересмотреть любой свой бой кадр за кадром — полезно для разбора ошибок.',
+          },
+        ]}
+      />
+
       {/* Matchmaking overlay */}
       {matchmaking && (
         <div className="rpg-modal-backdrop">

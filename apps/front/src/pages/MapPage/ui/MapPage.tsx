@@ -201,6 +201,7 @@ export function MapPage() {
             <RpgButton size="sm" variant={kindFilter === 'all' ? 'primary' : 'default'} onClick={() => setKindFilter('all')}>все</RpgButton>
             <RpgButton size="sm" variant={kindFilter === WorldPinKind.GUILD ? 'primary' : 'default'} onClick={() => setKindFilter(WorldPinKind.GUILD)}>гильдии</RpgButton>
             <RpgButton size="sm" variant={kindFilter === WorldPinKind.EVENT ? 'primary' : 'default'} onClick={() => setKindFilter(WorldPinKind.EVENT)}>события</RpgButton>
+            <RpgButton size="sm" onClick={() => navigate('/atlas/world')}>SVG атлас →</RpgButton>
           </div>
         }
       />

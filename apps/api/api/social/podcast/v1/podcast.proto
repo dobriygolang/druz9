@@ -13,6 +13,40 @@ service PodcastService {
     option (google.api.http) = { get: "/api/v1/podcasts" };
   }
 
+  // ADR-005 — Series catalog. Read-only public endpoint; admin CRUD
+  // (CreateSeries/UpdateSeries/DeleteSeries/ToggleFeatured) lives below.
+  rpc ListSeries(ListSeriesRequest) returns (ListSeriesResponse) {
+    option (google.api.http) = { get: "/api/v1/podcasts/series" };
+  }
+
+  // ── Admin: Series CRUD + Featured editorial flag ─────────────────────────
+  rpc AdminCreateSeries(AdminCreateSeriesRequest) returns (PodcastSeries) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/podcasts/series"
+      body: "*"
+    };
+  }
+  rpc AdminUpdateSeries(AdminUpdateSeriesRequest) returns (PodcastSeries) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/podcasts/series/{series_id}"
+      body: "*"
+    };
+  }
+  rpc AdminDeleteSeries(AdminDeleteSeriesRequest) returns (PodcastStatusResponse) {
+    option (google.api.http) = { delete: "/api/v1/admin/podcasts/series/{series_id}" };
+  }
+  rpc AdminToggleFeatured(AdminToggleFeaturedRequest) returns (Podcast) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/podcasts/{podcast_id}/featured"
+      body: "*"
+    };
+  }
+
+  // ── User-scoped: saved podcasts (cross-device list) ──────────────────────
+  rpc ListSavedPodcasts(ListSavedPodcastsRequest) returns (ListPodcastsResponse) {
+    option (google.api.http) = { get: "/api/v1/podcasts/saved" };
+  }
+
   rpc GetPodcast(GetPodcastRequest) returns (PodcastResponse) {
     option (google.api.http) = { get: "/api/v1/podcasts/{podcast_id}" };
   }
@@ -49,39 +83,6 @@ service PodcastService {
     option (google.api.http) = { delete: "/api/admin/podcasts/{podcast_id}" };
   }
 
-  // ADR-005 — Series catalog. Read-only public endpoint; admin CRUD
-  // (CreateSeries/UpdateSeries/DeleteSeries/ToggleFeatured) lives below.
-  rpc ListSeries(ListSeriesRequest) returns (ListSeriesResponse) {
-    option (google.api.http) = { get: "/api/v1/podcasts/series" };
-  }
-
-  // ── Admin: Series CRUD + Featured editorial flag ─────────────────────────
-  rpc AdminCreateSeries(AdminCreateSeriesRequest) returns (PodcastSeries) {
-    option (google.api.http) = {
-      post: "/api/v1/admin/podcasts/series"
-      body: "*"
-    };
-  }
-  rpc AdminUpdateSeries(AdminUpdateSeriesRequest) returns (PodcastSeries) {
-    option (google.api.http) = {
-      post: "/api/v1/admin/podcasts/series/{series_id}"
-      body: "*"
-    };
-  }
-  rpc AdminDeleteSeries(AdminDeleteSeriesRequest) returns (PodcastStatusResponse) {
-    option (google.api.http) = { delete: "/api/v1/admin/podcasts/series/{series_id}" };
-  }
-  rpc AdminToggleFeatured(AdminToggleFeaturedRequest) returns (Podcast) {
-    option (google.api.http) = {
-      post: "/api/v1/admin/podcasts/{podcast_id}/featured"
-      body: "*"
-    };
-  }
-
-  // ── User-scoped: saved podcasts (cross-device list) ──────────────────────
-  rpc ListSavedPodcasts(ListSavedPodcastsRequest) returns (ListPodcastsResponse) {
-    option (google.api.http) = { get: "/api/v1/podcasts/saved" };
-  }
   rpc SavePodcast(SavePodcastRequest) returns (PodcastStatusResponse) {
     option (google.api.http) = {
       post: "/api/v1/podcasts/{podcast_id}/save"

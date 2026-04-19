@@ -194,6 +194,22 @@ export const adminApi = {
     return { delivered: r.data.delivered ?? 0 }
   },
 
+  // Wallet — credit any currency to any user. Records the reason in the
+  // ledger so audits can trace why a grant happened (event, support ticket).
+  grantCurrency: async (
+    userId: string,
+    currency: 'gold' | 'gems' | 'shards',
+    amount: number,
+    reason: string,
+  ): Promise<void> => {
+    await apiClient.post(`/api/admin/users/${userId}/grant`, {
+      userId,
+      currency,
+      amount,
+      reason,
+    })
+  },
+
   // Podcasts admin — uses existing public ListPodcasts + admin CreatePodcast/DeletePodcast.
   listAllPodcasts: async (): Promise<unknown[]> => {
     const r = await apiClient.get<{ podcasts?: unknown[] }>('/api/v1/podcasts', { params: { limit: 200 } })

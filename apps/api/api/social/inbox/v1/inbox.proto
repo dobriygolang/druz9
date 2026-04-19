@@ -55,6 +55,34 @@ service InboxService {
       body: "*"
     };
   }
+
+  // ── #5 — Gift / trade flow (replaces text DMs in product narrative) ─
+  // SendGift moves an item from the sender's inventory into a pending
+  // gift; recipient claims to transfer ownership, declines to bounce.
+  rpc SendGift(SendGiftRequest) returns (Gift) {
+    option (google.api.http) = {
+      post: "/api/v1/inbox/gifts"
+      body: "*"
+    };
+  }
+  rpc ListReceivedGifts(ListReceivedGiftsRequest) returns (ListGiftsResponse) {
+    option (google.api.http) = { get: "/api/v1/inbox/gifts/received" };
+  }
+  rpc ListSentGifts(ListSentGiftsRequest) returns (ListGiftsResponse) {
+    option (google.api.http) = { get: "/api/v1/inbox/gifts/sent" };
+  }
+  rpc ClaimGift(ClaimGiftRequest) returns (Gift) {
+    option (google.api.http) = {
+      post: "/api/v1/inbox/gifts/{gift_id}/claim"
+      body: "*"
+    };
+  }
+  rpc DeclineGift(DeclineGiftRequest) returns (Gift) {
+    option (google.api.http) = {
+      post: "/api/v1/inbox/gifts/{gift_id}/decline"
+      body: "*"
+    };
+  }
 }
 
 // ThreadKind classifies inbox threads so the client can route icons, avatars
@@ -150,4 +178,45 @@ message CreateDirectThreadRequest {
 
 message CreateDirectThreadResponse {
   string thread_id = 1;  // sender-side thread UUID
+}
+
+// ── Gift messages (#5) ─────────────────────────────────────────────────
+
+message Gift {
+  string                    id            = 1;
+  string                    sender_id     = 2;
+  string                    sender_name   = 3;
+  string                    recipient_id  = 4;
+  string                    item_id       = 5;
+  string                    item_name     = 6;
+  string                    item_icon_ref = 7;
+  string                    note          = 8;
+  // pending | claimed | declined | expired
+  string                    status        = 9;
+  google.protobuf.Timestamp sent_at       = 10;
+  google.protobuf.Timestamp decided_at    = 11;
+}
+
+message SendGiftRequest {
+  string recipient_id = 1;
+  string item_id      = 2;
+  string note         = 3;
+}
+
+message ListReceivedGiftsRequest {
+  // Optional status filter ("pending" | "claimed" | …); empty = all.
+  string status = 1;
+}
+message ListSentGiftsRequest {
+  string status = 1;
+}
+message ListGiftsResponse {
+  repeated Gift gifts = 1;
+}
+
+message ClaimGiftRequest {
+  string gift_id = 1;
+}
+message DeclineGiftRequest {
+  string gift_id = 1;
 }

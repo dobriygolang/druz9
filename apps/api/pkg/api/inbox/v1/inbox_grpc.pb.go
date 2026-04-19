@@ -25,6 +25,11 @@ const (
 	InboxService_SendMessage_FullMethodName        = "/inbox.v1.InboxService/SendMessage"
 	InboxService_GetUnreadCount_FullMethodName     = "/inbox.v1.InboxService/GetUnreadCount"
 	InboxService_CreateDirectThread_FullMethodName = "/inbox.v1.InboxService/CreateDirectThread"
+	InboxService_SendGift_FullMethodName           = "/inbox.v1.InboxService/SendGift"
+	InboxService_ListReceivedGifts_FullMethodName  = "/inbox.v1.InboxService/ListReceivedGifts"
+	InboxService_ListSentGifts_FullMethodName      = "/inbox.v1.InboxService/ListSentGifts"
+	InboxService_ClaimGift_FullMethodName          = "/inbox.v1.InboxService/ClaimGift"
+	InboxService_DeclineGift_FullMethodName        = "/inbox.v1.InboxService/DeclineGift"
 )
 
 // InboxServiceClient is the client API for InboxService service.
@@ -53,6 +58,14 @@ type InboxServiceClient interface {
 	// CreateDirectThread opens (or returns existing) a bidirectional friend-mail
 	// thread between the caller and the given recipient. Idempotent.
 	CreateDirectThread(ctx context.Context, in *CreateDirectThreadRequest, opts ...grpc.CallOption) (*CreateDirectThreadResponse, error)
+	// ── #5 — Gift / trade flow (replaces text DMs in product narrative) ─
+	// SendGift moves an item from the sender's inventory into a pending
+	// gift; recipient claims to transfer ownership, declines to bounce.
+	SendGift(ctx context.Context, in *SendGiftRequest, opts ...grpc.CallOption) (*Gift, error)
+	ListReceivedGifts(ctx context.Context, in *ListReceivedGiftsRequest, opts ...grpc.CallOption) (*ListGiftsResponse, error)
+	ListSentGifts(ctx context.Context, in *ListSentGiftsRequest, opts ...grpc.CallOption) (*ListGiftsResponse, error)
+	ClaimGift(ctx context.Context, in *ClaimGiftRequest, opts ...grpc.CallOption) (*Gift, error)
+	DeclineGift(ctx context.Context, in *DeclineGiftRequest, opts ...grpc.CallOption) (*Gift, error)
 }
 
 type inboxServiceClient struct {
@@ -123,6 +136,56 @@ func (c *inboxServiceClient) CreateDirectThread(ctx context.Context, in *CreateD
 	return out, nil
 }
 
+func (c *inboxServiceClient) SendGift(ctx context.Context, in *SendGiftRequest, opts ...grpc.CallOption) (*Gift, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Gift)
+	err := c.cc.Invoke(ctx, InboxService_SendGift_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *inboxServiceClient) ListReceivedGifts(ctx context.Context, in *ListReceivedGiftsRequest, opts ...grpc.CallOption) (*ListGiftsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListGiftsResponse)
+	err := c.cc.Invoke(ctx, InboxService_ListReceivedGifts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *inboxServiceClient) ListSentGifts(ctx context.Context, in *ListSentGiftsRequest, opts ...grpc.CallOption) (*ListGiftsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListGiftsResponse)
+	err := c.cc.Invoke(ctx, InboxService_ListSentGifts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *inboxServiceClient) ClaimGift(ctx context.Context, in *ClaimGiftRequest, opts ...grpc.CallOption) (*Gift, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Gift)
+	err := c.cc.Invoke(ctx, InboxService_ClaimGift_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *inboxServiceClient) DeclineGift(ctx context.Context, in *DeclineGiftRequest, opts ...grpc.CallOption) (*Gift, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Gift)
+	err := c.cc.Invoke(ctx, InboxService_DeclineGift_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InboxServiceServer is the server API for InboxService service.
 // All implementations must embed UnimplementedInboxServiceServer
 // for forward compatibility.
@@ -149,6 +212,14 @@ type InboxServiceServer interface {
 	// CreateDirectThread opens (or returns existing) a bidirectional friend-mail
 	// thread between the caller and the given recipient. Idempotent.
 	CreateDirectThread(context.Context, *CreateDirectThreadRequest) (*CreateDirectThreadResponse, error)
+	// ── #5 — Gift / trade flow (replaces text DMs in product narrative) ─
+	// SendGift moves an item from the sender's inventory into a pending
+	// gift; recipient claims to transfer ownership, declines to bounce.
+	SendGift(context.Context, *SendGiftRequest) (*Gift, error)
+	ListReceivedGifts(context.Context, *ListReceivedGiftsRequest) (*ListGiftsResponse, error)
+	ListSentGifts(context.Context, *ListSentGiftsRequest) (*ListGiftsResponse, error)
+	ClaimGift(context.Context, *ClaimGiftRequest) (*Gift, error)
+	DeclineGift(context.Context, *DeclineGiftRequest) (*Gift, error)
 	mustEmbedUnimplementedInboxServiceServer()
 }
 
@@ -176,6 +247,21 @@ func (UnimplementedInboxServiceServer) GetUnreadCount(context.Context, *GetUnrea
 }
 func (UnimplementedInboxServiceServer) CreateDirectThread(context.Context, *CreateDirectThreadRequest) (*CreateDirectThreadResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateDirectThread not implemented")
+}
+func (UnimplementedInboxServiceServer) SendGift(context.Context, *SendGiftRequest) (*Gift, error) {
+	return nil, status.Error(codes.Unimplemented, "method SendGift not implemented")
+}
+func (UnimplementedInboxServiceServer) ListReceivedGifts(context.Context, *ListReceivedGiftsRequest) (*ListGiftsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListReceivedGifts not implemented")
+}
+func (UnimplementedInboxServiceServer) ListSentGifts(context.Context, *ListSentGiftsRequest) (*ListGiftsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListSentGifts not implemented")
+}
+func (UnimplementedInboxServiceServer) ClaimGift(context.Context, *ClaimGiftRequest) (*Gift, error) {
+	return nil, status.Error(codes.Unimplemented, "method ClaimGift not implemented")
+}
+func (UnimplementedInboxServiceServer) DeclineGift(context.Context, *DeclineGiftRequest) (*Gift, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeclineGift not implemented")
 }
 func (UnimplementedInboxServiceServer) mustEmbedUnimplementedInboxServiceServer() {}
 func (UnimplementedInboxServiceServer) testEmbeddedByValue()                      {}
@@ -306,6 +392,96 @@ func _InboxService_CreateDirectThread_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _InboxService_SendGift_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendGiftRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InboxServiceServer).SendGift(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InboxService_SendGift_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InboxServiceServer).SendGift(ctx, req.(*SendGiftRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InboxService_ListReceivedGifts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListReceivedGiftsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InboxServiceServer).ListReceivedGifts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InboxService_ListReceivedGifts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InboxServiceServer).ListReceivedGifts(ctx, req.(*ListReceivedGiftsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InboxService_ListSentGifts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListSentGiftsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InboxServiceServer).ListSentGifts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InboxService_ListSentGifts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InboxServiceServer).ListSentGifts(ctx, req.(*ListSentGiftsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InboxService_ClaimGift_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClaimGiftRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InboxServiceServer).ClaimGift(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InboxService_ClaimGift_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InboxServiceServer).ClaimGift(ctx, req.(*ClaimGiftRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InboxService_DeclineGift_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeclineGiftRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InboxServiceServer).DeclineGift(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InboxService_DeclineGift_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InboxServiceServer).DeclineGift(ctx, req.(*DeclineGiftRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // InboxService_ServiceDesc is the grpc.ServiceDesc for InboxService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -336,6 +512,26 @@ var InboxService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateDirectThread",
 			Handler:    _InboxService_CreateDirectThread_Handler,
+		},
+		{
+			MethodName: "SendGift",
+			Handler:    _InboxService_SendGift_Handler,
+		},
+		{
+			MethodName: "ListReceivedGifts",
+			Handler:    _InboxService_ListReceivedGifts_Handler,
+		},
+		{
+			MethodName: "ListSentGifts",
+			Handler:    _InboxService_ListSentGifts_Handler,
+		},
+		{
+			MethodName: "ClaimGift",
+			Handler:    _InboxService_ClaimGift_Handler,
+		},
+		{
+			MethodName: "DeclineGift",
+			Handler:    _InboxService_DeclineGift_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -2,6 +2,7 @@ package arena
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -16,7 +17,7 @@ func (i *Implementation) GetPlayerStats(ctx context.Context, req *v1.GetPlayerSt
 	if req.GetUserId() != "" {
 		id, err := apihelpers.ParseUUID(req.GetUserId(), "INVALID_USER_ID", "invalid user id")
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("parse user uuid: %w", err)
 		}
 		targetID = id
 	} else {
