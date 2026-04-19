@@ -104,11 +104,6 @@ func registerBackgroundWorkers(bootstrap *bootstrapContext, storage *storageCont
 		storage.arenaRepo,
 		storage.profileRepo,
 	))
-	// Start the Telegram bot only if notification-service is NOT running its own bot.
-	// When NOTIFICATION_SERVICE_ADDR is set, the bot lives in notification-service.
-	if bootstrap.cfg.External.NotificationService == nil || bootstrap.cfg.External.NotificationService.Addr == "" {
-		closer.AddSync(jobs.StartTelegramBot(services.profileServiceDomain, services.notificationSender))
-	}
 	closer.AddSync(jobs.StartStreakWarning(services.notificationSender, storage.streakRepo))
 	closer.AddSync(jobs.StartGuildDigest(services.notificationSender, storage.guildRepo))
 	closer.AddSync(jobs.StartGuildWarCron(storage.guildRepo, jobs.GuildWarNotifyDeps{
