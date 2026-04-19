@@ -5598,6 +5598,12 @@ components:
                     format: enum
                 isPublic:
                     type: boolean
+                visibility:
+                    type: integer
+                    description: 'ADR-004: optional visibility override. UNSPECIFIED falls back to is_public.'
+                    format: enum
+                guildId:
+                    type: string
         event.v1.Event:
             type: object
             properties:
@@ -5649,6 +5655,20 @@ components:
                 status:
                     type: integer
                     format: enum
+                visibility:
+                    type: integer
+                    description: |-
+                        ADR-004: refines is_public. UNSPECIFIED on legacy rows — clients should
+                         fall back to is_public when this is unset.
+                    format: enum
+                guildId:
+                    type: string
+                    description: Guild scope when visibility = GUILD_ONLY. Empty otherwise.
+                systemKind:
+                    type: string
+                    description: |-
+                        Marks system-generated events (e.g. guild_war_started). Hidden from
+                         the regular events list; surfaced as a feed entry instead.
         event.v1.EventParticipant:
             type: object
             properties:

@@ -289,6 +289,62 @@ func (EventStatus) EnumDescriptor() ([]byte, []int) {
 	return file_social_event_v1_event_proto_rawDescGZIP(), []int{4}
 }
 
+// EventVisibility (ADR-004) refines `is_public` with a guild-only mode.
+// Existing rows with is_public=true map to PUBLIC; is_public=false maps to
+// GUILD_ONLY when guild_id is set, otherwise PRIVATE. Server-side ListEvents
+// filters by visibility against the caller's guild memberships.
+type EventVisibility int32
+
+const (
+	EventVisibility_EVENT_VISIBILITY_UNSPECIFIED EventVisibility = 0
+	EventVisibility_EVENT_VISIBILITY_PUBLIC      EventVisibility = 1 // anyone can see / join
+	EventVisibility_EVENT_VISIBILITY_GUILD_ONLY  EventVisibility = 2 // only members of guild_id
+	EventVisibility_EVENT_VISIBILITY_PRIVATE     EventVisibility = 3 // only invited users
+)
+
+// Enum value maps for EventVisibility.
+var (
+	EventVisibility_name = map[int32]string{
+		0: "EVENT_VISIBILITY_UNSPECIFIED",
+		1: "EVENT_VISIBILITY_PUBLIC",
+		2: "EVENT_VISIBILITY_GUILD_ONLY",
+		3: "EVENT_VISIBILITY_PRIVATE",
+	}
+	EventVisibility_value = map[string]int32{
+		"EVENT_VISIBILITY_UNSPECIFIED": 0,
+		"EVENT_VISIBILITY_PUBLIC":      1,
+		"EVENT_VISIBILITY_GUILD_ONLY":  2,
+		"EVENT_VISIBILITY_PRIVATE":     3,
+	}
+)
+
+func (x EventVisibility) Enum() *EventVisibility {
+	p := new(EventVisibility)
+	*p = x
+	return p
+}
+
+func (x EventVisibility) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (EventVisibility) Descriptor() protoreflect.EnumDescriptor {
+	return file_social_event_v1_event_proto_enumTypes[5].Descriptor()
+}
+
+func (EventVisibility) Type() protoreflect.EnumType {
+	return &file_social_event_v1_event_proto_enumTypes[5]
+}
+
+func (x EventVisibility) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use EventVisibility.Descriptor instead.
+func (EventVisibility) EnumDescriptor() ([]byte, []int) {
+	return file_social_event_v1_event_proto_rawDescGZIP(), []int{5}
+}
+
 type ListEventsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
@@ -372,8 +428,11 @@ type CreateEventRequest struct {
 	MeetingLink    string                 `protobuf:"bytes,11,opt,name=meeting_link,json=meetingLink,proto3" json:"meeting_link,omitempty"`
 	Repeat         EventRepeat            `protobuf:"varint,12,opt,name=repeat,proto3,enum=event.v1.EventRepeat" json:"repeat,omitempty"`
 	IsPublic       bool                   `protobuf:"varint,13,opt,name=is_public,json=isPublic,proto3" json:"is_public,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// ADR-004: optional visibility override. UNSPECIFIED falls back to is_public.
+	Visibility    EventVisibility `protobuf:"varint,14,opt,name=visibility,proto3,enum=event.v1.EventVisibility" json:"visibility,omitempty"`
+	GuildId       string          `protobuf:"bytes,15,opt,name=guild_id,json=guildId,proto3" json:"guild_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CreateEventRequest) Reset() {
@@ -495,6 +554,20 @@ func (x *CreateEventRequest) GetIsPublic() bool {
 		return x.IsPublic
 	}
 	return false
+}
+
+func (x *CreateEventRequest) GetVisibility() EventVisibility {
+	if x != nil {
+		return x.Visibility
+	}
+	return EventVisibility_EVENT_VISIBILITY_UNSPECIFIED
+}
+
+func (x *CreateEventRequest) GetGuildId() string {
+	if x != nil {
+		return x.GuildId
+	}
+	return ""
 }
 
 type JoinEventRequest struct {
@@ -1008,8 +1081,16 @@ type Event struct {
 	MeetingLink      string                 `protobuf:"bytes,18,opt,name=meeting_link,json=meetingLink,proto3" json:"meeting_link,omitempty"`
 	IsPublic         bool                   `protobuf:"varint,19,opt,name=is_public,json=isPublic,proto3" json:"is_public,omitempty"`
 	Status           EventStatus            `protobuf:"varint,20,opt,name=status,proto3,enum=event.v1.EventStatus" json:"status,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// ADR-004: refines is_public. UNSPECIFIED on legacy rows — clients should
+	// fall back to is_public when this is unset.
+	Visibility EventVisibility `protobuf:"varint,21,opt,name=visibility,proto3,enum=event.v1.EventVisibility" json:"visibility,omitempty"`
+	// Guild scope when visibility = GUILD_ONLY. Empty otherwise.
+	GuildId string `protobuf:"bytes,22,opt,name=guild_id,json=guildId,proto3" json:"guild_id,omitempty"`
+	// Marks system-generated events (e.g. guild_war_started). Hidden from
+	// the regular events list; surfaced as a feed entry instead.
+	SystemKind    string `protobuf:"bytes,23,opt,name=system_kind,json=systemKind,proto3" json:"system_kind,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Event) Reset() {
@@ -1182,6 +1263,27 @@ func (x *Event) GetStatus() EventStatus {
 	return EventStatus_EVENT_STATUS_UNSPECIFIED
 }
 
+func (x *Event) GetVisibility() EventVisibility {
+	if x != nil {
+		return x.Visibility
+	}
+	return EventVisibility_EVENT_VISIBILITY_UNSPECIFIED
+}
+
+func (x *Event) GetGuildId() string {
+	if x != nil {
+		return x.GuildId
+	}
+	return ""
+}
+
+func (x *Event) GetSystemKind() string {
+	if x != nil {
+		return x.SystemKind
+	}
+	return ""
+}
+
 type EventParticipant struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -1260,7 +1362,7 @@ const file_social_event_v1_event_proto_rawDesc = "" +
 	"\x06offset\x18\x02 \x01(\x05R\x06offset\x121\n" +
 	"\x06status\x18\x03 \x01(\x0e2\x19.event.v1.EventListFilterR\x06status\x12\x1d\n" +
 	"\n" +
-	"creator_id\x18\x04 \x01(\tR\tcreatorId\"\xc5\x03\n" +
+	"creator_id\x18\x04 \x01(\tR\tcreatorId\"\x9b\x04\n" +
 	"\x12CreateEventRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x1f\n" +
 	"\vplace_label\x18\x02 \x01(\tR\n" +
@@ -1276,7 +1378,11 @@ const file_social_event_v1_event_proto_rawDesc = "" +
 	" \x01(\tR\vdescription\x12!\n" +
 	"\fmeeting_link\x18\v \x01(\tR\vmeetingLink\x12-\n" +
 	"\x06repeat\x18\f \x01(\x0e2\x15.event.v1.EventRepeatR\x06repeat\x12\x1b\n" +
-	"\tis_public\x18\r \x01(\bR\bisPublic\"-\n" +
+	"\tis_public\x18\r \x01(\bR\bisPublic\x129\n" +
+	"\n" +
+	"visibility\x18\x0e \x01(\x0e2\x19.event.v1.EventVisibilityR\n" +
+	"visibility\x12\x19\n" +
+	"\bguild_id\x18\x0f \x01(\tR\aguildId\"-\n" +
 	"\x10JoinEventRequest\x12\x19\n" +
 	"\bevent_id\x18\x01 \x01(\tR\aeventId\".\n" +
 	"\x11LeaveEventRequest\x12\x19\n" +
@@ -1312,7 +1418,7 @@ const file_social_event_v1_event_proto_rawDesc = "" +
 	"totalCount\x12\"\n" +
 	"\rhas_next_page\x18\x05 \x01(\bR\vhasNextPage\"6\n" +
 	"\rEventResponse\x12%\n" +
-	"\x05event\x18\x01 \x01(\v2\x0f.event.v1.EventR\x05event\"\xc4\x05\n" +
+	"\x05event\x18\x01 \x01(\v2\x0f.event.v1.EventR\x05event\"\xbb\x06\n" +
 	"\x05Event\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1f\n" +
@@ -1338,7 +1444,13 @@ const file_social_event_v1_event_proto_rawDesc = "" +
 	"\vdescription\x18\x11 \x01(\tR\vdescription\x12!\n" +
 	"\fmeeting_link\x18\x12 \x01(\tR\vmeetingLink\x12\x1b\n" +
 	"\tis_public\x18\x13 \x01(\bR\bisPublic\x12-\n" +
-	"\x06status\x18\x14 \x01(\x0e2\x15.event.v1.EventStatusR\x06status\"\xa2\x01\n" +
+	"\x06status\x18\x14 \x01(\x0e2\x15.event.v1.EventStatusR\x06status\x129\n" +
+	"\n" +
+	"visibility\x18\x15 \x01(\x0e2\x19.event.v1.EventVisibilityR\n" +
+	"visibility\x12\x19\n" +
+	"\bguild_id\x18\x16 \x01(\tR\aguildId\x12\x1f\n" +
+	"\vsystem_kind\x18\x17 \x01(\tR\n" +
+	"systemKind\"\xa2\x01\n" +
 	"\x10EventParticipant\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
 	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x1d\n" +
@@ -1369,7 +1481,12 @@ const file_social_event_v1_event_proto_rawDesc = "" +
 	"\x18EVENT_STATUS_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14EVENT_STATUS_PENDING\x10\x01\x12\x19\n" +
 	"\x15EVENT_STATUS_APPROVED\x10\x02\x12\x19\n" +
-	"\x15EVENT_STATUS_REJECTED\x10\x032\x8b\x06\n" +
+	"\x15EVENT_STATUS_REJECTED\x10\x03*\x8f\x01\n" +
+	"\x0fEventVisibility\x12 \n" +
+	"\x1cEVENT_VISIBILITY_UNSPECIFIED\x10\x00\x12\x1b\n" +
+	"\x17EVENT_VISIBILITY_PUBLIC\x10\x01\x12\x1f\n" +
+	"\x1bEVENT_VISIBILITY_GUILD_ONLY\x10\x02\x12\x1c\n" +
+	"\x18EVENT_VISIBILITY_PRIVATE\x10\x032\x8b\x06\n" +
 	"\fEventService\x12_\n" +
 	"\n" +
 	"ListEvents\x12\x1b.event.v1.ListEventsRequest\x1a\x1c.event.v1.ListEventsResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/api/v1/events\x12_\n" +
@@ -1393,7 +1510,7 @@ func file_social_event_v1_event_proto_rawDescGZIP() []byte {
 	return file_social_event_v1_event_proto_rawDescData
 }
 
-var file_social_event_v1_event_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
+var file_social_event_v1_event_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
 var file_social_event_v1_event_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_social_event_v1_event_proto_goTypes = []any{
 	(EventListFilter)(0),          // 0: event.v1.EventListFilter
@@ -1401,54 +1518,57 @@ var file_social_event_v1_event_proto_goTypes = []any{
 	(DeleteEventScope)(0),         // 2: event.v1.DeleteEventScope
 	(EventRepeat)(0),              // 3: event.v1.EventRepeat
 	(EventStatus)(0),              // 4: event.v1.EventStatus
-	(*ListEventsRequest)(nil),     // 5: event.v1.ListEventsRequest
-	(*CreateEventRequest)(nil),    // 6: event.v1.CreateEventRequest
-	(*JoinEventRequest)(nil),      // 7: event.v1.JoinEventRequest
-	(*LeaveEventRequest)(nil),     // 8: event.v1.LeaveEventRequest
-	(*UpdateEventRequest)(nil),    // 9: event.v1.UpdateEventRequest
-	(*DeleteEventRequest)(nil),    // 10: event.v1.DeleteEventRequest
-	(*InviteToEventRequest)(nil),  // 11: event.v1.InviteToEventRequest
-	(*EventStatusResponse)(nil),   // 12: event.v1.EventStatusResponse
-	(*ListEventsResponse)(nil),    // 13: event.v1.ListEventsResponse
-	(*EventResponse)(nil),         // 14: event.v1.EventResponse
-	(*Event)(nil),                 // 15: event.v1.Event
-	(*EventParticipant)(nil),      // 16: event.v1.EventParticipant
-	(*timestamppb.Timestamp)(nil), // 17: google.protobuf.Timestamp
-	(v1.OperationStatus)(0),       // 18: common.v1.OperationStatus
+	(EventVisibility)(0),          // 5: event.v1.EventVisibility
+	(*ListEventsRequest)(nil),     // 6: event.v1.ListEventsRequest
+	(*CreateEventRequest)(nil),    // 7: event.v1.CreateEventRequest
+	(*JoinEventRequest)(nil),      // 8: event.v1.JoinEventRequest
+	(*LeaveEventRequest)(nil),     // 9: event.v1.LeaveEventRequest
+	(*UpdateEventRequest)(nil),    // 10: event.v1.UpdateEventRequest
+	(*DeleteEventRequest)(nil),    // 11: event.v1.DeleteEventRequest
+	(*InviteToEventRequest)(nil),  // 12: event.v1.InviteToEventRequest
+	(*EventStatusResponse)(nil),   // 13: event.v1.EventStatusResponse
+	(*ListEventsResponse)(nil),    // 14: event.v1.ListEventsResponse
+	(*EventResponse)(nil),         // 15: event.v1.EventResponse
+	(*Event)(nil),                 // 16: event.v1.Event
+	(*EventParticipant)(nil),      // 17: event.v1.EventParticipant
+	(*timestamppb.Timestamp)(nil), // 18: google.protobuf.Timestamp
+	(v1.OperationStatus)(0),       // 19: common.v1.OperationStatus
 }
 var file_social_event_v1_event_proto_depIdxs = []int32{
 	0,  // 0: event.v1.ListEventsRequest.status:type_name -> event.v1.EventListFilter
-	17, // 1: event.v1.CreateEventRequest.scheduled_at:type_name -> google.protobuf.Timestamp
+	18, // 1: event.v1.CreateEventRequest.scheduled_at:type_name -> google.protobuf.Timestamp
 	3,  // 2: event.v1.CreateEventRequest.repeat:type_name -> event.v1.EventRepeat
-	17, // 3: event.v1.UpdateEventRequest.scheduled_at:type_name -> google.protobuf.Timestamp
-	2,  // 4: event.v1.DeleteEventRequest.delete_scope:type_name -> event.v1.DeleteEventScope
-	18, // 5: event.v1.EventStatusResponse.status:type_name -> common.v1.OperationStatus
-	15, // 6: event.v1.ListEventsResponse.events:type_name -> event.v1.Event
-	15, // 7: event.v1.EventResponse.event:type_name -> event.v1.Event
-	17, // 8: event.v1.Event.scheduled_at:type_name -> google.protobuf.Timestamp
-	17, // 9: event.v1.Event.created_at:type_name -> google.protobuf.Timestamp
-	16, // 10: event.v1.Event.participants:type_name -> event.v1.EventParticipant
-	4,  // 11: event.v1.Event.status:type_name -> event.v1.EventStatus
-	1,  // 12: event.v1.EventParticipant.status:type_name -> event.v1.ParticipantStatus
-	5,  // 13: event.v1.EventService.ListEvents:input_type -> event.v1.ListEventsRequest
-	6,  // 14: event.v1.EventService.CreateEvent:input_type -> event.v1.CreateEventRequest
-	7,  // 15: event.v1.EventService.JoinEvent:input_type -> event.v1.JoinEventRequest
-	8,  // 16: event.v1.EventService.LeaveEvent:input_type -> event.v1.LeaveEventRequest
-	9,  // 17: event.v1.EventService.UpdateEvent:input_type -> event.v1.UpdateEventRequest
-	10, // 18: event.v1.EventService.DeleteEvent:input_type -> event.v1.DeleteEventRequest
-	11, // 19: event.v1.EventService.InviteToEvent:input_type -> event.v1.InviteToEventRequest
-	13, // 20: event.v1.EventService.ListEvents:output_type -> event.v1.ListEventsResponse
-	14, // 21: event.v1.EventService.CreateEvent:output_type -> event.v1.EventResponse
-	14, // 22: event.v1.EventService.JoinEvent:output_type -> event.v1.EventResponse
-	12, // 23: event.v1.EventService.LeaveEvent:output_type -> event.v1.EventStatusResponse
-	14, // 24: event.v1.EventService.UpdateEvent:output_type -> event.v1.EventResponse
-	12, // 25: event.v1.EventService.DeleteEvent:output_type -> event.v1.EventStatusResponse
-	12, // 26: event.v1.EventService.InviteToEvent:output_type -> event.v1.EventStatusResponse
-	20, // [20:27] is the sub-list for method output_type
-	13, // [13:20] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	5,  // 3: event.v1.CreateEventRequest.visibility:type_name -> event.v1.EventVisibility
+	18, // 4: event.v1.UpdateEventRequest.scheduled_at:type_name -> google.protobuf.Timestamp
+	2,  // 5: event.v1.DeleteEventRequest.delete_scope:type_name -> event.v1.DeleteEventScope
+	19, // 6: event.v1.EventStatusResponse.status:type_name -> common.v1.OperationStatus
+	16, // 7: event.v1.ListEventsResponse.events:type_name -> event.v1.Event
+	16, // 8: event.v1.EventResponse.event:type_name -> event.v1.Event
+	18, // 9: event.v1.Event.scheduled_at:type_name -> google.protobuf.Timestamp
+	18, // 10: event.v1.Event.created_at:type_name -> google.protobuf.Timestamp
+	17, // 11: event.v1.Event.participants:type_name -> event.v1.EventParticipant
+	4,  // 12: event.v1.Event.status:type_name -> event.v1.EventStatus
+	5,  // 13: event.v1.Event.visibility:type_name -> event.v1.EventVisibility
+	1,  // 14: event.v1.EventParticipant.status:type_name -> event.v1.ParticipantStatus
+	6,  // 15: event.v1.EventService.ListEvents:input_type -> event.v1.ListEventsRequest
+	7,  // 16: event.v1.EventService.CreateEvent:input_type -> event.v1.CreateEventRequest
+	8,  // 17: event.v1.EventService.JoinEvent:input_type -> event.v1.JoinEventRequest
+	9,  // 18: event.v1.EventService.LeaveEvent:input_type -> event.v1.LeaveEventRequest
+	10, // 19: event.v1.EventService.UpdateEvent:input_type -> event.v1.UpdateEventRequest
+	11, // 20: event.v1.EventService.DeleteEvent:input_type -> event.v1.DeleteEventRequest
+	12, // 21: event.v1.EventService.InviteToEvent:input_type -> event.v1.InviteToEventRequest
+	14, // 22: event.v1.EventService.ListEvents:output_type -> event.v1.ListEventsResponse
+	15, // 23: event.v1.EventService.CreateEvent:output_type -> event.v1.EventResponse
+	15, // 24: event.v1.EventService.JoinEvent:output_type -> event.v1.EventResponse
+	13, // 25: event.v1.EventService.LeaveEvent:output_type -> event.v1.EventStatusResponse
+	15, // 26: event.v1.EventService.UpdateEvent:output_type -> event.v1.EventResponse
+	13, // 27: event.v1.EventService.DeleteEvent:output_type -> event.v1.EventStatusResponse
+	13, // 28: event.v1.EventService.InviteToEvent:output_type -> event.v1.EventStatusResponse
+	22, // [22:29] is the sub-list for method output_type
+	15, // [15:22] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_social_event_v1_event_proto_init() }
@@ -1461,7 +1581,7 @@ func file_social_event_v1_event_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_social_event_v1_event_proto_rawDesc), len(file_social_event_v1_event_proto_rawDesc)),
-			NumEnums:      5,
+			NumEnums:      6,
 			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,

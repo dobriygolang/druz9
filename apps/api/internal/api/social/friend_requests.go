@@ -2,6 +2,7 @@ package social
 
 import (
 	"context"
+	"fmt"
 	goerr "errors"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -14,7 +15,7 @@ import (
 func (i *Implementation) ListPendingRequests(ctx context.Context, _ *v1.ListPendingRequestsRequest) (*v1.ListPendingRequestsResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	buckets, err := i.service.ListPendingRequests(ctx, user.ID)
 	if err != nil {
@@ -29,7 +30,7 @@ func (i *Implementation) ListPendingRequests(ctx context.Context, _ *v1.ListPend
 func (i *Implementation) SendFriendRequest(ctx context.Context, req *v1.SendFriendRequestRequest) (*v1.SendFriendRequestResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	out, err := i.service.SendFriendRequest(ctx, user.ID, req.GetToUsername(), req.GetMessage())
 	if err != nil {
@@ -41,11 +42,11 @@ func (i *Implementation) SendFriendRequest(ctx context.Context, req *v1.SendFrie
 func (i *Implementation) AcceptFriendRequest(ctx context.Context, req *v1.AcceptFriendRequestRequest) (*v1.AcceptFriendRequestResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	id, perr := apihelpers.ParseUUID(req.GetRequestId(), "INVALID_REQUEST_ID", "request_id")
 	if perr != nil {
-		return nil, perr
+		return nil, fmt.Errorf("parse request_id: %w", perr)
 	}
 	f, err := i.service.AcceptFriendRequest(ctx, user.ID, id)
 	if err != nil {
@@ -57,11 +58,11 @@ func (i *Implementation) AcceptFriendRequest(ctx context.Context, req *v1.Accept
 func (i *Implementation) DeclineFriendRequest(ctx context.Context, req *v1.DeclineFriendRequestRequest) (*v1.DeclineFriendRequestResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	id, perr := apihelpers.ParseUUID(req.GetRequestId(), "INVALID_REQUEST_ID", "request_id")
 	if perr != nil {
-		return nil, perr
+		return nil, fmt.Errorf("parse request_id: %w", perr)
 	}
 	if err := i.service.DeclineFriendRequest(ctx, user.ID, id); err != nil {
 		return nil, mapAcceptErr(err)

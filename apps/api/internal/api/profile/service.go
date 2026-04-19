@@ -15,11 +15,18 @@ type Implementation struct {
 	progressRepo ProgressRepository
 	walletRepo   WalletRepository
 	notif        notif.Sender
+	prefsRepo    PreferencesRepository
 }
 
 // New returns new instance of Implementation.
 func New(service Service, cookie SessionCookieManager, progressRepo ProgressRepository, walletRepo WalletRepository, notificationSender notif.Sender) *Implementation {
 	return &Implementation{service: service, cookie: cookie, progressRepo: progressRepo, walletRepo: walletRepo, notif: notificationSender}
+}
+
+// WithPreferencesRepo wires user_preferences storage (ADR-005).
+func (i *Implementation) WithPreferencesRepo(r PreferencesRepository) *Implementation {
+	i.prefsRepo = r
+	return i
 }
 
 // GetDescription returns grpc service description.

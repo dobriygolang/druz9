@@ -2,6 +2,7 @@ package streak
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -12,7 +13,7 @@ import (
 func (i *Implementation) GetStreak(ctx context.Context, _ *v1.GetStreakRequest) (*v1.GetStreakResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	state, err := i.service.GetStreak(ctx, user.ID)
 	if err != nil {

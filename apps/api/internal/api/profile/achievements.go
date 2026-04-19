@@ -123,12 +123,12 @@ var achievementCatalog = []achievementDef{
 func (i *Implementation) ListProfileAchievements(ctx context.Context, req *v1.ListProfileAchievementsRequest) (*v1.ListProfileAchievementsResponse, error) {
 	userID, err := apihelpers.ParseUUID(req.GetUserId(), "INVALID_USER_ID", "user_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse user_id: %w", err)
 	}
 
 	progress, err := i.progressRepo.GetProfileProgress(ctx, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get profile progress: %w", err)
 	}
 
 	ov := &overview{

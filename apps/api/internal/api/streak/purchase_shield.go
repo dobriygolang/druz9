@@ -2,6 +2,7 @@ package streak
 
 import (
 	"context"
+	"fmt"
 	goerr "errors"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -14,7 +15,7 @@ import (
 func (i *Implementation) PurchaseShield(ctx context.Context, req *v1.PurchaseShieldRequest) (*v1.PurchaseShieldResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	state, count, cost, err := i.service.PurchaseShield(ctx, user.ID, req.GetCount())
 	if err != nil {

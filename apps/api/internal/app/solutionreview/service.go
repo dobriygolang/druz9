@@ -2,6 +2,7 @@ package solutionreview
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"sync"
 	"time"
@@ -130,7 +131,7 @@ func (s *Service) StartReview(ctx context.Context, input ReviewInput) (uuid.UUID
 	}
 
 	if err := s.repo.Create(ctx, review); err != nil {
-		return uuid.Nil, err
+		return uuid.Nil, fmt.Errorf("create review: %w", err)
 	}
 
 	// Only trigger AI review for accepted solutions by authenticated users
@@ -147,12 +148,20 @@ func (s *Service) StartReview(ctx context.Context, input ReviewInput) (uuid.UUID
 
 // GetReview returns a review by submission ID.
 func (s *Service) GetReview(ctx context.Context, submissionID uuid.UUID) (*model.SolutionReview, error) {
-	return s.repo.GetBySubmission(ctx, submissionID)
+	review, err := s.repo.GetBySubmission(ctx, submissionID)
+	if err != nil {
+		return nil, fmt.Errorf("get review by submission: %w", err)
+	}
+	return review, nil
 }
 
 // GetReviewByID returns a review by its ID.
 func (s *Service) GetReviewByID(ctx context.Context, id uuid.UUID) (*model.SolutionReview, error) {
-	return s.repo.GetByID(ctx, id)
+	review, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("get review by id: %w", err)
+	}
+	return review, nil
 }
 
 // runAIReview performs the LLM call and updates the review in the background.

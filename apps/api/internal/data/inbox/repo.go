@@ -52,7 +52,7 @@ func (r *Repo) ListThreads(ctx context.Context, userID uuid.UUID, limit, offset 
 		threads = append(threads, t)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, 0, 0, err
+		return nil, 0, 0, fmt.Errorf("iterate threads: %w", err)
 	}
 
 	var total int32
@@ -161,7 +161,10 @@ func (r *Repo) MarkThreadRead(ctx context.Context, userID, threadID uuid.UUID) e
 	`, threadID, userID); err != nil {
 		return fmt.Errorf("mark thread read: %w", err)
 	}
-	return tx.Commit(ctx)
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("commit transaction: %w", err)
+	}
+	return nil
 }
 
 // GetUnreadTotal sums unread_count across every thread of the user.

@@ -43,3 +43,15 @@ type ProgressRepository interface {
 type WalletRepository interface {
 	GetOrCreate(ctx context.Context, userID uuid.UUID) (*model.WalletBalance, error)
 }
+
+// PreferencesRepository — ADR-005. Reads/writes user_preferences.
+type PreferencesRepository interface {
+	GetOrInitPreferences(ctx context.Context, userID uuid.UUID) (*PreferencesRow, error)
+	UpsertPreferences(ctx context.Context, userID uuid.UUID, density, locale string) (*PreferencesRow, error)
+}
+
+type PreferencesRow struct {
+	UserID        uuid.UUID
+	LayoutDensity string
+	Locale        string
+}

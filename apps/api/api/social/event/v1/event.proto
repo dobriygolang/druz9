@@ -95,6 +95,17 @@ enum EventStatus {
   EVENT_STATUS_REJECTED    = 3;  // hidden, shown only to creator
 }
 
+// EventVisibility (ADR-004) refines `is_public` with a guild-only mode.
+// Existing rows with is_public=true map to PUBLIC; is_public=false maps to
+// GUILD_ONLY when guild_id is set, otherwise PRIVATE. Server-side ListEvents
+// filters by visibility against the caller's guild memberships.
+enum EventVisibility {
+  EVENT_VISIBILITY_UNSPECIFIED = 0;
+  EVENT_VISIBILITY_PUBLIC      = 1;  // anyone can see / join
+  EVENT_VISIBILITY_GUILD_ONLY  = 2;  // only members of guild_id
+  EVENT_VISIBILITY_PRIVATE     = 3;  // only invited users
+}
+
 // ── Request messages ───────────────────────────────────────────────────────
 
 message ListEventsRequest {
@@ -118,6 +129,9 @@ message CreateEventRequest {
   string                    meeting_link     = 11;
   EventRepeat               repeat           = 12;
   bool                      is_public        = 13;
+  // ADR-004: optional visibility override. UNSPECIFIED falls back to is_public.
+  EventVisibility           visibility       = 14;
+  string                    guild_id         = 15;
 }
 
 message JoinEventRequest {
@@ -195,6 +209,14 @@ message Event {
   string                    meeting_link      = 18;
   bool                      is_public         = 19;
   EventStatus               status            = 20;
+  // ADR-004: refines is_public. UNSPECIFIED on legacy rows — clients should
+  // fall back to is_public when this is unset.
+  EventVisibility           visibility        = 21;
+  // Guild scope when visibility = GUILD_ONLY. Empty otherwise.
+  string                    guild_id          = 22;
+  // Marks system-generated events (e.g. guild_war_started). Hidden from
+  // the regular events list; surfaced as a feed entry instead.
+  string                    system_kind       = 23;
 }
 
 message EventParticipant {

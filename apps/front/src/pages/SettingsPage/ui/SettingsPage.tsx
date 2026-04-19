@@ -5,6 +5,7 @@ import { i18n, SUPPORTED_LANGUAGES } from '@/shared/i18n'
 import { Panel, PageHeader } from '@/shared/ui/pixel'
 import { Hero } from '@/shared/ui/sprites'
 import { notificationApi, type NotificationSettings } from '@/features/Notification/api/notificationApi'
+import { preferencesApi } from '@/features/UserPreferences/api/preferencesApi'
 import { addToast } from '@/shared/lib/toasts'
 import { useTweaks, type Density } from '@/shared/lib/gameState'
 import { useAuth } from '@/app/providers/AuthProvider'
@@ -420,7 +421,15 @@ function SettingsTweaks() {
           defaultValue: 'Accessibility toggle — how tightly the UI packs.',
         })}
       >
-        <ChipGroup options={densities} active={tweaks.density} onChange={(v) => update({ density: v as Density })} />
+        <ChipGroup options={densities} active={tweaks.density} onChange={(v) => {
+          update({ density: v as Density })
+          // Mirror the local tweak to the server so it carries across devices
+          // (ADR-005). The local-state path is the source of truth for the
+          // current page; the server call is fire-and-forget — we don't
+          // block the UI on the round-trip.
+          const serverDensity = (v === 'compact') ? 'compact' : 'comfortable'
+          void preferencesApi.update({ layoutDensity: serverDensity }).catch(() => { /* anonymous user / offline */ })
+        }} />
       </Setting>
 
       <div

@@ -2,6 +2,7 @@ package social
 
 import (
 	"context"
+	"fmt"
 	goerr "errors"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -15,7 +16,7 @@ import (
 func (i *Implementation) ListFriends(ctx context.Context, req *v1.ListFriendsRequest) (*v1.ListFriendsResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	result, err := i.service.ListFriends(ctx, user.ID, req.GetLimit(), req.GetOffset())
 	if err != nil {
@@ -32,11 +33,11 @@ func (i *Implementation) ListFriends(ctx context.Context, req *v1.ListFriendsReq
 func (i *Implementation) RemoveFriend(ctx context.Context, req *v1.RemoveFriendRequest) (*v1.RemoveFriendResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	other, perr := apihelpers.ParseUUID(req.GetUserId(), "INVALID_USER_ID", "user_id")
 	if perr != nil {
-		return nil, perr
+		return nil, fmt.Errorf("parse user_id: %w", perr)
 	}
 	if err := i.service.RemoveFriend(ctx, user.ID, other); err != nil {
 		if goerr.Is(err, socialdomain.ErrNotFriends) {
