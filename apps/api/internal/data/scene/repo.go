@@ -22,6 +22,11 @@ const (
 	ScopeGuildHall Scope = "guild_hall"
 )
 
+var (
+	errInvalidCanvasSize = errors.New("invalid canvas size")
+	errInvalidItemScale  = errors.New("scale must be > 0")
+)
+
 // PlacedItem mirrors v1.PlacedItem at the data-layer boundary so the repo
 // has no dependency on generated proto types.
 type PlacedItem struct {
@@ -122,7 +127,7 @@ func (r *Repo) Upsert(
 	items []PlacedItem,
 ) (*Layout, error) {
 	if width <= 0 || height <= 0 {
-		return nil, fmt.Errorf("scene upsert: invalid canvas size %dx%d", width, height)
+		return nil, fmt.Errorf("scene upsert: %w", errInvalidCanvasSize)
 	}
 
 	tx, err := r.data.DB.Begin(ctx)
@@ -156,7 +161,7 @@ func (r *Repo) Upsert(
 		batch := &pgx.Batch{}
 		for _, it := range items {
 			if it.Scale <= 0 {
-				return nil, fmt.Errorf("scene upsert: scale must be > 0 (got %v)", it.Scale)
+				return nil, fmt.Errorf("scene upsert: %w", errInvalidItemScale)
 			}
 			batch.Queue(`
                 INSERT INTO scene_placed_items

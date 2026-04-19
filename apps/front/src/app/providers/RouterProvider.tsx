@@ -319,17 +319,13 @@ export const RouterProvider: React.FC = () => {
                 )
               }
             />
-            {/* Atlas = merged skill tree (was /skills + /training root).
-                 Keep old paths as redirects so bookmarks survive. Training
-                 sub-routes (daily, speed-run, task/:id, weekly-boss,
-                 blind-review) stay as-is — they're the actual playable
-                 screens, not the map. */}
+            {/* /atlas is the world map. Training keeps the skill canvas. */}
             <Route
               path="/atlas"
-              element={gate ? <Navigate to="/login" replace /> : <TrainingPage />}
+              element={gate ? <Navigate to="/login" replace /> : <AtlasWorldPage />}
             />
-            <Route path="/skills" element={<Navigate to="/atlas" replace />} />
-            <Route path="/training" element={<Navigate to="/atlas" replace />} />
+            <Route path="/skills" element={<Navigate to="/training" replace />} />
+            <Route path="/training" element={gate ? <Navigate to="/login" replace /> : <TrainingPage />} />
             <Route
               path="/training/task/:taskId"
               element={gate ? <Navigate to="/login" replace /> : <TrainingTaskPage />}
@@ -376,8 +372,8 @@ export const RouterProvider: React.FC = () => {
               element={gate ? <Navigate to="/login" replace /> : <PodcastsPage />}
             />
             <Route path="/map" element={gate ? <Navigate to="/login" replace /> : <MapPage />} />
-            {/* ADR-002 — stylised SVG world atlas */}
-            <Route path="/atlas/world" element={gate ? <Navigate to="/login" replace /> : <AtlasWorldPage />} />
+            {/* ADR-002 — old atlas deep-link */}
+            <Route path="/atlas/world" element={<Navigate to="/atlas" replace />} />
             {/* /tavern is the new canonical path; /shop kept as a backward-compat redirect. */}
             <Route path="/tavern" element={gate ? <Navigate to="/login" replace /> : <ShopPage />} />
             <Route path="/shop" element={<Navigate to="/tavern" replace />} />
@@ -458,4 +454,3 @@ export const RouterProvider: React.FC = () => {
     </Suspense>
   )
 }
-

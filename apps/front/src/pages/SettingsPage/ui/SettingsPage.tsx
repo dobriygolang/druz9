@@ -9,6 +9,7 @@ import { preferencesApi } from '@/features/UserPreferences/api/preferencesApi'
 import { addToast } from '@/shared/lib/toasts'
 import { useTweaks, type Density } from '@/shared/lib/gameState'
 import { useAuth } from '@/app/providers/AuthProvider'
+import { Tour } from '@/features/Tour/ui/Tour'
 
 // Gameplay / Privacy / Keybindings / Accessibility tabs were removed —
 // the toggles didn't persist anywhere (no backend, no local storage).
@@ -37,6 +38,13 @@ export function SettingsPage() {
 
   return (
     <>
+      <Tour
+        tourId="settings_intro"
+        steps={[
+          { selector: '[data-tour=settings-tabs]', title: t('settings.tour.tabsTitle', { defaultValue: 'Разделы' }), body: t('settings.tour.tabsBody', { defaultValue: 'Настройки разделены на аккаунт, оформление, уведомления и язык.' }) },
+          { selector: '[data-tour=settings-content]', title: t('settings.tour.contentTitle', { defaultValue: 'Сохранение' }), body: t('settings.tour.contentBody', { defaultValue: 'Изменения в подключённых разделах сразу отправляются в backend.' }) },
+        ]}
+      />
       <PageHeader
         eyebrow={t('settings.eyebrow')}
         title={t('settings.title')}
@@ -50,7 +58,7 @@ export function SettingsPage() {
             minHeight: 480,
           }}
         >
-          <div style={{ borderRight: '3px dashed var(--ink-3)', padding: '14px 0' }}>
+          <div data-tour="settings-tabs" style={{ borderRight: '3px dashed var(--ink-3)', padding: '14px 0' }}>
             {TABS.map(([id, label]) => (
               <div
                 key={id}
@@ -80,7 +88,7 @@ export function SettingsPage() {
               </div>
             ))}
           </div>
-          <div style={{ padding: 24 }}>
+          <div data-tour="settings-content" style={{ padding: 24 }}>
             {tab === 'account'  && <SettingsAccount />}
             {tab === 'tweaks'   && <SettingsTweaks />}
             {tab === 'notifs'   && <SettingsNotifs />}

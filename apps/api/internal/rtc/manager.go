@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	errKeyNotFound   = errors.New("config key not found")
+	errKeyNotFound    = errors.New("config key not found")
 	errKeyNotWritable = errors.New("config key is not writable")
 )
 

@@ -28,10 +28,11 @@ type TradeRow struct {
 }
 
 var (
-	ErrTradeNotFound       = errors.New("trade: not found")
-	ErrTradeNotPending     = errors.New("trade: not pending")
-	ErrTradeItemNotOwned   = errors.New("trade: item not owned by required side")
-	ErrTradeItemEquipped   = errors.New("trade: item is currently equipped")
+	ErrTradeNotFound        = errors.New("trade: not found")
+	ErrTradeNotPending      = errors.New("trade: not pending")
+	ErrTradeItemNotOwned    = errors.New("trade: item not owned by required side")
+	ErrTradeItemEquipped    = errors.New("trade: item is currently equipped")
+	ErrTradeSelf            = errors.New("trade: cannot trade with yourself")
 )
 
 // ProposeTrade verifies initiator owns initiator_item and counterparty
@@ -40,7 +41,7 @@ var (
 // cancel (no-op).
 func (r *Repo) ProposeTrade(ctx context.Context, initiatorID, counterpartyID, initiatorItemID, counterpartyItemID uuid.UUID, note string) (*TradeRow, error) {
 	if initiatorID == counterpartyID {
-		return nil, fmt.Errorf("trade: cannot trade with yourself")
+		return nil, fmt.Errorf("propose trade: %w", ErrTradeSelf)
 	}
 	tx, err := r.data.DB.Begin(ctx)
 	if err != nil {

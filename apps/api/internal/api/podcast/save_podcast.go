@@ -2,6 +2,7 @@ package podcast
 
 import (
 	"context"
+	"fmt"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -14,7 +15,7 @@ import (
 func (i *Implementation) SavePodcast(ctx context.Context, req *v1.SavePodcastRequest) (*v1.PodcastStatusResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.saved == nil {
 		return nil, kratoserrors.InternalServer("NOT_CONFIGURED", "saved podcasts not wired")

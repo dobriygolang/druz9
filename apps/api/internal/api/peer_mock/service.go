@@ -110,7 +110,7 @@ func (i *Implementation) ListOpenSlots(ctx context.Context, req *v1.ListOpenSlot
 func (i *Implementation) ListMySlots(ctx context.Context, req *v1.ListMySlotsRequest) (*v1.ListMySlotsResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	slots, err := i.repo.ListSlotsByInterviewer(ctx, user.ID, req.GetLimit(), req.GetOffset())
 	if err != nil {
@@ -179,7 +179,7 @@ func (i *Implementation) BookSlot(ctx context.Context, req *v1.BookSlotRequest) 
 func (i *Implementation) ListMyBookings(ctx context.Context, req *v1.ListMyBookingsRequest) (*v1.ListMyBookingsResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	asOfferer, err := i.repo.ListBookings(ctx, user.ID, true, req.GetLimit(), req.GetOffset())
 	if err != nil {
@@ -204,7 +204,7 @@ func (i *Implementation) ListMyBookings(ctx context.Context, req *v1.ListMyBooki
 func (i *Implementation) CancelBooking(ctx context.Context, req *v1.CancelBookingRequest) (*v1.CancelBookingResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	bookingID, err := apihelpers.ParseUUID(req.GetBookingId(), "INVALID_BOOKING_ID", "booking_id")
 	if err != nil {
@@ -251,7 +251,7 @@ func (i *Implementation) CancelBooking(ctx context.Context, req *v1.CancelBookin
 func (i *Implementation) SubmitReview(ctx context.Context, req *v1.SubmitReviewRequest) (*v1.SubmitReviewResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	bookingID, err := apihelpers.ParseUUID(req.GetBookingId(), "INVALID_BOOKING_ID", "booking_id")
 	if err != nil {
@@ -293,7 +293,7 @@ func (i *Implementation) SubmitReview(ctx context.Context, req *v1.SubmitReviewR
 func (i *Implementation) GetMyReliability(ctx context.Context, _ *v1.GetMyReliabilityRequest) (*v1.GetMyReliabilityResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	rel, err := i.repo.GetReliability(ctx, user.ID)
 	if err != nil {

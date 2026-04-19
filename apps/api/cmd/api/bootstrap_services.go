@@ -17,6 +17,7 @@ import (
 	guildservice "api/internal/api/guild"
 	hubservice "api/internal/api/hub"
 	inboxservice "api/internal/api/inbox"
+	insightsservice "api/internal/api/insights"
 	interviewprepservice "api/internal/api/interview_prep"
 	missionservice "api/internal/api/mission"
 	notificationservice "api/internal/api/notification"
@@ -24,7 +25,6 @@ import (
 	podcastservice "api/internal/api/podcast"
 	profileservice "api/internal/api/profile"
 	referralservice "api/internal/api/referral"
-	insightsservice "api/internal/api/insights"
 	sceneservice "api/internal/api/scene"
 	seasonpassservice "api/internal/api/season_pass"
 	shopservice "api/internal/api/shop"
@@ -295,10 +295,10 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		profileService: profileservice.New(profileServiceDomain, cookies, profileservice.NewCachedProgressRepository(storage.profileRepo), storage.walletRepo, notifSender).
 			WithPreferencesRepo(profilePreferencesAdapter{repo: storage.profileRepo}).
 			WithToursRepo(storage.profileRepo),
-		geoService:        geoservice.New(geoServiceDomain),
-		hubService:        hubservice.New(storage.profileRepo, missionServiceDomain, eventServiceDomain, arenaServiceDomain, guildServiceDomain, seasonPassDomain),
-		guildService:      guildservice.New(guildServiceDomain, eventServiceDomain, notifSender).WithWarRepo(storage.guildRepo),
-		eventService:      eventservice.New(eventServiceDomain),
+		geoService:   geoservice.New(geoServiceDomain),
+		hubService:   hubservice.New(storage.profileRepo, missionServiceDomain, eventServiceDomain, arenaServiceDomain, guildServiceDomain, seasonPassDomain).WithRegionStatsRepository(hubRegionStatsAdapter{db: storage.store.DB}),
+		guildService: guildservice.New(guildServiceDomain, eventServiceDomain, notifSender).WithWarRepo(storage.guildRepo),
+		eventService: eventservice.New(eventServiceDomain),
 		podcastService: podcastservice.New(podcastServiceDomain).
 			WithSeriesRepo(podcastSeriesAdapter{repo: storage.podcastRepo}).
 			WithSavedRepo(podcastSavedAdapter{repo: storage.podcastRepo}).
@@ -310,10 +310,10 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		arenaService: arenaservice.New(arenaServiceDomain, arenaRealtimeHub, func() bool {
 			return bootstrap.cfg.Arena != nil && !bootstrap.cfg.Arena.RequireAuth
 		}, solutionReviewService, notifSender).WithLobbyRepo(storage.arenaRepo),
-		interviewPrepService:   interviewprepservice.New(interviewPrepDomain, storage.interviewRepo, notifSender).WithAIMentorRepo(storage.aiMentorRepo),
-		missionService:         missionservice.New(missionServiceDomain),
-		notificationSettings:   notificationservice.NewSettings(notifSender),
-		challengeService:       challengeservice.New(challengeServiceDomain),
+		interviewPrepService: interviewprepservice.New(interviewPrepDomain, storage.interviewRepo, notifSender).WithAIMentorRepo(storage.aiMentorRepo),
+		missionService:       missionservice.New(missionServiceDomain),
+		notificationSettings: notificationservice.NewSettings(notifSender),
+		challengeService:     challengeservice.New(challengeServiceDomain),
 		inboxService: inboxservice.New(inboxServiceDomain, storage.profileRepo).
 			WithGiftsRepo(inboxGiftsAdapter{repo: storage.inboxRepo}).
 			WithTradesRepo(inboxTradesAdapter{repo: storage.inboxRepo}),

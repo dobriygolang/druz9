@@ -1986,5 +1986,13 @@
   "leaderboards.noSeasonProgress": "Season progress has not been earned yet — check back later.",
   "leaderboards.tierValue": "tier {{tier}}",
   "leaderboards.seasonNumber": "Season {{number}}",
-  "leaderboards.yourPosition": "· · · your position · · ·"
+  "leaderboards.yourPosition": "· · · your position · · ·",
+  "atlasWorld.zoomIn": "Zoom in",
+  "atlasWorld.zoomOut": "Zoom out",
+  "atlasWorld.reset": "Reset view",
+  "atlasWorld.status": "zoom {{zoom}}% · drag map · wheel to zoom",
+  "atlasWorld.counts.guilds": "{{count}} guilds",
+  "atlasWorld.counts.events": "{{count}} events",
+  "atlasWorld.counts.podcasts": "{{count}} podcasts",
+  "atlasWorld.emptyState": "Pick a region on the map to see context."
 }

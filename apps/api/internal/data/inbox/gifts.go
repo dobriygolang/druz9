@@ -27,9 +27,10 @@ type GiftRow struct {
 }
 
 var (
-	ErrGiftItemNotOwned = errors.New("gift: sender does not own this item")
-	ErrGiftNotFound     = errors.New("gift: not found")
-	ErrGiftNotPending   = errors.New("gift: not pending")
+	ErrGiftItemNotOwned    = errors.New("gift: sender does not own this item")
+	ErrGiftNotFound        = errors.New("gift: not found")
+	ErrGiftNotPending      = errors.New("gift: not pending")
+	ErrGiftItemEquipped    = errors.New("gift: item is currently equipped — unequip before sending")
 )
 
 // SendGift creates a 'pending' gift after verifying the sender owns the
@@ -55,7 +56,7 @@ func (r *Repo) SendGift(ctx context.Context, senderID, recipientID, itemID uuid.
 		return nil, fmt.Errorf("send gift verify: %w", err)
 	}
 	if equipped {
-		return nil, fmt.Errorf("gift: item is currently equipped — unequip before sending")
+		return nil, fmt.Errorf("send gift: %w", ErrGiftItemEquipped)
 	}
 
 	var giftID uuid.UUID

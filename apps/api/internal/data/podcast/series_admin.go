@@ -13,11 +13,15 @@ import (
 // CreateSeries inserts a new podcast_series row. Slug is unique; returns
 // the slug-collision case as ErrSeriesSlugTaken so handlers can map it
 // to 409 Conflict.
-var ErrSeriesSlugTaken = errors.New("podcast series slug already taken")
+var (
+	ErrSeriesSlugTaken    = errors.New("podcast series slug already taken")
+	ErrSeriesFieldsRequired = errors.New("create series: slug and title required")
+	ErrSeriesNotFound      = errors.New("series not found")
+)
 
 func (r *Repo) CreateSeries(ctx context.Context, slug, title, description, coverRef string) (*Series, error) {
 	if slug == "" || title == "" {
-		return nil, fmt.Errorf("create series: slug and title required")
+		return nil, fmt.Errorf("create series: %w", ErrSeriesFieldsRequired)
 	}
 	row := r.data.DB.QueryRow(ctx, `
         INSERT INTO podcast_series (slug, title, description, cover_ref)

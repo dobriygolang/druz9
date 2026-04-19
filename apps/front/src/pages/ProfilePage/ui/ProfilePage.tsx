@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Panel, RpgButton, Badge, PageHeader } from '@/shared/ui/pixel'
 import {
@@ -26,18 +26,22 @@ import { authApi, type ProfileAchievement, type ProfileActivityEntry } from '@/f
 import { shopApi } from '@/features/Shop/api/shopApi'
 import { ItemCategory, type OwnedItem, rarityLabel } from '@/features/Shop/model/types'
 import { InventoryModal } from '@/features/Shop/ui/InventoryModal'
-import type { ProfileProgress } from '@/entities/User/model/types'
+import type { ProfileProgress, User } from '@/entities/User/model/types'
 import { SceneViewer } from '@/features/Scene/ui/SceneViewer'
 import { SceneEditor } from '@/features/Scene/ui/SceneEditor'
+import { SendGiftModal } from '@/features/Inbox/ui/SendGiftModal'
+import { Tour } from '@/features/Tour/ui/Tour'
 
 export function ProfilePage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { userId: routeUserId } = useParams<{ userId?: string }>()
   const { user } = useAuth()
   const [tweaks] = useTweaks()
-  const [visitorMode, setVisitorMode] = useState(false)
+  const [visitorProfile, setVisitorProfile] = useState<User | null>(null)
   const [editRoom, setEditRoom] = useState(false)
   const [inventoryOpen, setInventoryOpen] = useState(false)
+  const [giftOpen, setGiftOpen] = useState(false)
   const [inventoryFallback, setInventoryFallback] = useState(buildInventory(t))
   const [dragIdx, setDragIdx] = useState<number | null>(null)
   const [overIdx, setOverIdx] = useState<number | null>(null)
@@ -56,20 +60,48 @@ export function ProfilePage() {
   const fallbackAchievements = buildAchievements(t)
   const fallbackTimeline = buildTimeline(t)
   const fallbackCosmetics = buildCosmetics(t)
+  const viewedUser = routeUserId && routeUserId !== user?.id ? visitorProfile : user
+  const viewedUserId = routeUserId || user?.id || ''
+  const visitorMode = Boolean(routeUserId && routeUserId !== user?.id)
+  const canEditOwnProfile = !visitorMode && Boolean(user?.id)
 
   useEffect(() => {
     setInventoryFallback(buildInventory(t))
   }, [t])
 
   useEffect(() => {
-    if (!user?.id) return
+    if (!routeUserId || routeUserId === user?.id) {
+      setVisitorProfile(null)
+      return
+    }
     let cancelled = false
-    authApi.getProfileAchievements(user.id).then((a) => { if (!cancelled) setAchievements(a) }).catch(() => {})
-    authApi.getProfileActivity(user.id).then((tl) => { if (!cancelled) setTimeline(tl) }).catch(() => {})
-    authApi.getProfileProgress(user.id).then((p) => { if (!cancelled) setProgress(p) }).catch(() => {})
+    authApi.getProfileById(routeUserId)
+      .then((profile) => { if (!cancelled) setVisitorProfile(profile.user) })
+      .catch(() => { if (!cancelled) setVisitorProfile(null) })
+    return () => { cancelled = true }
+  }, [routeUserId, user?.id])
+
+  useEffect(() => {
+    if (!viewedUserId) return
+    let cancelled = false
+    setAchievements(null)
+    setTimeline(null)
+    setProgress(null)
+    authApi.getProfileAchievements(viewedUserId).then((a) => { if (!cancelled) setAchievements(a) }).catch(() => {})
+    authApi.getProfileActivity(viewedUserId).then((tl) => { if (!cancelled) setTimeline(tl) }).catch(() => {})
+    authApi.getProfileProgress(viewedUserId).then((p) => { if (!cancelled) setProgress(p) }).catch(() => {})
+    return () => { cancelled = true }
+  }, [viewedUserId])
+
+  useEffect(() => {
+    if (!canEditOwnProfile) {
+      setOwned(null)
+      return
+    }
+    let cancelled = false
     shopApi.getInventory().then((items) => { if (!cancelled) setOwned(items) }).catch(() => {})
     return () => { cancelled = true }
-  }, [user?.id])
+  }, [canEditOwnProfile])
 
   // Derive the three panels' data sources. When the backend hasn't
   // answered yet or failed we keep the hardcoded decor so the page
@@ -79,6 +111,13 @@ export function ProfilePage() {
   const cosmetics = owned && owned.some((o) => o.equipped)
     ? buildCosmeticsFromOwned(owned.filter((o) => o.equipped))
     : fallbackCosmetics
+  const sceneItemAssets = useMemo(() => {
+    const assets: Record<string, { src?: string; label?: string }> = {}
+    for (const row of owned ?? []) {
+      assets[row.item.id] = { src: row.item.iconRef, label: row.item.name }
+    }
+    return assets
+  }, [owned])
 
   const reorder = (from: number, to: number) => {
     if (from === to) return
@@ -93,8 +132,8 @@ export function ProfilePage() {
     })
   }
 
-  const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim()
-  const displayName = fullName || user?.username || user?.telegramUsername || t('profile.title')
+  const fullName = [viewedUser?.firstName, viewedUser?.lastName].filter(Boolean).join(' ').trim()
+  const displayName = fullName || viewedUser?.username || viewedUser?.telegramUsername || t('profile.title')
   const title = visitorMode ? `${displayName} · ${t('profile.visitorBadge', { defaultValue: 'visiting' })}` : displayName
   const subtitle = visitorMode
     ? t('profile.subtitleVisitor')
@@ -102,6 +141,14 @@ export function ProfilePage() {
 
   return (
     <>
+      <Tour
+        tourId="profile_intro"
+        steps={[
+          { selector: '[data-tour=profile-scene]', title: t('profile.tour.sceneTitle', { defaultValue: 'Комната героя' }), body: t('profile.tour.sceneBody', { defaultValue: 'Здесь сохраняется расстановка предметов. У владельца доступен редактор, у гостя только просмотр.' }) },
+          { selector: '[data-tour=profile-stats]', title: t('profile.tour.statsTitle', { defaultValue: 'Прогресс' }), body: t('profile.tour.statsBody', { defaultValue: 'Статы, достижения и недавние действия подтягиваются из backend-профиля.' }) },
+          { selector: '[data-tour=profile-inventory]', title: t('profile.tour.inventoryTitle', { defaultValue: 'Экипировка' }), body: t('profile.tour.inventoryBody', { defaultValue: 'Надетые предметы остаются видимыми отдельно от комнаты.' }) },
+        ]}
+      />
       <PageHeader
         eyebrow={
           visitorMode
@@ -113,16 +160,16 @@ export function ProfilePage() {
         right={
           visitorMode ? (
             <div style={{ display: 'flex', gap: 8 }}>
-              <RpgButton size="sm" onClick={() => setVisitorMode(false)}>
+              <RpgButton size="sm" onClick={() => navigate('/profile')}>
                 {t('profile.exitVisitor')}
               </RpgButton>
-              <RpgButton size="sm" variant="primary" onClick={() => navigate('/inbox?tab=friends')}>
-                {t('profile.challenge')}
+              <RpgButton size="sm" variant="primary" disabled={!viewedUserId} onClick={() => setGiftOpen(true)}>
+                {t('profile.gift', { defaultValue: 'Подарить' })}
               </RpgButton>
             </div>
           ) : (
             <div style={{ display: 'flex', gap: 8 }}>
-              <RpgButton size="sm" onClick={() => setVisitorMode(true)}>
+              <RpgButton size="sm" onClick={() => user?.id && navigate(`/profile/${user.id}`)}>
                 {t('profile.viewAsVisitor')}
               </RpgButton>
               <RpgButton size="sm" variant="primary" onClick={() => setInventoryOpen(true)}>
@@ -292,8 +339,8 @@ export function ProfilePage() {
       {/* ADR-003: persisted Hero Room. Owner sees an "Edit" toggle that
           flips the panel into SceneEditor (drag-and-drop). Visitors see
           the read-only canvas. Server enforces canEdit. */}
-      {user?.id && (
-        <Panel nailed style={{ padding: 12, marginBottom: 18 }}>
+      {viewedUserId && (
+        <Panel nailed data-tour="profile-scene" style={{ padding: 12, marginBottom: 18 }}>
           <div
             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}
           >
@@ -306,10 +353,11 @@ export function ProfilePage() {
           </div>
           <SceneViewer
             scope="user_room"
-            ownerId={user.id}
+            ownerId={viewedUserId}
+            itemAssets={sceneItemAssets}
             maxHeight={360}
             renderEditor={(resp, refresh) => (
-              <SceneRoomToggle resp={resp} ownerId={user.id} refresh={refresh} />
+              <SceneRoomToggle resp={resp} ownerId={viewedUserId} itemAssets={sceneItemAssets} refresh={refresh} />
             )}
           />
         </Panel>
@@ -409,7 +457,7 @@ export function ProfilePage() {
       )}
 
       {/* Profile grid */}
-      <div className="rpg-profile-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 18 }}>
+      <div data-tour="profile-stats" className="rpg-profile-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 18 }}>
         {/* Stats */}
         <Panel>
           <h3 className="font-display" style={{ fontSize: 17 }}>
@@ -574,7 +622,7 @@ export function ProfilePage() {
       </div>
 
       {/* Inventory strip */}
-      <Panel variant="recessed" style={{ marginTop: 18 }}>
+      <Panel data-tour="profile-inventory" variant="recessed" style={{ marginTop: 18 }}>
         <div
           style={{
             display: 'flex',
@@ -612,6 +660,13 @@ export function ProfilePage() {
         initialItems={owned ?? []}
         onInventoryChange={setOwned}
       />
+      {giftOpen && viewedUserId && (
+        <SendGiftModal
+          recipientId={viewedUserId}
+          recipientName={displayName}
+          onClose={() => setGiftOpen(false)}
+        />
+      )}
     </>
   )
 }
@@ -681,10 +736,12 @@ function buildCosmetics(t: (key: string) => string) {
 function SceneRoomToggle({
   resp,
   ownerId,
+  itemAssets,
   refresh,
 }: {
   resp: import('@/features/Scene/api/sceneApi').SceneLayoutResponse
   ownerId: string
+  itemAssets?: Record<string, { src?: string; label?: string }>
   refresh: () => void
 }) {
   const [editing, setEditing] = useState(false)
@@ -702,7 +759,7 @@ function SceneRoomToggle({
   }
   return (
     <div>
-      <SceneCanvasInline layout={resp.layout} maxHeight={360} />
+      <SceneCanvasInline layout={resp.layout} itemAssets={itemAssets} maxHeight={360} />
       {resp.canEdit && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
           <button className="rpg-btn rpg-btn--sm rpg-btn--primary" onClick={() => setEditing(true)}>
@@ -720,8 +777,13 @@ function SceneRoomToggle({
 // expose its canvas as a standalone component, this can be deleted.
 function SceneCanvasInline({
   layout,
+  itemAssets,
   maxHeight,
-}: { layout: import('@/features/Scene/api/sceneApi').SceneLayout; maxHeight: number }) {
+}: {
+  layout: import('@/features/Scene/api/sceneApi').SceneLayout
+  itemAssets?: Record<string, { src?: string; label?: string }>
+  maxHeight: number
+}) {
   if (!layout.items || layout.items.length === 0) {
     return (
       <div style={{
@@ -743,21 +805,36 @@ function SceneCanvasInline({
       overflow: 'hidden', boxShadow: '4px 4px 0 var(--ink-0, #2a1a0c)',
     }}>
       {[...layout.items].sort((a, b) => a.zIndex - b.zIndex).map((it, idx) => {
+        const asset = itemAssets?.[it.itemId]
         const xPct = (it.x / layout.width) * 100
         const yPct = (it.y / layout.height) * 100
         const sizePct = 12 * it.scale
-        return (
-          <div key={`${it.itemId}-${idx}`} style={{
+        const itemStyle: CSSProperties = {
             position: 'absolute',
             left: `${xPct}%`, top: `${yPct}%`,
             width: `${sizePct * aspect}%`,
             transform: `translate(-50%, -50%) rotate(${it.rotationDeg}deg) scaleX(${it.flipped ? -1 : 1})`,
             zIndex: it.zIndex, transformOrigin: 'center', pointerEvents: 'none',
+        }
+        if (asset?.src) {
+          return (
+            <img
+              key={`${it.itemId}-${idx}`}
+              src={asset.src}
+              alt={asset.label ?? it.itemId}
+              style={itemStyle}
+              draggable={false}
+            />
+          )
+        }
+        return (
+          <div key={`${it.itemId}-${idx}`} style={{
+            ...itemStyle,
             padding: '6px 10px', background: 'var(--parch-2, #efe1bf)',
             border: '2px solid var(--ink-0, #2a1a0c)',
             fontFamily: 'Pixelify Sans, monospace', fontSize: 11,
             whiteSpace: 'nowrap', color: 'var(--ink-0, #2a1a0c)',
-          }}>{it.itemId.slice(0, 8)}</div>
+          }}>{asset?.label ?? it.itemId.slice(0, 8)}</div>
         )
       })}
     </div>

@@ -5,6 +5,7 @@ import { podcastApi } from '@/features/Podcast/api/podcastApi'
 import type { Podcast } from '@/entities/Podcast/model/types'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { addToast } from '@/shared/lib/toasts'
+import { Tour } from '@/features/Tour/ui/Tour'
 
 type Tab = 'featured' | 'series' | 'history' | 'saved'
 
@@ -127,6 +128,14 @@ export function PodcastsPage() {
 
   return (
     <>
+      <Tour
+        tourId="podcast_intro"
+        steps={[
+          { selector: '[data-tour=podcast-player]', title: 'Плеер', body: 'Текущий выпуск и быстрые действия остаются наверху страницы.' },
+          { selector: '[data-tour=podcast-tabs]', title: 'Вкладки', body: 'Переключай каталог, историю и сохранённые выпуски.' },
+          { selector: '[data-tour=podcast-list]', title: 'Выпуски', body: 'Клик по карточке запускает выпуск и добавляет его в историю.' },
+        ]}
+      />
       <PageHeader
         eyebrow="Tavern · hearthside tales"
         title="Tales by the Hearth"
@@ -162,7 +171,7 @@ export function PodcastsPage() {
           episode; the previous "NOW PLAYING · —" skeleton made the
           tavern look like something was playing when nothing was. */}
       {playing && (
-      <Panel variant="dark" style={{ padding: 0, overflow: 'hidden', marginBottom: 14 }}>
+      <Panel data-tour="podcast-player" variant="dark" style={{ padding: 0, overflow: 'hidden', marginBottom: 14 }}>
         <div
           style={{
             display: 'grid',
@@ -270,7 +279,7 @@ export function PodcastsPage() {
       </Panel>
       )}
 
-      <div className="rpg-tabs">
+      <div data-tour="podcast-tabs" className="rpg-tabs">
         {(
           [
             ['featured', 'Featured'],
@@ -289,7 +298,7 @@ export function PodcastsPage() {
         ))}
       </div>
 
-      <div className="rpg-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 18 }}>
+      <div data-tour="podcast-list" className="rpg-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 18 }}>
         <div>
           <h3 className="font-display" style={{ fontSize: 17, marginBottom: 12 }}>
             {tab === 'featured' && 'New from the hearth'}

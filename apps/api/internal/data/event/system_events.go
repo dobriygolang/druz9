@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -15,10 +16,12 @@ import (
 type SystemKind string
 
 const (
-	SystemKindGuildWarStarted    SystemKind = "guild_war_started"
-	SystemKindGuildWarPhase      SystemKind = "guild_war_phase"
-	SystemKindGuildWarResolved   SystemKind = "guild_war_resolved"
+	SystemKindGuildWarStarted  SystemKind = "guild_war_started"
+	SystemKindGuildWarPhase    SystemKind = "guild_war_phase"
+	SystemKindGuildWarResolved SystemKind = "guild_war_resolved"
 )
+
+var errSystemEventFieldsRequired = errors.New("system event: guild_id/creator_id/kind/title required")
 
 // InsertSystemEvent appends a server-generated event for `guildID`. The
 // row is hidden from the public /events list (ListEvents filters with
@@ -35,7 +38,7 @@ func (r *Repo) InsertSystemEvent(
 	scheduledAt time.Time,
 ) error {
 	if guildID == uuid.Nil || creatorID == uuid.Nil || kind == "" || title == "" {
-		return fmt.Errorf("system event: guild_id/creator_id/kind/title required")
+		return fmt.Errorf("system event: %w", errSystemEventFieldsRequired)
 	}
 	_, err := r.data.DB.Exec(ctx, `
         INSERT INTO events (

@@ -41,6 +41,16 @@ type SeasonService interface {
 	GetActivePass(ctx context.Context, at time.Time) (*model.SeasonPass, error)
 }
 
+type RegionStats struct {
+	ActiveGuilds int32
+	OpenEvents   int32
+	Podcasts     int32
+}
+
+type RegionStatsRepository interface {
+	GetRegionStats(ctx context.Context, regionID string) (RegionStats, error)
+}
+
 type Service struct {
 	profiles ProfileRepository
 	missions MissionService
@@ -48,12 +58,18 @@ type Service struct {
 	arena    ArenaService
 	guilds   GuildService
 	seasons  SeasonService
+	regions  RegionStatsRepository
 }
 
 // Implementation of hub service.
 type Implementation struct {
 	v1.UnimplementedHubServiceServer
 	service *Service
+}
+
+func (i *Implementation) WithRegionStatsRepository(repo RegionStatsRepository) *Implementation {
+	i.service.regions = repo
+	return i
 }
 
 // New returns new instance of Implementation.

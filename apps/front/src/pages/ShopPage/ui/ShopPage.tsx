@@ -29,6 +29,7 @@ import {
   type ShopItem,
   type ShopCategoryInfo,
 } from '@/features/Shop'
+import { Tour } from '@/features/Tour/ui/Tour'
 
 // Mapping catalog iconRef → React sprite component. Unknown refs fall back
 // to a neutral coin glyph so the grid still renders.
@@ -150,6 +151,14 @@ export function ShopPage() {
 
   return (
     <>
+      <Tour
+        tourId="shop_intro"
+        steps={[
+          { selector: '[data-tour=shop-categories]', title: t('shop.tour.categoriesTitle', { defaultValue: 'Категории' }), body: t('shop.tour.categoriesBody', { defaultValue: 'Переключай тип предметов и редкость, чтобы быстро найти нужный декор.' }) },
+          { selector: '[data-tour=shop-grid]', title: t('shop.tour.gridTitle', { defaultValue: 'Товары' }), body: t('shop.tour.gridBody', { defaultValue: 'Выбери предмет, чтобы увидеть детали и цену.' }) },
+          { selector: '[data-tour=shop-preview]', title: t('shop.tour.previewTitle', { defaultValue: 'Покупка' }), body: t('shop.tour.previewBody', { defaultValue: 'Здесь подтверждается покупка или видно, что предмет уже есть.' }) },
+        ]}
+      />
       <PageHeader
         eyebrow={t('shop.eyebrow')}
         title={t('shop.title')}
@@ -170,7 +179,7 @@ export function ShopPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '220px minmax(0, 1fr) 340px', gap: 18 }}>
         {/* Categories */}
-        <Panel variant="recessed" style={{ padding: 10 }}>
+        <Panel data-tour="shop-categories" variant="recessed" style={{ padding: 10 }}>
           {categories.length === 0 && (
             <div style={{ padding: 10, fontSize: 12, color: 'var(--ink-2)' }}>
               {t('shop.loadingCategories')}
@@ -234,7 +243,7 @@ export function ShopPage() {
         </Panel>
 
         {/* Item grid */}
-        <div>
+        <div data-tour="shop-grid">
           {loading && (
             <Panel style={{ marginBottom: 12 }}>
               <div style={{ padding: 20, textAlign: 'center', color: 'var(--ink-2)' }}>
@@ -320,7 +329,7 @@ export function ShopPage() {
         </div>
 
         {/* Preview */}
-        <Panel style={{ position: 'relative', overflow: 'hidden' }}>
+        <Panel data-tour="shop-preview" style={{ position: 'relative', overflow: 'hidden' }}>
           {selectedItem ? (
             <>
               <div

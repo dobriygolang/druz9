@@ -16,6 +16,7 @@ const (
 	defaultEventsLimit = 20
 	maxEventsLimit     = 100
 	maxEventsWindow    = 365 * 24 * time.Hour
+	eventStatusPast    = "past"
 )
 
 func (r *Repo) ListEvents(
@@ -70,7 +71,7 @@ func (r *Repo) buildListEventsQueries(opts model.ListEventsOptions) (string, str
 	argNum := 1
 	conditions := []string{}
 
-	if opts.From != nil && opts.To != nil && !hasExplicitWindow && opts.Status != "past" {
+	if opts.From != nil && opts.To != nil && !hasExplicitWindow && opts.Status != eventStatusPast {
 		conditions = append(conditions, fmt.Sprintf("(e.scheduled_at IS NULL OR (e.scheduled_at >= $%d AND e.scheduled_at <= $%d))", argNum, argNum+1))
 		args = append(args, *opts.From, *opts.To)
 		argNum += 2
@@ -88,7 +89,7 @@ func (r *Repo) buildListEventsQueries(opts model.ListEventsOptions) (string, str
 	}
 
 	if opts.From == nil && opts.To == nil {
-		if opts.Status == "past" {
+		if opts.Status == eventStatusPast {
 			conditions = append(conditions, "e.scheduled_at < NOW() - INTERVAL '12 hours'")
 		} else {
 			conditions = append(conditions, "e.scheduled_at >= NOW() - INTERVAL '12 hours'")
@@ -169,7 +170,7 @@ JOIN users cu ON cu.id = e.creator_id
 func normalizeListEventsWindow(opts model.ListEventsOptions, now time.Time) model.ListEventsOptions {
 	defaultFrom := now.Add(-12 * time.Hour)
 	defaultTo := now.Add(maxEventsWindow)
-	if opts.Status == "past" {
+	if opts.Status == eventStatusPast {
 		defaultFrom = now.Add(-maxEventsWindow)
 		defaultTo = now.Add(12 * time.Hour)
 	}
@@ -192,7 +193,7 @@ func normalizeListEventsWindow(opts model.ListEventsOptions, now time.Time) mode
 		opts.From = timePtr(lowerBound)
 	case opts.To.Sub(*opts.From) > maxEventsWindow:
 		clampedTo := opts.From.Add(maxEventsWindow)
-		if opts.Status == "past" && defaultTo.Before(clampedTo) {
+		if opts.Status == eventStatusPast && defaultTo.Before(clampedTo) {
 			clampedTo = defaultTo
 		}
 		if opts.Status != "past" && defaultTo.Before(clampedTo) {

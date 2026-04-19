@@ -25,6 +25,12 @@ type KeyVault struct {
 	gcm cipher.AEAD
 }
 
+var (
+	errMasterKeyLen       = errors.New("master key must be 32 bytes")
+	errMasterKeyEncoding  = errors.New("master key must be hex or base64 encoded")
+	errInvalidNonceSize   = errors.New("invalid nonce size")
+)
+
 // NewKeyVaultFromEnv reads AI_MENTOR_KEY_KMS. Accepts hex (64 chars) or
 // base64 (44 chars including '='). Returns (nil, nil) when the env is
 // empty — caller should treat that as "encryption disabled".
@@ -38,7 +44,7 @@ func NewKeyVaultFromEnv() (*KeyVault, error) {
 		return nil, fmt.Errorf("ai_mentor key vault: %w", err)
 	}
 	if len(keyBytes) != 32 {
-		return nil, fmt.Errorf("ai_mentor key vault: master key must be 32 bytes (got %d)", len(keyBytes))
+		return nil, fmt.Errorf("ai_mentor key vault: %w", errMasterKeyLen)
 	}
 	block, err := aes.NewCipher(keyBytes)
 	if err != nil {
@@ -58,7 +64,7 @@ func decodeMasterKey(raw string) ([]byte, error) {
 	if b, err := base64.StdEncoding.DecodeString(raw); err == nil {
 		return b, nil
 	}
-	return nil, errors.New("master key must be hex or base64 encoded")
+	return nil, fmt.Errorf("decode master key: %w", errMasterKeyEncoding)
 }
 
 // Seal returns (cipher, nonce). When the vault is nil, plaintext is
@@ -83,7 +89,7 @@ func (v *KeyVault) Open(ciphertext, nonce []byte) ([]byte, error) {
 		return ciphertext, nil
 	}
 	if len(nonce) != v.gcm.NonceSize() {
-		return nil, fmt.Errorf("ai_mentor open: invalid nonce size %d", len(nonce))
+		return nil, fmt.Errorf("ai_mentor open: %w", errInvalidNonceSize)
 	}
 	plaintext, err := v.gcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {

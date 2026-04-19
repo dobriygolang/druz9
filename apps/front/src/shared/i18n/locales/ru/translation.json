@@ -1990,5 +1990,13 @@
   "leaderboards.noSeasonProgress": "Сезонный прогресс ещё не набран — зайди позже.",
   "leaderboards.tierValue": "тир {{tier}}",
   "leaderboards.seasonNumber": "Сезон {{number}}",
-  "leaderboards.yourPosition": "· · · твоя позиция · · ·"
+  "leaderboards.yourPosition": "· · · твоя позиция · · ·",
+  "atlasWorld.zoomIn": "Приблизить",
+  "atlasWorld.zoomOut": "Отдалить",
+  "atlasWorld.reset": "Сбросить вид",
+  "atlasWorld.status": "зум {{zoom}}% · тащи карту · колесо — зум",
+  "atlasWorld.counts.guilds": "{{count}} гильдий",
+  "atlasWorld.counts.events": "{{count}} событий",
+  "atlasWorld.counts.podcasts": "{{count}} подкастов",
+  "atlasWorld.emptyState": "Выбери регион на карте, чтобы увидеть контекст."
 }

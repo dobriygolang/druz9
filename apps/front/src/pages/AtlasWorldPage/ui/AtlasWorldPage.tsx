@@ -10,18 +10,7 @@ import { AtlasSvgCanvas } from '@/widgets/Atlas/ui/AtlasSvgCanvas'
 import { InsightCard } from '@/features/Insights/ui/InsightCard'
 import { Tour } from '@/features/Tour/ui/Tour'
 import { regionsApi, type RegionContext } from '@/features/Atlas/api/regionsApi'
-
-// Region coordinates as percentages of the viewBox (1024×1024). Labels
-// pull from i18n with a Russian default so missing translations stay
-// readable. Backend GetRegionContext returns a localized title that
-// overrides this on click — the local label is the canvas tooltip only.
-const ATLAS_REGIONS = [
-  { id: 'north_peaks',      xPct: 32, yPct: 24, i18nKey: 'atlasWorld.region.north_peaks',      defaultLabel: 'Северные вершины' },
-  { id: 'capital_market',   xPct: 50, yPct: 50, i18nKey: 'atlasWorld.region.capital_market',   defaultLabel: 'Столичный рынок' },
-  { id: 'east_archipelago', xPct: 78, yPct: 60, i18nKey: 'atlasWorld.region.east_archipelago', defaultLabel: 'Восточный архипелаг' },
-  { id: 'south_dunes',      xPct: 44, yPct: 80, i18nKey: 'atlasWorld.region.south_dunes',      defaultLabel: 'Южные дюны' },
-  { id: 'west_caverns',     xPct: 18, yPct: 58, i18nKey: 'atlasWorld.region.west_caverns',     defaultLabel: 'Западные пещеры' },
-] as const
+import { ATLAS_REGIONS } from '../model/atlasRegions.generated'
 
 export function AtlasWorldPage() {
   const { t } = useTranslation()
@@ -73,11 +62,23 @@ export function AtlasWorldPage() {
             id: r.id,
             xPct: r.xPct,
             yPct: r.yPct,
-            label: t(r.i18nKey, { defaultValue: r.defaultLabel }),
+            label: t(r.i18nKey, { defaultValue: r.label }),
           }))}
+          labels={{
+            zoomIn: t('atlasWorld.zoomIn', { defaultValue: 'Приблизить' }),
+            zoomOut: t('atlasWorld.zoomOut', { defaultValue: 'Отдалить' }),
+            reset: t('atlasWorld.reset', { defaultValue: 'Сбросить' }),
+            status: (zoom) => t('atlasWorld.status', { zoom, defaultValue: 'zoom {{zoom}}% · тащи карту · колесо — зум' }),
+          }}
           onPointClick={(id) => setSelectedId(id)}
         />
       </Panel>
+
+      {!selectedId && (
+        <Panel style={{ marginTop: 14, padding: 14, color: 'var(--ink-2)', fontSize: 13 }}>
+          {t('atlasWorld.emptyState', { defaultValue: 'Выбери регион на карте, чтобы увидеть контекст.' })}
+        </Panel>
+      )}
 
       {selectedId && (
         <Panel style={{ marginTop: 14, padding: 14 }}>
@@ -92,6 +93,11 @@ export function AtlasWorldPage() {
                 <Badge variant="moss">id: {ctx.regionId}</Badge>
               </div>
               <p style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--ink-2)', margin: '0 0 10px' }}>{ctx.description}</p>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
+                <Badge variant="moss">{t('atlasWorld.counts.guilds', { count: ctx.activeGuilds ?? 0, defaultValue: '{{count}} гильдий' })}</Badge>
+                <Badge variant="ember">{t('atlasWorld.counts.events', { count: ctx.openEvents ?? 0, defaultValue: '{{count}} событий' })}</Badge>
+                <Badge>{t('atlasWorld.counts.podcasts', { count: ctx.podcasts ?? 0, defaultValue: '{{count}} подкастов' })}</Badge>
+              </div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {ctx.links.map((l) => (
                   <RpgButton key={l.actionUrl} size="sm" onClick={() => navigate(l.actionUrl)}>

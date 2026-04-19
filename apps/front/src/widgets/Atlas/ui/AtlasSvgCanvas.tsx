@@ -12,6 +12,12 @@ interface AtlasSvgCanvasProps {
   // small dots that emit `onPointClick` with the point's id.
   points?: Array<{ id: string; xPct: number; yPct: number; label?: string }>
   onPointClick?: (id: string) => void
+  labels?: {
+    zoomIn?: string
+    zoomOut?: string
+    reset?: string
+    status?: (zoom: number) => string
+  }
   // Container height. Width is always 100% of parent.
   height?: number
 }
@@ -23,6 +29,7 @@ export function AtlasSvgCanvas({
   src = '/img/big_map.svg',
   points = [],
   onPointClick,
+  labels,
   height = 640,
 }: AtlasSvgCanvasProps) {
   const wrapRef = useRef<HTMLDivElement | null>(null)
@@ -145,9 +152,9 @@ export function AtlasSvgCanvas({
         position: 'absolute', right: 12, top: 12,
         display: 'flex', flexDirection: 'column', gap: 6, zIndex: 10,
       }}>
-        <Btn onClick={() => setZoom((z) => Math.min(MAX_ZOOM, z * 1.25))}>+</Btn>
-        <Btn onClick={() => setZoom((z) => Math.max(MIN_ZOOM, z / 1.25))}>−</Btn>
-        <Btn onClick={reset}>⟳</Btn>
+        <Btn ariaLabel={labels?.zoomIn ?? 'Zoom in'} onClick={() => setZoom((z) => Math.min(MAX_ZOOM, z * 1.25))}>+</Btn>
+        <Btn ariaLabel={labels?.zoomOut ?? 'Zoom out'} onClick={() => setZoom((z) => Math.max(MIN_ZOOM, z / 1.25))}>−</Btn>
+        <Btn ariaLabel={labels?.reset ?? 'Reset'} onClick={reset}>⟳</Btn>
       </div>
       <div style={{
         position: 'absolute', left: 12, bottom: 8,
@@ -155,15 +162,17 @@ export function AtlasSvgCanvas({
         color: 'var(--parch-0, #fbf3dd)', background: 'rgba(0,0,0,0.4)',
         padding: '2px 8px', borderRadius: 4, zIndex: 10, pointerEvents: 'none',
       }}>
-        zoom {Math.round(zoom * 100)}% · drag to pan · wheel to zoom
+        {labels?.status?.(Math.round(zoom * 100)) ?? `zoom ${Math.round(zoom * 100)}% · drag to pan · wheel to zoom`}
       </div>
     </div>
   )
 }
 
-function Btn({ children, onClick }: { children: React.ReactNode; onClick: () => void }) {
+function Btn({ children, onClick, ariaLabel }: { children: React.ReactNode; onClick: () => void; ariaLabel: string }) {
   return (
     <button
+      aria-label={ariaLabel}
+      title={ariaLabel}
       onClick={onClick}
       onPointerDown={(e) => e.stopPropagation()}
       style={{

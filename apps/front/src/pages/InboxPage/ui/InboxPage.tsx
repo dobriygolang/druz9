@@ -16,6 +16,11 @@ import {
   type FriendRequest,
   type UserHit,
 } from '@/features/Social'
+import { SendGiftModal } from '@/features/Inbox/ui/SendGiftModal'
+import { SendTradeModal } from '@/features/Inbox/ui/SendTradeModal'
+import { Tour } from '@/features/Tour/ui/Tour'
+
+const ENABLE_LEGACY_MESSAGES = import.meta.env.VITE_ENABLE_LEGACY_INBOX_MESSAGES === 'true'
 
 const KIND_COLOR: Record<ThreadKind, string> = {
   [ThreadKind.UNSPECIFIED]: 'var(--ink-3)',
@@ -49,7 +54,7 @@ function relTime(iso: string): string {
   return new Date(iso).toLocaleDateString()
 }
 
-type Tab = 'messages' | 'friends' | 'gifts'
+type Tab = 'messages' | 'friends' | 'gifts' | 'trades'
 
 export function InboxPage() {
   const { t } = useTranslation()
@@ -60,7 +65,8 @@ export function InboxPage() {
     const q = new URLSearchParams(location.search).get('tab')
     if (q === 'friends') return 'friends'
     if (q === 'gifts') return 'gifts'
-    return 'messages'
+    if (q === 'trades') return 'trades'
+    return ENABLE_LEGACY_MESSAGES ? 'messages' : 'gifts'
   }, [location.search])
   const [tab, setTab] = useState<Tab>(urlTab)
   useEffect(() => { setTab(urlTab) }, [urlTab])
@@ -76,6 +82,10 @@ export function InboxPage() {
 
   // Load thread list once on mount.
   useEffect(() => {
+    if (!ENABLE_LEGACY_MESSAGES) {
+      setLoading(false)
+      return
+    }
     let cancelled = false
     inboxApi
       .listThreads()
@@ -100,6 +110,7 @@ export function InboxPage() {
   // re-fetch threads so the new thread appears and gets selected.
   const prevSearch = useRef(location.search)
   useEffect(() => {
+    if (!ENABLE_LEGACY_MESSAGES) return
     const prev = prevSearch.current
     prevSearch.current = location.search
     const deepThread = new URLSearchParams(location.search).get('thread')
@@ -114,6 +125,7 @@ export function InboxPage() {
 
   // Load messages + mark-read when active thread changes.
   useEffect(() => {
+    if (!ENABLE_LEGACY_MESSAGES) return
     if (!activeId) return
     let cancelled = false
     inboxApi
@@ -175,21 +187,39 @@ export function InboxPage() {
   const switchTab = (next: Tab) => {
     setTab(next)
     const params = new URLSearchParams(location.search)
-    if (next === 'messages') params.delete('tab')
+    if (next === 'messages' && ENABLE_LEGACY_MESSAGES) params.delete('tab')
     else params.set('tab', next)
     navigate({ pathname: '/inbox', search: params.toString() }, { replace: true })
   }
 
+  const headerTitle = tab === 'friends'
+    ? t('inbox.friendsTitle')
+    : tab === 'trades'
+      ? t('inbox.tradesTitle', { defaultValue: 'Обмены' })
+      : tab === 'gifts'
+        ? t('inbox.giftsTitle', { defaultValue: 'Подарки' })
+        : t('inbox.messagesTitle')
+  const headerSubtitle = tab === 'friends'
+    ? t('inbox.friendsSubtitle')
+    : tab === 'trades'
+      ? t('inbox.tradesSubtitle', { defaultValue: 'Входящие и исходящие предложения обмена предметами.' })
+      : tab === 'gifts'
+        ? t('inbox.giftsSubtitle', { defaultValue: 'Предметы, которые можно принять или отклонить.' })
+        : t('inbox.messagesSubtitle')
+
   return (
     <>
+      <Tour
+        tourId="inbox_intro"
+        steps={[
+          { selector: '[data-tour=inbox-tabs]', title: t('inbox.tour.tabsTitle', { defaultValue: 'Вкладки' }), body: t('inbox.tour.tabsBody', { defaultValue: 'Inbox теперь ведёт к объектным обменам: подаркам, трейдам и друзьям.' }) },
+          { selector: '[data-tour=inbox-content]', title: t('inbox.tour.contentTitle', { defaultValue: 'Передача объектов' }), body: t('inbox.tour.contentBody', { defaultValue: 'Прими подарок, подтверди обмен или открой профиль друга.' }) },
+        ]}
+      />
       <PageHeader
         eyebrow={t('inbox.eyebrow')}
-        title={tab === 'friends' ? t('inbox.friendsTitle') : t('inbox.messagesTitle')}
-        subtitle={
-          tab === 'friends'
-            ? t('inbox.friendsSubtitle')
-            : t('inbox.messagesSubtitle')
-        }
+        title={headerTitle}
+        subtitle={headerSubtitle}
         right={
           tab === 'messages' && unreadTotal > 0 ? (
             <Badge variant="ember">{t('inbox.unreadCount', { count: unreadTotal })}</Badge>
@@ -205,13 +235,15 @@ export function InboxPage() {
       />
 
       {/* Tab switcher: messages ↔ friends */}
-      <div className="rpg-tabs" style={{ marginBottom: 14 }}>
-        <div
-          className={`rpg-tab ${tab === 'messages' ? 'rpg-tab--active' : ''}`}
-          onClick={() => switchTab('messages')}
-        >
-          {t('inbox.tab.messages')}
-        </div>
+      <div data-tour="inbox-tabs" className="rpg-tabs" style={{ marginBottom: 14 }}>
+        {ENABLE_LEGACY_MESSAGES && (
+          <div
+            className={`rpg-tab ${tab === 'messages' ? 'rpg-tab--active' : ''}`}
+            onClick={() => switchTab('messages')}
+          >
+            {t('inbox.tab.messages')}
+          </div>
+        )}
         <div
           className={`rpg-tab ${tab === 'friends' ? 'rpg-tab--active' : ''}`}
           onClick={() => switchTab('friends')}
@@ -224,10 +256,19 @@ export function InboxPage() {
         >
           {t('inbox.tab.gifts', { defaultValue: 'Подарки' })}
         </div>
+        <div
+          className={`rpg-tab ${tab === 'trades' ? 'rpg-tab--active' : ''}`}
+          onClick={() => switchTab('trades')}
+        >
+          {t('inbox.tab.trades', { defaultValue: 'Обмены' })}
+        </div>
       </div>
 
+      <div data-tour="inbox-content">
       {tab === 'gifts' ? (
         <GiftsPanel />
+      ) : tab === 'trades' ? (
+        <TradesPanel />
       ) : tab === 'friends' ? (
         <FriendsPanel />
       ) : (
@@ -352,6 +393,7 @@ export function InboxPage() {
         </Panel>
       </div>
       )}
+      </div>
     </>
   )
 }
@@ -449,6 +491,104 @@ function GiftsPanel() {
   )
 }
 
+function TradesPanel() {
+  const [side, setSide] = useState<'received' | 'sent'>('received')
+  const [trades, setTrades] = useState<import('@/features/Inbox/api/tradesApi').Trade[]>([])
+  const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState<string | null>(null)
+
+  const reload = useCallback(async () => {
+    setLoading(true)
+    const { tradesApi } = await import('@/features/Inbox/api/tradesApi')
+    const list = side === 'received' ? await tradesApi.listReceived() : await tradesApi.listSent()
+    setTrades(list)
+    setLoading(false)
+  }, [side])
+
+  useEffect(() => { void reload().catch(() => setLoading(false)) }, [reload])
+
+  const decide = async (tradeId: string, action: 'accept' | 'cancel') => {
+    setBusy(tradeId)
+    try {
+      const { tradesApi } = await import('@/features/Inbox/api/tradesApi')
+      if (action === 'accept') await tradesApi.accept(tradeId)
+      else await tradesApi.cancel(tradeId)
+      await reload()
+    } finally { setBusy(null) }
+  }
+
+  return (
+    <Panel style={{ padding: 14 }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+        <RpgButton size="sm" variant={side === 'received' ? 'primary' : 'default'} onClick={() => setSide('received')}>
+          Получено
+        </RpgButton>
+        <RpgButton size="sm" variant={side === 'sent' ? 'primary' : 'default'} onClick={() => setSide('sent')}>
+          Отправлено
+        </RpgButton>
+      </div>
+      {loading && <div style={{ color: 'var(--ink-2)' }}>Загрузка...</div>}
+      {!loading && trades.length === 0 && (
+        <div style={{ color: 'var(--ink-2)', fontSize: 13 }}>
+          {side === 'received'
+            ? 'Предложений обмена пока нет.'
+            : 'Ты ещё не предлагал обмен. Открой друзей и нажми «Обмен».'}
+        </div>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {trades.map((trade) => (
+          <div key={trade.id} style={{
+            display: 'grid',
+            gridTemplateColumns: '64px 1fr 64px auto',
+            gap: 12,
+            alignItems: 'center',
+            padding: 12,
+            border: '2px solid var(--ink-3)',
+            background: trade.status === 'pending' ? 'var(--parch-1)' : 'var(--parch-0)',
+          }}>
+            <TradeIcon src={trade.initiatorItemIcon} />
+            <div>
+              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>
+                {trade.initiatorItemName || trade.initiatorItemId.slice(0, 8)}
+                <span style={{ color: 'var(--ink-2)' }}> → </span>
+                {trade.counterpartyItemName || trade.counterpartyItemId.slice(0, 8)}
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--ink-2)', marginTop: 4 }}>
+                {side === 'received' ? `от ${trade.initiatorName || trade.initiatorId.slice(0, 8)}` : `для ${trade.counterpartyId.slice(0, 8)}`}
+                {' · '}
+                {trade.status === 'pending' && 'ожидает решения'}
+                {trade.status === 'accepted' && 'принято'}
+                {trade.status === 'cancelled' && 'отменено'}
+                {trade.status === 'declined' && 'отклонено'}
+                {trade.status === 'expired' && 'истекло'}
+              </div>
+              {trade.note && <div style={{ fontSize: 12, color: 'var(--ink-2)', marginTop: 4 }}>«{trade.note}»</div>}
+            </div>
+            <TradeIcon src={trade.counterpartyItemIcon} />
+            {trade.status === 'pending' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {side === 'received' && (
+                  <RpgButton size="sm" variant="primary" disabled={busy === trade.id} onClick={() => decide(trade.id, 'accept')}>
+                    Принять
+                  </RpgButton>
+                )}
+                <RpgButton size="sm" disabled={busy === trade.id} onClick={() => decide(trade.id, 'cancel')}>
+                  {side === 'received' ? 'Отклонить' : 'Отменить'}
+                </RpgButton>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </Panel>
+  )
+}
+
+function TradeIcon({ src }: { src?: string }) {
+  if (src) return <img src={src} alt="" style={{ width: 56, height: 56, objectFit: 'contain' }} />
+  return <div style={{ width: 56, height: 56, background: 'var(--parch-3)', border: '2px solid var(--ink-0)' }} />
+}
+
 // ---------- Friends panel (embedded in inbox) ----------
 
 function FriendsPanel() {
@@ -460,6 +600,8 @@ function FriendsPanel() {
   const [loading, setLoading] = useState(true)
   const [composeOpen, setComposeOpen] = useState(false)
   const [chattingId, setChattingId] = useState<string | null>(null)
+  const [giftTarget, setGiftTarget] = useState<Friend | null>(null)
+  const [tradeTarget, setTradeTarget] = useState<Friend | null>(null)
 
   const openChat = useCallback(async (userId: string) => {
     setChattingId(userId)
@@ -576,13 +718,21 @@ function FriendsPanel() {
               </div>
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
-              <RpgButton
-                size="sm"
-                variant="ghost"
-                disabled={chattingId === f.userId}
-                onClick={() => void openChat(f.userId)}
-              >
-                {chattingId === f.userId ? '...' : t('inbox.chat')}
+              {ENABLE_LEGACY_MESSAGES && (
+                <RpgButton
+                  size="sm"
+                  variant="ghost"
+                  disabled={chattingId === f.userId}
+                  onClick={() => void openChat(f.userId)}
+                >
+                  {chattingId === f.userId ? '...' : t('inbox.chat')}
+                </RpgButton>
+              )}
+              <RpgButton size="sm" variant="ghost" onClick={() => setGiftTarget(f)}>
+                {t('inbox.gift', { defaultValue: 'Подарить' })}
+              </RpgButton>
+              <RpgButton size="sm" variant="ghost" onClick={() => setTradeTarget(f)}>
+                {t('inbox.trade', { defaultValue: 'Обмен' })}
               </RpgButton>
               <RpgButton size="sm" variant="ghost" onClick={() => void remove(f.userId)}>{t('inbox.remove')}</RpgButton>
             </div>
@@ -656,6 +806,20 @@ function FriendsPanel() {
       </Panel>
 
       {composeOpen && <ComposeFriendModal onClose={() => setComposeOpen(false)} onSent={load} />}
+      {giftTarget && (
+        <SendGiftModal
+          recipientId={giftTarget.userId}
+          recipientName={giftTarget.displayName || giftTarget.username}
+          onClose={() => setGiftTarget(null)}
+        />
+      )}
+      {tradeTarget && (
+        <SendTradeModal
+          counterpartyId={tradeTarget.userId}
+          counterpartyName={tradeTarget.displayName || tradeTarget.username}
+          onClose={() => setTradeTarget(null)}
+        />
+      )}
     </div>
   )
 }
