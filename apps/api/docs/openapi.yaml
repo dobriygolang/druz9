@@ -3575,6 +3575,42 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/interview_prep.v1.ListTasksResponse'
+    /api/v1/interview/live/chat:
+        post:
+            tags:
+                - InterviewLiveService
+            operationId: InterviewLiveService_Chat
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_live.v1.ChatRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_live.v1.ChatResponse'
+    /api/v1/interview/live/sessions:
+        post:
+            tags:
+                - InterviewLiveService
+            operationId: InterviewLiveService_SaveSession
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_live.v1.SaveSessionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_live.v1.SaveSessionResponse'
     /api/v1/missions/daily:
         get:
             tags:
@@ -4033,6 +4069,47 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/podcast.v1.PodcastStatusResponse'
+    /api/v1/premium/boosty/link:
+        post:
+            tags:
+                - PremiumService
+            operationId: PremiumService_LinkBoosty
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/premium.v1.LinkBoostyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/premium.v1.PremiumStatus'
+        delete:
+            tags:
+                - PremiumService
+            operationId: PremiumService_UnlinkBoosty
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/premium.v1.UnlinkBoostyResponse'
+    /api/v1/premium/status:
+        get:
+            tags:
+                - PremiumService
+            operationId: PremiumService_GetStatus
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/premium.v1.PremiumStatus'
     /api/v1/profile:
         get:
             tags:
@@ -7814,6 +7891,52 @@ components:
                 actionUrl:
                     type: string
                     description: Optional href the frontend can render as a CTA (e.g. "/training/dp").
+        interview_live.v1.ChatMessage:
+            type: object
+            properties:
+                role:
+                    type: string
+                content:
+                    type: string
+        interview_live.v1.ChatRequest:
+            type: object
+            properties:
+                messages:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_live.v1.ChatMessage'
+                model:
+                    type: string
+                mentor_id:
+                    type: string
+        interview_live.v1.ChatResponse:
+            type: object
+            properties:
+                reply:
+                    type: string
+        interview_live.v1.SaveSessionRequest:
+            type: object
+            properties:
+                focus:
+                    type: string
+                frontId:
+                    type: string
+                transcript:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_live.v1.ChatMessage'
+                code:
+                    type: string
+                evaluation:
+                    type: string
+                durationS:
+                    type: integer
+                    format: int32
+        interview_live.v1.SaveSessionResponse:
+            type: object
+            properties:
+                id:
+                    type: string
         interview_prep.v1.AIMentor:
             type: object
             properties:
@@ -9292,6 +9415,27 @@ components:
                 durationSeconds:
                     type: integer
                     format: uint32
+        premium.v1.LinkBoostyRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+        premium.v1.PremiumStatus:
+            type: object
+            properties:
+                active:
+                    type: boolean
+                source:
+                    type: string
+                boostyEmail:
+                    type: string
+                expiresAt:
+                    type: string
+        premium.v1.UnlinkBoostyResponse:
+            type: object
+            properties:
+                status:
+                    type: string
         profile.v1.BindTelegramRequest:
             type: object
             properties:
@@ -10998,6 +11142,7 @@ tags:
         InsightsService — ADR-002. Personalized recommendations derived from
          the user's progress, mock interviews and recent activity. Read-only;
          generation runs out-of-band on a cron schedule (see insights_worker.go).
+    - name: InterviewLiveService
     - name: InterviewPrepService
     - name: MissionService
     - name: NotificationSettingsService
@@ -11009,6 +11154,7 @@ tags:
          the session; chronic no-shows get XP penalties and eventually a ban
          — see Round 5 plan "Peer Mock Interview System" for the full spec.
     - name: PodcastService
+    - name: PremiumService
     - name: ProfileService
     - name: ReferralService
     - name: SceneService

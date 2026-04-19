@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package interview_live.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "api/pkg/api/interview_live/v1;v1";
+
+service InterviewLiveService {
+  rpc Chat(ChatRequest) returns (ChatResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/interview/live/chat"
+      body: "*"
+    };
+  }
+
+  rpc SaveSession(SaveSessionRequest) returns (SaveSessionResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/interview/live/sessions"
+      body: "*"
+    };
+  }
+}
+
+message ChatMessage {
+  string role    = 1;
+  string content = 2;
+}
+
+message ChatRequest {
+  repeated ChatMessage messages = 1;
+  string model                  = 2;
+  string mentor_id              = 3 [json_name = "mentor_id"];
+}
+
+message ChatResponse {
+  string reply = 1;
+}
+
+message SaveSessionRequest {
+  string focus                   = 1;
+  string front_id                = 2;
+  repeated ChatMessage transcript = 3;
+  string code                    = 4;
+  string evaluation              = 5;
+  int32 duration_s               = 6;
+}
+
+message SaveSessionResponse {
+  string id = 1;
+}
