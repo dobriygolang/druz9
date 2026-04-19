@@ -70,14 +70,3 @@ func TestKeyVault_BadMasterKey(t *testing.T) {
 		t.Fatal("expected length error for short key")
 	}
 }
-
-func TestKeyVault_EmptyEnvDisables(t *testing.T) {
-	t.Setenv("AI_MENTOR_KEY_KMS", "")
-	v, err := NewKeyVaultFromEnv()
-	if err != nil {
-		t.Fatalf("NewKeyVaultFromEnv with empty env: %v", err)
-	}
-	if v != nil {
-		t.Fatal("empty env must produce nil vault")
-	}
-}

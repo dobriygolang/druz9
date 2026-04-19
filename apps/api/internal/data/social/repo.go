@@ -154,7 +154,7 @@ func (r *Repo) GetRequestByID(ctx context.Context, id uuid.UUID) (*model.FriendR
 	req, err := scanRequest(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, socialdomain.ErrRequestNotFound
 		}
 		return nil, fmt.Errorf("get request: %w", err)
 	}
@@ -221,7 +221,7 @@ func (r *Repo) GetFriendByID(ctx context.Context, viewerID, friendID uuid.UUID) 
 	err := row.Scan(&f.UserID, &f.Username, &f.DisplayName, &f.AvatarURL, &activity, &lastSeen, &f.IsFavorite, &f.FriendsSince)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, socialdomain.ErrNotFriends
 		}
 		return nil, fmt.Errorf("get friend by id: %w", err)
 	}

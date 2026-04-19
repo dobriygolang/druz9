@@ -20,7 +20,7 @@ import (
 
 const friendChallengeSweepInterval = 15 * time.Minute
 
-func startFriendChallengeSweepWorker(logger klog.Logger, service *friendchallengedomain.Service) func() error {
+func startFriendChallengeSweepWorker(_ klog.Logger, service *friendchallengedomain.Service) func() error {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	runSweep := func() {

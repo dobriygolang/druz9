@@ -146,7 +146,7 @@ func (h *Hub) PublishMatch(match *schema.ArenaMatch, codes []*schema.ArenaPlayer
 	}
 }
 
-func (h *Hub) viewerCodes(match *schema.ArenaMatch, matchID, viewerUserID string, spectator bool) []*schema.ArenaPlayerCode {
+func (h *Hub) viewerCodes(_ *schema.ArenaMatch, matchID, viewerUserID string, spectator bool) []*schema.ArenaPlayerCode {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 

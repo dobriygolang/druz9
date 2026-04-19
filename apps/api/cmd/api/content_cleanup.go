@@ -13,7 +13,7 @@ const (
 	stalePodcastDraftTTL   = 24 * time.Hour
 )
 
-func startContentCleanupWorker(logger klog.Logger, storage *storageContext) func() error {
+func startContentCleanupWorker(_ klog.Logger, storage *storageContext) func() error {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	runCleanup := func() {

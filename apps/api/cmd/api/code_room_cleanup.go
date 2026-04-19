@@ -10,7 +10,7 @@ import (
 	"api/internal/rtc"
 )
 
-func startCodeRoomCleanupWorker(logger klog.Logger, rtcManager *rtc.Manager, service *appcodeeditor.Service) func() error {
+func startCodeRoomCleanupWorker(_ klog.Logger, rtcManager *rtc.Manager, service *appcodeeditor.Service) func() error {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	// Get initial values

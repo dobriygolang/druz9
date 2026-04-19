@@ -17,7 +17,7 @@ const (
 	defaultArenaMatchIdleTTL = 10 * time.Minute
 )
 
-func startBusinessMetricsWorker(logger klog.Logger, rtcManager *rtc.Manager, storage *storageContext) func() error {
+func startBusinessMetricsWorker(_ klog.Logger, rtcManager *rtc.Manager, storage *storageContext) func() error {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	codeRoomIdleTTL := rtcManager.GetValue(ctx, rtc.CodeRoomIdleTtl).Duration()
