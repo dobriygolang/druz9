@@ -2,6 +2,7 @@ package code_editor
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	kratosErrors "github.com/go-kratos/kratos/v2/errors"
@@ -13,7 +14,7 @@ import (
 func (i *Implementation) GetDailyChallenge(ctx context.Context, _ *v1.GetDailyChallengeRequest) (*v1.GetDailyChallengeResponse, error) {
 	tasks, err := i.service.ListTasks(ctx, codeeditordomain.TaskFilter{IncludeInactive: false})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list tasks: %w", err)
 	}
 	if len(tasks) == 0 {
 		return nil, kratosErrors.NotFound("NO_TASKS", "no tasks available")

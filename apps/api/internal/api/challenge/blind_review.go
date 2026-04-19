@@ -13,7 +13,7 @@ import (
 func (i *Implementation) GetBlindReviewTask(ctx context.Context, _ *v1.GetBlindReviewTaskRequest) (*v1.BlindReviewTask, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	task, err := i.service.GetBlindReviewTask(ctx, user.ID)
 	if err != nil || task == nil {
@@ -25,7 +25,7 @@ func (i *Implementation) GetBlindReviewTask(ctx context.Context, _ *v1.GetBlindR
 func (i *Implementation) SubmitBlindReview(ctx context.Context, req *v1.SubmitBlindReviewRequest) (*v1.BlindReviewResult, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	srcID, err := apihelpers.ParseUUID(req.GetSourceReviewId(), "INVALID_SOURCE_REVIEW_ID", "source_review_id")
 	if err != nil {

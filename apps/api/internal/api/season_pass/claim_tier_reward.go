@@ -2,6 +2,7 @@ package season_pass
 
 import (
 	"context"
+	"fmt"
 	goerr "errors"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -15,7 +16,7 @@ import (
 func (i *Implementation) ClaimTierReward(ctx context.Context, req *v1.ClaimTierRewardRequest) (*v1.ClaimTierRewardResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if req.GetTier() <= 0 {
 		return nil, errors.BadRequest("INVALID_TIER", "tier must be positive")

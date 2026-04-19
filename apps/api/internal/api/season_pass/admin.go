@@ -115,7 +115,7 @@ func (i *Implementation) AdminUpsertTier(ctx context.Context, req *v1.AdminUpser
 	}
 	passID, err := apihelpers.ParseUUID(req.GetSeasonPassId(), "INVALID_PASS_ID", "season_pass_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse uuid: %w", err)
 	}
 	t := &model.SeasonPassTier{
 		Tier:                req.GetTier(),
@@ -140,7 +140,7 @@ func (i *Implementation) AdminDeleteTier(ctx context.Context, req *v1.AdminDelet
 	}
 	passID, err := apihelpers.ParseUUID(req.GetSeasonPassId(), "INVALID_PASS_ID", "season_pass_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse uuid: %w", err)
 	}
 	if err := i.service.AdminDeleteTier(ctx, passID, req.GetTier()); err != nil {
 		klog.Errorf("admin season pass: delete tier %d pass=%s: %v", req.GetTier(), passID, err)

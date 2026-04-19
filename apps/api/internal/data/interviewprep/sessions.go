@@ -171,5 +171,5 @@ func (r *Repo) ListQuestionResults(ctx context.Context, sessionID uuid.UUID) ([]
 		}
 		items = append(items, item)
 	}
-	return items, rows.Err()
+	return items, fmt.Errorf("list interview prep question results: %w", rows.Err())
 }

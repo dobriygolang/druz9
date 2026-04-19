@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"fmt"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -25,7 +26,7 @@ type MentorSecretRepo interface {
 func (i *AIMentorImpl) UpsertMentorSecret(ctx context.Context, req *v1.UpsertMentorSecretRequest) (*v1.UpsertMentorSecretResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	mentorID, err := uuid.Parse(req.GetMentorId())
 	if err != nil {

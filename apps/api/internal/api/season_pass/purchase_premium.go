@@ -2,6 +2,7 @@ package season_pass
 
 import (
 	"context"
+	"fmt"
 	goerr "errors"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -16,7 +17,7 @@ import (
 func (i *Implementation) PurchasePremium(ctx context.Context, _ *v1.PurchasePremiumRequest) (*v1.PurchasePremiumResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	progress, err := i.service.PurchasePremium(ctx, user.ID)
 	if err != nil {

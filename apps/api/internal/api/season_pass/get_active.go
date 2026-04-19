@@ -2,6 +2,7 @@ package season_pass
 
 import (
 	"context"
+	"fmt"
 	goerr "errors"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -14,7 +15,7 @@ import (
 func (i *Implementation) GetActive(ctx context.Context, _ *v1.GetActiveRequest) (*v1.GetActiveResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	snap, err := i.service.GetActive(ctx, user.ID)
 	if err != nil {

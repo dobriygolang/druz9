@@ -64,7 +64,10 @@ func (r *Repo) ListMockBlueprints(ctx context.Context) ([]*model.InterviewMockBl
 		}
 		items = append(items, item)
 	}
-	return items, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate mock blueprints: %w", err)
+	}
+	return items, nil
 }
 
 func (r *Repo) ResolveMockBlueprint(ctx context.Context, companyTag, programSlug string) (*model.InterviewMockBlueprint, error) {
@@ -191,7 +194,10 @@ func (r *Repo) ListBlueprintRounds(ctx context.Context, blueprintID uuid.UUID) (
 		}
 		items = append(items, item)
 	}
-	return items, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate blueprint rounds: %w", err)
+	}
+	return items, nil
 }
 
 func (r *Repo) SelectTaskForBlueprintRound(ctx context.Context, round *model.InterviewBlueprintRound, preferredCompanyTag string) (*model.InterviewPrepTask, *uuid.UUID, error) {
@@ -651,7 +657,10 @@ func (r *Repo) listMockStages(ctx context.Context, sessionID uuid.UUID) ([]*mode
 		}
 		items = append(items, item)
 	}
-	return items, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate mock sessions: %w", err)
+	}
+	return items, nil
 }
 
 func (r *Repo) listMockQuestionResults(ctx context.Context, stageID uuid.UUID) ([]*model.InterviewPrepMockQuestionResult, error) {
@@ -676,7 +685,10 @@ func (r *Repo) listMockQuestionResults(ctx context.Context, stageID uuid.UUID) (
 		}
 		items = append(items, item)
 	}
-	return items, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate mock question results: %w", err)
+	}
+	return items, nil
 }
 
 func (r *Repo) UpdateMockStageSubmission(

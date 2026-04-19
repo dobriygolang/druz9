@@ -19,19 +19,26 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationInboxServiceAcceptTrade = "/inbox.v1.InboxService/AcceptTrade"
+const OperationInboxServiceCancelTrade = "/inbox.v1.InboxService/CancelTrade"
 const OperationInboxServiceClaimGift = "/inbox.v1.InboxService/ClaimGift"
 const OperationInboxServiceCreateDirectThread = "/inbox.v1.InboxService/CreateDirectThread"
 const OperationInboxServiceDeclineGift = "/inbox.v1.InboxService/DeclineGift"
 const OperationInboxServiceGetThread = "/inbox.v1.InboxService/GetThread"
 const OperationInboxServiceGetUnreadCount = "/inbox.v1.InboxService/GetUnreadCount"
 const OperationInboxServiceListReceivedGifts = "/inbox.v1.InboxService/ListReceivedGifts"
+const OperationInboxServiceListReceivedTrades = "/inbox.v1.InboxService/ListReceivedTrades"
 const OperationInboxServiceListSentGifts = "/inbox.v1.InboxService/ListSentGifts"
+const OperationInboxServiceListSentTrades = "/inbox.v1.InboxService/ListSentTrades"
 const OperationInboxServiceListThreads = "/inbox.v1.InboxService/ListThreads"
 const OperationInboxServiceMarkThreadRead = "/inbox.v1.InboxService/MarkThreadRead"
+const OperationInboxServiceProposeTrade = "/inbox.v1.InboxService/ProposeTrade"
 const OperationInboxServiceSendGift = "/inbox.v1.InboxService/SendGift"
 const OperationInboxServiceSendMessage = "/inbox.v1.InboxService/SendMessage"
 
 type InboxServiceHTTPServer interface {
+	AcceptTrade(context.Context, *AcceptTradeRequest) (*Trade, error)
+	CancelTrade(context.Context, *CancelTradeRequest) (*Trade, error)
 	ClaimGift(context.Context, *ClaimGiftRequest) (*Gift, error)
 	// CreateDirectThread CreateDirectThread opens (or returns existing) a bidirectional friend-mail
 	// thread between the caller and the given recipient. Idempotent.
@@ -43,12 +50,16 @@ type InboxServiceHTTPServer interface {
 	// GetUnreadCount GetUnreadCount returns the total unread thread count for badge rendering.
 	GetUnreadCount(context.Context, *GetUnreadCountRequest) (*GetUnreadCountResponse, error)
 	ListReceivedGifts(context.Context, *ListReceivedGiftsRequest) (*ListGiftsResponse, error)
+	ListReceivedTrades(context.Context, *ListTradesRequest) (*ListTradesResponse, error)
 	ListSentGifts(context.Context, *ListSentGiftsRequest) (*ListGiftsResponse, error)
+	ListSentTrades(context.Context, *ListTradesRequest) (*ListTradesResponse, error)
 	// ListThreads ListThreads returns the authenticated user's threads, newest activity first.
 	ListThreads(context.Context, *ListThreadsRequest) (*ListThreadsResponse, error)
 	// MarkThreadRead MarkThreadRead zeroes the thread's unread counter and flags every message
 	// in it as read for the current user.
 	MarkThreadRead(context.Context, *MarkThreadReadRequest) (*MarkThreadReadResponse, error)
+	// ProposeTrade ── Trades (#5 — bidirectional swap) ────────────────────────────────
+	ProposeTrade(context.Context, *ProposeTradeRequest) (*Trade, error)
 	// SendGift ── #5 — Gift / trade flow (replaces text DMs in product narrative) ─
 	// SendGift moves an item from the sender's inventory into a pending
 	// gift; recipient claims to transfer ownership, declines to bounce.
@@ -72,6 +83,11 @@ func RegisterInboxServiceHTTPServer(s *http.Server, srv InboxServiceHTTPServer) 
 	r.GET("/api/v1/inbox/gifts/sent", _InboxService_ListSentGifts0_HTTP_Handler(srv))
 	r.POST("/api/v1/inbox/gifts/{gift_id}/claim", _InboxService_ClaimGift0_HTTP_Handler(srv))
 	r.POST("/api/v1/inbox/gifts/{gift_id}/decline", _InboxService_DeclineGift0_HTTP_Handler(srv))
+	r.POST("/api/v1/inbox/trades", _InboxService_ProposeTrade0_HTTP_Handler(srv))
+	r.GET("/api/v1/inbox/trades/received", _InboxService_ListReceivedTrades0_HTTP_Handler(srv))
+	r.GET("/api/v1/inbox/trades/sent", _InboxService_ListSentTrades0_HTTP_Handler(srv))
+	r.POST("/api/v1/inbox/trades/{trade_id}/accept", _InboxService_AcceptTrade0_HTTP_Handler(srv))
+	r.POST("/api/v1/inbox/trades/{trade_id}/cancel", _InboxService_CancelTrade0_HTTP_Handler(srv))
 }
 
 func _InboxService_ListThreads0_HTTP_Handler(srv InboxServiceHTTPServer) func(ctx http.Context) error {
@@ -316,7 +332,119 @@ func _InboxService_DeclineGift0_HTTP_Handler(srv InboxServiceHTTPServer) func(ct
 	}
 }
 
+func _InboxService_ProposeTrade0_HTTP_Handler(srv InboxServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ProposeTradeRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInboxServiceProposeTrade)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ProposeTrade(ctx, req.(*ProposeTradeRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Trade)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _InboxService_ListReceivedTrades0_HTTP_Handler(srv InboxServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListTradesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInboxServiceListReceivedTrades)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListReceivedTrades(ctx, req.(*ListTradesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListTradesResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _InboxService_ListSentTrades0_HTTP_Handler(srv InboxServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListTradesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInboxServiceListSentTrades)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListSentTrades(ctx, req.(*ListTradesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListTradesResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _InboxService_AcceptTrade0_HTTP_Handler(srv InboxServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AcceptTradeRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInboxServiceAcceptTrade)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AcceptTrade(ctx, req.(*AcceptTradeRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Trade)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _InboxService_CancelTrade0_HTTP_Handler(srv InboxServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CancelTradeRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInboxServiceCancelTrade)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CancelTrade(ctx, req.(*CancelTradeRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Trade)
+		return ctx.Result(200, reply)
+	}
+}
+
 type InboxServiceHTTPClient interface {
+	AcceptTrade(ctx context.Context, req *AcceptTradeRequest, opts ...http.CallOption) (rsp *Trade, err error)
+	CancelTrade(ctx context.Context, req *CancelTradeRequest, opts ...http.CallOption) (rsp *Trade, err error)
 	ClaimGift(ctx context.Context, req *ClaimGiftRequest, opts ...http.CallOption) (rsp *Gift, err error)
 	// CreateDirectThread CreateDirectThread opens (or returns existing) a bidirectional friend-mail
 	// thread between the caller and the given recipient. Idempotent.
@@ -328,12 +456,16 @@ type InboxServiceHTTPClient interface {
 	// GetUnreadCount GetUnreadCount returns the total unread thread count for badge rendering.
 	GetUnreadCount(ctx context.Context, req *GetUnreadCountRequest, opts ...http.CallOption) (rsp *GetUnreadCountResponse, err error)
 	ListReceivedGifts(ctx context.Context, req *ListReceivedGiftsRequest, opts ...http.CallOption) (rsp *ListGiftsResponse, err error)
+	ListReceivedTrades(ctx context.Context, req *ListTradesRequest, opts ...http.CallOption) (rsp *ListTradesResponse, err error)
 	ListSentGifts(ctx context.Context, req *ListSentGiftsRequest, opts ...http.CallOption) (rsp *ListGiftsResponse, err error)
+	ListSentTrades(ctx context.Context, req *ListTradesRequest, opts ...http.CallOption) (rsp *ListTradesResponse, err error)
 	// ListThreads ListThreads returns the authenticated user's threads, newest activity first.
 	ListThreads(ctx context.Context, req *ListThreadsRequest, opts ...http.CallOption) (rsp *ListThreadsResponse, err error)
 	// MarkThreadRead MarkThreadRead zeroes the thread's unread counter and flags every message
 	// in it as read for the current user.
 	MarkThreadRead(ctx context.Context, req *MarkThreadReadRequest, opts ...http.CallOption) (rsp *MarkThreadReadResponse, err error)
+	// ProposeTrade ── Trades (#5 — bidirectional swap) ────────────────────────────────
+	ProposeTrade(ctx context.Context, req *ProposeTradeRequest, opts ...http.CallOption) (rsp *Trade, err error)
 	// SendGift ── #5 — Gift / trade flow (replaces text DMs in product narrative) ─
 	// SendGift moves an item from the sender's inventory into a pending
 	// gift; recipient claims to transfer ownership, declines to bounce.
@@ -350,6 +482,32 @@ type InboxServiceHTTPClientImpl struct {
 
 func NewInboxServiceHTTPClient(client *http.Client) InboxServiceHTTPClient {
 	return &InboxServiceHTTPClientImpl{client}
+}
+
+func (c *InboxServiceHTTPClientImpl) AcceptTrade(ctx context.Context, in *AcceptTradeRequest, opts ...http.CallOption) (*Trade, error) {
+	var out Trade
+	pattern := "/api/v1/inbox/trades/{trade_id}/accept"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationInboxServiceAcceptTrade))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *InboxServiceHTTPClientImpl) CancelTrade(ctx context.Context, in *CancelTradeRequest, opts ...http.CallOption) (*Trade, error) {
+	var out Trade
+	pattern := "/api/v1/inbox/trades/{trade_id}/cancel"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationInboxServiceCancelTrade))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *InboxServiceHTTPClientImpl) ClaimGift(ctx context.Context, in *ClaimGiftRequest, opts ...http.CallOption) (*Gift, error) {
@@ -435,11 +593,37 @@ func (c *InboxServiceHTTPClientImpl) ListReceivedGifts(ctx context.Context, in *
 	return &out, nil
 }
 
+func (c *InboxServiceHTTPClientImpl) ListReceivedTrades(ctx context.Context, in *ListTradesRequest, opts ...http.CallOption) (*ListTradesResponse, error) {
+	var out ListTradesResponse
+	pattern := "/api/v1/inbox/trades/received"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationInboxServiceListReceivedTrades))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *InboxServiceHTTPClientImpl) ListSentGifts(ctx context.Context, in *ListSentGiftsRequest, opts ...http.CallOption) (*ListGiftsResponse, error) {
 	var out ListGiftsResponse
 	pattern := "/api/v1/inbox/gifts/sent"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationInboxServiceListSentGifts))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *InboxServiceHTTPClientImpl) ListSentTrades(ctx context.Context, in *ListTradesRequest, opts ...http.CallOption) (*ListTradesResponse, error) {
+	var out ListTradesResponse
+	pattern := "/api/v1/inbox/trades/sent"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationInboxServiceListSentTrades))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -469,6 +653,20 @@ func (c *InboxServiceHTTPClientImpl) MarkThreadRead(ctx context.Context, in *Mar
 	pattern := "/api/v1/inbox/threads/{thread_id}/read"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationInboxServiceMarkThreadRead))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ProposeTrade ── Trades (#5 — bidirectional swap) ────────────────────────────────
+func (c *InboxServiceHTTPClientImpl) ProposeTrade(ctx context.Context, in *ProposeTradeRequest, opts ...http.CallOption) (*Trade, error) {
+	var out Trade
+	pattern := "/api/v1/inbox/trades"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationInboxServiceProposeTrade))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

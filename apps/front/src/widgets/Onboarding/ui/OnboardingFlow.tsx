@@ -330,8 +330,16 @@ function TutorialDuel({ name, klassLabel, onWin }: TutorialDuelProps) {
 // it caused accounts to identify as Thornmoss everywhere. We now pull
 // the display name straight from the authenticated user (Yandex /
 // Telegram profile) so this flow is identity-free.
-const STEPS = ['welcome', 'class', 'pet', 'goal', 'tutorial', 'done'] as const
+const STEPS = ['welcome', 'avatar', 'class', 'pet', 'goal', 'tutorial', 'done'] as const
 type Step = typeof STEPS[number]
+
+// Free starter avatars seeded by migration 00033. Slug → display config.
+// Premium avatars (rogue/paladin/archivist) live in /tavern; we only
+// surface the always-available ones here so the picker never 404s.
+const STARTER_AVATARS = [
+  { slug: 'avatar:warden', label: 'Warden', src: '/img/people/avatar-warden.svg', tagline: 'Серьёзный страж' },
+  { slug: 'avatar:mage',   label: 'Mage',   src: '/img/people/avatar-mage.svg',   tagline: 'Маг-исследователь' },
+] as const
 
 const PET_SPRITE: Record<string, React.ComponentType<{ scale?: number }>> = {
   slime: SlimePet,
@@ -342,6 +350,7 @@ const PET_SPRITE: Record<string, React.ComponentType<{ scale?: number }>> = {
 export function OnboardingFlow({ onFinish }: { onFinish: () => void }) {
   const { user } = useAuth()
   const [step, setStep] = useState(0)
+  const [avatarSlug, setAvatarSlug] = useState<string>(STARTER_AVATARS[0].slug)
   const [klass, setKlass] = useState('frontend')
   const [pet, setPet] = useState('slime')
   const [goal, setGoal] = useState('interviews')
@@ -362,6 +371,19 @@ export function OnboardingFlow({ onFinish }: { onFinish: () => void }) {
 
   const finish = () => {
     localStorage.setItem('druz9_onboarding_done', '1')
+    // Persist the avatar choice so other devices/sessions show the same
+    // hero. The shop API auto-equips when the user has the item — both
+    // starter avatars are pre-granted by migration 00033.
+    void (async () => {
+      try {
+        const { shopApi } = await import('@/features/Shop/api/shopApi')
+        const owned = await shopApi.getInventory()
+        const target = owned.find((o) => o.item.slug === avatarSlug)
+        if (target && !target.equipped) {
+          await shopApi.equipCosmetic(target.item.id)
+        }
+      } catch { /* shop offline — local-only state is fine */ }
+    })()
     onFinish()
   }
 
@@ -489,12 +511,58 @@ export function OnboardingFlow({ onFinish }: { onFinish: () => void }) {
             </div>
           )}
 
+          {cur === 'avatar' && (
+            <div>
+              <div
+                className="font-silkscreen uppercase"
+                style={{ color: 'var(--ember-1)', letterSpacing: '0.1em', marginBottom: 4 }}
+              >STEP 1 · AVATAR</div>
+              <h2 className="font-display" style={{ whiteSpace: 'normal', fontSize: 28, margin: '0 0 8px' }}>
+                Выбери базового героя
+              </h2>
+              <div style={{ color: 'var(--ink-2)', marginBottom: 20, fontSize: 13 }}>
+                Стартовые аватары бесплатны и живут в инвентаре. Премиум-варианты
+                (rogue / paladin / archivist) ждут в таверне.
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
+                {STARTER_AVATARS.map((a) => {
+                  const selected = avatarSlug === a.slug
+                  return (
+                    <button
+                      key={a.slug}
+                      onClick={() => setAvatarSlug(a.slug)}
+                      style={{
+                        padding: 16,
+                        border: `3px solid ${selected ? 'var(--ember-1)' : 'var(--ink-0)'}`,
+                        background: selected ? 'var(--parch-2)' : 'var(--parch-0)',
+                        boxShadow: selected ? '4px 4px 0 var(--ember-1)' : '3px 3px 0 var(--ink-0)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 10,
+                      }}
+                    >
+                      <img src={a.src} alt={a.label} style={{ width: 120, height: 120, objectFit: 'contain' }} draggable={false} />
+                      <div className="font-display" style={{ fontSize: 18 }}>{a.label}</div>
+                      <div style={{ fontSize: 11, color: 'var(--ink-2)' }}>{a.tagline}</div>
+                      {selected && <Badge variant="ember" style={{ fontSize: 9 }}>выбран</Badge>}
+                    </button>
+                  )
+                })}
+              </div>
+              <div style={{ marginTop: 14, fontSize: 11, color: 'var(--ink-2)' }}>
+                Поменять можно в любой момент в /profile или купить нового в таверне.
+              </div>
+            </div>
+          )}
+
           {cur === 'class' && (
             <div>
               <div
                 className="font-silkscreen uppercase"
                 style={{ color: 'var(--ember-1)', letterSpacing: '0.1em', marginBottom: 4 }}
-              >STEP 1 · CLASS</div>
+              >STEP 2 · CLASS</div>
               <h2 className="font-display" style={{ whiteSpace: 'normal', fontSize: 28, margin: '0 0 8px' }}>
                 Выбери путь
               </h2>

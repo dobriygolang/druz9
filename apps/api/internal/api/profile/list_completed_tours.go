@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -26,7 +27,7 @@ func (i *Implementation) WithToursRepo(r ToursRepo) *Implementation {
 func (i *Implementation) ListCompletedTours(ctx context.Context, _ *v1.ListCompletedToursRequest) (*v1.ListCompletedToursResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.tours == nil {
 		return &v1.ListCompletedToursResponse{}, nil

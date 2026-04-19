@@ -2,6 +2,7 @@ package arena
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -70,7 +71,7 @@ func pickTopic(mode string) (string, model.ArenaDifficulty) {
 func (i *Implementation) EnqueueForMatch(ctx context.Context, req *v1.EnqueueForMatchRequest) (*v1.EnqueueForMatchResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.matchmaker == nil {
 		return nil, errors.InternalServer("INTERNAL", "matchmaker not initialised")
@@ -162,7 +163,7 @@ func (i *Implementation) EnqueueForMatch(ctx context.Context, req *v1.EnqueueFor
 // the solo-timed fallback.
 func (i *Implementation) GetQueueStatus(ctx context.Context, req *v1.GetQueueStatusRequest) (*v1.GetQueueStatusResponse, error) {
 	if _, err := apihelpers.RequireUser(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.matchmaker == nil {
 		return nil, errors.InternalServer("INTERNAL", "matchmaker not initialised")
@@ -197,7 +198,7 @@ func (i *Implementation) GetQueueStatus(ctx context.Context, req *v1.GetQueueSta
 
 func (i *Implementation) LeaveQueue(ctx context.Context, req *v1.LeaveQueueRequest) (*v1.ArenaStatusResponse, error) {
 	if _, err := apihelpers.RequireUser(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.matchmaker == nil {
 		return nil, errors.InternalServer("INTERNAL", "matchmaker not initialised")

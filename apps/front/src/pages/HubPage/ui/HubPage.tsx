@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Panel, RpgButton, Bar, Badge, PageHeader } from '@/shared/ui/pixel'
+import { Tour } from '@/features/Tour/ui/Tour'
 import { Hero, Torch, Statue, Fireflies, Banner, SpiritOrb } from '@/shared/ui/sprites'
 import { useGameUser } from '@/shared/lib/gameState'
 import { useApi } from '@/shared/hooks/useApi'
@@ -111,6 +112,14 @@ export function HubPage() {
 
   return (
     <>
+      <Tour
+        tourId="hub_intro"
+        steps={[
+          { selector: '[data-hub-section="quest"]', title: 'Твой квест', body: 'Главный недельный квест и его прогресс. Кликай по шагам — попадёшь на нужную страницу.' },
+          { selector: '[data-hub-section="arena"]', title: 'Арена', body: 'Превью открытых матчей. Один клик — и ты в дуэли.' },
+          { selector: '[data-hub-section="guild"]', title: 'Гильдия', body: 'Что делает твоя гильдия прямо сейчас. Войти в зал — клик по карточке.' },
+        ]}
+      />
       <PageHeader
         eyebrow={t('hub.eyebrow')}
         title={headerTitle}

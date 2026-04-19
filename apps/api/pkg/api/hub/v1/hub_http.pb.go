@@ -20,14 +20,21 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationHubServiceGetOverview = "/hub.v1.HubService/GetOverview"
+const OperationHubServiceGetRegionContext = "/hub.v1.HubService/GetRegionContext"
 
 type HubServiceHTTPServer interface {
 	GetOverview(context.Context, *GetOverviewRequest) (*GetOverviewResponse, error)
+	// GetRegionContext ADR-002 — Region detail card on the SVG atlas. The region_id is one
+	// of the curated atlas-region slugs (north_peaks, capital_market, …).
+	// Server returns localized title/body + counts of nearby resources
+	// (open events, active guilds, etc.) the frontend renders inline.
+	GetRegionContext(context.Context, *GetRegionContextRequest) (*RegionContext, error)
 }
 
 func RegisterHubServiceHTTPServer(s *http.Server, srv HubServiceHTTPServer) {
 	r := s.Route("/")
 	r.GET("/api/v1/hub/overview", _HubService_GetOverview0_HTTP_Handler(srv))
+	r.GET("/api/v1/hub/regions/{region_id}", _HubService_GetRegionContext0_HTTP_Handler(srv))
 }
 
 func _HubService_GetOverview0_HTTP_Handler(srv HubServiceHTTPServer) func(ctx http.Context) error {
@@ -49,8 +56,35 @@ func _HubService_GetOverview0_HTTP_Handler(srv HubServiceHTTPServer) func(ctx ht
 	}
 }
 
+func _HubService_GetRegionContext0_HTTP_Handler(srv HubServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetRegionContextRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationHubServiceGetRegionContext)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetRegionContext(ctx, req.(*GetRegionContextRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*RegionContext)
+		return ctx.Result(200, reply)
+	}
+}
+
 type HubServiceHTTPClient interface {
 	GetOverview(ctx context.Context, req *GetOverviewRequest, opts ...http.CallOption) (rsp *GetOverviewResponse, err error)
+	// GetRegionContext ADR-002 — Region detail card on the SVG atlas. The region_id is one
+	// of the curated atlas-region slugs (north_peaks, capital_market, …).
+	// Server returns localized title/body + counts of nearby resources
+	// (open events, active guilds, etc.) the frontend renders inline.
+	GetRegionContext(ctx context.Context, req *GetRegionContextRequest, opts ...http.CallOption) (rsp *RegionContext, err error)
 }
 
 type HubServiceHTTPClientImpl struct {
@@ -66,6 +100,23 @@ func (c *HubServiceHTTPClientImpl) GetOverview(ctx context.Context, in *GetOverv
 	pattern := "/api/v1/hub/overview"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationHubServiceGetOverview))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// GetRegionContext ADR-002 — Region detail card on the SVG atlas. The region_id is one
+// of the curated atlas-region slugs (north_peaks, capital_market, …).
+// Server returns localized title/body + counts of nearby resources
+// (open events, active guilds, etc.) the frontend renders inline.
+func (c *HubServiceHTTPClientImpl) GetRegionContext(ctx context.Context, in *GetRegionContextRequest, opts ...http.CallOption) (*RegionContext, error) {
+	var out RegionContext
+	pattern := "/api/v1/hub/regions/{region_id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationHubServiceGetRegionContext))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

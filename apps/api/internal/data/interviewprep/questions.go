@@ -31,7 +31,10 @@ func (r *Repo) ListQuestionsByTask(ctx context.Context, taskID uuid.UUID) ([]*mo
 		}
 		items = append(items, item)
 	}
-	return items, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate questions: %w", err)
+	}
+	return items, nil
 }
 
 func (r *Repo) GetQuestionByID(ctx context.Context, questionID uuid.UUID) (*model.InterviewPrepQuestion, error) {

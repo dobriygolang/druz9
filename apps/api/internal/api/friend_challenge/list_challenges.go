@@ -2,6 +2,7 @@ package friend_challenge
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -13,7 +14,7 @@ import (
 func (i *Implementation) ListIncoming(ctx context.Context, req *v1.ListIncomingRequest) (*v1.ListChallengesResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	result, err := i.service.ListIncoming(ctx, user.ID, req.GetLimit(), req.GetOffset())
 	if err != nil {
@@ -25,7 +26,7 @@ func (i *Implementation) ListIncoming(ctx context.Context, req *v1.ListIncomingR
 func (i *Implementation) ListSent(ctx context.Context, req *v1.ListSentRequest) (*v1.ListChallengesResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	result, err := i.service.ListSent(ctx, user.ID, req.GetLimit(), req.GetOffset())
 	if err != nil {
@@ -37,7 +38,7 @@ func (i *Implementation) ListSent(ctx context.Context, req *v1.ListSentRequest) 
 func (i *Implementation) ListHistory(ctx context.Context, req *v1.ListHistoryRequest) (*v1.ListChallengesResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	result, err := i.service.ListHistory(ctx, user.ID, req.GetLimit(), req.GetOffset())
 	if err != nil {

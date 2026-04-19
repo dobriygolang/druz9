@@ -89,7 +89,7 @@ func (i *Implementation) LeaveLobby(ctx context.Context, req *v1.LeaveLobbyReque
 
 func (i *Implementation) EnqueueLobby(ctx context.Context, req *v1.EnqueueLobbyRequest) (*v1.ArenaStatusResponse, error) {
 	if _, err := apihelpers.RequireUser(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.lobbies == nil {
 		return nil, kratoserrors.InternalServer("NOT_CONFIGURED", "lobbies not wired")

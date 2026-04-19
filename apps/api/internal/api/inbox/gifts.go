@@ -5,6 +5,7 @@ package inbox
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
@@ -54,7 +55,7 @@ func (i *Implementation) WithGiftsRepo(r GiftsRepo) *Implementation {
 func (i *Implementation) SendGift(ctx context.Context, req *v1.SendGiftRequest) (*v1.Gift, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.gifts == nil {
 		return nil, kratoserrors.InternalServer("NOT_CONFIGURED", "gifts repo missing")
@@ -83,7 +84,7 @@ func (i *Implementation) SendGift(ctx context.Context, req *v1.SendGiftRequest) 
 func (i *Implementation) ListReceivedGifts(ctx context.Context, req *v1.ListReceivedGiftsRequest) (*v1.ListGiftsResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.gifts == nil {
 		return &v1.ListGiftsResponse{}, nil
@@ -98,7 +99,7 @@ func (i *Implementation) ListReceivedGifts(ctx context.Context, req *v1.ListRece
 func (i *Implementation) ListSentGifts(ctx context.Context, req *v1.ListSentGiftsRequest) (*v1.ListGiftsResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.gifts == nil {
 		return &v1.ListGiftsResponse{}, nil
@@ -113,7 +114,7 @@ func (i *Implementation) ListSentGifts(ctx context.Context, req *v1.ListSentGift
 func (i *Implementation) ClaimGift(ctx context.Context, req *v1.ClaimGiftRequest) (*v1.Gift, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.gifts == nil {
 		return nil, kratoserrors.InternalServer("NOT_CONFIGURED", "gifts repo missing")
@@ -138,7 +139,7 @@ func (i *Implementation) ClaimGift(ctx context.Context, req *v1.ClaimGiftRequest
 func (i *Implementation) DeclineGift(ctx context.Context, req *v1.DeclineGiftRequest) (*v1.Gift, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if i.gifts == nil {
 		return nil, kratoserrors.InternalServer("NOT_CONFIGURED", "gifts repo missing")

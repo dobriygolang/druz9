@@ -2,6 +2,7 @@ package challenge
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -13,7 +14,7 @@ import (
 func (i *Implementation) GetWeeklyChallenge(ctx context.Context, _ *v1.GetWeeklyChallengeRequest) (*v1.GetWeeklyChallengeResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	weekKey := challengedomain.CurrentWeekKey()

@@ -83,6 +83,32 @@ service InboxService {
       body: "*"
     };
   }
+
+  // ── Trades (#5 — bidirectional swap) ────────────────────────────────
+  rpc ProposeTrade(ProposeTradeRequest) returns (Trade) {
+    option (google.api.http) = {
+      post: "/api/v1/inbox/trades"
+      body: "*"
+    };
+  }
+  rpc ListReceivedTrades(ListTradesRequest) returns (ListTradesResponse) {
+    option (google.api.http) = { get: "/api/v1/inbox/trades/received" };
+  }
+  rpc ListSentTrades(ListTradesRequest) returns (ListTradesResponse) {
+    option (google.api.http) = { get: "/api/v1/inbox/trades/sent" };
+  }
+  rpc AcceptTrade(AcceptTradeRequest) returns (Trade) {
+    option (google.api.http) = {
+      post: "/api/v1/inbox/trades/{trade_id}/accept"
+      body: "*"
+    };
+  }
+  rpc CancelTrade(CancelTradeRequest) returns (Trade) {
+    option (google.api.http) = {
+      post: "/api/v1/inbox/trades/{trade_id}/cancel"
+      body: "*"
+    };
+  }
 }
 
 // ThreadKind classifies inbox threads so the client can route icons, avatars
@@ -219,4 +245,47 @@ message ClaimGiftRequest {
 }
 message DeclineGiftRequest {
   string gift_id = 1;
+}
+
+// ── Trade messages ────────────────────────────────────────────────────
+
+message Trade {
+  string                    id                     = 1;
+  string                    initiator_id           = 2;
+  string                    initiator_name         = 3;
+  string                    counterparty_id        = 4;
+  string                    initiator_item_id      = 5;
+  string                    initiator_item_name    = 6;
+  string                    initiator_item_icon    = 7;
+  string                    counterparty_item_id   = 8;
+  string                    counterparty_item_name = 9;
+  string                    counterparty_item_icon = 10;
+  string                    note                   = 11;
+  // pending | accepted | declined | cancelled | expired
+  string                    status                 = 12;
+  google.protobuf.Timestamp proposed_at            = 13;
+  google.protobuf.Timestamp decided_at             = 14;
+}
+
+message ProposeTradeRequest {
+  string counterparty_id       = 1;
+  string initiator_item_id     = 2;
+  string counterparty_item_id  = 3;
+  string note                  = 4;
+}
+
+message ListTradesRequest {
+  string status = 1;
+}
+
+message ListTradesResponse {
+  repeated Trade trades = 1;
+}
+
+message AcceptTradeRequest {
+  string trade_id = 1;
+}
+
+message CancelTradeRequest {
+  string trade_id = 1;
 }

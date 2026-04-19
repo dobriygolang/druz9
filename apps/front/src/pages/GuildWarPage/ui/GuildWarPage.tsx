@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Panel, RpgButton, Badge, PageHeader } from '@/shared/ui/pixel'
+import { Tour } from '@/features/Tour/ui/Tour'
 import { Banner } from '@/shared/ui/sprites'
 import { guildApi, type GuildWar } from '@/features/Guild/api/guildApi'
 
@@ -96,6 +97,13 @@ export function GuildWarPage() {
 
   return (
     <>
+      <Tour
+        tourId="war_intro"
+        steps={[
+          { selector: '[data-tour=war-fronts]', title: 'Фронты войны', body: 'Каждый фронт = маленькая цель: алгоритмы, SQL, дизайн. Закрашиваются, когда сторона побеждает в раунде.' },
+          { selector: '[data-tour=war-contribute]', title: 'Внести вклад', body: 'Решай задачи фронта — твои очки идут в гильдию. Один клик и ты в матче.' },
+        ]}
+      />
       <PageHeader
         eyebrow="Guild War · live"
         title={`${war.ourGuildName} vs ${war.theirGuildName}`}

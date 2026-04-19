@@ -1323,6 +1323,399 @@ func (x *DeclineGiftRequest) GetGiftId() string {
 	return ""
 }
 
+type Trade struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Id                   string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	InitiatorId          string                 `protobuf:"bytes,2,opt,name=initiator_id,json=initiatorId,proto3" json:"initiator_id,omitempty"`
+	InitiatorName        string                 `protobuf:"bytes,3,opt,name=initiator_name,json=initiatorName,proto3" json:"initiator_name,omitempty"`
+	CounterpartyId       string                 `protobuf:"bytes,4,opt,name=counterparty_id,json=counterpartyId,proto3" json:"counterparty_id,omitempty"`
+	InitiatorItemId      string                 `protobuf:"bytes,5,opt,name=initiator_item_id,json=initiatorItemId,proto3" json:"initiator_item_id,omitempty"`
+	InitiatorItemName    string                 `protobuf:"bytes,6,opt,name=initiator_item_name,json=initiatorItemName,proto3" json:"initiator_item_name,omitempty"`
+	InitiatorItemIcon    string                 `protobuf:"bytes,7,opt,name=initiator_item_icon,json=initiatorItemIcon,proto3" json:"initiator_item_icon,omitempty"`
+	CounterpartyItemId   string                 `protobuf:"bytes,8,opt,name=counterparty_item_id,json=counterpartyItemId,proto3" json:"counterparty_item_id,omitempty"`
+	CounterpartyItemName string                 `protobuf:"bytes,9,opt,name=counterparty_item_name,json=counterpartyItemName,proto3" json:"counterparty_item_name,omitempty"`
+	CounterpartyItemIcon string                 `protobuf:"bytes,10,opt,name=counterparty_item_icon,json=counterpartyItemIcon,proto3" json:"counterparty_item_icon,omitempty"`
+	Note                 string                 `protobuf:"bytes,11,opt,name=note,proto3" json:"note,omitempty"`
+	// pending | accepted | declined | cancelled | expired
+	Status        string                 `protobuf:"bytes,12,opt,name=status,proto3" json:"status,omitempty"`
+	ProposedAt    *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=proposed_at,json=proposedAt,proto3" json:"proposed_at,omitempty"`
+	DecidedAt     *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=decided_at,json=decidedAt,proto3" json:"decided_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Trade) Reset() {
+	*x = Trade{}
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Trade) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Trade) ProtoMessage() {}
+
+func (x *Trade) ProtoReflect() protoreflect.Message {
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Trade.ProtoReflect.Descriptor instead.
+func (*Trade) Descriptor() ([]byte, []int) {
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *Trade) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Trade) GetInitiatorId() string {
+	if x != nil {
+		return x.InitiatorId
+	}
+	return ""
+}
+
+func (x *Trade) GetInitiatorName() string {
+	if x != nil {
+		return x.InitiatorName
+	}
+	return ""
+}
+
+func (x *Trade) GetCounterpartyId() string {
+	if x != nil {
+		return x.CounterpartyId
+	}
+	return ""
+}
+
+func (x *Trade) GetInitiatorItemId() string {
+	if x != nil {
+		return x.InitiatorItemId
+	}
+	return ""
+}
+
+func (x *Trade) GetInitiatorItemName() string {
+	if x != nil {
+		return x.InitiatorItemName
+	}
+	return ""
+}
+
+func (x *Trade) GetInitiatorItemIcon() string {
+	if x != nil {
+		return x.InitiatorItemIcon
+	}
+	return ""
+}
+
+func (x *Trade) GetCounterpartyItemId() string {
+	if x != nil {
+		return x.CounterpartyItemId
+	}
+	return ""
+}
+
+func (x *Trade) GetCounterpartyItemName() string {
+	if x != nil {
+		return x.CounterpartyItemName
+	}
+	return ""
+}
+
+func (x *Trade) GetCounterpartyItemIcon() string {
+	if x != nil {
+		return x.CounterpartyItemIcon
+	}
+	return ""
+}
+
+func (x *Trade) GetNote() string {
+	if x != nil {
+		return x.Note
+	}
+	return ""
+}
+
+func (x *Trade) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *Trade) GetProposedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ProposedAt
+	}
+	return nil
+}
+
+func (x *Trade) GetDecidedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DecidedAt
+	}
+	return nil
+}
+
+type ProposeTradeRequest struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	CounterpartyId     string                 `protobuf:"bytes,1,opt,name=counterparty_id,json=counterpartyId,proto3" json:"counterparty_id,omitempty"`
+	InitiatorItemId    string                 `protobuf:"bytes,2,opt,name=initiator_item_id,json=initiatorItemId,proto3" json:"initiator_item_id,omitempty"`
+	CounterpartyItemId string                 `protobuf:"bytes,3,opt,name=counterparty_item_id,json=counterpartyItemId,proto3" json:"counterparty_item_id,omitempty"`
+	Note               string                 `protobuf:"bytes,4,opt,name=note,proto3" json:"note,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *ProposeTradeRequest) Reset() {
+	*x = ProposeTradeRequest{}
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProposeTradeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProposeTradeRequest) ProtoMessage() {}
+
+func (x *ProposeTradeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ProposeTradeRequest.ProtoReflect.Descriptor instead.
+func (*ProposeTradeRequest) Descriptor() ([]byte, []int) {
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *ProposeTradeRequest) GetCounterpartyId() string {
+	if x != nil {
+		return x.CounterpartyId
+	}
+	return ""
+}
+
+func (x *ProposeTradeRequest) GetInitiatorItemId() string {
+	if x != nil {
+		return x.InitiatorItemId
+	}
+	return ""
+}
+
+func (x *ProposeTradeRequest) GetCounterpartyItemId() string {
+	if x != nil {
+		return x.CounterpartyItemId
+	}
+	return ""
+}
+
+func (x *ProposeTradeRequest) GetNote() string {
+	if x != nil {
+		return x.Note
+	}
+	return ""
+}
+
+type ListTradesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListTradesRequest) Reset() {
+	*x = ListTradesRequest{}
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListTradesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListTradesRequest) ProtoMessage() {}
+
+func (x *ListTradesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListTradesRequest.ProtoReflect.Descriptor instead.
+func (*ListTradesRequest) Descriptor() ([]byte, []int) {
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *ListTradesRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type ListTradesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Trades        []*Trade               `protobuf:"bytes,1,rep,name=trades,proto3" json:"trades,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListTradesResponse) Reset() {
+	*x = ListTradesResponse{}
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListTradesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListTradesResponse) ProtoMessage() {}
+
+func (x *ListTradesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListTradesResponse.ProtoReflect.Descriptor instead.
+func (*ListTradesResponse) Descriptor() ([]byte, []int) {
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *ListTradesResponse) GetTrades() []*Trade {
+	if x != nil {
+		return x.Trades
+	}
+	return nil
+}
+
+type AcceptTradeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TradeId       string                 `protobuf:"bytes,1,opt,name=trade_id,json=tradeId,proto3" json:"trade_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AcceptTradeRequest) Reset() {
+	*x = AcceptTradeRequest{}
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AcceptTradeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AcceptTradeRequest) ProtoMessage() {}
+
+func (x *AcceptTradeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AcceptTradeRequest.ProtoReflect.Descriptor instead.
+func (*AcceptTradeRequest) Descriptor() ([]byte, []int) {
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *AcceptTradeRequest) GetTradeId() string {
+	if x != nil {
+		return x.TradeId
+	}
+	return ""
+}
+
+type CancelTradeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TradeId       string                 `protobuf:"bytes,1,opt,name=trade_id,json=tradeId,proto3" json:"trade_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CancelTradeRequest) Reset() {
+	*x = CancelTradeRequest{}
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CancelTradeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CancelTradeRequest) ProtoMessage() {}
+
+func (x *CancelTradeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CancelTradeRequest.ProtoReflect.Descriptor instead.
+func (*CancelTradeRequest) Descriptor() ([]byte, []int) {
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *CancelTradeRequest) GetTradeId() string {
+	if x != nil {
+		return x.TradeId
+	}
+	return ""
+}
+
 var File_social_inbox_v1_inbox_proto protoreflect.FileDescriptor
 
 const file_social_inbox_v1_inbox_proto_rawDesc = "" +
@@ -1408,7 +1801,38 @@ const file_social_inbox_v1_inbox_proto_rawDesc = "" +
 	"\x10ClaimGiftRequest\x12\x17\n" +
 	"\agift_id\x18\x01 \x01(\tR\x06giftId\"-\n" +
 	"\x12DeclineGiftRequest\x12\x17\n" +
-	"\agift_id\x18\x01 \x01(\tR\x06giftId*\xb9\x01\n" +
+	"\agift_id\x18\x01 \x01(\tR\x06giftId\"\xd8\x04\n" +
+	"\x05Trade\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12!\n" +
+	"\finitiator_id\x18\x02 \x01(\tR\vinitiatorId\x12%\n" +
+	"\x0einitiator_name\x18\x03 \x01(\tR\rinitiatorName\x12'\n" +
+	"\x0fcounterparty_id\x18\x04 \x01(\tR\x0ecounterpartyId\x12*\n" +
+	"\x11initiator_item_id\x18\x05 \x01(\tR\x0finitiatorItemId\x12.\n" +
+	"\x13initiator_item_name\x18\x06 \x01(\tR\x11initiatorItemName\x12.\n" +
+	"\x13initiator_item_icon\x18\a \x01(\tR\x11initiatorItemIcon\x120\n" +
+	"\x14counterparty_item_id\x18\b \x01(\tR\x12counterpartyItemId\x124\n" +
+	"\x16counterparty_item_name\x18\t \x01(\tR\x14counterpartyItemName\x124\n" +
+	"\x16counterparty_item_icon\x18\n" +
+	" \x01(\tR\x14counterpartyItemIcon\x12\x12\n" +
+	"\x04note\x18\v \x01(\tR\x04note\x12\x16\n" +
+	"\x06status\x18\f \x01(\tR\x06status\x12;\n" +
+	"\vproposed_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"proposedAt\x129\n" +
+	"\n" +
+	"decided_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tdecidedAt\"\xb0\x01\n" +
+	"\x13ProposeTradeRequest\x12'\n" +
+	"\x0fcounterparty_id\x18\x01 \x01(\tR\x0ecounterpartyId\x12*\n" +
+	"\x11initiator_item_id\x18\x02 \x01(\tR\x0finitiatorItemId\x120\n" +
+	"\x14counterparty_item_id\x18\x03 \x01(\tR\x12counterpartyItemId\x12\x12\n" +
+	"\x04note\x18\x04 \x01(\tR\x04note\"+\n" +
+	"\x11ListTradesRequest\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\"=\n" +
+	"\x12ListTradesResponse\x12'\n" +
+	"\x06trades\x18\x01 \x03(\v2\x0f.inbox.v1.TradeR\x06trades\"/\n" +
+	"\x12AcceptTradeRequest\x12\x19\n" +
+	"\btrade_id\x18\x01 \x01(\tR\atradeId\"/\n" +
+	"\x12CancelTradeRequest\x12\x19\n" +
+	"\btrade_id\x18\x01 \x01(\tR\atradeId*\xb9\x01\n" +
 	"\n" +
 	"ThreadKind\x12\x1b\n" +
 	"\x17THREAD_KIND_UNSPECIFIED\x10\x00\x12\x16\n" +
@@ -1424,8 +1848,7 @@ const file_social_inbox_v1_inbox_proto_rawDesc = "" +
 	"\x10SENDER_KIND_USER\x10\x01\x12\x16\n" +
 	"\x12SENDER_KIND_SYSTEM\x10\x02\x12\x1a\n" +
 	"\x16SENDER_KIND_MENTOR_BOT\x10\x03\x12\x19\n" +
-	"\x15SENDER_KIND_GUILD_BOT\x10\x042\x89\n" +
-	"\n" +
+	"\x15SENDER_KIND_GUILD_BOT\x10\x042\xb4\x0e\n" +
 	"\fInboxService\x12i\n" +
 	"\vListThreads\x12\x1c.inbox.v1.ListThreadsRequest\x1a\x1d.inbox.v1.ListThreadsResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v1/inbox/threads\x12o\n" +
 	"\tGetThread\x12\x1a.inbox.v1.GetThreadRequest\x1a\x1b.inbox.v1.GetThreadResponse\")\x82\xd3\xe4\x93\x02#\x12!/api/v1/inbox/threads/{thread_id}\x12\x86\x01\n" +
@@ -1437,7 +1860,12 @@ const file_social_inbox_v1_inbox_proto_rawDesc = "" +
 	"\x11ListReceivedGifts\x12\".inbox.v1.ListReceivedGiftsRequest\x1a\x1b.inbox.v1.ListGiftsResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/inbox/gifts/received\x12n\n" +
 	"\rListSentGifts\x12\x1e.inbox.v1.ListSentGiftsRequest\x1a\x1b.inbox.v1.ListGiftsResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/api/v1/inbox/gifts/sent\x12g\n" +
 	"\tClaimGift\x12\x1a.inbox.v1.ClaimGiftRequest\x1a\x0e.inbox.v1.Gift\".\x82\xd3\xe4\x93\x02(:\x01*\"#/api/v1/inbox/gifts/{gift_id}/claim\x12m\n" +
-	"\vDeclineGift\x12\x1c.inbox.v1.DeclineGiftRequest\x1a\x0e.inbox.v1.Gift\"0\x82\xd3\xe4\x93\x02*:\x01*\"%/api/v1/inbox/gifts/{gift_id}/declineB\x19Z\x17api/pkg/api/inbox/v1;v1b\x06proto3"
+	"\vDeclineGift\x12\x1c.inbox.v1.DeclineGiftRequest\x1a\x0e.inbox.v1.Gift\"0\x82\xd3\xe4\x93\x02*:\x01*\"%/api/v1/inbox/gifts/{gift_id}/decline\x12_\n" +
+	"\fProposeTrade\x12\x1d.inbox.v1.ProposeTradeRequest\x1a\x0f.inbox.v1.Trade\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/v1/inbox/trades\x12v\n" +
+	"\x12ListReceivedTrades\x12\x1b.inbox.v1.ListTradesRequest\x1a\x1c.inbox.v1.ListTradesResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/inbox/trades/received\x12n\n" +
+	"\x0eListSentTrades\x12\x1b.inbox.v1.ListTradesRequest\x1a\x1c.inbox.v1.ListTradesResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/inbox/trades/sent\x12o\n" +
+	"\vAcceptTrade\x12\x1c.inbox.v1.AcceptTradeRequest\x1a\x0f.inbox.v1.Trade\"1\x82\xd3\xe4\x93\x02+:\x01*\"&/api/v1/inbox/trades/{trade_id}/accept\x12o\n" +
+	"\vCancelTrade\x12\x1c.inbox.v1.CancelTradeRequest\x1a\x0f.inbox.v1.Trade\"1\x82\xd3\xe4\x93\x02+:\x01*\"&/api/v1/inbox/trades/{trade_id}/cancelB\x19Z\x17api/pkg/api/inbox/v1;v1b\x06proto3"
 
 var (
 	file_social_inbox_v1_inbox_proto_rawDescOnce sync.Once
@@ -1452,7 +1880,7 @@ func file_social_inbox_v1_inbox_proto_rawDescGZIP() []byte {
 }
 
 var file_social_inbox_v1_inbox_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_social_inbox_v1_inbox_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_social_inbox_v1_inbox_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
 var file_social_inbox_v1_inbox_proto_goTypes = []any{
 	(ThreadKind)(0),                    // 0: inbox.v1.ThreadKind
 	(SenderKind)(0),                    // 1: inbox.v1.SenderKind
@@ -1477,47 +1905,66 @@ var file_social_inbox_v1_inbox_proto_goTypes = []any{
 	(*ListGiftsResponse)(nil),          // 20: inbox.v1.ListGiftsResponse
 	(*ClaimGiftRequest)(nil),           // 21: inbox.v1.ClaimGiftRequest
 	(*DeclineGiftRequest)(nil),         // 22: inbox.v1.DeclineGiftRequest
-	(*timestamppb.Timestamp)(nil),      // 23: google.protobuf.Timestamp
+	(*Trade)(nil),                      // 23: inbox.v1.Trade
+	(*ProposeTradeRequest)(nil),        // 24: inbox.v1.ProposeTradeRequest
+	(*ListTradesRequest)(nil),          // 25: inbox.v1.ListTradesRequest
+	(*ListTradesResponse)(nil),         // 26: inbox.v1.ListTradesResponse
+	(*AcceptTradeRequest)(nil),         // 27: inbox.v1.AcceptTradeRequest
+	(*CancelTradeRequest)(nil),         // 28: inbox.v1.CancelTradeRequest
+	(*timestamppb.Timestamp)(nil),      // 29: google.protobuf.Timestamp
 }
 var file_social_inbox_v1_inbox_proto_depIdxs = []int32{
 	0,  // 0: inbox.v1.InboxThread.kind:type_name -> inbox.v1.ThreadKind
-	23, // 1: inbox.v1.InboxThread.last_message_at:type_name -> google.protobuf.Timestamp
+	29, // 1: inbox.v1.InboxThread.last_message_at:type_name -> google.protobuf.Timestamp
 	1,  // 2: inbox.v1.InboxMessage.sender_kind:type_name -> inbox.v1.SenderKind
-	23, // 3: inbox.v1.InboxMessage.created_at:type_name -> google.protobuf.Timestamp
+	29, // 3: inbox.v1.InboxMessage.created_at:type_name -> google.protobuf.Timestamp
 	2,  // 4: inbox.v1.ListThreadsResponse.threads:type_name -> inbox.v1.InboxThread
 	2,  // 5: inbox.v1.GetThreadResponse.thread:type_name -> inbox.v1.InboxThread
 	3,  // 6: inbox.v1.GetThreadResponse.messages:type_name -> inbox.v1.InboxMessage
 	3,  // 7: inbox.v1.SendMessageResponse.message:type_name -> inbox.v1.InboxMessage
-	23, // 8: inbox.v1.Gift.sent_at:type_name -> google.protobuf.Timestamp
-	23, // 9: inbox.v1.Gift.decided_at:type_name -> google.protobuf.Timestamp
+	29, // 8: inbox.v1.Gift.sent_at:type_name -> google.protobuf.Timestamp
+	29, // 9: inbox.v1.Gift.decided_at:type_name -> google.protobuf.Timestamp
 	16, // 10: inbox.v1.ListGiftsResponse.gifts:type_name -> inbox.v1.Gift
-	4,  // 11: inbox.v1.InboxService.ListThreads:input_type -> inbox.v1.ListThreadsRequest
-	6,  // 12: inbox.v1.InboxService.GetThread:input_type -> inbox.v1.GetThreadRequest
-	8,  // 13: inbox.v1.InboxService.MarkThreadRead:input_type -> inbox.v1.MarkThreadReadRequest
-	10, // 14: inbox.v1.InboxService.SendMessage:input_type -> inbox.v1.SendMessageRequest
-	12, // 15: inbox.v1.InboxService.GetUnreadCount:input_type -> inbox.v1.GetUnreadCountRequest
-	14, // 16: inbox.v1.InboxService.CreateDirectThread:input_type -> inbox.v1.CreateDirectThreadRequest
-	17, // 17: inbox.v1.InboxService.SendGift:input_type -> inbox.v1.SendGiftRequest
-	18, // 18: inbox.v1.InboxService.ListReceivedGifts:input_type -> inbox.v1.ListReceivedGiftsRequest
-	19, // 19: inbox.v1.InboxService.ListSentGifts:input_type -> inbox.v1.ListSentGiftsRequest
-	21, // 20: inbox.v1.InboxService.ClaimGift:input_type -> inbox.v1.ClaimGiftRequest
-	22, // 21: inbox.v1.InboxService.DeclineGift:input_type -> inbox.v1.DeclineGiftRequest
-	5,  // 22: inbox.v1.InboxService.ListThreads:output_type -> inbox.v1.ListThreadsResponse
-	7,  // 23: inbox.v1.InboxService.GetThread:output_type -> inbox.v1.GetThreadResponse
-	9,  // 24: inbox.v1.InboxService.MarkThreadRead:output_type -> inbox.v1.MarkThreadReadResponse
-	11, // 25: inbox.v1.InboxService.SendMessage:output_type -> inbox.v1.SendMessageResponse
-	13, // 26: inbox.v1.InboxService.GetUnreadCount:output_type -> inbox.v1.GetUnreadCountResponse
-	15, // 27: inbox.v1.InboxService.CreateDirectThread:output_type -> inbox.v1.CreateDirectThreadResponse
-	16, // 28: inbox.v1.InboxService.SendGift:output_type -> inbox.v1.Gift
-	20, // 29: inbox.v1.InboxService.ListReceivedGifts:output_type -> inbox.v1.ListGiftsResponse
-	20, // 30: inbox.v1.InboxService.ListSentGifts:output_type -> inbox.v1.ListGiftsResponse
-	16, // 31: inbox.v1.InboxService.ClaimGift:output_type -> inbox.v1.Gift
-	16, // 32: inbox.v1.InboxService.DeclineGift:output_type -> inbox.v1.Gift
-	22, // [22:33] is the sub-list for method output_type
-	11, // [11:22] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	29, // 11: inbox.v1.Trade.proposed_at:type_name -> google.protobuf.Timestamp
+	29, // 12: inbox.v1.Trade.decided_at:type_name -> google.protobuf.Timestamp
+	23, // 13: inbox.v1.ListTradesResponse.trades:type_name -> inbox.v1.Trade
+	4,  // 14: inbox.v1.InboxService.ListThreads:input_type -> inbox.v1.ListThreadsRequest
+	6,  // 15: inbox.v1.InboxService.GetThread:input_type -> inbox.v1.GetThreadRequest
+	8,  // 16: inbox.v1.InboxService.MarkThreadRead:input_type -> inbox.v1.MarkThreadReadRequest
+	10, // 17: inbox.v1.InboxService.SendMessage:input_type -> inbox.v1.SendMessageRequest
+	12, // 18: inbox.v1.InboxService.GetUnreadCount:input_type -> inbox.v1.GetUnreadCountRequest
+	14, // 19: inbox.v1.InboxService.CreateDirectThread:input_type -> inbox.v1.CreateDirectThreadRequest
+	17, // 20: inbox.v1.InboxService.SendGift:input_type -> inbox.v1.SendGiftRequest
+	18, // 21: inbox.v1.InboxService.ListReceivedGifts:input_type -> inbox.v1.ListReceivedGiftsRequest
+	19, // 22: inbox.v1.InboxService.ListSentGifts:input_type -> inbox.v1.ListSentGiftsRequest
+	21, // 23: inbox.v1.InboxService.ClaimGift:input_type -> inbox.v1.ClaimGiftRequest
+	22, // 24: inbox.v1.InboxService.DeclineGift:input_type -> inbox.v1.DeclineGiftRequest
+	24, // 25: inbox.v1.InboxService.ProposeTrade:input_type -> inbox.v1.ProposeTradeRequest
+	25, // 26: inbox.v1.InboxService.ListReceivedTrades:input_type -> inbox.v1.ListTradesRequest
+	25, // 27: inbox.v1.InboxService.ListSentTrades:input_type -> inbox.v1.ListTradesRequest
+	27, // 28: inbox.v1.InboxService.AcceptTrade:input_type -> inbox.v1.AcceptTradeRequest
+	28, // 29: inbox.v1.InboxService.CancelTrade:input_type -> inbox.v1.CancelTradeRequest
+	5,  // 30: inbox.v1.InboxService.ListThreads:output_type -> inbox.v1.ListThreadsResponse
+	7,  // 31: inbox.v1.InboxService.GetThread:output_type -> inbox.v1.GetThreadResponse
+	9,  // 32: inbox.v1.InboxService.MarkThreadRead:output_type -> inbox.v1.MarkThreadReadResponse
+	11, // 33: inbox.v1.InboxService.SendMessage:output_type -> inbox.v1.SendMessageResponse
+	13, // 34: inbox.v1.InboxService.GetUnreadCount:output_type -> inbox.v1.GetUnreadCountResponse
+	15, // 35: inbox.v1.InboxService.CreateDirectThread:output_type -> inbox.v1.CreateDirectThreadResponse
+	16, // 36: inbox.v1.InboxService.SendGift:output_type -> inbox.v1.Gift
+	20, // 37: inbox.v1.InboxService.ListReceivedGifts:output_type -> inbox.v1.ListGiftsResponse
+	20, // 38: inbox.v1.InboxService.ListSentGifts:output_type -> inbox.v1.ListGiftsResponse
+	16, // 39: inbox.v1.InboxService.ClaimGift:output_type -> inbox.v1.Gift
+	16, // 40: inbox.v1.InboxService.DeclineGift:output_type -> inbox.v1.Gift
+	23, // 41: inbox.v1.InboxService.ProposeTrade:output_type -> inbox.v1.Trade
+	26, // 42: inbox.v1.InboxService.ListReceivedTrades:output_type -> inbox.v1.ListTradesResponse
+	26, // 43: inbox.v1.InboxService.ListSentTrades:output_type -> inbox.v1.ListTradesResponse
+	23, // 44: inbox.v1.InboxService.AcceptTrade:output_type -> inbox.v1.Trade
+	23, // 45: inbox.v1.InboxService.CancelTrade:output_type -> inbox.v1.Trade
+	30, // [30:46] is the sub-list for method output_type
+	14, // [14:30] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_social_inbox_v1_inbox_proto_init() }
@@ -1531,7 +1978,7 @@ func file_social_inbox_v1_inbox_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_social_inbox_v1_inbox_proto_rawDesc), len(file_social_inbox_v1_inbox_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   21,
+			NumMessages:   27,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

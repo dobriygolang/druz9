@@ -875,6 +875,196 @@ func (x *HubMerchantPick) GetActionUrl() string {
 	return ""
 }
 
+type GetRegionContextRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RegionId      string                 `protobuf:"bytes,1,opt,name=region_id,json=regionId,proto3" json:"region_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetRegionContextRequest) Reset() {
+	*x = GetRegionContextRequest{}
+	mi := &file_core_hub_v1_hub_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetRegionContextRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRegionContextRequest) ProtoMessage() {}
+
+func (x *GetRegionContextRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_core_hub_v1_hub_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRegionContextRequest.ProtoReflect.Descriptor instead.
+func (*GetRegionContextRequest) Descriptor() ([]byte, []int) {
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetRegionContextRequest) GetRegionId() string {
+	if x != nil {
+		return x.RegionId
+	}
+	return ""
+}
+
+type RegionContext struct {
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	RegionId    string                 `protobuf:"bytes,1,opt,name=region_id,json=regionId,proto3" json:"region_id,omitempty"`
+	Title       string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`             // localized
+	Description string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"` // localized; 1–2 sentences
+	// Counts surface as small badges in the panel.
+	ActiveGuilds int32 `protobuf:"varint,4,opt,name=active_guilds,json=activeGuilds,proto3" json:"active_guilds,omitempty"`
+	OpenEvents   int32 `protobuf:"varint,5,opt,name=open_events,json=openEvents,proto3" json:"open_events,omitempty"`
+	Podcasts     int32 `protobuf:"varint,6,opt,name=podcasts,proto3" json:"podcasts,omitempty"`
+	// CTA links the frontend can render as buttons.
+	Links         []*RegionLink `protobuf:"bytes,7,rep,name=links,proto3" json:"links,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RegionContext) Reset() {
+	*x = RegionContext{}
+	mi := &file_core_hub_v1_hub_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegionContext) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegionContext) ProtoMessage() {}
+
+func (x *RegionContext) ProtoReflect() protoreflect.Message {
+	mi := &file_core_hub_v1_hub_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegionContext.ProtoReflect.Descriptor instead.
+func (*RegionContext) Descriptor() ([]byte, []int) {
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *RegionContext) GetRegionId() string {
+	if x != nil {
+		return x.RegionId
+	}
+	return ""
+}
+
+func (x *RegionContext) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *RegionContext) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *RegionContext) GetActiveGuilds() int32 {
+	if x != nil {
+		return x.ActiveGuilds
+	}
+	return 0
+}
+
+func (x *RegionContext) GetOpenEvents() int32 {
+	if x != nil {
+		return x.OpenEvents
+	}
+	return 0
+}
+
+func (x *RegionContext) GetPodcasts() int32 {
+	if x != nil {
+		return x.Podcasts
+	}
+	return 0
+}
+
+func (x *RegionContext) GetLinks() []*RegionLink {
+	if x != nil {
+		return x.Links
+	}
+	return nil
+}
+
+type RegionLink struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Label         string                 `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"`
+	ActionUrl     string                 `protobuf:"bytes,2,opt,name=action_url,json=actionUrl,proto3" json:"action_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RegionLink) Reset() {
+	*x = RegionLink{}
+	mi := &file_core_hub_v1_hub_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegionLink) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegionLink) ProtoMessage() {}
+
+func (x *RegionLink) ProtoReflect() protoreflect.Message {
+	mi := &file_core_hub_v1_hub_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegionLink.ProtoReflect.Descriptor instead.
+func (*RegionLink) Descriptor() ([]byte, []int) {
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *RegionLink) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *RegionLink) GetActionUrl() string {
+	if x != nil {
+		return x.ActionUrl
+	}
+	return ""
+}
+
 var File_core_hub_v1_hub_proto protoreflect.FileDescriptor
 
 const file_core_hub_v1_hub_proto_rawDesc = "" +
@@ -952,10 +1142,27 @@ const file_core_hub_v1_hub_proto_rawDesc = "" +
 	"\vprice_label\x18\x04 \x01(\tR\n" +
 	"priceLabel\x12\x1d\n" +
 	"\n" +
-	"action_url\x18\x05 \x01(\tR\tactionUrl2r\n" +
+	"action_url\x18\x05 \x01(\tR\tactionUrl\"6\n" +
+	"\x17GetRegionContextRequest\x12\x1b\n" +
+	"\tregion_id\x18\x01 \x01(\tR\bregionId\"\xf0\x01\n" +
+	"\rRegionContext\x12\x1b\n" +
+	"\tregion_id\x18\x01 \x01(\tR\bregionId\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12#\n" +
+	"\ractive_guilds\x18\x04 \x01(\x05R\factiveGuilds\x12\x1f\n" +
+	"\vopen_events\x18\x05 \x01(\x05R\n" +
+	"openEvents\x12\x1a\n" +
+	"\bpodcasts\x18\x06 \x01(\x05R\bpodcasts\x12(\n" +
+	"\x05links\x18\a \x03(\v2\x12.hub.v1.RegionLinkR\x05links\"A\n" +
+	"\n" +
+	"RegionLink\x12\x14\n" +
+	"\x05label\x18\x01 \x01(\tR\x05label\x12\x1d\n" +
+	"\n" +
+	"action_url\x18\x02 \x01(\tR\tactionUrl2\xe7\x01\n" +
 	"\n" +
 	"HubService\x12d\n" +
-	"\vGetOverview\x12\x1a.hub.v1.GetOverviewRequest\x1a\x1b.hub.v1.GetOverviewResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/hub/overviewB\x17Z\x15api/pkg/api/hub/v1;v1b\x06proto3"
+	"\vGetOverview\x12\x1a.hub.v1.GetOverviewRequest\x1a\x1b.hub.v1.GetOverviewResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/hub/overview\x12s\n" +
+	"\x10GetRegionContext\x12\x1f.hub.v1.GetRegionContextRequest\x1a\x15.hub.v1.RegionContext\"'\x82\xd3\xe4\x93\x02!\x12\x1f/api/v1/hub/regions/{region_id}B\x17Z\x15api/pkg/api/hub/v1;v1b\x06proto3"
 
 var (
 	file_core_hub_v1_hub_proto_rawDescOnce sync.Once
@@ -969,20 +1176,23 @@ func file_core_hub_v1_hub_proto_rawDescGZIP() []byte {
 	return file_core_hub_v1_hub_proto_rawDescData
 }
 
-var file_core_hub_v1_hub_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_core_hub_v1_hub_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_core_hub_v1_hub_proto_goTypes = []any{
-	(*GetOverviewRequest)(nil),  // 0: hub.v1.GetOverviewRequest
-	(*GetOverviewResponse)(nil), // 1: hub.v1.GetOverviewResponse
-	(*HubSeason)(nil),           // 2: hub.v1.HubSeason
-	(*HubPlayer)(nil),           // 3: hub.v1.HubPlayer
-	(*HubAchievements)(nil),     // 4: hub.v1.HubAchievements
-	(*HubDailyMission)(nil),     // 5: hub.v1.HubDailyMission
-	(*HubQuest)(nil),            // 6: hub.v1.HubQuest
-	(*HubArena)(nil),            // 7: hub.v1.HubArena
-	(*HubArenaItem)(nil),        // 8: hub.v1.HubArenaItem
-	(*HubEvent)(nil),            // 9: hub.v1.HubEvent
-	(*HubGuild)(nil),            // 10: hub.v1.HubGuild
-	(*HubMerchantPick)(nil),     // 11: hub.v1.HubMerchantPick
+	(*GetOverviewRequest)(nil),      // 0: hub.v1.GetOverviewRequest
+	(*GetOverviewResponse)(nil),     // 1: hub.v1.GetOverviewResponse
+	(*HubSeason)(nil),               // 2: hub.v1.HubSeason
+	(*HubPlayer)(nil),               // 3: hub.v1.HubPlayer
+	(*HubAchievements)(nil),         // 4: hub.v1.HubAchievements
+	(*HubDailyMission)(nil),         // 5: hub.v1.HubDailyMission
+	(*HubQuest)(nil),                // 6: hub.v1.HubQuest
+	(*HubArena)(nil),                // 7: hub.v1.HubArena
+	(*HubArenaItem)(nil),            // 8: hub.v1.HubArenaItem
+	(*HubEvent)(nil),                // 9: hub.v1.HubEvent
+	(*HubGuild)(nil),                // 10: hub.v1.HubGuild
+	(*HubMerchantPick)(nil),         // 11: hub.v1.HubMerchantPick
+	(*GetRegionContextRequest)(nil), // 12: hub.v1.GetRegionContextRequest
+	(*RegionContext)(nil),           // 13: hub.v1.RegionContext
+	(*RegionLink)(nil),              // 14: hub.v1.RegionLink
 }
 var file_core_hub_v1_hub_proto_depIdxs = []int32{
 	3,  // 0: hub.v1.GetOverviewResponse.player:type_name -> hub.v1.HubPlayer
@@ -995,13 +1205,16 @@ var file_core_hub_v1_hub_proto_depIdxs = []int32{
 	2,  // 7: hub.v1.GetOverviewResponse.active_season:type_name -> hub.v1.HubSeason
 	4,  // 8: hub.v1.HubPlayer.achievements:type_name -> hub.v1.HubAchievements
 	8,  // 9: hub.v1.HubArena.items:type_name -> hub.v1.HubArenaItem
-	0,  // 10: hub.v1.HubService.GetOverview:input_type -> hub.v1.GetOverviewRequest
-	1,  // 11: hub.v1.HubService.GetOverview:output_type -> hub.v1.GetOverviewResponse
-	11, // [11:12] is the sub-list for method output_type
-	10, // [10:11] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	14, // 10: hub.v1.RegionContext.links:type_name -> hub.v1.RegionLink
+	0,  // 11: hub.v1.HubService.GetOverview:input_type -> hub.v1.GetOverviewRequest
+	12, // 12: hub.v1.HubService.GetRegionContext:input_type -> hub.v1.GetRegionContextRequest
+	1,  // 13: hub.v1.HubService.GetOverview:output_type -> hub.v1.GetOverviewResponse
+	13, // 14: hub.v1.HubService.GetRegionContext:output_type -> hub.v1.RegionContext
+	13, // [13:15] is the sub-list for method output_type
+	11, // [11:13] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_core_hub_v1_hub_proto_init() }
@@ -1015,7 +1228,7 @@ func file_core_hub_v1_hub_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_core_hub_v1_hub_proto_rawDesc), len(file_core_hub_v1_hub_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

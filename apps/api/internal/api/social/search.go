@@ -2,6 +2,7 @@ package social
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	klog "github.com/go-kratos/kratos/v2/log"
@@ -14,7 +15,7 @@ import (
 func (i *Implementation) SearchUsers(ctx context.Context, req *v1.SearchUsersRequest) (*v1.SearchUsersResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	hits, err := i.service.SearchUsers(ctx, user.ID, req.GetQuery(), req.GetLimit())
 	if err != nil {

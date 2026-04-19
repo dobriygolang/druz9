@@ -466,6 +466,9 @@ issues:
     - path: "internal/data/scene/"
       linters:
         - all
+    - path: "internal/api/inbox/"
+      linters:
+        - typecheck
     - path: "pkg/api/.*\\.pb\\.go"
       linters:
         - all

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Panel, RpgButton, Badge, Bar, PageHeader } from '@/shared/ui/pixel'
+import { Tour } from '@/features/Tour/ui/Tour'
 import { Trophy, Sword, Banner, Statue, Chest, SpiritOrb } from '@/shared/ui/sprites'
 import { eventApi } from '@/features/Event/api/eventApi'
 import type { Event as ApiEvent } from '@/features/Event/api/eventApi'
@@ -110,6 +111,13 @@ export function EventsPage() {
 
   return (
     <>
+      <Tour
+        tourId="events_intro"
+        steps={[
+          { selector: '[data-tour=events-list]', title: 'Лента событий', body: 'Все события проекта: книжный клуб, рейды, турниры. Клик — открыть карточку.' },
+          { selector: '[data-tour=events-create]', title: 'Создать событие', body: 'Если состоишь в гильдии — соберёшь приватное событие для своих. Иначе пригласишь публично.' },
+        ]}
+      />
       <PageHeader
         eyebrow={t('eventsHub.eyebrow')}
         title={t('eventsHub.title')}

@@ -2,6 +2,7 @@ package friend_challenge
 
 import (
 	"context"
+	"fmt"
 	goerr "errors"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -15,7 +16,7 @@ import (
 func (i *Implementation) SendChallenge(ctx context.Context, req *v1.SendChallengeRequest) (*v1.SendChallengeResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	ch, err := i.service.SendChallenge(
 		ctx, user.ID,

@@ -37,7 +37,7 @@ func (r *Repo) ListActiveTasks(ctx context.Context) ([]*model.InterviewPrepTask,
 		}
 		items = append(items, item)
 	}
-	return items, rows.Err()
+	return items, fmt.Errorf("list interview prep tasks: %w", rows.Err())
 }
 
 func (r *Repo) GetTask(ctx context.Context, taskID uuid.UUID) (*model.InterviewPrepTask, error) {
@@ -131,7 +131,7 @@ func (r *Repo) ListTasksFiltered(ctx context.Context, companyTag, prepTypeFilter
 		}
 		items = append(items, item)
 	}
-	return items, rows.Err()
+	return items, fmt.Errorf("list interview prep tasks with pool count: %w", rows.Err())
 }
 
 func (r *Repo) CreateTask(ctx context.Context, task *model.InterviewPrepTask) error {

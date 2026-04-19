@@ -12,6 +12,14 @@ service HubService {
       get: "/api/v1/hub/overview"
     };
   }
+
+  // ADR-002 — Region detail card on the SVG atlas. The region_id is one
+  // of the curated atlas-region slugs (north_peaks, capital_market, …).
+  // Server returns localized title/body + counts of nearby resources
+  // (open events, active guilds, etc.) the frontend renders inline.
+  rpc GetRegionContext(GetRegionContextRequest) returns (RegionContext) {
+    option (google.api.http) = { get: "/api/v1/hub/regions/{region_id}" };
+  }
 }
 
 message GetOverviewRequest {}
@@ -104,4 +112,27 @@ message HubMerchantPick {
   string rarity = 3;
   string price_label = 4;
   string action_url = 5;
+}
+
+// ── ADR-002 region context ───────────────────────────────────────────────
+
+message GetRegionContextRequest {
+  string region_id = 1;
+}
+
+message RegionContext {
+  string region_id   = 1;
+  string title       = 2;  // localized
+  string description = 3;  // localized; 1–2 sentences
+  // Counts surface as small badges in the panel.
+  int32 active_guilds = 4;
+  int32 open_events   = 5;
+  int32 podcasts      = 6;
+  // CTA links the frontend can render as buttons.
+  repeated RegionLink links = 7;
+}
+
+message RegionLink {
+  string label      = 1;
+  string action_url = 2;
 }

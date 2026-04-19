@@ -151,7 +151,7 @@ func scanMockSession(s scanner) (*model.InterviewPrepMockSession, error) {
 		&item.CreatedAt,
 		&item.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan mock session: %w", err)
 	}
 	item.Status = model.InterviewPrepMockSessionStatusFromString(status)
 	return &item, nil
@@ -184,7 +184,7 @@ func scanMockStage(s scanner) (*model.InterviewPrepMockStage, error) {
 		&item.CreatedAt,
 		&item.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan mock stage: %w", err)
 	}
 	item.Kind = model.InterviewPrepMockStageKindFromRoundType(item.RoundType)
 	item.Status = model.InterviewPrepMockStageStatusFromString(status)
@@ -206,7 +206,7 @@ func scanMockQuestionResult(s scanner) (*model.InterviewPrepMockQuestionResult, 
 		&item.CreatedAt,
 		&item.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan mock question result: %w", err)
 	}
 	questionKey = fmt.Sprintf("followup-%d", item.Position)
 	item.QuestionKey = questionKey
@@ -227,7 +227,7 @@ func scanMockBlueprintSummary(s scanner) (*model.InterviewMockBlueprintSummary, 
 		&item.PublicAliasSlugs,
 		&item.PublicAliasNames,
 	); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan mock blueprint summary: %w", err)
 	}
 	return &item, nil
 }
@@ -252,7 +252,7 @@ func scanBlueprintRound(s scanner) (*model.InterviewBlueprintRound, error) {
 		&item.CreatedAt,
 		&item.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan blueprint round: %w", err)
 	}
 	return &item, nil
 }

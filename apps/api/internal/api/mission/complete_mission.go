@@ -2,6 +2,7 @@ package mission
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -12,7 +13,7 @@ import (
 func (i *Implementation) CompleteMission(ctx context.Context, req *v1.CompleteMissionRequest) (*v1.CompleteMissionResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if req.GetMissionKey() == "" {
 		return nil, errors.BadRequest("INVALID_MISSION_KEY", "mission_key is required")

@@ -209,7 +209,7 @@ func (r *Repo) ListGifts(ctx context.Context, side string, userID uuid.UUID, sta
 		}
 		out = append(out, g)
 	}
-	return out, rows.Err()
+	return out, fmt.Errorf("list gifts: %w", rows.Err())
 }
 
 const giftSelectSQL = `

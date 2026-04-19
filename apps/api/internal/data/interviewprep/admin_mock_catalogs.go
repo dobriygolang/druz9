@@ -128,7 +128,10 @@ func (r *Repo) ListMockCompanyPresets(ctx context.Context) ([]*model.InterviewPr
 		item.StageKind = model.InterviewPrepMockStageKindFromString(kind)
 		items = append(items, &item)
 	}
-	return items, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate mock company presets: %w", err)
+	}
+	return items, nil
 }
 
 func (r *Repo) GetAvailableCompanies(ctx context.Context) ([]string, error) {

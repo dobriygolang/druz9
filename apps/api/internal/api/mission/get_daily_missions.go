@@ -2,6 +2,7 @@ package mission
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -13,7 +14,7 @@ import (
 func (i *Implementation) GetDailyMissions(ctx context.Context, _ *v1.GetDailyMissionsRequest) (*v1.GetDailyMissionsResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	result, err := i.service.GetDailyMissions(ctx, user.ID)

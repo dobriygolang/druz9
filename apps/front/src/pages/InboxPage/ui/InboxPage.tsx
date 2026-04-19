@@ -49,7 +49,7 @@ function relTime(iso: string): string {
   return new Date(iso).toLocaleDateString()
 }
 
-type Tab = 'messages' | 'friends'
+type Tab = 'messages' | 'friends' | 'gifts'
 
 export function InboxPage() {
   const { t } = useTranslation()
@@ -58,7 +58,9 @@ export function InboxPage() {
   // Tab lives in the query string so /social → /inbox?tab=friends works.
   const urlTab = useMemo<Tab>(() => {
     const q = new URLSearchParams(location.search).get('tab')
-    return q === 'friends' ? 'friends' : 'messages'
+    if (q === 'friends') return 'friends'
+    if (q === 'gifts') return 'gifts'
+    return 'messages'
   }, [location.search])
   const [tab, setTab] = useState<Tab>(urlTab)
   useEffect(() => { setTab(urlTab) }, [urlTab])
@@ -173,8 +175,8 @@ export function InboxPage() {
   const switchTab = (next: Tab) => {
     setTab(next)
     const params = new URLSearchParams(location.search)
-    if (next === 'friends') params.set('tab', 'friends')
-    else params.delete('tab')
+    if (next === 'messages') params.delete('tab')
+    else params.set('tab', next)
     navigate({ pathname: '/inbox', search: params.toString() }, { replace: true })
   }
 
@@ -216,9 +218,17 @@ export function InboxPage() {
         >
           {t('inbox.tab.friends')}
         </div>
+        <div
+          className={`rpg-tab ${tab === 'gifts' ? 'rpg-tab--active' : ''}`}
+          onClick={() => switchTab('gifts')}
+        >
+          {t('inbox.tab.gifts', { defaultValue: 'Подарки' })}
+        </div>
       </div>
 
-      {tab === 'friends' ? (
+      {tab === 'gifts' ? (
+        <GiftsPanel />
+      ) : tab === 'friends' ? (
         <FriendsPanel />
       ) : (
       <div
@@ -343,6 +353,99 @@ export function InboxPage() {
       </div>
       )}
     </>
+  )
+}
+
+// ---------- Gifts panel (#5 — replaces text DMs with item exchanges) ----------
+
+function GiftsPanel() {
+  const [side, setSide] = useState<'received' | 'sent'>('received')
+  const [gifts, setGifts] = useState<import('@/features/Inbox/api/giftsApi').Gift[]>([])
+  const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState<string | null>(null)
+
+  const reload = useCallback(async () => {
+    setLoading(true)
+    const { giftsApi } = await import('@/features/Inbox/api/giftsApi')
+    const list = side === 'received' ? await giftsApi.listReceived() : await giftsApi.listSent()
+    setGifts(list)
+    setLoading(false)
+  }, [side])
+
+  useEffect(() => { void reload().catch(() => setLoading(false)) }, [reload])
+
+  const decide = async (giftId: string, action: 'claim' | 'decline') => {
+    setBusy(giftId)
+    try {
+      const { giftsApi } = await import('@/features/Inbox/api/giftsApi')
+      if (action === 'claim') await giftsApi.claim(giftId)
+      else await giftsApi.decline(giftId)
+      await reload()
+    } finally { setBusy(null) }
+  }
+
+  return (
+    <Panel style={{ padding: 14 }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+        <RpgButton size="sm" variant={side === 'received' ? 'primary' : 'default'} onClick={() => setSide('received')}>
+          Получено
+        </RpgButton>
+        <RpgButton size="sm" variant={side === 'sent' ? 'primary' : 'default'} onClick={() => setSide('sent')}>
+          Отправлено
+        </RpgButton>
+      </div>
+      {loading && <div style={{ color: 'var(--ink-2)' }}>Загрузка…</div>}
+      {!loading && gifts.length === 0 && (
+        <div style={{ color: 'var(--ink-2)', fontSize: 13 }}>
+          {side === 'received'
+            ? 'Подарков пока нет — друзья пришлют что-нибудь, как только поймут, что эта вкладка существует.'
+            : 'Ты ещё никому ничего не отправлял. Зайди на профиль друга и нажми «Подарить».'}
+        </div>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {gifts.map((g) => (
+          <div key={g.id} style={{
+            display: 'grid',
+            gridTemplateColumns: '60px 1fr auto',
+            gap: 12,
+            alignItems: 'center',
+            padding: 12,
+            border: '2px solid var(--ink-3)',
+            background: g.status === 'pending' ? 'var(--parch-1)' : 'var(--parch-0)',
+          }}>
+            {g.itemIconRef ? (
+              <img src={g.itemIconRef} alt="" style={{ width: 56, height: 56, objectFit: 'contain' }} />
+            ) : (
+              <div style={{ width: 56, height: 56, background: 'var(--parch-3)', border: '2px solid var(--ink-0)' }} />
+            )}
+            <div>
+              <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 14 }}>
+                {g.itemName} {' '}
+                <span style={{ fontSize: 11, color: 'var(--ink-2)' }}>
+                  · {side === 'received' ? `от ${g.senderName}` : `→ recipient`}
+                </span>
+              </div>
+              {g.note && <div style={{ fontSize: 12, color: 'var(--ink-2)', marginTop: 4 }}>«{g.note}»</div>}
+              <div style={{ fontSize: 10, color: 'var(--ink-3)', marginTop: 4 }}>
+                {g.status === 'pending' && '⌛ ожидает решения'}
+                {g.status === 'claimed' && '✓ принято'}
+                {g.status === 'declined' && '✕ отклонено'}
+              </div>
+            </div>
+            {side === 'received' && g.status === 'pending' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <RpgButton size="sm" variant="primary" disabled={busy === g.id} onClick={() => decide(g.id, 'claim')}>
+                  Принять
+                </RpgButton>
+                <RpgButton size="sm" disabled={busy === g.id} onClick={() => decide(g.id, 'decline')}>
+                  Отклонить
+                </RpgButton>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </Panel>
   )
 }
 

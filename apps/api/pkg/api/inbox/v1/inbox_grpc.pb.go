@@ -30,6 +30,11 @@ const (
 	InboxService_ListSentGifts_FullMethodName      = "/inbox.v1.InboxService/ListSentGifts"
 	InboxService_ClaimGift_FullMethodName          = "/inbox.v1.InboxService/ClaimGift"
 	InboxService_DeclineGift_FullMethodName        = "/inbox.v1.InboxService/DeclineGift"
+	InboxService_ProposeTrade_FullMethodName       = "/inbox.v1.InboxService/ProposeTrade"
+	InboxService_ListReceivedTrades_FullMethodName = "/inbox.v1.InboxService/ListReceivedTrades"
+	InboxService_ListSentTrades_FullMethodName     = "/inbox.v1.InboxService/ListSentTrades"
+	InboxService_AcceptTrade_FullMethodName        = "/inbox.v1.InboxService/AcceptTrade"
+	InboxService_CancelTrade_FullMethodName        = "/inbox.v1.InboxService/CancelTrade"
 )
 
 // InboxServiceClient is the client API for InboxService service.
@@ -66,6 +71,12 @@ type InboxServiceClient interface {
 	ListSentGifts(ctx context.Context, in *ListSentGiftsRequest, opts ...grpc.CallOption) (*ListGiftsResponse, error)
 	ClaimGift(ctx context.Context, in *ClaimGiftRequest, opts ...grpc.CallOption) (*Gift, error)
 	DeclineGift(ctx context.Context, in *DeclineGiftRequest, opts ...grpc.CallOption) (*Gift, error)
+	// ── Trades (#5 — bidirectional swap) ────────────────────────────────
+	ProposeTrade(ctx context.Context, in *ProposeTradeRequest, opts ...grpc.CallOption) (*Trade, error)
+	ListReceivedTrades(ctx context.Context, in *ListTradesRequest, opts ...grpc.CallOption) (*ListTradesResponse, error)
+	ListSentTrades(ctx context.Context, in *ListTradesRequest, opts ...grpc.CallOption) (*ListTradesResponse, error)
+	AcceptTrade(ctx context.Context, in *AcceptTradeRequest, opts ...grpc.CallOption) (*Trade, error)
+	CancelTrade(ctx context.Context, in *CancelTradeRequest, opts ...grpc.CallOption) (*Trade, error)
 }
 
 type inboxServiceClient struct {
@@ -186,6 +197,56 @@ func (c *inboxServiceClient) DeclineGift(ctx context.Context, in *DeclineGiftReq
 	return out, nil
 }
 
+func (c *inboxServiceClient) ProposeTrade(ctx context.Context, in *ProposeTradeRequest, opts ...grpc.CallOption) (*Trade, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Trade)
+	err := c.cc.Invoke(ctx, InboxService_ProposeTrade_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *inboxServiceClient) ListReceivedTrades(ctx context.Context, in *ListTradesRequest, opts ...grpc.CallOption) (*ListTradesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListTradesResponse)
+	err := c.cc.Invoke(ctx, InboxService_ListReceivedTrades_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *inboxServiceClient) ListSentTrades(ctx context.Context, in *ListTradesRequest, opts ...grpc.CallOption) (*ListTradesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListTradesResponse)
+	err := c.cc.Invoke(ctx, InboxService_ListSentTrades_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *inboxServiceClient) AcceptTrade(ctx context.Context, in *AcceptTradeRequest, opts ...grpc.CallOption) (*Trade, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Trade)
+	err := c.cc.Invoke(ctx, InboxService_AcceptTrade_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *inboxServiceClient) CancelTrade(ctx context.Context, in *CancelTradeRequest, opts ...grpc.CallOption) (*Trade, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Trade)
+	err := c.cc.Invoke(ctx, InboxService_CancelTrade_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InboxServiceServer is the server API for InboxService service.
 // All implementations must embed UnimplementedInboxServiceServer
 // for forward compatibility.
@@ -220,6 +281,12 @@ type InboxServiceServer interface {
 	ListSentGifts(context.Context, *ListSentGiftsRequest) (*ListGiftsResponse, error)
 	ClaimGift(context.Context, *ClaimGiftRequest) (*Gift, error)
 	DeclineGift(context.Context, *DeclineGiftRequest) (*Gift, error)
+	// ── Trades (#5 — bidirectional swap) ────────────────────────────────
+	ProposeTrade(context.Context, *ProposeTradeRequest) (*Trade, error)
+	ListReceivedTrades(context.Context, *ListTradesRequest) (*ListTradesResponse, error)
+	ListSentTrades(context.Context, *ListTradesRequest) (*ListTradesResponse, error)
+	AcceptTrade(context.Context, *AcceptTradeRequest) (*Trade, error)
+	CancelTrade(context.Context, *CancelTradeRequest) (*Trade, error)
 	mustEmbedUnimplementedInboxServiceServer()
 }
 
@@ -262,6 +329,21 @@ func (UnimplementedInboxServiceServer) ClaimGift(context.Context, *ClaimGiftRequ
 }
 func (UnimplementedInboxServiceServer) DeclineGift(context.Context, *DeclineGiftRequest) (*Gift, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeclineGift not implemented")
+}
+func (UnimplementedInboxServiceServer) ProposeTrade(context.Context, *ProposeTradeRequest) (*Trade, error) {
+	return nil, status.Error(codes.Unimplemented, "method ProposeTrade not implemented")
+}
+func (UnimplementedInboxServiceServer) ListReceivedTrades(context.Context, *ListTradesRequest) (*ListTradesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListReceivedTrades not implemented")
+}
+func (UnimplementedInboxServiceServer) ListSentTrades(context.Context, *ListTradesRequest) (*ListTradesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListSentTrades not implemented")
+}
+func (UnimplementedInboxServiceServer) AcceptTrade(context.Context, *AcceptTradeRequest) (*Trade, error) {
+	return nil, status.Error(codes.Unimplemented, "method AcceptTrade not implemented")
+}
+func (UnimplementedInboxServiceServer) CancelTrade(context.Context, *CancelTradeRequest) (*Trade, error) {
+	return nil, status.Error(codes.Unimplemented, "method CancelTrade not implemented")
 }
 func (UnimplementedInboxServiceServer) mustEmbedUnimplementedInboxServiceServer() {}
 func (UnimplementedInboxServiceServer) testEmbeddedByValue()                      {}
@@ -482,6 +564,96 @@ func _InboxService_DeclineGift_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _InboxService_ProposeTrade_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProposeTradeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InboxServiceServer).ProposeTrade(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InboxService_ProposeTrade_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InboxServiceServer).ProposeTrade(ctx, req.(*ProposeTradeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InboxService_ListReceivedTrades_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTradesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InboxServiceServer).ListReceivedTrades(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InboxService_ListReceivedTrades_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InboxServiceServer).ListReceivedTrades(ctx, req.(*ListTradesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InboxService_ListSentTrades_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTradesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InboxServiceServer).ListSentTrades(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InboxService_ListSentTrades_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InboxServiceServer).ListSentTrades(ctx, req.(*ListTradesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InboxService_AcceptTrade_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AcceptTradeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InboxServiceServer).AcceptTrade(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InboxService_AcceptTrade_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InboxServiceServer).AcceptTrade(ctx, req.(*AcceptTradeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InboxService_CancelTrade_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelTradeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InboxServiceServer).CancelTrade(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InboxService_CancelTrade_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InboxServiceServer).CancelTrade(ctx, req.(*CancelTradeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // InboxService_ServiceDesc is the grpc.ServiceDesc for InboxService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -532,6 +704,26 @@ var InboxService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeclineGift",
 			Handler:    _InboxService_DeclineGift_Handler,
+		},
+		{
+			MethodName: "ProposeTrade",
+			Handler:    _InboxService_ProposeTrade_Handler,
+		},
+		{
+			MethodName: "ListReceivedTrades",
+			Handler:    _InboxService_ListReceivedTrades_Handler,
+		},
+		{
+			MethodName: "ListSentTrades",
+			Handler:    _InboxService_ListSentTrades_Handler,
+		},
+		{
+			MethodName: "AcceptTrade",
+			Handler:    _InboxService_AcceptTrade_Handler,
+		},
+		{
+			MethodName: "CancelTrade",
+			Handler:    _InboxService_CancelTrade_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

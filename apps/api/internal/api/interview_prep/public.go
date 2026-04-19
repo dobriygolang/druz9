@@ -3,6 +3,7 @@ package interview_prep
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -19,7 +20,7 @@ func (i *Implementation) ListTasks(ctx context.Context, req *v1.ListTasksRequest
 	_ = req
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	tasks, err := i.service.ListTasks(ctx, user)
@@ -37,7 +38,7 @@ func (i *Implementation) ListTasks(ctx context.Context, req *v1.ListTasksRequest
 func (i *Implementation) StartSession(ctx context.Context, req *v1.StartSessionRequest) (*v1.SessionEnvelope, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	taskID, err := parseUUID(req.GetTaskId(), "INVALID_TASK_ID", "invalid task id")
 	if err != nil {
@@ -54,7 +55,7 @@ func (i *Implementation) StartSession(ctx context.Context, req *v1.StartSessionR
 func (i *Implementation) GetSession(ctx context.Context, req *v1.GetSessionRequest) (*v1.SessionEnvelope, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
@@ -71,7 +72,7 @@ func (i *Implementation) GetSession(ctx context.Context, req *v1.GetSessionReque
 func (i *Implementation) SubmitSession(ctx context.Context, req *v1.SubmitSessionRequest) (*v1.SubmitSessionResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
@@ -99,7 +100,7 @@ func (i *Implementation) SubmitSession(ctx context.Context, req *v1.SubmitSessio
 func (i *Implementation) AnswerQuestion(ctx context.Context, req *v1.AnswerQuestionRequest) (*v1.AnswerQuestionResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
@@ -124,7 +125,7 @@ func (i *Implementation) AnswerQuestion(ctx context.Context, req *v1.AnswerQuest
 func (i *Implementation) ReviewSystemDesign(ctx context.Context, req *v1.ReviewSystemDesignRequest) (*v1.ReviewSystemDesignResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
@@ -173,7 +174,7 @@ func (i *Implementation) ListMockBlueprints(ctx context.Context, req *v1.ListMoc
 func (i *Implementation) StartMockSession(ctx context.Context, req *v1.StartMockSessionRequest) (*v1.MockSessionEnvelope, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	session, err := i.service.StartMockSession(ctx, user, req.GetCompanyTag(), req.GetProgramSlug())
 	if err != nil {
@@ -185,7 +186,7 @@ func (i *Implementation) StartMockSession(ctx context.Context, req *v1.StartMock
 func (i *Implementation) GetMockSession(ctx context.Context, req *v1.GetMockSessionRequest) (*v1.MockSessionEnvelope, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
@@ -201,7 +202,7 @@ func (i *Implementation) GetMockSession(ctx context.Context, req *v1.GetMockSess
 func (i *Implementation) SubmitMockStage(ctx context.Context, req *v1.SubmitMockStageRequest) (*v1.SubmitMockStageResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
@@ -239,7 +240,7 @@ func (i *Implementation) SubmitMockStage(ctx context.Context, req *v1.SubmitMock
 func (i *Implementation) ReviewMockSystemDesign(ctx context.Context, req *v1.ReviewMockSystemDesignRequest) (*v1.ReviewMockSystemDesignResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
@@ -271,7 +272,7 @@ func (i *Implementation) ReviewMockSystemDesign(ctx context.Context, req *v1.Rev
 func (i *Implementation) AnswerMockQuestion(ctx context.Context, req *v1.AnswerMockQuestionRequest) (*v1.AnswerMockQuestionResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {

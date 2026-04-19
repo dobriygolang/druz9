@@ -315,7 +315,8 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		notificationSettings:   notificationservice.NewSettings(notifSender),
 		challengeService:       challengeservice.New(challengeServiceDomain),
 		inboxService: inboxservice.New(inboxServiceDomain, storage.profileRepo).
-			WithGiftsRepo(inboxGiftsAdapter{repo: storage.inboxRepo}),
+			WithGiftsRepo(inboxGiftsAdapter{repo: storage.inboxRepo}).
+			WithTradesRepo(inboxTradesAdapter{repo: storage.inboxRepo}),
 		friendChallengeService: friendchallengeservice.New(friendChallengeDomain),
 		duelReplayService:      duelreplayservice.New(duelReplayDomain),
 		seasonPassService:      seasonpassservice.New(seasonPassDomain),

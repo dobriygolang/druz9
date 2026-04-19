@@ -2,6 +2,7 @@ package friend_challenge
 
 import (
 	"context"
+	"fmt"
 	goerr "errors"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -14,11 +15,11 @@ import (
 func (i *Implementation) Decline(ctx context.Context, req *v1.DeclineRequest) (*v1.DeclineResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	challengeID, parseErr := apihelpers.ParseUUID(req.GetChallengeId(), "INVALID_CHALLENGE_ID", "challenge_id")
 	if parseErr != nil {
-		return nil, parseErr
+		return nil, fmt.Errorf("parse challenge id: %w", parseErr)
 	}
 	ch, err := i.service.Decline(ctx, user.ID, challengeID)
 	if err != nil {

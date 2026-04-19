@@ -2,6 +2,7 @@ package scene
 
 import (
 	"context"
+	"fmt"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -14,7 +15,7 @@ import (
 func (i *Implementation) UpdateUserRoom(ctx context.Context, req *v1.UpdateUserRoomRequest) (*v1.SceneLayoutResponse, error) {
 	caller, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	ownerID, err := uuid.Parse(req.GetUserId())
 	if err != nil {

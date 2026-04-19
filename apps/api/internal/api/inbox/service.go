@@ -36,6 +36,7 @@ type Implementation struct {
 	service      Service
 	userResolver UserResolver
 	gifts        GiftsRepo
+	trades       TradesRepo
 }
 
 // New constructs the inbox service Implementation.

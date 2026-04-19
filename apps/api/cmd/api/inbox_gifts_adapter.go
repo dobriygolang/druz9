@@ -63,6 +63,75 @@ func mapGift(g *inboxdata.GiftRow) *inboxservice.GiftRowAPI {
 	}
 }
 
+// inboxTradesAdapter satisfies inboxservice.TradesRepo. Mirror of the
+// gifts adapter for the bidirectional swap flow (#5).
+type inboxTradesAdapter struct {
+	repo *inboxdata.Repo
+}
+
+func (a inboxTradesAdapter) ProposeTrade(ctx context.Context, initiatorID, counterpartyID, initiatorItemID, counterpartyItemID uuid.UUID, note string) (*inboxservice.TradeRowAPI, error) {
+	row, err := a.repo.ProposeTrade(ctx, initiatorID, counterpartyID, initiatorItemID, counterpartyItemID, note)
+	return mapTrade(row), translateTradeErr(err)
+}
+func (a inboxTradesAdapter) ListTrades(ctx context.Context, side string, userID uuid.UUID, status string) ([]*inboxservice.TradeRowAPI, error) {
+	rows, err := a.repo.ListTrades(ctx, side, userID, status)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]*inboxservice.TradeRowAPI, len(rows))
+	for i, r := range rows {
+		out[i] = mapTrade(r)
+	}
+	return out, nil
+}
+func (a inboxTradesAdapter) AcceptTrade(ctx context.Context, counterpartyID, tradeID uuid.UUID) (*inboxservice.TradeRowAPI, error) {
+	row, err := a.repo.AcceptTrade(ctx, counterpartyID, tradeID)
+	return mapTrade(row), translateTradeErr(err)
+}
+func (a inboxTradesAdapter) CancelTrade(ctx context.Context, actorID, tradeID uuid.UUID) (*inboxservice.TradeRowAPI, error) {
+	row, err := a.repo.CancelTrade(ctx, actorID, tradeID)
+	return mapTrade(row), translateTradeErr(err)
+}
+
+func mapTrade(t *inboxdata.TradeRow) *inboxservice.TradeRowAPI {
+	if t == nil {
+		return nil
+	}
+	return &inboxservice.TradeRowAPI{
+		ID:                   t.ID.String(),
+		InitiatorID:          t.InitiatorID.String(),
+		InitiatorName:        t.InitiatorName,
+		CounterpartyID:       t.CounterpartyID.String(),
+		InitiatorItemID:      t.InitiatorItemID.String(),
+		InitiatorItemName:    t.InitiatorItemName,
+		InitiatorItemIcon:    t.InitiatorItemIcon,
+		CounterpartyItemID:   t.CounterpartyItemID.String(),
+		CounterpartyItemName: t.CounterpartyItemName,
+		CounterpartyItemIcon: t.CounterpartyItemIcon,
+		Note:                 t.Note,
+		Status:               t.Status,
+		ProposedAt:           t.ProposedAt,
+		DecidedAt:            t.DecidedAt,
+	}
+}
+
+func translateTradeErr(err error) error {
+	if err == nil {
+		return nil
+	}
+	switch {
+	case errors.Is(err, inboxdata.ErrTradeNotFound):
+		return inboxservice.ErrTradeNotFound
+	case errors.Is(err, inboxdata.ErrTradeNotPending):
+		return inboxservice.ErrTradeNotPending
+	case errors.Is(err, inboxdata.ErrTradeItemNotOwned):
+		return inboxservice.ErrTradeItemNotOwned
+	case errors.Is(err, inboxdata.ErrTradeItemEquipped):
+		return inboxservice.ErrTradeItemEquipped
+	}
+	return err
+}
+
 func translateGiftErr(err error) error {
 	if err == nil {
 		return nil

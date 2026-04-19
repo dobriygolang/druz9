@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	HubService_GetOverview_FullMethodName = "/hub.v1.HubService/GetOverview"
+	HubService_GetOverview_FullMethodName      = "/hub.v1.HubService/GetOverview"
+	HubService_GetRegionContext_FullMethodName = "/hub.v1.HubService/GetRegionContext"
 )
 
 // HubServiceClient is the client API for HubService service.
@@ -27,6 +28,11 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type HubServiceClient interface {
 	GetOverview(ctx context.Context, in *GetOverviewRequest, opts ...grpc.CallOption) (*GetOverviewResponse, error)
+	// ADR-002 — Region detail card on the SVG atlas. The region_id is one
+	// of the curated atlas-region slugs (north_peaks, capital_market, …).
+	// Server returns localized title/body + counts of nearby resources
+	// (open events, active guilds, etc.) the frontend renders inline.
+	GetRegionContext(ctx context.Context, in *GetRegionContextRequest, opts ...grpc.CallOption) (*RegionContext, error)
 }
 
 type hubServiceClient struct {
@@ -47,11 +53,26 @@ func (c *hubServiceClient) GetOverview(ctx context.Context, in *GetOverviewReque
 	return out, nil
 }
 
+func (c *hubServiceClient) GetRegionContext(ctx context.Context, in *GetRegionContextRequest, opts ...grpc.CallOption) (*RegionContext, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RegionContext)
+	err := c.cc.Invoke(ctx, HubService_GetRegionContext_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // HubServiceServer is the server API for HubService service.
 // All implementations must embed UnimplementedHubServiceServer
 // for forward compatibility.
 type HubServiceServer interface {
 	GetOverview(context.Context, *GetOverviewRequest) (*GetOverviewResponse, error)
+	// ADR-002 — Region detail card on the SVG atlas. The region_id is one
+	// of the curated atlas-region slugs (north_peaks, capital_market, …).
+	// Server returns localized title/body + counts of nearby resources
+	// (open events, active guilds, etc.) the frontend renders inline.
+	GetRegionContext(context.Context, *GetRegionContextRequest) (*RegionContext, error)
 	mustEmbedUnimplementedHubServiceServer()
 }
 
@@ -64,6 +85,9 @@ type UnimplementedHubServiceServer struct{}
 
 func (UnimplementedHubServiceServer) GetOverview(context.Context, *GetOverviewRequest) (*GetOverviewResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetOverview not implemented")
+}
+func (UnimplementedHubServiceServer) GetRegionContext(context.Context, *GetRegionContextRequest) (*RegionContext, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetRegionContext not implemented")
 }
 func (UnimplementedHubServiceServer) mustEmbedUnimplementedHubServiceServer() {}
 func (UnimplementedHubServiceServer) testEmbeddedByValue()                    {}
@@ -104,6 +128,24 @@ func _HubService_GetOverview_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _HubService_GetRegionContext_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRegionContextRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HubServiceServer).GetRegionContext(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HubService_GetRegionContext_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HubServiceServer).GetRegionContext(ctx, req.(*GetRegionContextRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // HubService_ServiceDesc is the grpc.ServiceDesc for HubService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +156,10 @@ var HubService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetOverview",
 			Handler:    _HubService_GetOverview_Handler,
+		},
+		{
+			MethodName: "GetRegionContext",
+			Handler:    _HubService_GetRegionContext_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

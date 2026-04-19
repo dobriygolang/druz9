@@ -2714,6 +2714,29 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/hub.v1.GetOverviewResponse'
+    /api/v1/hub/regions/{regionId}:
+        get:
+            tags:
+                - HubService
+            description: |-
+                ADR-002 — Region detail card on the SVG atlas. The region_id is one
+                 of the curated atlas-region slugs (north_peaks, capital_market, …).
+                 Server returns localized title/body + counts of nearby resources
+                 (open events, active guilds, etc.) the frontend renders inline.
+            operationId: HubService_GetRegionContext
+            parameters:
+                - name: regionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/hub.v1.RegionContext'
     /api/v1/inbox/gifts:
         post:
             tags:
@@ -2939,6 +2962,107 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/inbox.v1.MarkThreadReadResponse'
+    /api/v1/inbox/trades:
+        post:
+            tags:
+                - InboxService
+            description: ── Trades (#5 — bidirectional swap) ────────────────────────────────
+            operationId: InboxService_ProposeTrade
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/inbox.v1.ProposeTradeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.Trade'
+    /api/v1/inbox/trades/received:
+        get:
+            tags:
+                - InboxService
+            operationId: InboxService_ListReceivedTrades
+            parameters:
+                - name: status
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.ListTradesResponse'
+    /api/v1/inbox/trades/sent:
+        get:
+            tags:
+                - InboxService
+            operationId: InboxService_ListSentTrades
+            parameters:
+                - name: status
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.ListTradesResponse'
+    /api/v1/inbox/trades/{tradeId}/accept:
+        post:
+            tags:
+                - InboxService
+            operationId: InboxService_AcceptTrade
+            parameters:
+                - name: tradeId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/inbox.v1.AcceptTradeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.Trade'
+    /api/v1/inbox/trades/{tradeId}/cancel:
+        post:
+            tags:
+                - InboxService
+            operationId: InboxService_CancelTrade
+            parameters:
+                - name: tradeId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/inbox.v1.CancelTradeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.Trade'
     /api/v1/inbox/unread:
         get:
             tags:
@@ -7172,6 +7296,47 @@ components:
             description: |-
                 HubSeason describes the currently-live season pass (number, title and
                  a short "days left" label). `number == 0` means no active season.
+        hub.v1.RegionContext:
+            type: object
+            properties:
+                regionId:
+                    type: string
+                title:
+                    type: string
+                description:
+                    type: string
+                activeGuilds:
+                    type: integer
+                    description: Counts surface as small badges in the panel.
+                    format: int32
+                openEvents:
+                    type: integer
+                    format: int32
+                podcasts:
+                    type: integer
+                    format: int32
+                links:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/hub.v1.RegionLink'
+                    description: CTA links the frontend can render as buttons.
+        hub.v1.RegionLink:
+            type: object
+            properties:
+                label:
+                    type: string
+                actionUrl:
+                    type: string
+        inbox.v1.AcceptTradeRequest:
+            type: object
+            properties:
+                tradeId:
+                    type: string
+        inbox.v1.CancelTradeRequest:
+            type: object
+            properties:
+                tradeId:
+                    type: string
         inbox.v1.ClaimGiftRequest:
             type: object
             properties:
@@ -7300,6 +7465,13 @@ components:
                 unreadTotal:
                     type: integer
                     format: int32
+        inbox.v1.ListTradesResponse:
+            type: object
+            properties:
+                trades:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/inbox.v1.Trade'
         inbox.v1.MarkThreadReadRequest:
             type: object
             properties:
@@ -7313,6 +7485,17 @@ components:
                 unreadTotal:
                     type: integer
                     format: int32
+        inbox.v1.ProposeTradeRequest:
+            type: object
+            properties:
+                counterpartyId:
+                    type: string
+                initiatorItemId:
+                    type: string
+                counterpartyItemId:
+                    type: string
+                note:
+                    type: string
         inbox.v1.SendGiftRequest:
             type: object
             properties:
@@ -7334,6 +7517,40 @@ components:
             properties:
                 message:
                     $ref: '#/components/schemas/inbox.v1.InboxMessage'
+        inbox.v1.Trade:
+            type: object
+            properties:
+                id:
+                    type: string
+                initiatorId:
+                    type: string
+                initiatorName:
+                    type: string
+                counterpartyId:
+                    type: string
+                initiatorItemId:
+                    type: string
+                initiatorItemName:
+                    type: string
+                initiatorItemIcon:
+                    type: string
+                counterpartyItemId:
+                    type: string
+                counterpartyItemName:
+                    type: string
+                counterpartyItemIcon:
+                    type: string
+                note:
+                    type: string
+                status:
+                    type: string
+                    description: pending | accepted | declined | cancelled | expired
+                proposedAt:
+                    type: string
+                    format: date-time
+                decidedAt:
+                    type: string
+                    format: date-time
         insights.v1.Insight:
             type: object
             properties:

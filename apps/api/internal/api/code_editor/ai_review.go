@@ -3,6 +3,7 @@ package code_editor
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	kratosErrors "github.com/go-kratos/kratos/v2/errors"
 
@@ -25,7 +26,7 @@ func (i *Implementation) AIReview(ctx context.Context, req *v1.AIReviewRequest) 
 		if errors.Is(err, aireview.ErrNotConfigured) {
 			return nil, kratosErrors.ServiceUnavailable("AI_REVIEW_NOT_CONFIGURED", "ai review not configured")
 		}
-		return nil, err
+		return nil, fmt.Errorf("review interview solution: %w", err)
 	}
 	return &v1.AIReviewResponse{
 		Review: &commonv1.InterviewSolutionReview{
