@@ -157,7 +157,10 @@ func (r *Repo) DeleteGuild(ctx context.Context, guildID uuid.UUID) error {
 	if _, err := tx.Exec(ctx, `DELETE FROM guilds WHERE id = $1`, guildID); err != nil {
 		return fmt.Errorf("delete guild: %w", err)
 	}
-	return tx.Commit(ctx)
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("commit delete guild: %w", err)
+	}
+	return nil
 }
 
 func (r *Repo) LeaveGuild(ctx context.Context, guildID, userID uuid.UUID) error {
@@ -196,7 +199,10 @@ func (r *Repo) LeaveGuild(ctx context.Context, guildID, userID uuid.UUID) error 
 		return fmt.Errorf("update member count: %w", err)
 	}
 
-	return tx.Commit(ctx)
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("commit leave guild: %w", err)
+	}
+	return nil
 }
 
 // GetMemberRole returns the caller's role in the guild ("creator", "officer", "member")

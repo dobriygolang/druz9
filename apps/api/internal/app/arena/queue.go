@@ -2,6 +2,7 @@ package arena
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/google/uuid"
@@ -22,7 +23,7 @@ import (
 func (s *Service) GetPlayerStats(ctx context.Context, userID uuid.UUID) (*domain.PlayerStats, error) {
 	stats, err := s.repo.GetPlayerStats(ctx, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get player stats: %w", err)
 	}
 	if stats == nil {
 		return &domain.PlayerStats{
@@ -50,12 +51,12 @@ func (s *Service) ReportPlayerSuspicion(ctx context.Context, matchID uuid.UUID, 
 	}
 
 	if err := s.repo.ReportPlayerSuspicion(ctx, matchID, user.ID, reason); err != nil {
-		return err
+		return fmt.Errorf("report player suspicion: %w", err)
 	}
 
 	player, err := s.repo.GetPlayer(ctx, matchID, user.ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("get player: %w", err)
 	}
 	if player == nil {
 		return nil
@@ -65,7 +66,7 @@ func (s *Service) ReportPlayerSuspicion(ctx context.Context, matchID uuid.UUID, 
 	// Match continues - winner is determined only by accepted or timeout
 	if player.SuspicionCount >= 2 && !player.AntiCheatPenalized {
 		if err := s.repo.ApplyAntiCheatPenalty(ctx, matchID, user.ID, -25, "anti_cheat"); err != nil {
-			return err
+			return fmt.Errorf("apply anti cheat penalty: %w", err)
 		}
 	}
 

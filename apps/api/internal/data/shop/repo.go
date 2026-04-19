@@ -109,11 +109,14 @@ func (r *Repo) ListCategoryCounts(ctx context.Context) (map[model.ItemCategory]i
 		var c int16
 		var n int32
 		if err := rows.Scan(&c, &n); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("scan category count: %w", err)
 		}
 		out[model.ItemCategory(c)] = n
 	}
-	return out, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate category counts: %w", err)
+	}
+	return out, nil
 }
 
 func (r *Repo) GetItemByID(ctx context.Context, id uuid.UUID) (*model.ShopItem, error) {
@@ -176,7 +179,10 @@ func (r *Repo) GetInventory(ctx context.Context, userID uuid.UUID) ([]*model.Sho
 		it.Currency = model.ItemCurrency(currency)
 		result = append(result, owned)
 	}
-	return result, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate inventory: %w", err)
+	}
+	return result, nil
 }
 
 func (r *Repo) IsOwned(ctx context.Context, userID, itemID uuid.UUID) (bool, error) {

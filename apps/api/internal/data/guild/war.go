@@ -139,7 +139,10 @@ func (r *Repo) ListFronts(ctx context.Context, warID uuid.UUID) ([]*FrontRow, er
 		}
 		out = append(out, f)
 	}
-	return out, fmt.Errorf("list fronts rows err: %w", rows.Err())
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("list fronts rows: %w", err)
+	}
+	return out, nil
 }
 
 // Front threshold that flips captured_by to "ours" — chosen small (10)
@@ -228,7 +231,10 @@ func (r *Repo) ListTerritories(ctx context.Context, guildID uuid.UUID) ([]*Terri
 		}
 		out = append(out, t)
 	}
-	return out, fmt.Errorf("list territories rows err: %w", rows.Err())
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("list territories rows: %w", err)
+	}
+	return out, nil
 }
 
 // noRows is a small helper: callers frequently want to know "is this
@@ -264,7 +270,10 @@ func (r *Repo) ListGuildsForWarPairing(ctx context.Context) ([]GuildSeed, error)
 		}
 		out = append(out, g)
 	}
-	return out, fmt.Errorf("list guilds for war pairing rows err: %w", rows.Err())
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("list guilds for war pairing rows: %w", err)
+	}
+	return out, nil
 }
 
 // CreateDraftWar inserts a new guild war in 'draft' phase (not yet visible
@@ -349,13 +358,13 @@ func (r *Repo) ResolveWarsAndAwardTerritories(ctx context.Context) (int64, error
 		var e warEntry
 		if err := rows.Scan(&e.id, &e.guildID); err != nil {
 			rows.Close()
-			return 0, err
+			return 0, fmt.Errorf("scan war entry: %w", err)
 		}
 		wars = append(wars, e)
 	}
 	rows.Close()
 	if err := rows.Err(); err != nil {
-		return 0, err
+		return 0, fmt.Errorf("iterate war entries: %w", err)
 	}
 
 	var resolved int64

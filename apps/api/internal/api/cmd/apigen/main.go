@@ -74,7 +74,7 @@ func discoverServices(root string) ([]service, error) {
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("walk dir: %w", err)
 	}
 
 	return services, nil

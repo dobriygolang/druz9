@@ -2,6 +2,7 @@ package arena
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -54,7 +55,11 @@ func (s *Service) CreateMatch(ctx context.Context, creator *domain.User, topic s
 		UpdatedAt:   nowTime,
 	}
 
-	return s.repo.CreateMatch(ctx, match, player, task.StarterCode)
+	match, err := s.repo.CreateMatch(ctx, match, player, task.StarterCode)
+	if err != nil {
+		return nil, fmt.Errorf("create match: %w", err)
+	}
+	return match, nil
 }
 
 func (s *Service) GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, error) {
@@ -146,21 +151,31 @@ func (s *Service) JoinMatch(ctx context.Context, matchID uuid.UUID, user *domain
 	if match.Task != nil {
 		starterCode = match.Task.StarterCode
 	}
-	return s.repo.JoinMatch(ctx, matchID, player, starterCode)
+	match, err := s.repo.JoinMatch(ctx, matchID, player, starterCode)
+	if err != nil {
+		return nil, fmt.Errorf("join match: %w", err)
+	}
+	return match, nil
 }
 
 func (s *Service) SavePlayerCode(ctx context.Context, matchID uuid.UUID, user *domain.User, code string) error {
 	if user == nil || (isGuestUser(user) && !s.allowGuestAccess()) {
 		return domain.ErrGuestsNotSupported
 	}
-	return s.repo.SavePlayerCode(ctx, matchID, user.ID, code)
+	if err := s.repo.SavePlayerCode(ctx, matchID, user.ID, code); err != nil {
+		return fmt.Errorf("save player code: %w", err)
+	}
+	return nil
 }
 
 func (s *Service) SavePlayerCodes(ctx context.Context, matchID uuid.UUID, codes map[uuid.UUID]string) error {
 	if len(codes) == 0 {
 		return nil
 	}
-	return s.repo.SavePlayerCodes(ctx, matchID, codes)
+	if err := s.repo.SavePlayerCodes(ctx, matchID, codes); err != nil {
+		return fmt.Errorf("save player codes: %w", err)
+	}
+	return nil
 }
 
 func (s *Service) LeaveMatch(ctx context.Context, matchID uuid.UUID, user *domain.User) (*domain.Match, error) {
@@ -215,13 +230,25 @@ func (s *Service) LeaveMatch(ctx context.Context, matchID uuid.UUID, user *domai
 }
 
 func (s *Service) CleanupInactiveMatches(ctx context.Context, idleFor time.Duration) (int64, error) {
-	return s.repo.CleanupInactiveMatches(ctx, idleFor)
+	count, err := s.repo.CleanupInactiveMatches(ctx, idleFor)
+	if err != nil {
+		return 0, fmt.Errorf("cleanup inactive matches: %w", err)
+	}
+	return count, nil
 }
 
 func (s *Service) CleanupOldSubmissions(ctx context.Context, idleFor time.Duration) (int64, error) {
-	return s.repo.CleanupOldSubmissions(ctx, idleFor)
+	count, err := s.repo.CleanupOldSubmissions(ctx, idleFor)
+	if err != nil {
+		return 0, fmt.Errorf("cleanup old submissions: %w", err)
+	}
+	return count, nil
 }
 
 func (s *Service) CleanupFinishedEditorStates(ctx context.Context, idleFor time.Duration) (int64, error) {
-	return s.repo.CleanupFinishedEditorStates(ctx, idleFor)
+	count, err := s.repo.CleanupFinishedEditorStates(ctx, idleFor)
+	if err != nil {
+		return 0, fmt.Errorf("cleanup finished editor states: %w", err)
+	}
+	return count, nil
 }

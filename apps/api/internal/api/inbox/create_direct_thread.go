@@ -2,6 +2,7 @@ package inbox
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -12,11 +13,11 @@ import (
 func (i *Implementation) CreateDirectThread(ctx context.Context, req *v1.CreateDirectThreadRequest) (*v1.CreateDirectThreadResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	recipientID, err := apihelpers.ParseUUID(req.GetRecipientId(), "INVALID_RECIPIENT_ID", "recipient_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse recipient id: %w", err)
 	}
 	if recipientID == user.ID {
 		return nil, errors.BadRequest("INVALID_RECIPIENT", "cannot start a thread with yourself")

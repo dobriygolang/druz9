@@ -16,7 +16,7 @@ import (
 // response shape is identical to the public ListItems RPC.
 func (i *Implementation) AdminListItems(ctx context.Context, req *v1.AdminListItemsRequest) (*v1.ListItemsResponse, error) {
 	if _, err := apihelpers.RequireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require admin: %w", err)
 	}
 	p := apihelpers.ClampPage(req.GetLimit(), req.GetOffset(), 50, 200)
 	list, err := i.service.AdminListItems(ctx, model.ItemCategory(req.GetCategory()), model.ItemRarity(req.GetRarity()), p.Limit, p.Offset)
@@ -33,7 +33,7 @@ func (i *Implementation) AdminListItems(ctx context.Context, req *v1.AdminListIt
 
 func (i *Implementation) AdminCreateItem(ctx context.Context, req *v1.AdminCreateItemRequest) (*v1.ShopItem, error) {
 	if _, err := apihelpers.RequireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require admin: %w", err)
 	}
 	item := &model.ShopItem{
 		Slug:        req.GetSlug(),
@@ -59,7 +59,7 @@ func (i *Implementation) AdminCreateItem(ctx context.Context, req *v1.AdminCreat
 
 func (i *Implementation) AdminUpdateItem(ctx context.Context, req *v1.AdminUpdateItemRequest) (*v1.ShopItem, error) {
 	if _, err := apihelpers.RequireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require admin: %w", err)
 	}
 	id, err := apihelpers.ParseUUID(req.GetId(), "INVALID_ITEM_ID", "item_id")
 	if err != nil {
@@ -90,7 +90,7 @@ func (i *Implementation) AdminUpdateItem(ctx context.Context, req *v1.AdminUpdat
 
 func (i *Implementation) AdminDeleteItem(ctx context.Context, req *v1.AdminDeleteItemRequest) (*v1.AdminDeleteItemResponse, error) {
 	if _, err := apihelpers.RequireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require admin: %w", err)
 	}
 	id, err := apihelpers.ParseUUID(req.GetId(), "INVALID_ITEM_ID", "item_id")
 	if err != nil {

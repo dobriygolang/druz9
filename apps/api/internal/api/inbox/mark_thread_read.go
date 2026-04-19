@@ -2,6 +2,7 @@ package inbox
 
 import (
 	"context"
+	"fmt"
 	goerr "errors"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -14,11 +15,11 @@ import (
 func (i *Implementation) MarkThreadRead(ctx context.Context, req *v1.MarkThreadReadRequest) (*v1.MarkThreadReadResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	threadID, err := apihelpers.ParseUUID(req.GetThreadId(), "INVALID_THREAD_ID", "thread_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse thread id: %w", err)
 	}
 
 	unreadTotal, err := i.service.MarkThreadRead(ctx, user.ID, threadID)

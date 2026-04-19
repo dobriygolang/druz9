@@ -58,7 +58,11 @@ var (
 // GetBalance returns the user's full wallet. Creates a zero-balance row
 // for first-time callers so downstream callers never get ENOTFOUND.
 func (s *Service) GetBalance(ctx context.Context, userID uuid.UUID) (*model.WalletBalance, error) {
-	return s.repo.GetOrCreate(ctx, userID)
+	balance, err := s.repo.GetOrCreate(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("get balance: %w", err)
+	}
+	return balance, nil
 }
 
 // Debit subtracts `amount` from the chosen currency. Fails with
@@ -74,7 +78,11 @@ func (s *Service) Debit(
 	if currency < CurrencyGold || currency > CurrencyShards {
 		return nil, ErrInvalidCurrency
 	}
-	return s.repo.ChangeBalance(ctx, userID, currency, -amount, source, sourceID, reason)
+	balance, err := s.repo.ChangeBalance(ctx, userID, currency, -amount, source, sourceID, reason)
+	if err != nil {
+		return nil, fmt.Errorf("debit: %w", err)
+	}
+	return balance, nil
 }
 
 // Credit adds `amount` to the chosen currency. Used by mission-reward,
@@ -90,7 +98,11 @@ func (s *Service) Credit(
 	if currency < CurrencyGold || currency > CurrencyShards {
 		return nil, ErrInvalidCurrency
 	}
-	return s.repo.ChangeBalance(ctx, userID, currency, amount, source, sourceID, reason)
+	balance, err := s.repo.ChangeBalance(ctx, userID, currency, amount, source, sourceID, reason)
+	if err != nil {
+		return nil, fmt.Errorf("credit: %w", err)
+	}
+	return balance, nil
 }
 
 // ---------- Narrow adapter interfaces for domain callers ----------

@@ -6,6 +6,8 @@ func mapGuildMemberRole(role string) v1.GuildMemberRole {
 	switch role {
 	case "creator":
 		return v1.GuildMemberRole_GUILD_MEMBER_ROLE_CREATOR
+	case "officer":
+		return v1.GuildMemberRole_GUILD_MEMBER_ROLE_OFFICER
 	case "member":
 		return v1.GuildMemberRole_GUILD_MEMBER_ROLE_MEMBER
 	default:

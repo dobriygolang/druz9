@@ -2,6 +2,7 @@ package inbox
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -12,7 +13,7 @@ import (
 func (i *Implementation) GetUnreadCount(ctx context.Context, _ *v1.GetUnreadCountRequest) (*v1.GetUnreadCountResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	unread, err := i.service.GetUnreadCount(ctx, user.ID)
 	if err != nil {
